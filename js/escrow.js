@@ -295,7 +295,7 @@ class WaseetEscrowRoom {
             `;
             topPill.style.borderColor = '#ef4444';
             topPill.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.3)';
-        } else if (this.deal.currentStep >= 5) {
+        } else if (this.deal.status === 'completed' || this.deal.currentStep >= 4) {
             topPill.innerHTML = `
                 <span style="color: #10b981; font-weight: 700;"><i class="fas fa-check-double"></i> حالة الصفقة:</span>
                 <strong style="color: #10b981; font-family: var(--font-ar); font-size: 1.05rem;">مكتملة بنجاح 100% • تم تحرير الأرباح</strong>
@@ -317,7 +317,7 @@ class WaseetEscrowRoom {
         if (!banner || !this.deal) return;
 
         const isCancelled = this.deal.status === 'cancelled';
-        const isCompleted = this.deal.currentStep >= 5;
+        const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
         const buyerName = (this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
         const sellerName = (this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
         const pts = this.deal.totalPoints || 0;
@@ -382,11 +382,11 @@ class WaseetEscrowRoom {
             return;
         }
 
+        const pts = this.deal.totalPoints || 0;
         const steps = [
-            { num: 1, title: 'حجز النقاط', desc: 'تم حجز 33 نقطة بالمحفظة' },
-            { num: 2, title: 'فحص الوسيط', desc: 'أنت تفحص بيانات الدخول' },
-            { num: 3, title: 'نقل الملكية', desc: 'تغيير الربط وتأمين المشتري' },
-            { num: 4, title: 'تحرير الرصيد', desc: 'إرسال الأرباح وإنهاء الصفقة' }
+            { num: 1, title: 'حجز النقاط', desc: `تم حجز ${pts} نقطة بالخزينة` },
+            { num: 2, title: 'نقل الملكية', desc: 'تغيير الربط وتأمين المشتري' },
+            { num: 3, title: 'تحرير الرصيد', desc: 'إرسال الأرباح وإنهاء الصفقة' }
         ];
 
         pipelineContainer.innerHTML = steps.map(step => {
@@ -560,7 +560,7 @@ class WaseetEscrowRoom {
             backupCodes: 'غير محدد'
         };
         const isCancelled = this.deal.status === 'cancelled';
-        const isCompleted = this.deal.currentStep >= 5;
+        const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
 
         let actionButtonsHtml = '';
 
@@ -586,19 +586,13 @@ class WaseetEscrowRoom {
             `;
         } else {
             let nextBtn = '';
-            if (this.deal.currentStep === 2) {
+            if (this.deal.currentStep <= 2) {
                 nextBtn = `
-                    <button class="btn-3d btn-gold" style="width: 100%;" onclick="window.escrowRoom.advanceStep(3, 'تم فحص الحساب ومطابقة المواصفات بواسطة الوسيط المعتمد. جاري نقل الربط للمشتري.')">
-                        <i class="fas fa-user-check"></i> تأكيد صحة الحساب والمتابعة
-                    </button>
-                `;
-            } else if (this.deal.currentStep === 3) {
-                nextBtn = `
-                    <button class="btn-3d btn-orange" style="width: 100%;" onclick="window.escrowRoom.advanceStep(4, 'قام المشتري بتأكيد استلام الحساب وتغيير كلمة السر وربط إيميله بنجاح.')">
+                    <button class="btn-3d btn-gold glow-gold" style="width: 100%;" onclick="window.escrowRoom.advanceStep(3, 'الحساب مفحوص ومطابق للمواصفات مسبقاً قبل العرض. قام الوسيط بتسليم البيانات ونقل الربط للمشتري وتأمينه بنجاح.')">
                         <i class="fas fa-key"></i> تأكيد نقل الملكية للمشتري
                     </button>
                 `;
-            } else if (this.deal.currentStep === 4) {
+            } else if (this.deal.currentStep === 3) {
                 nextBtn = `
                     <button class="btn-3d btn-gold glow-gold" style="width: 100%;" onclick="window.escrowRoom.completeDeal()">
                         <i class="fas fa-coins"></i> تحرير الرصيد (${sellerPayout}$ للبائع + ${fee}$ عمولة المنصة)
@@ -609,7 +603,7 @@ class WaseetEscrowRoom {
             actionButtonsHtml = `
                 ${nextBtn}
                 <button class="btn-3d btn-danger-cancel" onclick="window.escrowRoom.cancelAndRefundDeal()">
-                    <i class="fas fa-undo-alt"></i> رفض الحساب وإلغاء الصفقة (استرجاع ${pts}$ للمشتري)
+                    <i class="fas fa-undo-alt"></i> إلغاء الصفقة واسترجاع ${pts}$ للمشتري
                 </button>
             `;
         }
@@ -651,7 +645,7 @@ class WaseetEscrowRoom {
 
     renderBuyerSideCard() {
         const isCancelled = this.deal.status === 'cancelled';
-        const isCompleted = this.deal.currentStep >= 5;
+        const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
         const creds = this.deal.credentials || {
             loginType: 'جوجل Gmail',
             email: 'buyer@gmail.com',
@@ -690,7 +684,7 @@ class WaseetEscrowRoom {
                         <i class="fas fa-crown text-gold" style="font-size: 2.3rem; margin-bottom: 0.5rem;"></i>
                         <h4 style="color: #fff; font-size: 1.15rem; margin-bottom: 0.4rem;">🎉 تهانينا! الحساب أصبح ملكك رسمياً</h4>
                         <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.7;">
-                            تم فحص الحساب بواسطة الوسيط المعتمد، وفك كافة الروابط القديمة للبائع وتثبيت بياناتك الشخصية بنجاح.
+                            تم فحص الحساب مسبقاً وتأكيد سلامته، وقام الوسيط المعتمد بفك كافة الروابط القديمة للبائع وتثبيت بياناتك الشخصية بنجاح.
                         </p>
                     </div>
                     <div class="delivery-credentials-card">
@@ -713,7 +707,7 @@ class WaseetEscrowRoom {
                     <i class="fas fa-lock text-orange" style="font-size: 2.2rem; margin-bottom: 0.6rem;"></i>
                     <h4 style="color: #fff; font-size: 1.05rem; margin-bottom: 0.4rem;">بيانات الدخول محمية ومحجوبة عنك حالياً</h4>
                     <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.7;">
-                        الوسيط المعتمد يقوم الآن بفحص الحساب والتأكد من مطابقة المواصفات والأسلحة وفك الروابط السابقة. لن تُسلّم بيانات الدخول إلا بعد التأكد التام من سلامة الحساب لتفادي أي محاولة احتيال.
+                        الحساب تم فحصه واعتماده مسبقاً قبل عرضه في المتجر. يقوم الوسيط المعتمد الآن بنقل الربط وتغيير بيانات الدخول وتأمين الحساب باسمك 100%. لن يُحرر أي رصيد للبائع إلا بعد استلامك التام للحساب.
                     </p>
                 </div>
                 <div class="deal-receipt-summary">
@@ -727,7 +721,7 @@ class WaseetEscrowRoom {
 
     renderSellerSideCard() {
         const isCancelled = this.deal.status === 'cancelled';
-        const isCompleted = this.deal.currentStep >= 5;
+        const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
 
         if (isCancelled) {
             return `
@@ -982,7 +976,7 @@ class WaseetEscrowRoom {
 
     async completeDeal() {
         this.deal.status = 'completed';
-        this.deal.currentStep = 5;
+        this.deal.currentStep = 4;
 
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;

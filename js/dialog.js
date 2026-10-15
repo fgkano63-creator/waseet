@@ -118,6 +118,63 @@ class WaseetDialogManager {
         }, 200);
     }
 
+    prompt({
+        title = 'إدخال البيانات',
+        message = '',
+        defaultValue = '',
+        okText = 'تأكيد',
+        cancelText = 'إلغاء'
+    }) {
+        return new Promise((resolve) => {
+            const titleEl = document.getElementById('waseet-dialog-title');
+            const bodyEl = document.getElementById('waseet-dialog-body');
+            const iconWrap = document.getElementById('waseet-dialog-icon-wrap');
+            const iconEl = document.getElementById('waseet-dialog-icon');
+            const actionsEl = document.getElementById('waseet-dialog-actions');
+            const boxEl = document.getElementById('waseet-dialog-box');
+
+            if (titleEl) titleEl.innerText = title;
+            if (bodyEl) {
+                bodyEl.innerHTML = `
+                    <div style="margin-bottom: 0.8rem; font-size: 0.92rem; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>
+                    <textarea id="waseet-prompt-input" class="input-3d" style="width: 100%; min-height: 85px; padding: 0.75rem; border-radius: 10px; font-family: var(--font-ar); font-size: 0.9rem; resize: vertical;" placeholder="اكتب هنا...">${defaultValue}</textarea>
+                `;
+            }
+
+            if (iconWrap) {
+                iconWrap.className = 'waseet-dialog-icon-circle waseet-dialog-icon-warning';
+            }
+            if (iconEl) {
+                iconEl.className = 'fas fa-exclamation-triangle';
+            }
+
+            actionsEl.innerHTML = `
+                <button class="btn-3d btn-gold" id="waseet-dialog-prompt-ok" style="min-width: 120px;">${okText}</button>
+                <button class="btn-3d btn-outline" id="waseet-dialog-prompt-cancel" style="min-width: 90px;">${cancelText}</button>
+            `;
+
+            document.getElementById('waseet-dialog-prompt-ok').onclick = () => {
+                const inp = document.getElementById('waseet-prompt-input');
+                const val = inp ? inp.value : '';
+                this.close();
+                resolve(val);
+            };
+
+            document.getElementById('waseet-dialog-prompt-cancel').onclick = () => {
+                this.close();
+                resolve(null);
+            };
+
+            this.overlay.classList.add('active');
+            boxEl.classList.remove('animate-out');
+            boxEl.classList.add('animate-in');
+            setTimeout(() => {
+                const inp = document.getElementById('waseet-prompt-input');
+                if (inp) inp.focus();
+            }, 100);
+        });
+    }
+
     /**
      * Mediator Authentication - Client-side login disabled for security
      */
@@ -152,6 +209,16 @@ window.waseetConfirm = function(title, message, confirmText = 'نعم، تأكي
         type,
         isConfirm: true,
         confirmText,
+        cancelText
+    });
+};
+
+window.waseetPrompt = function(title, message, defaultValue = '', okText = 'تأكيد', cancelText = 'إلغاء') {
+    return window.waseetDialogManager.prompt({
+        title,
+        message,
+        defaultValue,
+        okText,
         cancelText
     });
 };

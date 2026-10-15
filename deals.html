@@ -314,6 +314,7 @@
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/supabase.js"></script>
+    <script src="js/calculator.js"></script>
     <script src="js/data.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/dialog.js"></script>
@@ -573,6 +574,78 @@
                     userHtml += myDeals.map((deal, idx) => buildDealCardHtml(deal, idx, false)).join('');
                 }
 
+                // Seller Accounts Section (Requirement: show listed accounts, pending review, approved, rejected)
+                const myAccounts = (WASEET_STATE.accounts || []).filter(a => {
+                    return (user && a.sellerId && a.sellerId === user.id) ||
+                           (user && a.sellerName && a.sellerName === user.name) ||
+                           (user && a.sellerEmail && a.sellerEmail === user.email);
+                });
+
+                if (myAccounts.length > 0) {
+                    userHtml += `
+                        <div style="margin-top: 2.5rem; margin-bottom: 1.2rem;">
+                            <h3 style="font-size: 1.2rem; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 0.6rem;">
+                                <i class="fas fa-tags text-gold"></i> حساباتك المعروضة للبيع وحالتها (${myAccounts.length})
+                            </h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                            ${myAccounts.map(acc => {
+                                let badgeHtml = '';
+                                if (acc.status === 'pending_review') {
+                                    badgeHtml = `
+                                        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid #f59e0b; border-radius: 12px; padding: 0.75rem 1rem; margin-top: 0.8rem; color: #f59e0b; font-size: 0.88rem; line-height: 1.6;">
+                                            <i class="fas fa-clock"></i> <strong>قيد الفحص (أقل من 24 ساعة):</strong> الحساب قيد الفحص، وعند إنهائه سيتم وضعه في السوق والمراجعة تكون في أقل من 24 ساعة.
+                                        </div>
+                                    `;
+                                } else if (acc.status === 'rejected') {
+                                    badgeHtml = `
+                                        <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; border-radius: 12px; padding: 0.75rem 1rem; margin-top: 0.8rem; color: #ef4444; font-size: 0.88rem; line-height: 1.6;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                <strong>تم رفض وحذف هذا الحساب من السوق</strong>
+                                            </div>
+                                            <div style="color: #fff; font-weight: 700;">سبب الرفض المسجل من الوسيط:</div>
+                                            <div style="color: var(--silver-light); margin-top: 2px;">${acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.'}</div>
+                                        </div>
+                                    `;
+                                } else if (acc.status === 'available') {
+                                    badgeHtml = `
+                                        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid #10b981; border-radius: 12px; padding: 0.75rem 1rem; margin-top: 0.8rem; color: #10b981; font-size: 0.88rem; line-height: 1.6;">
+                                            <i class="fas fa-check-circle"></i> <strong>معروض في السوق ومفحوص:</strong> الحساب تم فحصه واعتماده بنجاح وهو متاح للشراء في المتجر الآن.
+                                        </div>
+                                    `;
+                                } else {
+                                    badgeHtml = `
+                                        <div style="background: rgba(234, 88, 12, 0.12); border: 1px solid var(--orange-primary); border-radius: 12px; padding: 0.75rem 1rem; margin-top: 0.8rem; color: var(--orange-bright); font-size: 0.88rem; line-height: 1.6;">
+                                            <i class="fas fa-handshake"></i> <strong>جارية في صفقة وساطة:</strong> يوجد مشتري يحجز نقاط الحساب حالياً.
+                                        </div>
+                                    `;
+                                }
+
+                                return `
+                                    <div class="deal-row-card" style="padding: 1.2rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+                                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                                <img src="${acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200'}" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold-primary);" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200'">
+                                                <div>
+                                                    <div style="font-weight: 800; color: #fff; font-size: 1.05rem;">#${acc.accountNumber || acc.id} - ${acc.title}</div>
+                                                    <div style="color: var(--silver-muted); font-size: 0.82rem; margin-top: 2px;">
+                                                        ${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'} • ليفل ${acc.level || 50} • طريقة الدخول: ${acc.loginType === 'google' ? 'Google' : 'Facebook'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="font-family: var(--font-en); font-weight: 900; color: var(--gold-light); font-size: 1.25rem;">
+                                                $${acc.sellerPrice} <span style="font-size: 0.8rem; color: var(--silver-muted);">(صافي ربحك)</span>
+                                            </div>
+                                        </div>
+                                        ${badgeHtml}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+
                 // Switch to Mediator Gate
                 userHtml += `
                     <div style="margin-top: 2.5rem; background: rgba(12, 15, 24, 0.75); border: 1px dashed rgba(234, 88, 12, 0.4); border-radius: 16px; padding: 1.5rem; text-align: center;">
@@ -627,6 +700,58 @@
                     </div>
                 </div>
             `;
+
+            // Pending Review Accounts Section for Mediator (Requirement 1 & 2)
+            const pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_review');
+            if (pendingAccounts.length > 0) {
+                html += `
+                    <div style="margin-bottom: 2.5rem; background: rgba(245, 158, 11, 0.07); border: 2px solid rgba(245, 158, 11, 0.4); border-radius: 20px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.6rem;">
+                            <h2 style="font-size: 1.25rem; font-weight: 800; color: #f59e0b; display: flex; align-items: center; gap: 0.6rem;">
+                                <i class="fas fa-clipboard-check"></i> حسابات معروضة بانتظار فحص الوسيط (المراجعة في أقل من 24h)
+                                <span style="font-size: 0.85rem; background: rgba(245,158,11,0.25); color: #f59e0b; border: 1px solid #f59e0b; padding: 2px 10px; border-radius: 999px;">
+                                    ${pendingAccounts.length} حساب
+                                </span>
+                            </h2>
+                            <span style="color: var(--silver-muted); font-size: 0.85rem;">يجب فحص الحساب ومطابقة بياناته قبل ظهوره في المتجر للمشترين</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            ${pendingAccounts.map(acc => {
+                                const pricing = (typeof calculateWaseetFee === 'function') ? calculateWaseetFee(acc.sellerPrice) : { fee: 3, buyerPrice: acc.sellerPrice + 3 };
+                                return `
+                                    <div class="deal-row-card" style="border-color: rgba(245, 158, 11, 0.35); background: rgba(14, 18, 28, 0.95); margin-bottom: 0;">
+                                        <div class="deal-row-top">
+                                            <div class="deal-account-heading">
+                                                <span class="deal-num-tag" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #f59e0b;">
+                                                    حساب #${acc.accountNumber || acc.id}
+                                                </span>
+                                                <span style="color: #fff;">${acc.title}</span>
+                                            </div>
+                                            <div class="deal-amount-tag">
+                                                $${acc.sellerPrice} <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice} نقطة)</span>
+                                            </div>
+                                        </div>
+                                        <div class="deal-parties-grid">
+                                            <div><i class="fas fa-store text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName}</strong></div>
+                                            <div><i class="fas fa-gamepad text-silver"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></div>
+                                            <div><i class="fas fa-sign-in-alt text-orange"></i> طريقة الدخول: <strong style="color: #fff;">${acc.loginType === 'google' ? 'Google' : 'Facebook'}</strong></div>
+                                            <div><i class="fas fa-layer-group text-gold"></i> الليفل: <strong style="color: #fff;">Lv.${acc.level || 50} • برايم ${acc.primeLevel || 1}</strong></div>
+                                        </div>
+                                        <div style="display: flex; gap: 0.8rem; justify-content: flex-end; flex-wrap: wrap;">
+                                            <button class="btn-3d btn-outline" onclick="rejectPendingAccount('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+                                                <i class="fas fa-trash-alt"></i> حذف هذا الحساب (تحايل / غير صحيح)
+                                            </button>
+                                            <button class="btn-3d" onclick="approvePendingAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+                                                <i class="fas fa-check-circle"></i> فحص الحساب واعتماده ونشره في السوق
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
 
             // Active Deals Section Header
             html += `
@@ -689,7 +814,7 @@
         }
 
         function buildDealCardHtml(deal, idx, isCompleted) {
-            const stepText = deal.stageText || `المرحلة ${deal.currentStep}: فحص بيانات الدخول والروابط`;
+            const stepText = deal.stageText || `المرحلة ${deal.currentStep}: نقل الملكية للمشتري وتأمين الحساب`;
             const isCancelled = deal.status === 'cancelled';
             const statusColor = isCancelled ? '#ef4444' : (isCompleted ? '#10b981' : 'var(--gold-light)');
             const statusText = isCancelled ? 'ملغاة • تم استرجاع النقاط للمشتري' : (isCompleted ? 'مكتملة بنجاح 100% • تم تحرير الأرباح ✅' : stepText);
@@ -734,6 +859,81 @@
                     </a>
                 </div>
             `;
+        }
+
+        async function approvePendingAccount(accId) {
+            const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+            if (!acc) return;
+
+            acc.status = 'available';
+            acc.reviewStatus = 'approved';
+            acc.approvedAt = new Date().toISOString();
+
+            try {
+                const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const idx = savedAccounts.findIndex(a => a.id === accId);
+                if (idx !== -1) {
+                    savedAccounts[idx].status = 'available';
+                    savedAccounts[idx].reviewStatus = 'approved';
+                    savedAccounts[idx].approvedAt = acc.approvedAt;
+                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
+                }
+            } catch(e) { console.warn(e); }
+
+            saveWaseetData();
+            renderDealsView();
+
+            if (typeof window.waseetAlert === 'function') {
+                await window.waseetAlert(
+                    'تم اعتماد الحساب ونشره في السوق',
+                    `تم فحص الحساب #${acc.accountNumber || acc.id} بنجاح واعتماده رسمياً، وأصبح متاحاً الآن أمام كافة المشترين في متجر WASEET.`,
+                    'success'
+                );
+            }
+        }
+
+        async function rejectPendingAccount(accId) {
+            const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+            if (!acc) return;
+
+            let reason = 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.';
+            if (typeof window.waseetPrompt === 'function') {
+                const userReason = await window.waseetPrompt(
+                    'سبب حذف ورفض الحساب',
+                    'اكتب سبب رفض الحساب ليظهر للبائع في قائمة حساباته المعروضة:',
+                    reason
+                );
+                if (userReason === null) return;
+                if (userReason && userReason.trim()) reason = userReason.trim();
+            }
+
+            acc.status = 'rejected';
+            acc.reviewStatus = 'rejected';
+            acc.rejectionReason = reason;
+            acc.rejectedAt = new Date().toISOString();
+
+            try {
+                const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const idx = savedAccounts.findIndex(a => a.id === accId);
+                if (idx !== -1) {
+                    savedAccounts[idx].status = 'rejected';
+                    savedAccounts[idx].reviewStatus = 'rejected';
+                    savedAccounts[idx].rejectionReason = reason;
+                    savedAccounts[idx].rejectedAt = acc.rejectedAt;
+                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
+                }
+            } catch(e) { console.warn(e); }
+
+            saveWaseetData();
+            renderDealsView();
+
+            if (typeof window.waseetAlert === 'function') {
+                await window.waseetAlert(
+                    'تم حذف الحساب وإشعار البائع',
+                    `تم حذف الحساب #${acc.accountNumber || acc.id} من المتجر بنجاح وإشعار البائع بالسبب: "${reason}".`,
+                    'warning'
+                );
+            }
         }
 
         function loginAsMediatorAndReload() {

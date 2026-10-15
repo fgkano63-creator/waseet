@@ -73,6 +73,17 @@ class WaseetApp {
             }
         }
 
+        // Show/Hide Seller Listings Button
+        const sellerListingsBtn = document.getElementById('btn-seller-listings');
+        if (sellerListingsBtn) {
+            if (user && !isMediatorUser(user)) {
+                sellerListingsBtn.style.display = 'inline-flex';
+            } else {
+                sellerListingsBtn.style.display = 'none';
+            }
+        }
+        this.updateSellerListingsCounter();
+
         if (!container) return;
 
         if (user) {
@@ -163,6 +174,11 @@ class WaseetApp {
         if (authActions) {
             if (user) {
                 authActions.innerHTML = `
+                    ${!isMediatorUser(user) ? `
+                        <button class="btn-3d btn-outline" onclick="window.waseetApp.openSellerListingsModal(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: #fff;">
+                            <i class="fas fa-boxes text-gold"></i> حساباتي المعروضة للبيع
+                        </button>
+                    ` : ''}
                     <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetApp.closeMobileDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
                     </button>
@@ -349,10 +365,9 @@ class WaseetApp {
             const stepTitles = [
                 'المرحلة 0: ملغاة',
                 'المرحلة 1: حجز النقاط وتأكيد الطلب',
-                'المرحلة 2: فحص بيانات الدخول والروابط',
-                'المرحلة 3: نقل الملكية للمشتري وتأمين الحساب',
-                'المرحلة 4: تحرير الرصيد وإرسال الأرباح',
-                'المرحلة 5: مكتملة بنجاح 100%'
+                'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب',
+                'المرحلة 3: تحرير الرصيد وإرسال الأرباح',
+                'المرحلة 4: مكتملة بنجاح 100%'
             ];
             const currentTitle = stepTitles[deal.currentStep] || deal.stageText;
 
@@ -520,15 +535,31 @@ class WaseetApp {
     }
 
     renderMarketplace(filteredAccounts = null) {
-        if (filteredAccounts !== null) {
-            this.currentFilteredAccounts = filteredAccounts;
-            this.currentPage = 1; // reset to page 1 on new filter
-        } else {
-            this.currentFilteredAccounts = [...WASEET_STATE.accounts];
+        const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
+        const currentUser = WASEET_STATE.user;
+
+        let baseAccounts = filteredAccounts !== null ? filteredAccounts : [...WASEET_STATE.accounts];
+
+        // Public filter:
+        // Visitors & normal buyers only see approved/available accounts
+        // The mediator sees ALL accounts (including pending_review & rejected)
+        // Sellers can also see their own pending_review accounts in the marketplace or in their dashboard
+        if (!isMediator) {
+            baseAccounts = baseAccounts.filter(a => {
+                if (a.status === 'available' || !a.status) return true;
+                if (currentUser && (a.sellerId === currentUser.id || a.sellerName === currentUser.name)) {
+                    return a.status !== 'rejected';
+                }
+                return false;
+            });
         }
+
+        this.currentFilteredAccounts = baseAccounts;
+        this.currentPage = (filteredAccounts !== null) ? 1 : (this.currentPage || 1);
 
         this.renderMarketplaceCardsOnly();
         this.renderPagination();
+        this.updateSellerListingsCounter();
     }
 
     renderMarketplaceCardsOnly() {
@@ -536,6 +567,7 @@ class WaseetApp {
         const counterEl = document.getElementById('accounts-total-counter');
         if (!grid) return;
 
+        const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
         const accounts = this.currentFilteredAccounts;
         const total = accounts.length;
 
@@ -543,7 +575,7 @@ class WaseetApp {
             grid.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--silver-muted);">
                     <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--gold-primary);"></i>
-                    <p style="font-size: 1.1rem;">لا توجد حسابات مطابقة لهذه الفلاتر حالياً.</p>
+                    <p style="font-size: 1.1rem;">لا توجد حسابات معروضة حالياً.</p>
                 </div>
             `;
             if (counterEl) counterEl.innerText = '0 حسابات';
@@ -559,7 +591,7 @@ class WaseetApp {
             counterEl.innerText = `عرض ${startIdx + 1}-${Math.min(endIdx, total)} من أصل ${total} حساب (صفحة ${this.currentPage})`;
         }
 
-        grid.innerHTML = pageAccounts.map(acc => {
+        grid.innerHTML = pageAccounts.map((acc, index) => {
             const pricing = calculateWaseetFee(acc.sellerPrice);
             const loginIcon = acc.loginType === 'google' ? 'fab fa-google text-orange' : 'fab fa-facebook text-silver';
             const loginName = acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك';
@@ -573,7 +605,6 @@ class WaseetApp {
                 ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${acc.iconicPants[0]}</span>`
                 : '';
 
-            // Requirement 3 & 7: Organized Account number badge replacing primary link badge
             const accNum = acc.accountNumber || (index + 1001);
             let primeBadgeHtml = '';
             if (acc.game === 'free_fire') {
@@ -582,13 +613,21 @@ class WaseetApp {
                 primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff; border: 1px solid var(--gold-light);"><i class="fas fa-award"></i> ${acc.badge}</div>`;
             }
 
-            // Prominent Account Number Tag replacing the primary link badge (Requirement 3)
             const accountNumBadgeHtml = `<div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${accNum}</div>`;
+
+            // Status Badge for pending review or rejected
+            let statusTagHtml = '';
+            if (acc.status === 'pending_review') {
+                statusTagHtml = `<div class="pending-review-banner" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(245, 158, 11, 0.95); color: #000; font-weight: 800; font-size: 0.72rem; padding: 3px 9px; border-radius: 6px; box-shadow: 0 0 10px rgba(245,158,11,0.5);"><i class="fas fa-clock"></i> قيد الفحص (أقل من 24h)</div>`;
+            } else if (acc.status === 'rejected') {
+                statusTagHtml = `<div class="rejected-banner" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(239, 68, 68, 0.95); color: #fff; font-weight: 800; font-size: 0.72rem; padding: 3px 9px; border-radius: 6px;"><i class="fas fa-ban"></i> مرفوض</div>`;
+            }
 
             return `
                 <div class="account-card-3d card-3d">
                     <div class="card-media" onclick="window.waseetApp.openCardDeck('${acc.id}')" style="cursor: pointer;" title="انقر لعرض صور الحساب مع كامل التفاصيل">
                         <img src="${imagesList[0]}" alt="${acc.title}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        ${statusTagHtml}
                         ${primeBadgeHtml}
                         ${accountNumBadgeHtml}
                         <div class="level-tag">
@@ -611,9 +650,20 @@ class WaseetApp {
                                 <span class="price-sub">صافي البائع: $${pricing.sellerPrice} + عمولة $${pricing.fee}</span>
                                 <span class="price-main">${pricing.buyerPrice} <span style="font-size: 0.9rem; color: var(--gold-light);">نقطة</span></span>
                             </div>
-                            <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
-                                <i class="fas fa-shield-alt"></i> طلب وساطة
-                            </button>
+                            ${isMediator ? `
+                                <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                                    <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.45rem 0.75rem; font-size: 0.82rem;" title="فحص بيانات ومواصفات الحساب">
+                                        <i class="fas fa-search-plus"></i> فحص الحساب
+                                    </button>
+                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.45rem 0.65rem; font-size: 0.8rem;" title="حذف هذا الحساب للاشتباه في احتيال أو بيانات غير صحيحة">
+                                        <i class="fas fa-trash-alt"></i> حذف هذا الحساب
+                                    </button>
+                                </div>
+                            ` : `
+                                <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
+                                    <i class="fas fa-shield-alt"></i> طلب وساطة
+                                </button>
+                            `}
                         </div>
                     </div>
                 </div>
@@ -774,13 +824,22 @@ class WaseetApp {
                     <span class="price-sub">صافي البائع: $${pricing.sellerPrice} + عمولة الوساطة: $${pricing.fee}</span>
                     <span class="price-main" style="font-size: 1.6rem;">${pricing.buyerPrice} <span style="font-size: 1rem; color: var(--gold-light);">نقطة ($${pricing.buyerPrice})</span></span>
                 </div>
-                <div style="display: flex; gap: 0.8rem;">
+                <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
                     <a href="${WASEET_STATE.activeDeal ? 'chat.html?dealId=' + WASEET_STATE.activeDeal.id : 'chat.html'}" class="btn-3d btn-outline" style="text-decoration: none;">
                         <i class="fas fa-comments"></i> استفسار بالشات
                     </a>
-                    <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
-                        <i class="fas fa-shield-alt"></i> طلب وساطة فوري للشراء
-                    </button>
+                    ${isMediator ? `
+                        <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}'); document.getElementById('modal-card-deck').classList.remove('active');" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.1rem; font-size: 0.95rem;">
+                            <i class="fas fa-search-plus"></i> فحص الحساب
+                        </button>
+                        <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}'); document.getElementById('modal-card-deck').classList.remove('active');" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 0.95rem; font-size: 0.95rem;">
+                            <i class="fas fa-trash-alt"></i> حذف هذا الحساب
+                        </button>
+                    ` : `
+                        <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
+                            <i class="fas fa-shield-alt"></i> طلب وساطة فوري للشراء
+                        </button>
+                    `}
                 </div>
             </div>
         `;
@@ -1110,7 +1169,10 @@ class WaseetApp {
                     images: finalImages,
                     badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
                     featured: false,
-                    status: 'available'
+                    status: 'pending_review',
+                    submittedAt: new Date().toISOString(),
+                    reviewStatus: 'pending',
+                    reviewMessage: 'الحساب قيد الفحص والتدقيق من قبل الوسيط المعتمد. المراجعة تكون في أقل من 24 ساعة.'
                 };
 
                 WASEET_STATE.accounts.unshift(newAccount);
@@ -1122,6 +1184,7 @@ class WaseetApp {
                 } catch(e) { console.warn('Could not save account', e); }
                 saveWaseetData();
                 this.renderMarketplace();
+                this.updateSellerListingsCounter();
 
                 // Reset and close
                 this.uploadedImages = [];
@@ -1130,9 +1193,9 @@ class WaseetApp {
                 form.reset();
 
                 await waseetAlert(
-                    'تم نشر الحساب بنجاح!',
-                    `تم إدراج حسابك بنجاح في متجر WASEET مع ${finalImages.length} صور تم إعدادها كـ أوراق لعب ثلاثية الأبعاد!`,
-                    'success'
+                    'الحساب قيد الفحص (أقل من 24 ساعة)',
+                    'تم استلام بيانات حسابك بنجاح وهو الآن قيد الفحص والتدقيق من قبل الوسيط المعتمد.\n\nعند إنهاء الفحص والتأكد من صحة البيانات سيتم وضعه ونشره فوراً في السوق المفتوح. تتم المراجعة عادةً في أقل من 24 ساعة.\n\nيمكنك متابعة حالة حسابك من زر "حساباتي المعروضة".',
+                    'info'
                 );
             });
         }
@@ -1288,7 +1351,7 @@ class WaseetApp {
                 totalPoints: pricing.buyerPrice,
                 currentStep: 2,
                 status: 'active',
-                stageText: 'المرحلة 2: فحص بيانات الدخول والروابط بواسطة الوسيط',
+                stageText: 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب (الحساب مفحوص ومعتمد)',
                 credentials: {
                     email: 'seller_' + acc.id + '@gmail.com',
                     password: '•••••••••••• (محمية ومطابقة)',
@@ -1297,14 +1360,14 @@ class WaseetApp {
                     backupCodes: '8912-4410, 6721-9981'
                 },
                 sellerMessages: [
-                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice} نقطة لشراء الحساب.`, time: '12:00' },
-                    { sender: 'seller', name: acc.sellerName + ' (البائع)', text: 'مرحباً بالوسيط، قمت برفع بيانات الحساب (الإيميل ورمز الدخول). الحساب نظيف تماماً.', time: '12:02' },
-                    { sender: 'mediator', name: 'أنت (الوسيط)', text: 'أهلاً بك، أقوم الآن بفحص الحساب والتأكد من مطابقة السكنات والروابط.', time: '12:04' }
+                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice} نقطة لشراء الحساب المفحوص والمعتمد.`, time: '12:00' },
+                    { sender: 'seller', name: acc.sellerName + ' (البائع)', text: 'مرحباً بالوسيط، الحساب مفحوص وجاهز لنقل الربط وتسليم الإيميل للمشتري.', time: '12:02' },
+                    { sender: 'mediator', name: 'أنت (الوسيط)', text: 'أهلاً بك، الحساب تم التحقق منه مسبقاً، سأقوم الآن بنقل الربط وتأمينه للمشتري.', time: '12:04' }
                 ],
                 buyerMessages: [
                     { sender: 'system', text: `تم حجز ${pricing.buyerPrice} نقطة بنجاح في خزينة الوساطة الآمنة.`, time: '12:00' },
-                    { sender: 'buyer', name: WASEET_STATE.user.name + ' (المشتري)', text: 'مرحباً بالوسيط، تم حجز النقاط. بانتظار فحص الحساب والتأكد من بياناته.', time: '12:03' },
-                    { sender: 'mediator', name: 'الوسيط المعتمد', text: 'أهلاً بك، أموالك مؤمنة بالكامل في الخزينة، جاري فحص الحساب ومطابقة المواصفات.', time: '12:05' }
+                    { sender: 'buyer', name: WASEET_STATE.user.name + ' (المشتري)', text: 'مرحباً بالوسيط، تم حجز النقاط. بانتظار نقل الربط واستلام بيانات الحساب المفحوص.', time: '12:03' },
+                    { sender: 'mediator', name: 'الوسيط المعتمد', text: 'أهلاً بك، أموالك مؤمنة بالكامل في الخزينة، الحساب مفحوص مسبقاً وجاري تأمين نقله إليك.', time: '12:05' }
                 ]
             };
 
@@ -1396,6 +1459,298 @@ class WaseetApp {
             `تم شحن ${amount} نقطة بنجاح إلى محفظتك الآمنة عبر [${paymentMethod}]!\nالرصيد المتاح الآن: ${WASEET_STATE.user.wallet.available} نقطة ($${WASEET_STATE.user.wallet.available}).`,
             'success'
         );
+    }
+
+    /* ==========================================================================
+       SELLER LISTINGS & MEDIATOR INSPECTION SYSTEM
+       ========================================================================== */
+
+    updateSellerListingsCounter() {
+        const badge = document.getElementById('seller-listings-count');
+        const user = WASEET_STATE.user;
+        if (!badge || !user) {
+            if (badge) badge.style.display = 'none';
+            return;
+        }
+
+        const myAccounts = (WASEET_STATE.accounts || []).filter(a => a.sellerId === user.id || a.sellerName === user.name);
+        if (myAccounts.length > 0) {
+            badge.innerText = myAccounts.length;
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    openSellerListingsModal() {
+        const user = WASEET_STATE.user;
+        if (!user) {
+            this.openLoginModal();
+            return;
+        }
+
+        const modal = document.getElementById('modal-seller-listings');
+        const body = document.getElementById('seller-listings-modal-body');
+        if (!modal || !body) return;
+
+        const myAccounts = (WASEET_STATE.accounts || []).filter(a => a.sellerId === user.id || a.sellerName === user.name);
+
+        if (myAccounts.length === 0) {
+            body.innerHTML = `
+                <div style="text-align: center; padding: 3rem 1rem; color: var(--silver-muted);">
+                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gold-primary); opacity: 0.7;"></i>
+                    <h4 style="color: #fff; font-size: 1.15rem; margin-bottom: 0.5rem;">ليس لديك حسابات معروضة حالياً</h4>
+                    <p style="font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.5rem;">
+                        يمكنك عرض حسابك للبيع عبر المنصة وسيقوم الوسيط المعتمد بفحصه ومراجعته في أقل من 24 ساعة ونشره في السوق.
+                    </p>
+                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings').classList.remove('active'); window.waseetApp.openSellModal();">
+                        <i class="fas fa-plus-circle"></i> عرض حساب جديد للبيع
+                    </button>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="font-size: 0.95rem; color: var(--silver-muted);">
+                        إجمالي حساباتك المسجلة: <strong style="color: #fff;">${myAccounts.length}</strong>
+                    </div>
+                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings').classList.remove('active'); window.waseetApp.openSellModal();" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+                        <i class="fas fa-plus-circle"></i> إضافة حساب آخر
+                    </button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    ${myAccounts.map(acc => {
+                        let statusBadge = '';
+                        let statusNote = '';
+                        if (acc.status === 'pending_review') {
+                            statusBadge = '<span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)</span>';
+                            statusNote = '<div style="background: rgba(245, 158, 11, 0.08); border-right: 3px solid #f59e0b; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: var(--silver-light); margin-top: 0.6rem;"><i class="fas fa-info-circle text-orange"></i> الحساب قيد المراجعة والتدقيق الأمني من قبل الوسيط المعتمد للتأكد من نظافة الروابط وخلوه من المشاكل قبل عرضه للمشترين.</div>';
+                        } else if (acc.status === 'rejected') {
+                            statusBadge = '<span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-times-circle"></i> تم رفض الحساب</span>';
+                            const reasonText = acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لشروط المنصة.';
+                            statusNote = `<div style="background: rgba(239, 68, 68, 0.12); border-right: 3px solid #ef4444; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: #fca5a5; margin-top: 0.6rem;"><i class="fas fa-exclamation-triangle"></i> <strong>سبب الرفض:</strong> ${reasonText}</div>`;
+                        } else {
+                            statusBadge = '<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-check-circle"></i> معروض ومتاح في السوق</span>';
+                            statusNote = '<div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: #a7f3d0; margin-top: 0.6rem;"><i class="fas fa-store"></i> تم فحص الحساب واعتماده وهو معروض للبيع الآن.</div>';
+                        }
+
+                        const img = (acc.images && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400';
+                        const accNum = acc.accountNumber || acc.id;
+
+                        return `
+                            <div style="background: rgba(16, 20, 32, 0.85); border: 1px solid var(--border-metal); border-radius: 12px; padding: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <img src="${img}" alt="${acc.title}" style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary);" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                                <div style="flex: 1; min-width: 240px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+                                        <h4 style="color: #fff; font-size: 0.98rem; margin: 0;">${acc.title} <span style="color: var(--gold-primary); font-size: 0.85rem;">#${accNum}</span></h4>
+                                        ${statusBadge}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: var(--silver-muted);">
+                                        السعر الصافي لك: <strong style="color: var(--gold-light);">$${acc.sellerPrice}</strong> • السيرفر: ${acc.server || 'الشرق الأوسط'} • طريقة الدخول: ${acc.loginType === 'google' ? 'Google' : 'Facebook'}
+                                    </div>
+                                    ${statusNote}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        modal.classList.add('active');
+    }
+
+    inspectAccount(accId) {
+        if (!isMediatorUser()) {
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('صلاحية مطلوبة', 'فحص الحسابات مخصص فقط للوسيط المعتمد للمنصة.', 'danger');
+            }
+            return;
+        }
+
+        const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+        if (!acc) return;
+
+        const modal = document.getElementById('modal-inspect-account');
+        const body = document.getElementById('inspect-account-modal-body');
+        if (!modal || !body) return;
+
+        const pricing = calculateWaseetFee(acc.sellerPrice);
+        const imagesList = (acc.images && acc.images.length > 0) ? acc.images : [acc.image];
+
+        let statusText = 'قيد الفحص (أقل من 24 ساعة)';
+        let statusColor = '#f59e0b';
+        if (acc.status === 'available') {
+            statusText = 'معروض في السوق ومفحوص';
+            statusColor = '#10b981';
+        } else if (acc.status === 'rejected') {
+            statusText = 'مرفوض ومحذوف';
+            statusColor = '#ef4444';
+        }
+
+        body.innerHTML = `
+            <div style="background: rgba(197, 160, 89, 0.08); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <span style="font-size: 1.05rem; font-weight: 800; color: #fff;">#${acc.accountNumber || acc.id} - ${acc.title}</span>
+                    <span style="background: ${statusColor}22; color: ${statusColor}; border: 1px solid ${statusColor}; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">
+                        ${statusText}
+                    </span>
+                </div>
+                <div style="font-size: 0.88rem; color: var(--silver-muted); line-height: 1.6;">
+                    البائع: <strong style="color: #fff;">${acc.sellerName}</strong> • اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong> • الرتبة: <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong> • السيرفر: ${acc.server || 'الشرق الأوسط'}
+                </div>
+                <div style="font-size: 0.88rem; color: var(--silver-muted); margin-top: 0.3rem;">
+                    صافي البائع: <strong style="color: #fff;">$${pricing.sellerPrice}</strong> | عمولة المنصة: <strong style="color: var(--gold-light);">$${pricing.fee}</strong> | سعر المشتري: <strong style="color: var(--orange-bright);">${pricing.buyerPrice} نقطة ($${pricing.buyerPrice})</strong>
+                </div>
+            </div>
+
+            <!-- Specs Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
+                    <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">طريقة الدخول:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">${acc.loginType === 'google' ? 'Google Gmail' : 'Facebook'}</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
+                    <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">نوع الربط:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
+                    <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">ليفيل الحساب:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">Lv. ${acc.level || 50}</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
+                    <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">أسلحة إيفو:</span>
+                    <strong style="color: var(--orange-bright); font-size: 0.9rem;">${acc.evoGunsCount || 0} أسلحة</strong>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem;">
+                <span style="color: var(--gold-light); font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.3rem;"><i class="fas fa-clipboard"></i> ملاحظات وتفاصيل الحساب:</span>
+                <p style="color: var(--silver-light); font-size: 0.85rem; margin: 0; line-height: 1.6;">${acc.accountNotes || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.'}</p>
+            </div>
+
+            <!-- Images Preview Gallery -->
+            <div style="margin-bottom: 1.5rem;">
+                <span style="color: #fff; font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.5rem;"><i class="fas fa-images text-gold"></i> صور الحساب المرفوعة (${imagesList.length}):</span>
+                <div style="display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                    ${imagesList.map(src => `
+                        <img src="${src}" alt="Account Preview" style="width: 110px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary); cursor: pointer;" onclick="window.waseetApp.openImageLightbox('${src}', '${acc.title}')" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Mediator Action Buttons -->
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid var(--border-metal); padding-top: 1rem;">
+                <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccount('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.65rem 1.2rem; font-size: 0.92rem;">
+                    <i class="fas fa-trash-alt"></i> حذف هذا الحساب (تحايل أو خطأ)
+                </button>
+                <button class="btn-3d" onclick="window.waseetApp.approveAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.65rem 1.4rem; font-size: 0.95rem;">
+                    <i class="fas fa-check-circle"></i> اعتماد الحساب ونشره في السوق
+                </button>
+            </div>
+        `;
+
+        modal.classList.add('active');
+    }
+
+    async approveAccount(accId) {
+        const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+        if (!acc) return;
+
+        acc.status = 'available';
+        acc.reviewStatus = 'approved';
+        acc.approvedAt = new Date().toISOString();
+
+        // Update localStorage
+        try {
+            const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+            const idx = savedAccounts.findIndex(a => a.id === accId);
+            if (idx !== -1) {
+                savedAccounts[idx].status = 'available';
+                savedAccounts[idx].reviewStatus = 'approved';
+                savedAccounts[idx].approvedAt = acc.approvedAt;
+                localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
+            }
+        } catch (e) { console.warn(e); }
+
+        saveWaseetData();
+        this.renderMarketplace();
+
+        const modal = document.getElementById('modal-inspect-account');
+        if (modal) modal.classList.remove('active');
+
+        await waseetAlert(
+            'تم اعتماد الحساب بنجاح!',
+            `تم فحص حساب #${acc.accountNumber || acc.id} واعتماده رسمياً، وهو متاح الآن للشراء في متجر WASEET أمام جميع المشترين.`,
+            'success'
+        );
+    }
+
+    async rejectAccount(accId) {
+        const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+        if (!acc) return;
+
+        let reason = 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.';
+        if (typeof waseetPrompt === 'function') {
+            const userReason = await waseetPrompt(
+                'سبب حذف ورفض الحساب',
+                'اكتب سبب رفض الحساب ليظهر للبائع في قائمة حساباته:',
+                reason
+            );
+            if (userReason === null) return; // user cancelled
+            if (userReason && userReason.trim()) reason = userReason.trim();
+        }
+
+        acc.status = 'rejected';
+        acc.reviewStatus = 'rejected';
+        acc.rejectionReason = reason;
+        acc.rejectedAt = new Date().toISOString();
+
+        // Update localStorage
+        try {
+            const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+            const idx = savedAccounts.findIndex(a => a.id === accId);
+            if (idx !== -1) {
+                savedAccounts[idx].status = 'rejected';
+                savedAccounts[idx].reviewStatus = 'rejected';
+                savedAccounts[idx].rejectionReason = reason;
+                savedAccounts[idx].rejectedAt = acc.rejectedAt;
+                localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
+            }
+        } catch (e) { console.warn(e); }
+
+        saveWaseetData();
+        this.renderMarketplace();
+
+        const modalInspect = document.getElementById('modal-inspect-account');
+        if (modalInspect) modalInspect.classList.remove('active');
+        const modalCard = document.getElementById('modal-card-deck');
+        if (modalCard) modalCard.classList.remove('active');
+
+        await waseetAlert(
+            'تم حذف ورفض الحساب',
+            `تم حذف الحساب #${acc.accountNumber || acc.id} من المتجر وإشعار البائع بالسبب: "${reason}".`,
+            'warning'
+        );
+    }
+
+    async rejectAccountDirect(accId) {
+        const acc = (WASEET_STATE.accounts || []).find(a => a.id === accId);
+        if (!acc) return;
+
+        if (typeof waseetConfirm === 'function') {
+            const confirmed = await waseetConfirm(
+                'حذف ورفض الحساب',
+                `هل أنت متأكد من حذف الحساب #${acc.accountNumber || acc.id} للاشتباه في احتيال أو بيانات غير صحيحة؟ سيتم حجب الحساب عن السوق وإشعار البائع.`,
+                'حذف الحساب وإشعار البائع',
+                'إلغاء',
+                'danger'
+            );
+            if (!confirmed) return;
+        }
+
+        await this.rejectAccount(accId);
     }
 }
 
