@@ -24,9 +24,15 @@ class WaseetEscrowRoom {
             if (!this.deal.status) this.deal.status = 'active';
         }
 
-        // Auto-detect viewer role: if official mediator logged in, show mediator; else show buyer
-        if (typeof isMediatorUser === 'function' && isMediatorUser()) {
+        // Auto-detect viewer role strictly from real logged in user:
+        // 1. Mediator/Admin -> shows 3-screen mediator dashboard
+        // 2. Seller of the deal -> shows seller view
+        // 3. Buyer of the deal -> shows buyer view
+        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+        if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
             this.viewerRole = 'mediator';
+        } else if (currentUser && this.deal && this.deal.seller && (this.deal.seller.id === currentUser.id || this.deal.seller.name === currentUser.name)) {
+            this.viewerRole = 'seller';
         } else {
             this.viewerRole = 'buyer';
         }
@@ -36,15 +42,6 @@ class WaseetEscrowRoom {
     }
 
     init() {
-        const roleSelector = document.getElementById('active-viewer-role');
-        if (roleSelector) {
-            if (roleSelector.dataset.userChanged) {
-                this.viewerRole = roleSelector.value;
-            } else {
-                roleSelector.value = this.viewerRole;
-            }
-        }
-
         this.renderAll();
         this.initLiveSync();
     }

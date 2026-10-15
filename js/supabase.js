@@ -217,8 +217,6 @@ async function waseetSyncAuthState() {
         // إذا كان في غرفة الشات وهو وسيط معتمد، تحويل الشاشة فوراً لوضع الوسيط (3 شاشات)
         if (isAdmin && window.escrowRoom) {
             window.escrowRoom.setViewerRole('mediator');
-            const roleSelect = document.getElementById('active-viewer-role');
-            if (roleSelect) roleSelect.value = 'mediator';
         }
     } catch (err) {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);
