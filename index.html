@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وسيط | WASEET - منصة الوساطة الآمنة لحسابات الألعاب</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon / شعار التبويب البارز عالي الدقة متوافق مع كافة المتصفحات -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png?v=3">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png?v=3">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=3">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Subtle 3D Ambient Background Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <a href="#" class="brand-wrap">
+                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">وسيط • حماية وضمان الألعاب</span>
+                    </div>
+                </a>
+
+                <ul class="nav-menu">
+                    <li><a href="#marketplace" class="nav-link active"><i class="fas fa-store"></i> المتجر</a></li>
+                    <li><a href="#fee-calculator" class="nav-link"><i class="fas fa-calculator"></i> حاسبة العمولات</a></li>
+                    <li><a href="chat.html" class="nav-link"><i class="fas fa-shield-alt"></i> غرفة الوساطة المباشرة</a></li>
+                </ul>
+
+                <div class="nav-actions">
+                    <!-- Secure Wallet Pill -->
+                    <div class="wallet-pill" id="wallet-pill-btn" title="انقر لإدارة وشحن المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                        </div>
+                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 محجوز</span>
+                    </div>
+
+                    <!-- Direct Chat / Conversations Button -->
+                    <a href="chat.html" class="btn-3d btn-outline btn-nav-chats" id="btn-goto-chats" title="الانتقال إلى صفحة المحادثات وغرفة الوساطة">
+                        <i class="fas fa-comments text-orange"></i>
+                        <span>المحادثات</span>
+                        <span class="chats-badge-pulse" id="nav-chats-badge" style="display: none;">0</span>
+                    </a>
+
+                    <!-- Mediator Deals List Button (Shows to Mediator) -->
+                    <a href="deals.html" class="btn-deals-list" id="btn-mediator-deals" style="display: none;" title="قائمة صفقات وطلبات الوساطة المباشرة">
+                        <i class="fas fa-crown text-gold"></i>
+                        <span>قائمة الصفقات</span>
+                        <span class="deals-badge-count" id="nav-deals-count">0</span>
+                    </a>
+
+                    <!-- Add Listing Button -->
+                    <button class="btn-3d btn-orange" id="btn-open-sell">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </button>
+
+                    <!-- User Profile / Login Button Container (Visually on the physical LEFT of 'بيع حساب') -->
+                    <div id="nav-user-container">
+                        <!-- Populated by JS based on user role -->
+                    </div>
+
+                    <!-- Facebook-Style 3 Lines Menu Button (Requirement 6) -->
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="window.waseetApp && window.waseetApp.toggleMobileDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Hero Section ================= -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-check text-gold"></i>
+                    <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
+                </div>
+
+                <h1 class="hero-title">
+                    بيع وشراء حسابات الألعاب عبر <br>
+                    <span class="text-gradient-gold">وساطة معتمدة وأمان مطلق</span>
+                </h1>
+
+                <p class="hero-description">
+                    أول منصة عربية تضمن صفقات حسابات فري فاير وببجي. لا يحصل البائع على أموالك حتى تفحص الحساب وتغير الروابط بإشراف وسيط معتمد.
+                </p>
+
+                <div class="hero-cta-group">
+                    <a href="#marketplace" class="btn-3d btn-gold">
+                        <i class="fas fa-gamepad"></i> تصفح الحسابات المضمونة
+                    </a>
+                    <a href="#fee-calculator" class="btn-3d btn-outline">
+                        <i class="fas fa-coins text-gold"></i> تجربة حاسبة الأرباح
+                    </a>
+                </div>
+
+                <!-- 3D Stat Counters -->
+                <div class="hero-stats-grid">
+                    <div class="stat-card-3d card-3d">
+                        <div class="stat-num text-gold">100%</div>
+                        <div class="stat-label">ضمان استرجاع النقاط عند الخلل</div>
+                    </div>
+                    <div class="stat-card-3d card-3d">
+                        <div class="stat-num text-orange">3$ - 5$</div>
+                        <div class="stat-label">عمولة ثابتة متدرجة تبدأ من 3$</div>
+                    </div>
+                    <div class="stat-card-3d card-3d">
+                        <div class="stat-num text-gold">برايم 1-8</div>
+                        <div class="stat-label">تصنيف دقيق لحسابات فري فاير النادرة</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Marketplace Section ================= -->
+        <section class="marketplace-section" id="marketplace">
+            <div class="container">
+                <div class="section-head" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <h2 class="section-title">
+                        <i class="fas fa-fire-alt text-orange"></i>
+                        سوق الحسابات المفحوصة
+                    </h2>
+                    <span style="color: var(--silver-muted); font-size: 0.88rem;" id="accounts-total-counter">
+                        عرض 30 حساب في الصفحة الأولى
+                    </span>
+                </div>
+
+                <!-- Search Bar with Live Filter (Requirement 2) -->
+                <div class="search-bar-wrapper" style="margin-bottom: 1.2rem;">
+                    <div style="position: relative; max-width: 520px;">
+                        <i class="fas fa-search" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
+                        <input type="text" id="marketplace-search" class="input-3d" placeholder="ابحث برقم الحساب (مثال: 1001) أو اسم الحساب أو البائع..." style="padding-right: 44px; width: 100%; font-size: 0.95rem; border-radius: 12px;" oninput="window.waseetApp && window.waseetApp.handleSearch(this.value)">
+                    </div>
+                </div>
+
+                <!-- Dynamic Multi-Game Filter Bar (Clean & Borderless) -->
+                <div class="filter-bar">
+                    <!-- 1. Game Filter -->
+                    <div class="filter-item" style="max-width: 170px;">
+                        <label class="filter-label"><i class="fas fa-gamepad text-gold"></i> اللعبة</label>
+                        <select id="filter-game" class="filter-select">
+                            <option value="all">كل الألعاب</option>
+                            <option value="free_fire" selected>فري فاير (Free Fire)</option>
+                            <option value="pubg">ببجي موبايل (PUBG)</option>
+                            <option value="brawl_stars">براول ستارز (Brawl)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic sub-filters for Free Fire: 1. Prime, 2. Level, 3. Evo Guns -->
+                    <div id="dynamic-game-filters" style="display: contents;">
+                        <div class="filter-item">
+                            <label class="filter-label"><i class="fas fa-crown text-gold"></i> مستوى البرايم (Prime)</label>
+                            <select id="filter-prime" class="filter-select">
+                                <option value="all">كل الرتب</option>
+                                <option value="8">برايم 8 (الحد الأقصى)</option>
+                                <option value="7">برايم 7</option>
+                                <option value="6">برايم 6</option>
+                                <option value="5">برايم 5</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label class="filter-label"><i class="fas fa-bolt text-orange"></i> ليفل الحساب (Level)</label>
+                            <select id="filter-level" class="filter-select">
+                                <option value="all">كل المستويات</option>
+                                <option value="75">ليفل 75 فما فوق</option>
+                                <option value="65">ليفل 65 فما فوق</option>
+                                <option value="55">ليفل 55 فما فوق</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label class="filter-label"><i class="fas fa-crosshairs text-orange"></i> أسلحة إيفو المطورة</label>
+                            <select id="filter-evo" class="filter-select">
+                                <option value="all">الكل</option>
+                                <option value="5">5+ أسلحة إيفو ماكس</option>
+                                <option value="3">3-4 أسلحة إيفو</option>
+                                <option value="1">1-2 أسلحة إيفو</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Universal Filters -->
+                    <div class="filter-item" style="max-width: 170px;">
+                        <label class="filter-label"><i class="fas fa-link text-silver"></i> نوع الربط</label>
+                        <select id="filter-login" class="filter-select">
+                            <option value="all">الكل (جوجل وفيسبوك)</option>
+                            <option value="google">جوجل Gmail فقط</option>
+                            <option value="facebook">فيسبوك</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item" style="max-width: 170px;">
+                        <label class="filter-label"><i class="fas fa-sort-amount-down text-gold"></i> ترتيب حسب</label>
+                        <select id="filter-sort" class="filter-select">
+                            <option value="default">المميز أولاً</option>
+                            <option value="price-asc">الأقل سعراً</option>
+                            <option value="price-desc">الأعلى سعراً</option>
+                            <option value="level">أعلى ليفل</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3D Accounts Grid Wrapper (With 3D Phone Screen / Door Transition) -->
+                <div class="accounts-grid-wrapper">
+                    <div class="accounts-grid" id="accounts-grid">
+                        <!-- Populated by JS (Max 30 accounts per page) -->
+                    </div>
+                </div>
+
+                <!-- Pagination Bar (30 accounts per page limit) -->
+                <div class="pagination-bar" id="marketplace-pagination">
+                    <!-- Populated by JS -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= Dynamic Fee Calculator Section (Moved Below Marketplace) ================= -->
+        <section class="calc-section" id="fee-calculator">
+            <div class="container">
+                <div class="calc-card">
+                    <div class="calc-grid">
+                        <div>
+                            <h2 class="calc-title">
+                                <i class="fas fa-calculator text-orange"></i>
+                                حاسبة العمولات الآلية للبائع والمشتري
+                            </h2>
+                            <p class="calc-desc">
+                                عند وضع سعرك، يضيف الموقع عمولة الوساطة الآمنة تلقائياً للمشتري، لتستلم أنت حقك كاملاً دون أي خصم!
+                            </p>
+
+                            <div class="input-group">
+                                <label class="input-label"><i class="fas fa-hand-holding-usd text-gold"></i> المبلغ الصافي الذي ترغب في استلامه كبائع ($):</label>
+                                <div class="luxury-stepper-container">
+                                    <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustCalc(-10)" title="إنقاص 10$">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <div class="stepper-input-wrap">
+                                        <input type="number" id="calc-seller-input" class="stepper-number-input" value="30" min="5" max="10000" step="5">
+                                        <span class="stepper-unit-label">$</span>
+                                    </div>
+                                    <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustCalc(10)" title="زيادة 10$">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small style="color: var(--silver-muted); line-height: 1.6; display: block; margin-top: 0.5rem;">
+                                * نظام العمولات المحدث: أقل من 100$ (3$-5$) • من 100$-250$ (10$) • من 250$-500$ (15$) • من 500$-750$ (20$) • من 750$-850$ (25$) • من 850$-1000$ (30$) • من 1000$-1500$ (35$) • من 1500$-2000$ (40$) • من 2000$-3000$ (45$) • من 3000$ فما فوق (50$ كحد أقصى).
+                            </small>
+                        </div>
+
+                        <div class="calc-results-panel">
+                            <div class="res-row">
+                                <span class="res-label"><i class="fas fa-hand-holding-usd text-gold"></i> صافي ربح البائع:</span>
+                                <span class="res-val" id="calc-res-seller">$30</span>
+                            </div>
+                            <div class="res-row">
+                                <span class="res-label"><i class="fas fa-shield-alt text-orange"></i> عمولة خدمة ووساطة الموقع:</span>
+                                <span class="res-val text-orange" id="calc-res-fee">+$3</span>
+                            </div>
+                            <div class="res-row">
+                                <span class="res-label"><i class="fas fa-info-circle text-gold"></i> الشريحة المطبقة:</span>
+                                <span class="res-val" style="font-size: 0.85rem;" id="calc-res-tier">أقل من 50$ (عمولة 3$)</span>
+                            </div>
+                            <div class="res-row">
+                                <span class="res-label" style="font-weight: 800; color: #fff;">السعر النهائي الذي يدفعه المشتري:</span>
+                                <span class="res-val text-gold big" id="calc-res-buyer">33 نقطة ($33)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Footer ================= -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <img src="assets/logo.png" alt="WASEET Logo" style="width: 44px; height: 44px; border: none; object-fit: contain; background: transparent;">
+                            <span style="font-family: var(--font-en); font-weight: 800; font-size: 1.2rem; color: #fff;">WASEET</span>
+                        </div>
+                        <p class="footer-desc">
+                            منصة الوساطة الأولى المتخصصة في تجارة حسابات الألعاب في الوطن العربي، تضمن حماية أموال المشتري وحساب البائع بنظام المحفظة المحمية والوساطة المباشرة.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="footer-col-title">روابط سريعة</h4>
+                        <ul class="footer-links">
+                            <li><a href="#marketplace">سوق حسابات فري فاير</a></li>
+                            <li><a href="#fee-calculator">حاسبة العمولات</a></li>
+                            <li><a href="chat.html">غرفة الوساطة المباشرة</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="footer-col-title">الأمان والضمان</h4>
+                        <ul class="footer-links">
+                            <li><span style="color: var(--gold-light);"><i class="fas fa-lock"></i> نظام حجز النقاط (Escrow)</span></li>
+                            <li><span style="color: var(--orange-bright);"><i class="fas fa-user-shield"></i> فحص يدوي لكل حساب</span></li>
+                            <li><span style="color: var(--silver-muted);"><i class="fas fa-bolt"></i> تحرير الرصيد فور إتمام النقل</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    جميع الحقوق محفوظة © 2026 لمنصة وسيط WASEET | وساطة ألعاب آمنة 100%.
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ================= Modal: Login with Social Accounts ================= -->
+    <div class="modal-overlay" id="modal-login">
+        <div class="modal-box-3d" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-user-circle text-gold"></i>
+                    تسجيل الدخول إلى WASEET
+                </h3>
+                <button class="btn-close-modal" id="btn-close-login">&times;</button>
+            </div>
+
+            <p style="color: var(--silver-muted); font-size: 0.88rem; margin-bottom: 1.2rem; text-align: center;">
+                سجل دخولك لحماية معاملاتك وشحن محفظتك وإدارة صفقاتك الآمنة.
+            </p>
+
+            <div id="login-current-status-box" style="display: none;"></div>
+
+            <button class="btn-social-login btn-social-google" onclick="window.waseetApp.loginWithProvider('google')">
+                <i class="fab fa-google" style="color: #ea4335; font-size: 1.2rem;"></i>
+                المتابعة باستخدام Google
+            </button>
+
+            <button class="btn-social-login btn-social-facebook" onclick="window.waseetApp.loginWithProvider('facebook')" style="opacity: 0.75;">
+                <i class="fab fa-facebook-f" style="font-size: 1.2rem;"></i>
+                <span>المتابعة باستخدام Facebook</span>
+                <span style="font-size: 0.72rem; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 999px; margin-right: auto;">(قريباً)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= Modal: Mediator Deals List (قائمة الصفقات) ================= -->
+    <div class="modal-overlay" id="modal-mediator-deals">
+        <div class="modal-box-3d" style="max-width: 680px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-crown text-gold" style="font-size: 1.4rem;"></i>
+                    <div>
+                        <h3 class="modal-title" style="margin-bottom: 0.1rem;">قائمة صفقات وطلبات الوساطة</h3>
+                        <span style="font-size: 0.78rem; color: var(--silver-muted);">صلاحية الوسيط المعتمد • إدارة صفقات البيع والشراء النشطة</span>
+                    </div>
+                </div>
+                <button class="btn-close-modal" id="btn-close-mediator-deals">&times;</button>
+            </div>
+
+            <div id="mediator-deals-list-container" style="max-height: 60vh; overflow-y: auto; padding-left: 0.3rem;">
+                <!-- Populated dynamically by JS with Deal 1, Deal 2, Deal 3 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Modal: 3D Playing Cards Fan Spread & Specs (أوراق لعب مفتوحة) ================= -->
+    <div class="modal-overlay" id="modal-card-deck">
+        <div class="modal-box-3d cards-deck-modal-box">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-layer-group text-gold" style="font-size: 1.4rem;"></i>
+                    <div>
+                        <h3 class="modal-title" id="deck-modal-title" style="font-size: 1.25rem; margin-bottom: 0.2rem;">ألبوم صور الحساب المفتوح</h3>
+                        <span style="font-size: 0.8rem; color: var(--gold-light);" id="deck-modal-badges">فري فاير • برايم 8 • ربط أحادي</span>
+                    </div>
+                </div>
+                <button class="btn-close-modal" id="btn-close-card-deck">&times;</button>
+            </div>
+
+            <!-- Interactive Image Gallery with Right/Left Navigation & Zoom (Requirement 3) -->
+            <div class="deck-gallery-wrapper">
+                <div class="deck-gallery-main">
+                    <button type="button" class="deck-nav-btn deck-nav-prev" onclick="window.waseetApp.prevDeckImage()" title="الصورة السابقة">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="deck-main-img-box" onclick="window.waseetApp.zoomCurrentImage()" title="انقر لتكبير الصورة ملء الشاشة">
+                        <img id="deck-main-display-img" src="" alt="Account Image" class="deck-display-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        <div class="deck-zoom-hint-badge">
+                            <i class="fas fa-search-plus"></i> انقر للتكبير
+                        </div>
+                        <div class="deck-counter-badge" id="deck-image-counter">1 / 1</div>
+                    </div>
+                    <button type="button" class="deck-nav-btn deck-nav-next" onclick="window.waseetApp.nextDeckImage()" title="الصورة التالية">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                <!-- Thumbnails Strip -->
+                <div class="deck-thumbs-strip" id="deck-thumbs-strip">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Full Details Underneath the Image Gallery -->
+            <div class="deck-details-panel" id="deck-details-panel">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Modal: Image Fullscreen Zoom Lightbox (Requirement 3) ================= -->
+    <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 9999;" onclick="this.classList.remove('active')">
+        <div class="lightbox-box" onclick="event.stopPropagation()">
+            <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
+            <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <!-- ================= Modal: Sell Account (Game Selector First) ================= -->
+    <div class="modal-overlay" id="modal-sell">
+        <div class="modal-box-3d" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    عرض حساب للبيع في WASEET
+                </h3>
+                <button class="btn-close-modal" id="btn-close-sell">&times;</button>
+            </div>
+
+            <form id="sell-account-form">
+                <!-- 1. Game Selection Tabs -->
+                <label class="input-label" style="font-weight: 800; color: var(--gold-light);">
+                    <i class="fas fa-gamepad"></i> 1. اختر اللعبة أولاً:
+                </label>
+                <div class="game-select-grid" id="sell-game-tabs">
+                    <button type="button" class="game-tab-btn active" data-game="free_fire">
+                        <i class="fas fa-fire-alt text-orange"></i>
+                        <span>فري فاير (Free Fire)</span>
+                    </button>
+                    <button type="button" class="game-tab-btn" data-game="pubg">
+                        <i class="fas fa-crosshairs text-gold"></i>
+                        <span>ببجي موبايل (PUBG)</span>
+                    </button>
+                    <button type="button" class="game-tab-btn" data-game="brawl_stars">
+                        <i class="fas fa-skull text-silver"></i>
+                        <span>براول ستارز</span>
+                    </button>
+                    <button type="button" class="game-tab-btn" data-game="other">
+                        <i class="fas fa-gem text-orange"></i>
+                        <span>لعبة أخرى</span>
+                    </button>
+                </div>
+                <input type="hidden" id="form-selected-game" value="free_fire">
+
+                <!-- 2. Basic Info -->
+                <div class="input-group">
+                    <label class="input-label">عنوان الإعلان ومميزات الحساب الرئيسية:</label>
+                    <input type="text" id="form-title" class="input-3d" style="font-size: 1rem;" placeholder="مثال: حساب برايم 8 - ساكورا وأسلحة إيفو ماكس وبنطلون الجاز" required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="input-group">
+                        <label class="input-label">مستوى الحساب (Level):</label>
+                        <input type="number" id="form-level" class="input-3d" value="75" min="1" max="150" required>
+                    </div>
+
+                    <div class="input-group" id="group-form-prime">
+                        <label class="input-label">مستوى البرايم (Prime Level):</label>
+                        <select id="form-prime" class="filter-select" style="width: 100%; padding: 0.8rem;" required>
+                            <option value="8">برايم 8 (الحد الأقصى الأسطوري)</option>
+                            <option value="7">برايم 7</option>
+                            <option value="6">برايم 6</option>
+                            <option value="5">برايم 5</option>
+                            <option value="4">برايم 4</option>
+                            <option value="3">برايم 3</option>
+                            <option value="2">برايم 2</option>
+                            <option value="1">برايم 1</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Free Fire Specific Detailed Attributes (Requirement 5) -->
+                <div id="freefire-detailed-fields">
+                    <div class="form-grid-2">
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-crosshairs text-orange"></i> عدد أسلحة إيفو (المطورة):</label>
+                            <input type="number" id="form-evo-count" class="input-3d" value="4" min="0" max="15" placeholder="عدد أسلحة إيفو">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-tshirt text-gold"></i> السراويل المميزة:</label>
+                            <input type="text" id="form-iconic-pants" class="input-3d" value="بنطلون الجاز، بنطلون الملاك" placeholder="مثال: بنطلون الجاز، بنطلون الملاك، الدودة">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label"><i class="fas fa-crown text-gold"></i> السكنات النادرة:</label>
+                        <input type="text" id="form-rare-skins" class="input-3d" value="سكن الساكورا، حزمة الهيب هوب، كريمنال" placeholder="مثال: ساكورا، هيب هوب، كريمنال، جوكر...">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label"><i class="fas fa-comment-alt text-silver"></i> ملاحظة وتفاصيل عن الحساب:</label>
+                        <textarea id="form-account-notes" class="input-3d" style="height: 80px; resize: vertical;" placeholder="اكتب ملاحظة واضحة عن تاريخ الحساب، الشحن، وبطاقات الغرف..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="input-group">
+                        <label class="input-label">نوع الربط الأساسي:</label>
+                        <select id="form-login-type" class="filter-select" style="width: 100%; padding: 0.8rem;">
+                            <option value="google">جوجل Gmail (نظيف)</option>
+                            <option value="facebook">فيسبوك</option>
+                            <option value="twitter">تويتر (X)</option>
+                            <option value="vk">VK</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">حالة الربط:</label>
+                        <select id="form-bind-status" class="filter-select" style="width: 100%; padding: 0.8rem;">
+                            <option value="single">ربط أحادي آمن (إيميل فقط)</option>
+                            <option value="double">ربط ثنائي</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">المبلغ الصافي الذي ترغب باستلامه كبائع ($):</label>
+                    <input type="number" id="form-seller-price" class="input-3d" value="45" min="5" required>
+                </div>
+
+                <!-- Dynamic Fee Preview -->
+                <div id="form-fee-preview" style="margin-bottom: 1.2rem;">
+                    <!-- Auto updated by JS -->
+                </div>
+
+                <!-- Multi-image Upload Section -->
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label class="input-label" style="margin-bottom: 0;">
+                            <i class="fas fa-images text-orange"></i> صور الحساب (الخزينة، الأسلحة، الملف الشخصي):
+                        </label>
+                        <span style="font-size: 0.75rem; color: var(--gold-light);" id="upload-count-badge">0 صور مختارة</span>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <div class="image-dropzone" id="image-dropzone">
+                        <input type="file" id="form-account-images" multiple accept="image/*" class="dropzone-file-input">
+                        <div class="dropzone-body">
+                            <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+                            <div class="dropzone-text">
+                                اسحب وأفلت لقطات الشاشة هنا، أو <span class="text-orange" style="text-decoration: underline; font-weight: 700;">تصفح ملفات جهازك</span>
+                            </div>
+                            <div class="dropzone-sub">يدعم صور متعددة • ستعرض تلقائياً كـ أوراق لعب مفتوحة 3D للمشترين!</div>
+                        </div>
+                    </div>
+
+                    <!-- Previews Grid -->
+                    <div class="image-previews-grid" id="image-previews-grid"></div>
+                </div>
+
+                <!-- Private Escrow Credentials Box -->
+                <div class="secret-escrow-box">
+                    <div class="secret-header">
+                        <i class="fas fa-lock"></i>
+                        <span>بيانات الدخول للوسيط فقط (مشفرة ولن تظهر لأحد غيرك والوسيط عند الشراء):</span>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="input-group">
+                            <label class="input-label">البريد الإلكتروني / رقم الحساب:</label>
+                            <input type="text" class="input-3d" style="font-size: 0.95rem;" placeholder="" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">كلمة المرور:</label>
+                            <input type="password" class="input-3d" style="font-size: 0.95rem;" placeholder="" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-3d btn-orange" style="width: 100%;">
+                    <i class="fas fa-check-circle"></i> نشر الحساب في المتجر وتفعيل الحماية
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= Modal: Wallet & Points ================= -->
+    <div class="modal-overlay" id="modal-wallet">
+        <div class="modal-box-3d">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-wallet text-gold"></i>
+                    إدارة محفظة النقاط الآمنة
+                </h3>
+                <button class="btn-close-modal" id="btn-close-wallet">&times;</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 1rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المتاح للشراء والسحب:</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0 نقطة ($0)</div>
+                </div>
+                <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid var(--orange-primary); padding: 1rem; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المحجوز في صفقات الوساطة:</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0 نقطة ($0)</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-metal); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--gold-light);">
+                    <i class="fas fa-money-bill-wave"></i> شحن نقاط جديدة (1 نقطة = 1 دولار)
+                </h4>
+                
+                <!-- Luxury 3D Number Stepper (Requirement 2 & 3 - Image 3) -->
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> عدد النقاط المراد شحنها:</label>
+                        <span class="stepper-live-val" id="topup-live-preview">50 نقطة ($50)</span>
+                    </div>
+                    
+                    <div class="luxury-stepper-container">
+                        <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustTopup(-10)" title="إنقاص 10 نقاط">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="stepper-input-wrap">
+                            <input type="number" id="topup-amount" class="stepper-number-input" value="50" min="10" max="10000" step="5" oninput="window.waseetSyncTopupInput()">
+                            <span class="stepper-unit-label">نقطة</span>
+                        </div>
+                        <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10 نقاط">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Quick Preset Selection Pills -->
+                    <div class="stepper-quick-presets" id="topup-presets-container">
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(25)">25$</button>
+                        <button type="button" class="preset-pill active" onclick="window.waseetSetTopup(50)">50$</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(100)">100$</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(250)">250$</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(500)">500$</button>
+                    </div>
+                </div>
+
+                <!-- ================= 3D Recharge Cards & Methods (Requirement 1 & 6: Demo Simulation) ================= -->
+                <div class="payment-cards-section">
+                    <div style="background: rgba(197, 160, 89, 0.12); border: 1px dashed var(--gold-primary); border-radius: 10px; padding: 0.65rem 0.9rem; margin-bottom: 0.9rem; font-size: 0.82rem; color: var(--gold-light); display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-flask" style="font-size: 1.1rem; color: var(--gold-primary);"></i>
+                        <span><strong>نظام شحن تجريبي (محاكاة):</strong> هذه الواجهة مخصصة لاختبار آلية الرصيد والوساطة فقط. لا توجد عمليات دفع مالية فعلية حالياً، وسيتم تفعيل بوابات الدفع الرسمية عبر خادم معتمد لاحقاً.</span>
+                    </div>
+
+                    <div class="payment-section-header">
+                        <label class="input-label" style="margin-bottom: 0;">
+                            <i class="fas fa-credit-card text-orange"></i> بطاقات وطرق الشحن المعتمدة (اختر بطاقتك):
+                        </label>
+                        <span style="font-size: 0.72rem; color: var(--gold-light);"><i class="fas fa-flask text-gold"></i> وضع المحاكاة التجريبي</span>
+                    </div>
+
+                    <!-- Visual 3D Cards Grid (Binance, Morocco, Libya, Syria, Egypt, Algeria, Iraq, Saudi) -->
+                    <div class="payment-cards-grid" id="payment-cards-grid">
+                        <!-- Binance Pay Card -->
+                        <div class="payment-card-item active" 
+                             data-val="USDT / Binance Pay (بينانس)" 
+                             data-title="Binance Pay (بينانس)" 
+                             data-country="عالمي 🌐" 
+                             data-img="assets/payments/binance.svg"
+                             data-account="DEMO-BINANCE-PAY-ID"
+                             data-account-label="معرف بينانس التجريبي (Demo Pay ID)"
+                             data-note="محاكاة تجريبية لواجهة الشحن عبر Binance Pay (لأغراض الاختبار)"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">بينانس • عالمي 🌐</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/binance.svg" alt="Binance Logo" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">Binance Pay</div>
+                            <div class="payment-card-sub">USDT (تجريبي)</div>
+                        </div>
+
+                        <!-- Morocco Card (المغرب) -->
+                        <div class="payment-card-item" 
+                             data-val="CIH Bank / كاش بلوس (المغرب)" 
+                             data-title="CIH Bank / كاش بلوس" 
+                             data-country="المغرب 🇲🇦" 
+                             data-img="assets/payments/morocco.svg"
+                             data-account="DEMO-CIH-RIB-0000"
+                             data-account-label="رقم الحساب التجريبي (CIH RIB / Cash Plus)"
+                             data-note="محاكاة تجريبية للتحويل البنكي عبر CIH Bank أو Cash Plus بالمغرب"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">المغرب 🇲🇦</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/morocco.svg" alt="CIH Bank Morocco" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">CIH / Cash Plus</div>
+                            <div class="payment-card-sub">المغرب • كاش بلوس</div>
+                        </div>
+
+                        <!-- Libya Card (ليبيا) -->
+                        <div class="payment-card-item" 
+                             data-val="سداد / تداول (ليبيا)" 
+                             data-title="سداد / تداول" 
+                             data-country="ليبيا 🇱🇾" 
+                             data-img="assets/payments/libya.svg"
+                             data-account="DEMO-SADAD-0000"
+                             data-account-label="رقم حساب تاجر سداد التجريبي"
+                             data-note="محاكاة تجريبية للشحن عبر منظومة سداد وتداول كاش بليبيا"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">ليبيا 🇱🇾</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/libya.svg" alt="Sadad Libya" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">سداد / تداول</div>
+                            <div class="payment-card-sub">كروت مصرفية • ليبيا</div>
+                        </div>
+
+                        <!-- Syria Card (سوريا) -->
+                        <div class="payment-card-item" 
+                             data-val="سيريتل كاش / شام كاش (سوريا)" 
+                             data-title="سيريتل كاش / شام كاش" 
+                             data-country="سوريا 🇸🇾" 
+                             data-img="assets/payments/syria.svg"
+                             data-account="DEMO-SYRIATEL-0000"
+                             data-account-label="رقم محفظة سيريتل كاش التجريبي"
+                             data-note="محاكاة تجريبية للشحن عبر محفظة سيريتل كاش وشام كاش بسوريا"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">سوريا 🇸🇾</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/syria.svg" alt="Syriatel Cash Syria" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">سيريتل كاش</div>
+                            <div class="payment-card-sub">Syriatel • شام كاش</div>
+                        </div>
+
+                        <!-- Egypt Card (مصر) -->
+                        <div class="payment-card-item" 
+                             data-val="فودافون كاش / إنستاباي (مصر)" 
+                             data-title="فودافون كاش / إنستاباي" 
+                             data-country="مصر 🇪🇬" 
+                             data-img="assets/payments/egypt.svg"
+                             data-account="DEMO-VODAFONE-0000"
+                             data-account-label="رقم المحفظة التجريبي (Demo Wallet)"
+                             data-note="محاكاة تجريبية للتحويل عبر إنستاباي وفودافون كاش بمصر"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">مصر 🇪🇬</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/egypt.svg" alt="Vodafone Cash Egypt" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">فودافون / إنستاباي</div>
+                            <div class="payment-card-sub">InstaPay • مصر</div>
+                        </div>
+
+                        <!-- Algeria Card (الجزائر) -->
+                        <div class="payment-card-item" 
+                             data-val="بريدي موب - BaridiMob (الجزائر)" 
+                             data-title="بريدي موب - BaridiMob" 
+                             data-country="الجزائر 🇩🇿" 
+                             data-img="assets/payments/algeria.svg"
+                             data-account="DEMO-BARIDIMOB-0000"
+                             data-account-label="رقم الحساب التجريبي (Demo RIP)"
+                             data-note="محاكاة تجريبية للشحن عبر تطبيق بريدي موب بريد الجزائر"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">الجزائر 🇩🇿</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/algeria.svg" alt="BaridiMob Algeria" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">بريدي موب</div>
+                            <div class="payment-card-sub">بريد الجزائر • RIP</div>
+                        </div>
+
+                        <!-- Iraq Card (العراق) -->
+                        <div class="payment-card-item" 
+                             data-val="زين كاش - ZainCash (العراق)" 
+                             data-title="زين كاش - ZainCash" 
+                             data-country="العراق 🇮🇶" 
+                             data-img="assets/payments/iraq.svg"
+                             data-account="DEMO-ZAINCASH-0000"
+                             data-account-label="رقم المحفظة التجريبي (Demo Wallet)"
+                             data-note="محاكاة تجريبية للشحن عبر محفظة زين كاش العراق"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">العراق 🇮🇶</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/iraq.svg" alt="ZainCash Iraq" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">زين كاش</div>
+                            <div class="payment-card-sub">محفظة إلكترونية • العراق</div>
+                        </div>
+
+                        <!-- Saudi Card (السعودية والخليج) -->
+                        <div class="payment-card-item" 
+                             data-val="STC Pay / مدى (السعودية والخليج)" 
+                             data-title="STC Pay / مدى" 
+                             data-country="السعودية والخليج 🇸🇦" 
+                             data-img="assets/payments/saudi.svg"
+                             data-account="DEMO-STCPAY-0000"
+                             data-account-label="رقم المحفظة التجريبي (Demo Account)"
+                             data-note="محاكاة تجريبية للشحن عبر محفظة STC Pay ومدى"
+                             onclick="window.waseetSelectPaymentCard(this)">
+                            <div class="payment-card-check"><i class="fas fa-check"></i></div>
+                            <span class="payment-card-badge-country">السعودية والخليج 🇸🇦</span>
+                            <div class="payment-card-icon-wrap">
+                                <img src="assets/payments/saudi.svg" alt="STC Pay Saudi" class="payment-card-img">
+                            </div>
+                            <div class="payment-card-name">STC Pay / مدى</div>
+                            <div class="payment-card-sub">مدى • تحويل فوري</div>
+                        </div>
+                    </div>
+
+                    <!-- Live Selected Payment Details Box -->
+                    <div class="payment-details-panel" id="payment-details-panel">
+                        <div class="payment-details-header">
+                            <div class="payment-details-meta">
+                                <img src="assets/payments/binance.svg" alt="Selected Provider" class="pay-logo-img" id="pay-detail-img">
+                                <div>
+                                    <span style="font-weight: 800; color: #fff; font-size: 0.88rem;" id="pay-detail-title">Binance Pay (بينانس)</span>
+                                    <span style="color: var(--silver-muted); font-size: 0.72rem; display: block;" id="pay-detail-country">عالمي 🌐</span>
+                                </div>
+                            </div>
+                            <span class="payment-details-chip-icon"><i class="fas fa-flask text-gold"></i> وضع تجريبي</span>
+                        </div>
+
+                        <div class="payment-details-row">
+                            <span style="color: var(--silver-muted);" id="pay-detail-label">معرف بينانس التجريبي (Demo Pay ID):</span>
+                            <div class="payment-details-val-wrap">
+                                <span class="payment-details-val" id="pay-detail-account">DEMO-BINANCE-PAY-ID</span>
+                                <button type="button" class="btn-copy-pay" onclick="window.waseetCopyPaymentAccount(this)" title="نسخ">
+                                    <i class="fas fa-copy"></i> <span>نسخ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="payment-details-note" id="pay-detail-note">
+                            <i class="fas fa-info-circle text-gold"></i> <span>محاكاة تجريبية لواجهة الشحن عبر Binance Pay (لأغراض الاختبار)</span>
+                        </div>
+                    </div>
+
+                    <!-- Custom 3D Luxury Payment Select (Quick Dropdown) -->
+                    <div class="luxury-custom-select" id="wallet-payment-select-wrap">
+                        <button type="button" class="custom-select-trigger" id="wallet-payment-trigger" onclick="window.waseetTogglePaymentDropdown()">
+                            <div class="custom-select-selected" id="wallet-payment-selected-val">
+                                <img src="assets/payments/binance.svg" class="pay-logo-img" alt="Binance">
+                                <span class="pay-title-txt">USDT / Binance Pay (بينانس)</span>
+                                <span class="pay-country-pill">عالمي 🌐</span>
+                            </div>
+                            <i class="fas fa-chevron-down custom-select-arrow" id="wallet-payment-arrow"></i>
+                        </button>
+
+                        <div class="custom-select-menu" id="wallet-payment-menu">
+                            <div class="custom-select-opt active" data-val="USDT / Binance Pay (بينانس)" data-title="Binance Pay (بينانس)" data-country="عالمي 🌐" data-img="assets/payments/binance.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/binance.svg" class="pay-logo-img" alt="Binance">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">USDT / Binance Pay (بينانس)</span>
+                                    <span class="pay-country-pill">عالمي 🌐</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="CIH Bank / كاش بلوس (المغرب)" data-title="CIH Bank / كاش بلوس" data-country="المغرب 🇲🇦" data-img="assets/payments/morocco.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/morocco.svg" class="pay-logo-img" alt="Morocco CIH">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">CIH Bank / كاش بلوس (المغرب)</span>
+                                    <span class="pay-country-pill">المغرب 🇲🇦</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="سداد / تداول (ليبيا)" data-title="سداد / تداول" data-country="ليبيا 🇱🇾" data-img="assets/payments/libya.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/libya.svg" class="pay-logo-img" alt="Libya Sadad">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">سداد / تداول (ليبيا)</span>
+                                    <span class="pay-country-pill">ليبيا 🇱🇾</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="سيريتل كاش / شام كاش (سوريا)" data-title="سيريتل كاش / شام كاش" data-country="سوريا 🇸🇾" data-img="assets/payments/syria.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/syria.svg" class="pay-logo-img" alt="Syria Syriatel">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">سيريتل كاش / شام كاش (سوريا)</span>
+                                    <span class="pay-country-pill">سوريا 🇸🇾</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="فودافون كاش / إنستاباي (مصر)" data-title="فودافون كاش / إنستاباي" data-country="مصر 🇪🇬" data-img="assets/payments/egypt.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/egypt.svg" class="pay-logo-img" alt="Egypt Vodafone">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">فودافون كاش / إنستاباي</span>
+                                    <span class="pay-country-pill">مصر 🇪🇬</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="بريدي موب - BaridiMob (الجزائر)" data-title="بريدي موب - BaridiMob" data-country="الجزائر 🇩🇿" data-img="assets/payments/algeria.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/algeria.svg" class="pay-logo-img" alt="Algeria BaridiMob">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">بريدي موب - BaridiMob</span>
+                                    <span class="pay-country-pill">الجزائر 🇩🇿</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="زين كاش - ZainCash (العراق)" data-title="زين كاش - ZainCash" data-country="العراق 🇮🇶" data-img="assets/payments/iraq.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/iraq.svg" class="pay-logo-img" alt="Iraq ZainCash">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">زين كاش - ZainCash</span>
+                                    <span class="pay-country-pill">العراق 🇮🇶</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+
+                            <div class="custom-select-opt" data-val="STC Pay / مدى (السعودية والخليج)" data-title="STC Pay / مدى" data-country="السعودية والخليج 🇸🇦" data-img="assets/payments/saudi.svg" onclick="window.waseetSelectPayment(this)">
+                                <img src="assets/payments/saudi.svg" class="pay-logo-img" alt="Saudi STC Pay">
+                                <div class="pay-opt-text">
+                                    <span class="pay-title-txt">STC Pay / مدى</span>
+                                    <span class="pay-country-pill">السعودية والخليج 🇸🇦</span>
+                                </div>
+                                <i class="fas fa-check pay-check-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Hidden synced value -->
+                        <input type="hidden" id="selected-payment-method-val" value="USDT / Binance Pay (بينانس)">
+                    </div>
+                </div>
+
+                <button class="btn-3d btn-gold" style="width: 100%; margin-top: 0.8rem;" onclick="window.waseetApp.topupSimulation()">
+                    <i class="fas fa-flask"></i> محاكاة شحن الرصيد التجريبي (اختبار فقط)
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- ================= Mobile App Bottom Navigation Bar ================= -->
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item active">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="#marketplace" class="mobile-nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <button class="mobile-nav-item mobile-nav-center-action" onclick="window.waseetApp.openSellModal()" title="بيع حساب جديد">
+            <div class="center-action-circle">
+                <i class="fas fa-plus"></i>
+            </div>
+            <span>بيع حساب</span>
+        </button>
+        <a href="deals.html" class="mobile-nav-item" id="mobile-nav-deals-link">
+            <i class="fas fa-shield-alt"></i>
+            <span>الصفقات</span>
+        </a>
+        <button class="mobile-nav-item" onclick="window.waseetApp.openLoginModal()">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </button>
+    </nav>
+
+    <!-- Facebook-style Sliding Drawer Menu (Requirement 6 & Images 4 & 5) -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()"></div>
+    <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
+        <div class="drawer-header">
+            <div class="drawer-user-card" id="drawer-user-card">
+                <!-- Injected dynamically: User Avatar, Name, Role, Balance -->
+            </div>
+            <button class="drawer-close-btn" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="#marketplace" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قائمة الصفقات</span>
+                </a>
+                <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetApp && window.waseetApp.openSellModal()">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    <span>بيع حساب</span>
+                </button>
+                <a href="#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+                <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); document.getElementById('modal-wallet') && document.getElementById('modal-wallet').classList.add('active')">
+                    <i class="fas fa-wallet text-gold"></i>
+                    <span>شحن المحفظة</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">الحساب وتسجيل الدخول</h4>
+            <div class="drawer-auth-actions" id="drawer-auth-actions">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="#" onclick="if(typeof waseetAlert==='function') waseetAlert('ضمان WASEET الذهبي', 'منصة WASEET تضمن الحساب بنسبة 100% لمدة 48 ساعة ضد أي محاولة استرجاع، وتتحمل المسؤولية الكاملة في حال حدوث أي خلل.', 'success'); return false;"><i class="fas fa-shield-check text-gold"></i> شروط الضمان والأمان</a></li>
+                <li><a href="https://wa.me/" target="_blank"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم الفني المباشر</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/escrow.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

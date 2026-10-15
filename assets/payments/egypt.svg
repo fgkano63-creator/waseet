@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="egBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#241014"/>
+      <stop offset="100%" stop-color="#12080A"/>
+    </linearGradient>
+    <linearGradient id="egRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E60000"/>
+      <stop offset="100%" stop-color="#990000"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#egBg)" stroke="#E60000" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Egypt Flag Badge -->
+  <circle cx="95" cy="25" r="14" fill="#FFFFFF" stroke="#C09300" stroke-width="1.5"/>
+  <rect x="81" y="11" width="28" height="9" fill="#CE1126"/>
+  <rect x="81" y="29" width="28" height="10" fill="#000000"/>
+  <!-- Eagle -->
+  <polygon points="95,22 97,25 96,28 94,28 93,25" fill="#C09300"/>
+
+  <!-- Vodafone Cash Speechmark -->
+  <circle cx="52" cy="58" r="22" fill="#E60000"/>
+  <path d="M52 46 C45 46 41 51 41 57 C41 64 47 69 53 69 C60 69 64 64 64 57 C64 48 57 46 52 46 Z M52 64 C48 64 45 61 45 57 C45 53 48 50 52 50 C55 50 58 53 58 57 C58 61 55 64 52 64 Z" fill="#FFFFFF"/>
+  <path d="M52 46 C52 42 56 40 60 40" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+
+  <text x="52" y="99" text-anchor="middle" font-family="'Cairo', sans-serif" font-weight="800" font-size="11" fill="#FF8080">ظپظˆط¯ط§ظپظˆظ† â€¢ ط¥ظ†ط³طھط§ط¨ط§ظٹ</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="lyBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E221E"/>
+      <stop offset="100%" stop-color="#061210"/>
+    </linearGradient>
+    <linearGradient id="lyGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#lyBg)" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Libya Flag Badge -->
+  <circle cx="95" cy="25" r="14" fill="#000000" stroke="#E03C31" stroke-width="2"/>
+  <!-- Crescent & Star -->
+  <path d="M96 19 A 6 6 0 1 0 96 31 A 5 5 0 1 1 96 19 Z" fill="#FFFFFF"/>
+  <polygon points="98,24 100,24 101,22 101,24 103,25 101,26 101,28 100,26 98,26 99,25" fill="#FFFFFF"/>
+  
+  <!-- Sadad Pay Icon / Shield & Arrow -->
+  <circle cx="54" cy="62" r="24" fill="#0A382C" stroke="url(#lyGold)" stroke-width="2.5"/>
+  <path d="M44 62 L51 69 L65 53" fill="none" stroke="#34D399" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <text x="54" y="100" text-anchor="middle" font-family="'Cairo', sans-serif" font-weight="800" font-size="12" fill="#34D399">ط³ط¯ط§ط¯ â€¢ طھط¯ط§ظˆظ„</text>
+</svg>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | التحقق من تسجيل الدخول الآمن عبر Google</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon / شعار التبويب البارز -->
+    <link rel="icon" type="image/png" sizes="128x128" href="../../assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png">
+    <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="apple-touch-icon" href="../../assets/logo.png">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .callback-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        .callback-card {
+            background: linear-gradient(145deg, #121522, #0a0c13);
+            border: 1px solid var(--border-metal);
+            border-radius: 24px;
+            max-width: 520px;
+            width: 100%;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 40px rgba(197,160,89,0.15);
+        }
+        .callback-spinner {
+            width: 65px;
+            height: 65px;
+            border: 4px solid rgba(197, 160, 89, 0.2);
+            border-top: 4px solid var(--gold-primary);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(197, 160, 89, 0.12);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-light);
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .error-card {
+            background: rgba(220, 38, 38, 0.12);
+            border: 1px solid #ef4444;
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: #fff;
+            margin-top: 1rem;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="callback-wrap">
+        <div class="callback-card">
+            
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                نظام التحقق الآمن OAuth 2.0 PKCE • وسيط WASEET
+            </div>
+
+            <!-- Loading State -->
+            <div id="callback-loading">
+                <div class="callback-spinner"></div>
+                <h2 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem;">
+                    جاري التحقق من تسجيل الدخول...
+                </h2>
+                <p style="color: var(--silver-muted); font-size: 0.9rem; line-height: 1.6;">
+                    يتم الآن التحقق من رموز الحماية (State & PKCE Code Verifier) وتأكيد حساب Google الخاص بك بأمان.
+                </p>
+            </div>
+
+            <!-- Success State -->
+            <div id="callback-success" style="display: none;">
+                <div class="waseet-dialog-icon-circle glow-success" style="width: 70px; height: 70px; font-size: 2rem; margin: 0 auto 1.2rem;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">
+                    تم تسجيل الدخول بنجاح!
+                </h2>
+                <p style="color: var(--silver-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;" id="success-welcome-text">
+                    مرحباً بك مجدداً في منصة WASEET. جاري نقلك تلقائياً إلى المتجر...
+                </p>
+                <a href="../../index.html" class="btn-3d btn-gold">
+                    <i class="fas fa-store"></i> الانتقال للمتجر فوراً
+                </a>
+            </div>
+
+            <!-- Error State (State Mismatch or Redirect Tampering) -->
+            <div id="callback-error" style="display: none;">
+                <div class="waseet-dialog-icon-circle glow-danger" style="width: 70px; height: 70px; font-size: 2rem; margin: 0 auto 1.2rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">
+                    فشل التحقق الأمني من الجلسة
+                </h2>
+                
+                <div class="error-card" id="error-details-box">
+                    <strong style="color: #ef4444; display: block; margin-bottom: 0.4rem;" id="error-title">
+                        <i class="fas fa-ban"></i> خطأ أمني:
+                    </strong>
+                    <div style="font-size: 0.88rem; line-height: 1.7; color: var(--silver-white);" id="error-message-text">
+                        حدث خطأ أثناء فحص رموز الحماية.
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.8rem; display: flex; gap: 0.8rem; justify-content: center;">
+                    <a href="../../index.html" class="btn-3d btn-outline">
+                        <i class="fas fa-arrow-right"></i> العودة للرئيسية
+                    </a>
+                    <button class="btn-3d btn-orange" onclick="window.waseetAuth.initiateGoogleLogin()">
+                        <i class="fas fa-redo-alt"></i> إعادة المحاولة
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/data.js"></script>
+    <script src="../../js/particles.js"></script>
+    <script src="../../js/dialog.js"></script>
+    <script src="../../js/auth.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadingEl = document.getElementById('callback-loading');
+            const successEl = document.getElementById('callback-success');
+            const errorEl = document.getElementById('callback-error');
+            const errorMsgEl = document.getElementById('error-message-text');
+            const welcomeEl = document.getElementById('success-welcome-text');
+
+            try {
+                // Execute secure callback validation
+                const result = await window.waseetAuth.handleAuthCallback(window.location.href);
+
+                if (result && result.success) {
+                    loadingEl.style.display = 'none';
+                    successEl.style.display = 'block';
+                    if (welcomeEl && result.user) {
+                        welcomeEl.innerText = `مرحباً بك ${result.user.name} (${result.user.email})! تم توثيق حسابك بنجاح. جاري نقلك إلى المتجر...`;
+                    }
+                    setTimeout(() => {
+                        window.location.href = '../../index.html';
+                    }, 1400);
+                }
+            } catch (err) {
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                if (errorMsgEl) {
+                    errorMsgEl.innerText = err.message || 'فشل التحقق الأمني: لم تتطابق رموز الحماية أو حدث تلاعب بالرابط.';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | قائمة صفقات وطلبات الوساطة</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon / شعار التبويب البارز -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Official Facebook JavaScript SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
+
+    <style>
+        .deals-page-container {
+            max-width: 960px;
+            margin: 2rem auto 4rem;
+            padding: 0 1rem;
+        }
+        .deals-header-card {
+            text-align: center;
+            margin-bottom: 2.2rem;
+            position: relative;
+        }
+        .deals-header-card .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        .deals-header-card .page-subtitle {
+            color: var(--silver-muted);
+            font-size: 0.95rem;
+        }
+        .deal-row-card {
+            background: linear-gradient(145deg, #131724, #0b0e17);
+            border: 1px solid var(--border-metal);
+            border-radius: 20px;
+            padding: 1.6rem 1.8rem;
+            margin-bottom: 1.4rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .deal-row-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 25px rgba(197, 160, 89, 0.15);
+            transform: translateY(-3px);
+        }
+        .deal-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .deal-account-heading {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .deal-amount-tag {
+            font-family: var(--font-en);
+            font-weight: 900;
+            font-size: 1.35rem;
+            color: var(--gold-light);
+        }
+        .deal-parties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+            background: rgba(18, 22, 34, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+        }
+        .deal-stage-bar {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.75rem 1.2rem;
+            margin-bottom: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+        }
+        .btn-enter-deal {
+            width: 100%;
+            padding: 0.85rem 1.5rem;
+            background: linear-gradient(135deg, var(--orange-bright), #c2410c);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-family: var(--font-ar);
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(234, 88, 12, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-enter-deal:hover {
+            background: linear-gradient(135deg, #ff7a1a, var(--orange-bright));
+            box-shadow: 0 15px 35px rgba(234, 88, 12, 0.6);
+            transform: translateY(-2px);
+        }
+        .empty-deals-box {
+            background: rgba(14, 18, 28, 0.7);
+            border: 2px dashed rgba(197, 160, 89, 0.3);
+            border-radius: 20px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            color: var(--silver-muted);
+        }
+        @media (max-width: 768px) {
+            .deals-page-container {
+                margin: 1.2rem auto 4.5rem;
+                padding: 0 0.8rem;
+            }
+            .deals-header-card .page-title {
+                font-size: 1.4rem;
+            }
+            .deal-row-card {
+                padding: 1.1rem 1rem;
+                border-radius: 16px;
+            }
+            .deal-parties-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                padding: 0.75rem 0.9rem;
+            }
+            .btn-enter-deal {
+                font-size: 0.95rem;
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- Header -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <a href="index.html" class="brand-wrap">
+                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">وسيط • جدول صفقات الوساطة</span>
+                    </div>
+                </a>
+
+                <div class="nav-actions">
+                    <a href="chat.html" class="btn-3d btn-outline">
+                        <i class="fas fa-comments text-orange"></i>
+                        <span>غرفة المحادثات</span>
+                    </a>
+                    <a href="index.html" class="btn-3d btn-gold">
+                        <i class="fas fa-store"></i>
+                        <span>سوق الحسابات</span>
+                    </a>
+                    <div id="deals-nav-user-container"></div>
+                    <!-- Facebook-Style 3 Lines Menu Button (Requirement 6) -->
+                    <button class="mobile-hamburger-btn" onclick="toggleDealsDrawer()" aria-label="القائمة" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content (Matches Image 1) -->
+        <main class="deals-page-container">
+            
+            <div class="deals-header-card">
+                <h1 class="page-title">
+                    <i class="fas fa-crown text-gold"></i>
+                    قائمة صفقات وطلبات الوساطة
+                </h1>
+                <p class="page-subtitle">
+                    صلاحية الوسيط المعتمد • إدارة صفقات البيع والشراء النشطة وفحص بيانات الحسابات
+                </p>
+            </div>
+
+            <!-- Deals List Container -->
+            <div id="deals-table-container">
+                <!-- Rendered dynamically by JS -->
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" style="padding: 1.5rem 0; margin-top: auto;">
+            <div class="container" style="text-align: center; font-size: 0.8rem; color: var(--silver-muted);">
+                منصة وسيط WASEET • إدارة صفقات الوساطة المشفرة بنسبة 100%.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Facebook-style Sliding Drawer Menu (Requirement 6 & Images 4 & 5) -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeDealsDrawer()"></div>
+    <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
+        <div class="drawer-header">
+            <div class="drawer-user-card" id="drawer-user-card">
+                <!-- Populated dynamically -->
+            </div>
+            <button class="drawer-close-btn" onclick="closeDealsDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قائمة الصفقات</span>
+                </a>
+                <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">تسجيل الدخول إلى قوقل وغيره (صورة 3)</h4>
+            <div class="drawer-auth-actions" id="drawer-auth-actions">
+                <button class="btn-social-login btn-social-google" onclick="loginWithGoogle(); closeDealsDrawer();">
+                    <i class="fab fa-google" style="color: #ea4335;"></i> الدخول بحساب Google
+                </button>
+                <button class="btn-social-login btn-social-facebook" onclick="loginWithFacebook(); closeDealsDrawer();">
+                    <i class="fab fa-facebook-f" style="color: #1877f2;"></i> الدخول بحساب Facebook
+                </button>
+                <button class="btn-3d btn-gold" onclick="loginAsMediatorAndReload(); closeDealsDrawer();">
+                    <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
+                </button>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="https://wa.me/" target="_blank"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم الفني المباشر</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-right text-gold"></i> العودة للمتجر</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Mobile App Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#marketplace" class="mobile-nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <a href="chat.html" class="mobile-nav-item mobile-nav-center-action" title="غرفة المحادثة">
+            <div class="center-action-circle">
+                <i class="fas fa-comments"></i>
+            </div>
+            <span>المحادثة</span>
+        </a>
+        <a href="deals.html" class="mobile-nav-item active">
+            <i class="fas fa-shield-alt"></i>
+            <span>الصفقات</span>
+        </a>
+        <button class="mobile-nav-item" onclick="toggleDealsDrawer()">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/dialog.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDealsView();
+            updateDrawerProfile();
+        });
+
+        function toggleDealsDrawer() {
+            const overlay = document.getElementById('mobile-drawer-overlay');
+            const drawer = document.getElementById('mobile-drawer-sidebar');
+            if (overlay && drawer) {
+                const isActive = drawer.classList.contains('active');
+                if (isActive) closeDealsDrawer();
+                else {
+                    overlay.classList.add('active');
+                    drawer.classList.add('active');
+                    updateDrawerProfile();
+                }
+            }
+        }
+
+        function closeDealsDrawer() {
+            const overlay = document.getElementById('mobile-drawer-overlay');
+            const drawer = document.getElementById('mobile-drawer-sidebar');
+            if (overlay) overlay.classList.remove('active');
+            if (drawer) drawer.classList.remove('active');
+        }
+
+        function updateDrawerProfile() {
+            const userCard = document.getElementById('drawer-user-card');
+            const authActions = document.getElementById('drawer-auth-actions');
+            const user = WASEET_STATE.user;
+
+            if (userCard) {
+                if (user) {
+                    const avatar = user.avatar || (user.role === 'mediator' 
+                        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
+                        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
+                    const roleLabel = user.role === 'mediator' ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    userCard.innerHTML = `
+                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-role">${roleLabel}</span>
+                        </div>
+                    `;
+                } else {
+                    userCard.innerHTML = `
+                        <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">زائر غير مسجل</span>
+                            <span class="drawer-user-role" style="color: var(--silver-muted);">اختر طريقة تسجيل الدخول أدناه</span>
+                        </div>
+                    `;
+                }
+            }
+
+            if (authActions) {
+                if (user) {
+                    authActions.innerHTML = `
+                        <button class="btn-3d btn-outline" onclick="logoutFromDeals()" style="width: 100%; border-color: #ef4444; color: #ef4444;">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                        </button>
+                        ${user.role !== 'mediator' ? `
+                            <button class="btn-3d btn-gold" onclick="loginAsMediatorAndReload()" style="width: 100%; margin-top: 0.5rem;">
+                                <i class="fas fa-crown"></i> التبديل لصلاحية الوسيط
+                            </button>
+                        ` : ''}
+                    `;
+                } else {
+                    authActions.innerHTML = `
+                        <button class="btn-social-login btn-social-google" onclick="loginWithGoogle(); closeDealsDrawer();">
+                            <i class="fab fa-google" style="color: #ea4335;"></i> الدخول بحساب Google
+                        </button>
+                        <button class="btn-social-login btn-social-facebook" onclick="loginWithFacebook(); closeDealsDrawer();">
+                            <i class="fab fa-facebook-f" style="color: #1877f2;"></i> الدخول بحساب Facebook
+                        </button>
+                        <button class="btn-3d btn-gold" onclick="loginAsMediatorAndReload(); closeDealsDrawer();" style="width: 100%;">
+                            <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
+                        </button>
+                    `;
+                }
+            }
+
+            // Sync Desktop Nav User Container
+            const navUserBox = document.getElementById('deals-nav-user-container');
+            if (navUserBox) {
+                if (user) {
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                        || user.avatar
+                        || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
+                    const roleTag = user.role === 'mediator' ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
+                    navUserBox.innerHTML = `
+                        <div class="nav-user-chip" onclick="toggleDealsDrawer()" style="cursor: pointer; display: flex; align-items: center; gap: 0.55rem; background: rgba(14, 18, 28, 0.85); border: 1px solid var(--border-metal); padding: 3px 12px 3px 4px; border-radius: 999px;">
+                            <img src="${avatar}" referrerpolicy="no-referrer" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold-primary); display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">${user.name}</span>
+                            <span style="font-size: 0.72rem; color: var(--gold-primary); font-weight: 800;">${roleTag}</span>
+                        </div>
+                    `;
+                } else {
+                    navUserBox.innerHTML = `
+                        <button class="btn-3d btn-outline" onclick="loginWithGoogle()" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; border-radius: 999px;">
+                            <i class="fab fa-google text-gold"></i>
+                            <span>تسجيل الدخول</span>
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        async function loginWithGoogle() {
+            if (typeof waseetSignInWithGoogle === 'function') {
+                await waseetSignInWithGoogle();
+                return;
+            }
+            if (typeof window.waseetAuth !== 'undefined') {
+                await window.waseetAuth.initiateGoogleLogin();
+                return;
+            }
+        }
+
+        async function loginWithFacebook() {
+            WASEET_STATE.user = {
+                id: 'usr_fb_' + Date.now(),
+                name: 'مستخدم Facebook',
+                email: 'seller.fb@facebook.com',
+                role: 'seller',
+                provider: 'facebook',
+                wallet: { available: 0, locked: 0, total: 0 }
+            };
+            saveWaseetData();
+            renderDealsView();
+            updateDrawerProfile();
+            if (typeof window.waseetAlert === 'function') {
+                await window.waseetAlert(
+                    'تم تسجيل الدخول بنجاح',
+                    'مرحباً بك يا مستخدم Facebook! تم تسجيل دخولك بنجاح كبائع موثق.\nيمكنك متابعة صفقات بيع حساباتك وإدارتها أدناه.',
+                    'success'
+                );
+            }
+        }
+
+        function logoutFromDeals() {
+            WASEET_STATE.user = null;
+            saveWaseetData();
+            renderDealsView();
+            updateDrawerProfile();
+        }
+
+        function renderDealsView(searchQuery = '') {
+            const container = document.getElementById('deals-table-container');
+            if (!container) return;
+
+            const user = WASEET_STATE.user;
+
+            // 1. Visitor / Not Logged In -> Show Luxury Lock Screen (Image 1)
+            if (!user) {
+                container.innerHTML = `
+                    <div class="empty-deals-box" style="padding: 3rem 1.5rem; border-color: rgba(234, 88, 12, 0.4); text-align: center; max-width: 620px; margin: 0 auto;">
+                        <i class="fas fa-lock text-orange" style="font-size: 3.5rem; margin-bottom: 1.2rem; display: block;"></i>
+                        <h2 style="color: #fff; font-size: 1.45rem; margin-bottom: 0.6rem;">صلاحية الوسيط المعتمد مطلوبة</h2>
+                        <p style="font-size: 0.95rem; line-height: 1.8; margin: 0 auto 1.8rem; color: var(--silver-muted);">
+                            صفحة قائمة الصفقات مخصصة حصرياً لإدارة الوسيط المعتمد. يمكنك تسجيل الدخول بحساب Google أو بحساب Facebook أو بحساب الوسيط المعتمد:
+                        </p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 380px; margin: 0 auto;">
+                            <button class="btn-social-login btn-social-google" onclick="loginWithGoogle()" style="width: 100%; justify-content: center;">
+                                <i class="fab fa-google" style="color: #ea4335; font-size: 1.2rem;"></i>
+                                تسجيل الدخول بحساب Google
+                            </button>
+                            <button class="btn-social-login btn-social-facebook" onclick="loginWithFacebook()" style="width: 100%; justify-content: center;">
+                                <i class="fab fa-facebook-f" style="color: #1877f2; font-size: 1.2rem;"></i>
+                                تسجيل الدخول عبر Facebook
+                            </button>
+                            <button class="btn-3d btn-orange" onclick="loginAsMediatorAndReload()" style="width: 100%; padding: 0.85rem; font-size: 0.95rem;">
+                                <i class="fas fa-crown text-gold"></i> تسجيل الدخول كـ الوسيط المعتمد (المدير)
+                            </button>
+                            <a href="index.html" class="btn-3d btn-outline" style="width: 100%; padding: 0.75rem; text-decoration: none; font-size: 0.95rem;">
+                                <i class="fas fa-arrow-right"></i> العودة للمتجر
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 2. Buyer or Seller Logged In -> Show Personalized Deals Dashboard & Mediator Gate
+            if (user.role !== 'mediator') {
+                const isBuyer = user.role === 'buyer';
+                const roleLabel = isBuyer ? 'مشتري موثق' : 'بائع موثق';
+                const roleIcon = isBuyer ? 'fa-shopping-cart text-orange' : 'fa-store text-gold';
+                
+                // Filter user's active deals
+                const myDeals = (WASEET_STATE.deals || []).filter(d => {
+                    if (isBuyer) {
+                        return (d.buyer && (d.buyer.id === user.id || d.buyer.name === user.name)) || d.status === 'active';
+                    }
+                    return (d.seller && (d.seller.id === user.id || d.seller.name === user.name));
+                });
+
+                let userHtml = `
+                    <div style="background: rgba(197, 160, 89, 0.08); border: 1px solid var(--gold-primary); border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.9rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(234, 88, 12, 0.15); border: 2px solid var(--gold-primary); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                                <i class="fas ${roleIcon}"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: #fff; font-size: 1.15rem; margin-bottom: 0.2rem;">مرحباً بك، ${user.name} (${roleLabel})</h3>
+                                <span style="color: var(--silver-muted); font-size: 0.85rem;">هنا قائمة صفقاتك النشطة الجارية مع الوسيط المعتمد</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <a href="chat.html" class="btn-3d btn-orange" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none;">
+                                <i class="fas fa-comments"></i> غرفة الوساطة
+                            </a>
+                            <button class="btn-3d btn-outline" onclick="logoutFromDeals()" style="border-color: #ef4444; color: #ef4444; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (myDeals.length === 0) {
+                    userHtml += `
+                        <div class="empty-deals-box" style="margin-bottom: 2rem; padding: 3rem 1.5rem;">
+                            <i class="fas ${isBuyer ? 'fa-shopping-bag' : 'fa-tags'} text-gold" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.8;"></i>
+                            <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.6rem;">
+                                ${isBuyer ? 'لا توجد صفقات شراء جارية حالياً بحسابك' : 'لا توجد صفقات بيع جارية لحساباتك المعروضة حالياً'}
+                            </h3>
+                            <p style="font-size: 0.92rem; max-width: 500px; margin: 0 auto 1.5rem; color: var(--silver-muted);">
+                                ${isBuyer 
+                                    ? 'يمكنك تصفح سوق الحسابات الآن، واختيار الحساب المناسب للشراء ليقوم الوسيط المعتمد بتأمينه ونقله إليك فوراً.' 
+                                    : 'يمكنك عرض حسابك للبيع عبر سوق الحسابات وسيقوم الوسيط المعتمد بربطك بالمشتري وتأمين مستحقاتك.'}
+                            </p>
+                            <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+                                <a href="index.html#marketplace" class="btn-3d btn-gold" style="text-decoration: none;">
+                                    <i class="fas fa-store"></i> ${isBuyer ? 'تصفح سوق الحسابات والشراء' : 'عرض حساب للبيع في المتجر'}
+                                </a>
+                                <a href="chat.html" class="btn-3d btn-outline" style="text-decoration: none;">
+                                    <i class="fas fa-comments"></i> غرفة الوساطة المباشرة
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    userHtml += `
+                        <div style="margin-bottom: 1.2rem;">
+                            <h3 style="font-size: 1.2rem; color: #fff; font-weight: 800;">
+                                <i class="fas fa-tasks text-orange"></i> صفقاتك النشطة (${myDeals.length})
+                            </h3>
+                        </div>
+                    `;
+                    userHtml += myDeals.map((deal, idx) => buildDealCardHtml(deal, idx, false)).join('');
+                }
+
+                // Switch to Mediator Gate
+                userHtml += `
+                    <div style="margin-top: 2.5rem; background: rgba(12, 15, 24, 0.75); border: 1px dashed rgba(234, 88, 12, 0.4); border-radius: 16px; padding: 1.5rem; text-align: center;">
+                        <i class="fas fa-crown text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem; display: block;"></i>
+                        <h4 style="color: #fff; font-size: 1.05rem; margin-bottom: 0.4rem;">هل أنت الوسيط المعتمد للمنصة (المدير)؟</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.88rem; max-width: 520px; margin: 0 auto 1.2rem;">
+                            صفحة فحص كلمات مرور الحسابات وإدارة كافة صفقات جميع الأعضاء تتطلب تسجيل الدخول بصلاحية الوسيط المعتمد.
+                        </p>
+                        <button class="btn-3d btn-gold" onclick="loginAsMediatorAndReload()" style="padding: 0.65rem 1.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
+                        </button>
+                    </div>
+                `;
+
+                container.innerHTML = userHtml;
+                return;
+            }
+
+            // 3. Mediator Logged In -> Full Platform Deals Administration!
+
+            // Active and Completed deals
+            const activeDeals = (WASEET_STATE.deals || []).filter(d => d.status === 'active' || !d.status || d.status === 'pending');
+            const completedDeals = WASEET_STATE.completedDeals || [];
+
+            // Filter by search query (Requirement 6)
+            const q = searchQuery.trim().toLowerCase();
+            const filterFn = (d) => {
+                if (!q) return true;
+                const accNum = String(d.accountNumber || (d.accountId ? d.accountId.replace('acc_', '') : ''));
+                const dealNum = String(d.dealNumber || '');
+                const title = (d.accountTitle || '').toLowerCase();
+                const buyer = (d.buyer && d.buyer.name ? d.buyer.name.toLowerCase() : '');
+                const seller = (d.seller && d.seller.name ? d.seller.name.toLowerCase() : '');
+                return accNum.includes(q) || dealNum.includes(q) || title.includes(q) || buyer.includes(q) || seller.includes(q);
+            };
+
+            const filteredActive = activeDeals.filter(filterFn);
+            const filteredCompleted = completedDeals.filter(filterFn);
+
+            let html = '';
+
+            // Search Bar (Requirement 6)
+            html += `
+                <div style="margin-bottom: 2rem;">
+                    <div style="position: relative; max-width: 550px; margin: 0 auto;">
+                        <i class="fas fa-search" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
+                        <input type="text" id="deals-search-input" class="input-3d" 
+                               placeholder="ابحث برقم الحساب (#1001) أو رقم الصفقة (#1) أو اسم الحساب..." 
+                               value="${searchQuery}"
+                               style="padding-right: 46px; width: 100%; font-size: 0.95rem; border-radius: 14px;"
+                               oninput="renderDealsView(this.value)">
+                    </div>
+                </div>
+            `;
+
+            // Active Deals Section Header
+            html += `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.6rem;">
+                    <h2 style="font-size: 1.3rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-fire text-orange"></i> الصفقات النشطة الجارية 
+                        <span style="font-size: 0.85rem; background: rgba(234,88,12,0.2); color: var(--orange-bright); border: 1px solid var(--orange-primary); padding: 2px 10px; border-radius: 999px;">
+                            ${filteredActive.length} صفقة
+                        </span>
+                    </h2>
+                </div>
+            `;
+
+            if (filteredActive.length === 0) {
+                html += `
+                    <div class="empty-deals-box" style="margin-bottom: 2.5rem;">
+                        <i class="fas fa-shield-alt text-gold" style="font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.7;"></i>
+                        <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">لا توجد صفقات وساطة نشطة حالياً</h3>
+                        <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto; color: var(--silver-muted);">
+                            عند قيام أي مشتري بطلب وساطة لحساب في المتجر، ستظهر صفقته هنا فوراً مع تفاصيل البائع والمشتري وبيانات الدخول للفحص وتأكيد النقل.
+                        </p>
+                    </div>
+                `;
+            } else {
+                html += filteredActive.map((deal, idx) => buildDealCardHtml(deal, idx, false)).join('');
+            }
+
+            // Completed / Archived Deals Section (Requirement 5)
+            if (completedDeals.length > 0) {
+                html += `
+                    <div style="margin-top: 3rem; margin-bottom: 1.2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08);">
+                        <h2 style="font-size: 1.3rem; font-weight: 800; color: #10b981; display: flex; align-items: center; gap: 0.6rem;">
+                            <i class="fas fa-check-double"></i> قائمة الصفقات المنتهية والمؤرشفة
+                            <span style="font-size: 0.85rem; background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; padding: 2px 10px; border-radius: 999px;">
+                                ${filteredCompleted.length} صفقة
+                            </span>
+                        </h2>
+                    </div>
+                `;
+
+                if (filteredCompleted.length === 0) {
+                    html += `
+                        <div class="empty-deals-box">
+                            <p style="font-size: 0.9rem; color: var(--silver-muted);">لا توجد نتائج مطابقة لبحثك في الصفقات المنتهية.</p>
+                        </div>
+                    `;
+                } else {
+                    html += filteredCompleted.map((deal, idx) => buildDealCardHtml(deal, idx, true)).join('');
+                }
+            }
+
+            container.innerHTML = html;
+
+            // Retain focus on search input if typing
+            const searchInput = document.getElementById('deals-search-input');
+            if (searchInput && searchQuery) {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchQuery.length, searchQuery.length);
+            }
+        }
+
+        function buildDealCardHtml(deal, idx, isCompleted) {
+            const stepText = deal.stageText || `المرحلة ${deal.currentStep}: فحص بيانات الدخول والروابط`;
+            const isCancelled = deal.status === 'cancelled';
+            const statusColor = isCancelled ? '#ef4444' : (isCompleted ? '#10b981' : 'var(--gold-light)');
+            const statusText = isCancelled ? 'ملغاة • تم استرجاع النقاط للمشتري' : (isCompleted ? 'مكتملة بنجاح 100% • تم تحرير الأرباح ✅' : stepText);
+            const cardBorder = isCompleted ? 'border-color: rgba(16,185,129,0.3); opacity: 0.9;' : (isCancelled ? 'border-color: rgba(239,68,68,0.3);' : '');
+
+            // Account number (Requirement 2 & 6)
+            let accNumberDisplay = '';
+            if (deal.accountNumber) {
+                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${deal.accountNumber}</span>`;
+            } else if (deal.accountId) {
+                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${deal.accountId.replace('acc_', '')}</span>`;
+            }
+
+            return `
+                <div class="deal-row-card" style="${cardBorder}">
+                    <div class="deal-row-top">
+                        <div class="deal-account-heading">
+                            <span class="deal-num-tag" style="background: rgba(197,160,89,0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 4px 10px; border-radius: 8px; font-family: var(--font-en); font-weight: 800;">
+                                #DEAL-${deal.dealNumber || (idx + 1)}
+                            </span>
+                            ${accNumberDisplay}
+                            <span>${deal.accountTitle}</span>
+                        </div>
+                        <div class="deal-amount-tag">
+                            ${deal.totalPoints}$ <span style="font-size: 0.95rem; color: #fff;">(${deal.totalPoints} نقطة)</span>
+                        </div>
+                    </div>
+
+                    <div class="deal-parties-grid">
+                        <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color: #fff;">${deal.buyer ? deal.buyer.name : 'أحمد'}</strong></div>
+                        <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color: #fff;">${deal.seller ? deal.seller.name : 'سامي'}</strong></div>
+                        <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+$${deal.fee || 3}</strong></div>
+                    </div>
+
+                    <div class="deal-stage-bar">
+                        <span style="color: var(--silver-muted);"><i class="fas fa-tasks text-gold"></i> حالة الصفقة:</span>
+                        <span style="color: ${statusColor}; font-weight: 700;">${statusText}</span>
+                    </div>
+
+                    <a href="chat.html?dealId=${deal.id}" class="btn-enter-deal" style="${isCompleted ? 'background: linear-gradient(135deg, #10b981, #047857);' : ''}">
+                        <i class="fas fa-shield-alt"></i> ${isCompleted ? 'معاينة سجل الصفقة والضمان' : 'الدخول إلى غرفة الوساطة المباشرة لهذه الصفقة'}
+                    </a>
+                </div>
+            `;
+        }
+
+        function loginAsMediatorAndReload() {
+            if (typeof isMediatorUser === 'function' && isMediatorUser()) {
+                renderDealsView();
+                updateDrawerProfile();
+                if (typeof window.waseetAlert === 'function') {
+                    window.waseetAlert('صلاحية الوسيط مفعلة', 'أنت مسجل حالياً بصلاحية الوسيط المعتمد (المدير).', 'success');
+                }
+                return;
+            }
+            if (typeof window.waseetPromptMediatorLogin === 'function') {
+                window.waseetPromptMediatorLogin((user) => {
+                    renderDealsView();
+                    updateDrawerProfile();
+                });
+            }
+        }
+    </script>
+</body>
+</html>

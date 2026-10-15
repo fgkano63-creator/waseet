@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | غرفة الوساطة المباشرة والمحادثات</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon / شعار التبويب البارز -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Official Facebook JavaScript SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
+</head>
+<body class="chat-page-body">
+
+    <!-- Subtle 3D Ambient Background Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <a href="index.html" class="brand-wrap">
+                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">وسيط • غرفة الوساطة الآمنة</span>
+                    </div>
+                </a>
+
+                <div class="nav-actions">
+                    <!-- Direct Deals Table Link (Requirement 2) -->
+                    <a href="deals.html" class="btn-3d btn-outline" title="عرض جدول وقائمة جميع الصفقات">
+                        <i class="fas fa-list-alt text-gold"></i> <span>جدول الصفقات</span>
+                    </a>
+
+                    <!-- Return to Marketplace -->
+                    <a href="index.html" class="btn-3d btn-gold">
+                        <i class="fas fa-store"></i> <span>المتجر</span>
+                    </a>
+
+                    <!-- Facebook-Style 3 Lines Menu Button (Requirement 6) -->
+                    <button class="mobile-hamburger-btn" onclick="toggleChatDrawer()" aria-label="القائمة" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Main Dedicated Escrow / Chat View ================= -->
+        <main class="chat-main-container">
+            <div class="container" style="max-width: 1440px; padding-top: 1.2rem; padding-bottom: 2rem;">
+                <!-- Notice Banner according to Role -->
+                <div class="role-notice-banner" id="role-notice-banner">
+                    <!-- Populated dynamically based on role -->
+                </div>
+
+                <!-- Escrow Room Card -->
+                <div class="escrow-room-card">
+                    
+                    <!-- Top Bar: Deal Info & Locked Balance (Image 3) -->
+                    <div class="escrow-topbar">
+                        <div class="deal-header-info">
+                            <i class="fas fa-shield-alt deal-icon-shield"></i>
+                            <div>
+                                <div class="deal-meta-title">غرفة الوساطة المباشرة</div>
+                                <div class="deal-meta-id">جاري تجهيز بيانات الصفقة والوساطة...</div>
+                            </div>
+                        </div>
+                        <div class="escrow-topbar-controls" style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+                            <!-- Active Deal Switcher (Populated by escrow.js) -->
+                            <div class="role-switcher-box" id="deal-switcher-wrap" style="display: none;">
+                                <span class="role-switch-label"><i class="fas fa-exchange-alt text-orange"></i> الصفقة:</span>
+                                <select id="active-deal-switcher" class="role-select" onchange="window.location.href='chat.html?dealId='+this.value">
+                                </select>
+                            </div>
+
+                            <!-- Role Switcher: Allows testing as Mediator, Buyer, Seller -->
+                            <div class="role-switcher-box">
+                                <span class="role-switch-label"><i class="fas fa-eye text-gold"></i> عرض بصفتك:</span>
+                                <select id="active-viewer-role" class="role-select">
+                                    <option value="buyer">المشتري</option>
+                                    <option value="seller">البائع</option>
+                                    <option value="mediator">الوسيط المعتمد (المدير)</option>
+                                </select>
+                            </div>
+
+                            <div class="locked-amount-pill">
+                                <span>المبلغ المحجوز:</span>
+                                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0 نقطة</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4-Step Pipeline Progression Track (Image 3) -->
+                    <div class="pipeline-track" id="escrow-pipeline">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Dynamic Workspace Container: 3 Screens for Mediator OR 2 Screens for Buyer/Seller -->
+                    <div id="escrow-workspace-container">
+                        <!-- Rendered dynamically by JS -->
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" style="padding: 1.5rem 0; margin-top: auto;">
+            <div class="container" style="text-align: center; font-size: 0.8rem; color: var(--silver-muted);">
+                غرفة وساطة WASEET المشفرة • جميع البيانات المالية والحسابات تخضع لضمان الحماية بنسبة 100%.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Facebook-style Sliding Drawer Menu (Requirement 6 & Images 4 & 5) -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeChatDrawer()"></div>
+    <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
+        <div class="drawer-header">
+            <div class="drawer-user-card" id="drawer-user-card">
+                <!-- Populated dynamically -->
+            </div>
+            <button class="drawer-close-btn" onclick="closeChatDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="closeChatDrawer()">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="closeChatDrawer()">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="closeChatDrawer()">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قائمة الصفقات</span>
+                </a>
+                <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="closeChatDrawer()">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">الحساب وتسجيل الدخول</h4>
+            <div class="drawer-auth-actions" id="drawer-auth-actions">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="https://wa.me/" target="_blank"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم الفني المباشر</a></li>
+                <li><a href="index.html"><i class="fas fa-arrow-right text-gold"></i> العودة للمتجر</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Mobile App Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#marketplace" class="mobile-nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <a href="chat.html" class="mobile-nav-item active mobile-nav-center-action" title="غرفة المحادثة">
+            <div class="center-action-circle">
+                <i class="fas fa-comments"></i>
+            </div>
+            <span>المحادثة</span>
+        </a>
+        <a href="deals.html" class="mobile-nav-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>الصفقات</span>
+        </a>
+        <button class="mobile-nav-item" onclick="toggleChatDrawer()">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/escrow.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function toggleChatDrawer() {
+            const overlay = document.getElementById('mobile-drawer-overlay');
+            const drawer = document.getElementById('mobile-drawer-sidebar');
+            if (overlay && drawer) {
+                const isActive = drawer.classList.contains('active');
+                if (isActive) closeChatDrawer();
+                else {
+                    overlay.classList.add('active');
+                    drawer.classList.add('active');
+                    updateChatDrawerProfile();
+                }
+            }
+        }
+
+        function closeChatDrawer() {
+            const overlay = document.getElementById('mobile-drawer-overlay');
+            const drawer = document.getElementById('mobile-drawer-sidebar');
+            if (overlay) overlay.classList.remove('active');
+            if (drawer) drawer.classList.remove('active');
+        }
+
+        function updateChatDrawerProfile() {
+            const userCard = document.getElementById('drawer-user-card');
+            const authActions = document.getElementById('drawer-auth-actions');
+            const user = WASEET_STATE.user;
+
+            if (userCard) {
+                if (user) {
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                        || user.avatar
+                        || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
+                    const roleLabel = user.role === 'mediator' ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    userCard.innerHTML = `
+                        <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-role">${roleLabel}</span>
+                        </div>
+                    `;
+                } else {
+                    userCard.innerHTML = `
+                        <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">زائر غرفة الوساطة</span>
+                            <span class="drawer-user-role" style="color: var(--silver-muted);">اختر الدخول كـ وسيط أو مشتري أو بائع</span>
+                        </div>
+                    `;
+                }
+            }
+
+            if (authActions) {
+                if (user) {
+                    authActions.innerHTML = `
+                        <button class="btn-3d btn-outline" onclick="logoutFromChat(); closeChatDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                        </button>
+                        ${user.role !== 'mediator' ? `
+                            <button class="btn-3d btn-gold" onclick="switchRoleAndReload('mediator'); closeChatDrawer();" style="width: 100%; margin-top: 0.5rem;">
+                                <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
+                            </button>
+                        ` : ''}
+                    `;
+                } else {
+                    authActions.innerHTML = `
+                        <button class="btn-3d btn-gold" onclick="switchRoleAndReload('mediator'); closeChatDrawer();" style="width: 100%;">
+                            <i class="fas fa-crown"></i> عرض بصفتك الوسيط المعتمد (المدير)
+                        </button>
+                        <button class="btn-3d btn-orange" onclick="switchRoleAndReload('buyer'); closeChatDrawer();" style="width: 100%; margin-top: 0.4rem;">
+                            <i class="fas fa-shopping-cart"></i> عرض بصفتك المشتري
+                        </button>
+                        <button class="btn-3d btn-outline" onclick="switchRoleAndReload('seller'); closeChatDrawer();" style="width: 100%; margin-top: 0.4rem;">
+                            <i class="fas fa-store"></i> عرض بصفتك البائع
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        function logoutFromChat() {
+            WASEET_STATE.user = null;
+            saveWaseetData();
+            if (window.escrowRoom) window.escrowRoom.setViewerRole('buyer');
+            const roleSelect = document.getElementById('active-viewer-role');
+            if (roleSelect) roleSelect.value = 'buyer';
+            updateChatDrawerProfile();
+        }
+
+        function switchRoleAndReload(role) {
+            if (role === 'mediator') {
+                if (typeof isMediatorUser === 'function' && !isMediatorUser()) {
+                    if (typeof window.waseetPromptMediatorLogin === 'function') {
+                        window.waseetPromptMediatorLogin((user) => {
+                            if (window.escrowRoom) window.escrowRoom.setViewerRole('mediator');
+                            const roleSelect = document.getElementById('active-viewer-role');
+                            if (roleSelect) roleSelect.value = 'mediator';
+                            updateChatDrawerProfile();
+                        }, () => {
+                            const roleSelect = document.getElementById('active-viewer-role');
+                            if (roleSelect && window.escrowRoom) roleSelect.value = window.escrowRoom.viewerRole;
+                        });
+                    }
+                    return;
+                }
+            }
+            if (window.escrowRoom) {
+                window.escrowRoom.setViewerRole(role);
+                const roleSelect = document.getElementById('active-viewer-role');
+                if (roleSelect) roleSelect.value = role;
+            }
+            updateChatDrawerProfile();
+        }
+
+        function initEscrow() {
+            window.escrowRoom = new WaseetEscrowRoom();
+            
+            // Sync viewer role selector
+            const roleSelect = document.getElementById('active-viewer-role');
+            if (roleSelect && window.escrowRoom) {
+                roleSelect.value = window.escrowRoom.viewerRole;
+                roleSelect.addEventListener('change', (e) => {
+                    const selected = e.target.value;
+                    if (selected === 'mediator' && typeof isMediatorUser === 'function' && !isMediatorUser()) {
+                        e.target.value = window.escrowRoom.viewerRole;
+                        if (typeof window.waseetPromptMediatorLogin === 'function') {
+                            window.waseetPromptMediatorLogin((user) => {
+                                roleSelect.value = 'mediator';
+                                roleSelect.dataset.userChanged = 'true';
+                                if (window.escrowRoom) window.escrowRoom.setViewerRole('mediator');
+                                updateChatDrawerProfile();
+                            }, () => {
+                                roleSelect.value = window.escrowRoom.viewerRole;
+                            });
+                        }
+                        return;
+                    }
+                    roleSelect.dataset.userChanged = 'true';
+                    window.escrowRoom.setViewerRole(selected);
+                    updateChatDrawerProfile();
+                });
+            }
+            updateChatDrawerProfile();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initEscrow);
+        } else {
+            initEscrow();
+        }
+    </script>
+</body>
+</html>

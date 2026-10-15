@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="iqBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#241432"/>
+      <stop offset="100%" stop-color="#12071C"/>
+    </linearGradient>
+    <linearGradient id="iqPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#7E22CE"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#iqBg)" stroke="#A855F7" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Iraq Flag Badge -->
+  <circle cx="95" cy="25" r="14" fill="#FFFFFF" stroke="#CE1126" stroke-width="1.5"/>
+  <rect x="81" y="11" width="28" height="9" fill="#CE1126"/>
+  <rect x="81" y="29" width="28" height="10" fill="#000000"/>
+  <text x="95" y="27" text-anchor="middle" font-family="'Cairo', sans-serif" font-weight="900" font-size="7" fill="#007A3D">ط§ظ„ظ„ظ‡ ط£ظƒط¨ط±</text>
+
+  <!-- Zain Sparkle Icon -->
+  <circle cx="52" cy="58" r="22" fill="#3B1254" stroke="url(#iqPurple)" stroke-width="2"/>
+  <path d="M52 44 Q52 58 66 58 Q52 58 52 72 Q52 58 38 58 Q52 58 52 44 Z" fill="#C084FC"/>
+  <circle cx="52" cy="58" r="3" fill="#FFFFFF"/>
+
+  <text x="52" y="99" text-anchor="middle" font-family="'Cairo', sans-serif" font-weight="800" font-size="12" fill="#D8B4FE">ط²ظٹظ† ظƒط§ط´</text>
+</svg>

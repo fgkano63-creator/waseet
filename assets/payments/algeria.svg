@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="dzBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14261C"/>
+      <stop offset="100%" stop-color="#0A160F"/>
+    </linearGradient>
+    <linearGradient id="dzGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#dzBg)" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Algeria Flag Badge -->
+  <circle cx="95" cy="25" r="14" fill="#FFFFFF" stroke="#006233" stroke-width="1.5"/>
+  <path d="M81 11 L95 11 L95 39 L81 39 Z" fill="#006233"/>
+  <circle cx="95" cy="25" r="6" fill="#D21034"/>
+  <circle cx="97" cy="25" r="4.8" fill="#FFFFFF"/>
+
+  <!-- BaridiMob Post Horn / Emblem -->
+  <circle cx="52" cy="58" r="22" fill="#183D2A" stroke="url(#dzGold)" stroke-width="2"/>
+  <path d="M42 50 Q64 44 64 62 Q64 70 54 70 Q44 70 44 60" fill="none" stroke="url(#dzGold)" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="43" cy="52" r="3.5" fill="#F59E0B"/>
+
+  <text x="52" y="99" text-anchor="middle" font-family="'Cairo', sans-serif" font-weight="800" font-size="11.5" fill="#FBBF24">ط¨ط±ظٹط¯ظٹ ظ…ظˆط¨</text>
+</svg>
