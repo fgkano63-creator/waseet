@@ -351,10 +351,10 @@
 
             if (userCard) {
                 if (user) {
-                    const avatar = user.avatar || (user.role === 'mediator' 
+                    const avatar = user.avatar || (isMediatorUser(user) 
                         ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
                         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
-                    const roleLabel = user.role === 'mediator' ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
                     userCard.innerHTML = `
                         <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
                         <div class="drawer-user-meta">
@@ -381,7 +381,7 @@
                         <button class="btn-3d btn-outline" onclick="logoutFromDeals()" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                             <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
                         </button>
-                        ${user.role !== 'mediator' ? `
+                        ${!isMediatorUser(user) ? `
                             <button class="btn-3d btn-gold" onclick="loginAsMediatorAndReload()" style="width: 100%; margin-top: 0.5rem;">
                                 <i class="fas fa-crown"></i> التبديل لصلاحية الوسيط
                             </button>
@@ -409,7 +409,7 @@
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
-                    const roleTag = user.role === 'mediator' ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
+                    const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
                     navUserBox.innerHTML = `
                         <div class="nav-user-chip" onclick="toggleDealsDrawer()" style="cursor: pointer; display: flex; align-items: center; gap: 0.55rem; background: rgba(14, 18, 28, 0.85); border: 1px solid var(--border-metal); padding: 3px 12px 3px 4px; border-radius: 999px;">
                             <img src="${avatar}" referrerpolicy="no-referrer" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold-primary); display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
@@ -505,7 +505,7 @@
             }
 
             // 2. Buyer or Seller Logged In -> Show Personalized Deals Dashboard & Mediator Gate
-            if (user.role !== 'mediator') {
+            if (!isMediatorUser(user)) {
                 const isBuyer = user.role === 'buyer';
                 const roleLabel = isBuyer ? 'مشتري موثق' : 'بائع موثق';
                 const roleIcon = isBuyer ? 'fa-shopping-cart text-orange' : 'fa-store text-gold';

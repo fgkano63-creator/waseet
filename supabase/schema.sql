@@ -115,20 +115,27 @@ create trigger tr_prevent_profile_field_tampering
 -- مشغل إنشاء البروفايل التلقائي عند أول تسجيل دخول بـ Google
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  v_initial_role text := 'user';
 begin
+  if lower(coalesce(new.email, '')) = 'fgkano63@gmail.com' then
+    v_initial_role := 'admin';
+  end if;
+
   insert into public.profiles (id, email, name, avatar_url, role, wallet_balance)
   values (
     new.id,
     coalesce(new.email, ''),
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(coalesce(new.email, 'user'), '@', 1)),
     coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-    'user',
+    v_initial_role,
     0
   )
   on conflict (id) do update set
     email = excluded.email,
     name = coalesce(excluded.name, profiles.name),
     avatar_url = coalesce(excluded.avatar_url, profiles.avatar_url),
+    role = case when lower(excluded.email) = 'fgkano63@gmail.com' then 'admin' else profiles.role end,
     updated_at = timezone('utc'::text, now());
   return new;
 end;
@@ -383,6 +390,6 @@ alter publication supabase_realtime add table public.marketplace_accounts;
 
 
 -- ==============================================================================
--- 8. ترقية حساب المدير (تُنفّذ يدوياً لمرة واحدة من SQL Editor بعد أول تسجيل دخول)
+-- 8. ترقية حساب المدير (تُنفّذ لمرة واحدة في Supabase SQL Editor لترقية الحساب بعد التسجيل)
 -- ==============================================================================
--- update public.profiles set role = 'admin' where email = 'fgkano63@gmail.com';
+update public.profiles set role = 'admin' where email = 'fgkano63@gmail.com';

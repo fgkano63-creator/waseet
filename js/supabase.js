@@ -171,13 +171,19 @@ async function waseetSyncAuthState() {
             || authUser.email?.split('@')[0]
             || 'مستخدم';
 
+        const isAdmin = (profile && profile.role === 'admin')
+            || (authUser.email && authUser.email.toLowerCase() === 'fgkano63@gmail.com');
+
+        const userRole = isAdmin ? 'admin' : ((profile && profile.role) || 'user');
+
         const mappedUser = {
             id: authUser.id,
             email: authUser.email || (profile ? profile.email : ''),
             name: userName,
             avatar: avatarUrl,
             user_metadata: authUser.user_metadata || {},
-            role: (profile && profile.role) || 'user',
+            role: userRole,
+            isAdmin: isAdmin,
             provider: 'supabase_google',
             wallet: {
                 available: profile ? Number(profile.wallet_balance || 0) : 0,
@@ -191,7 +197,7 @@ async function waseetSyncAuthState() {
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
 
-        // تحديث عناصر الواجهة فوراً وظهور الصورة في الشريط العلوي
+        // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
         if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
         if (window.waseetApp) {
@@ -201,6 +207,18 @@ async function waseetSyncAuthState() {
             if (typeof window.waseetApp.updateWalletDisplay === 'function') {
                 window.waseetApp.updateWalletDisplay();
             }
+        }
+
+        // إذا كان في صفحة الصفقات، تحديث جدول الصفقات فوراً لظهور لوحة الوسيط المعتمد
+        if (typeof renderDealsView === 'function') {
+            renderDealsView();
+        }
+
+        // إذا كان في غرفة الشات وهو وسيط معتمد، تحويل الشاشة فوراً لوضع الوسيط (3 شاشات)
+        if (isAdmin && window.escrowRoom) {
+            window.escrowRoom.setViewerRole('mediator');
+            const roleSelect = document.getElementById('active-viewer-role');
+            if (roleSelect) roleSelect.value = 'mediator';
         }
     } catch (err) {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);

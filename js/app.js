@@ -63,7 +63,7 @@ class WaseetApp {
 
         // Show/Hide Mediator Deals Button on left of Sell Account
         if (dealsBtn) {
-            if (user && user.role === 'mediator') {
+            if (user && isMediatorUser(user)) {
                 dealsBtn.style.display = 'inline-flex';
                 if (dealsCountBadge && WASEET_STATE.deals) {
                     dealsCountBadge.innerText = WASEET_STATE.deals.length;
@@ -81,8 +81,8 @@ class WaseetApp {
                 || user.avatar
                 || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
 
-            const roleBadge = user.role === 'mediator'
-                ? '<i class="fas fa-crown text-gold" style="font-size: 0.8rem; margin-right: 0.25rem;" title="الوسيط المعتمد"></i>'
+            const roleBadge = isMediatorUser(user)
+                ? '<i class="fas fa-crown text-gold" style="font-size: 0.8rem; margin-right: 0.25rem;" title="الوسيط المعتمد (المدير)"></i>'
                 : '';
 
             // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي
@@ -134,10 +134,10 @@ class WaseetApp {
 
         if (userCard) {
             if (user) {
-                const avatar = user.avatar || (user.role === 'mediator' 
+                const avatar = user.avatar || (isMediatorUser(user) 
                     ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
                     : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
-                const roleLabel = user.role === 'mediator' ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
+                const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
                 const pts = user.wallet ? user.wallet.available : 0;
                 userCard.innerHTML = `
                     <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
@@ -166,7 +166,7 @@ class WaseetApp {
                     <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetApp.closeMobileDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
                     </button>
-                    ${user.role !== 'mediator' ? `
+                    ${!isMediatorUser(user) ? `
                         <button class="btn-3d btn-gold" onclick="window.waseetApp.loginAsMediator(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-top: 0.5rem;">
                             <i class="fas fa-crown"></i> الدخول بصلاحية الوسيط المعتمد
                         </button>
@@ -211,7 +211,7 @@ class WaseetApp {
         const currentStatusBox = document.getElementById('login-current-status-box');
         if (currentStatusBox) {
             if (WASEET_STATE.user) {
-                const roleBadge = WASEET_STATE.user.role === 'mediator' ? '👑 الوسيط المعتمد' : 'مستخدم';
+                const roleBadge = isMediatorUser(WASEET_STATE.user) ? '👑 الوسيط المعتمد (المدير)' : 'مستخدم';
                 const avatar = (WASEET_STATE.user.user_metadata && WASEET_STATE.user.user_metadata.avatar_url)
                     || WASEET_STATE.user.avatar
                     || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';

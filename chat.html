@@ -247,7 +247,7 @@
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
-                    const roleLabel = user.role === 'mediator' ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
                     userCard.innerHTML = `
                         <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
@@ -274,7 +274,7 @@
                         <button class="btn-3d btn-outline" onclick="logoutFromChat(); closeChatDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                             <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
                         </button>
-                        ${user.role !== 'mediator' ? `
+                        ${!isMediatorUser(user) ? `
                             <button class="btn-3d btn-gold" onclick="switchRoleAndReload('mediator'); closeChatDrawer();" style="width: 100%; margin-top: 0.5rem;">
                                 <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
                             </button>
@@ -336,7 +336,12 @@
             // Sync viewer role selector
             const roleSelect = document.getElementById('active-viewer-role');
             if (roleSelect && window.escrowRoom) {
-                roleSelect.value = window.escrowRoom.viewerRole;
+                if (typeof isMediatorUser === 'function' && isMediatorUser()) {
+                    window.escrowRoom.setViewerRole('mediator');
+                    roleSelect.value = 'mediator';
+                } else {
+                    roleSelect.value = window.escrowRoom.viewerRole;
+                }
                 roleSelect.addEventListener('change', (e) => {
                     const selected = e.target.value;
                     if (selected === 'mediator' && typeof isMediatorUser === 'function' && !isMediatorUser()) {
