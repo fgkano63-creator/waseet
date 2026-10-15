@@ -1,5 +1,5 @@
 param(
-    [string]$Message = "تحديث وتطوير ملفات منصة وسيط WASEET"
+    [string]$Message = "Update WASEET platform files"
 )
 
 $git = "$env:LOCALAPPDATA\Programs\MinGit\cmd\git.exe"
@@ -7,19 +7,22 @@ if (-not (Test-Path $git)) {
     $git = "git"
 }
 
-Write-Host "جاري فحص وتجهيز التعديلات..." -ForegroundColor Cyan
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+Write-Host "Checking and staging changes..." -ForegroundColor Cyan
 & $git add .
 
 $status = & $git status --porcelain
 if ($status) {
+    Write-Host "Committing changes..." -ForegroundColor Cyan
     & $git commit -m $Message
-    Write-Host "جاري الرفع إلى مستودع GitHub..." -ForegroundColor Cyan
+    Write-Host "Pushing to GitHub (origin/main)..." -ForegroundColor Cyan
     & $git push origin main
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ تم الحفظ والرفع بنجاح إلى GitHub!" -ForegroundColor Green
+        Write-Host "SUCCESS: Repository synced to GitHub!" -ForegroundColor Green
     } else {
-        Write-Host "⚠️ تعذر الرفع. تأكد من إعداد رابط المستودع وصلاحيات الوصول." -ForegroundColor Red
+        Write-Host "ERROR: Push failed. Check your network or credentials." -ForegroundColor Red
     }
 } else {
-    Write-Host "ℹ️ لا توجد تعديلات جديدة لرفعها." -ForegroundColor Yellow
+    Write-Host "INFO: Working tree clean. No changes to commit." -ForegroundColor Yellow
 }
