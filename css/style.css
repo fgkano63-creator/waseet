@@ -2581,62 +2581,139 @@ html, body {
         padding: 0 1rem;
     }
 
-    /* Header & Navigation on Mobile with Safe Area (Fixes Image 3 screen cutoff) */
+    /* Header & Navigation on Mobile with Safe Area (Prevents Cutoff) */
     .header-navbar {
-        padding-top: max(0.85rem, env(safe-area-inset-top, 14px));
-        padding-bottom: 0.75rem;
+        padding-top: max(0.55rem, env(safe-area-inset-top, 10px)) !important;
+        padding-bottom: 0.55rem !important;
+        width: 100% !important;
+        overflow: hidden !important;
     }
     .header-navbar .nav-container {
-        margin-right: 0;
-        margin-left: 0;
-        padding: 0 0.8rem;
-        gap: 0.75rem;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        padding: 0 0.8rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 0.45rem !important;
+    }
+    .brand-wrap {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        flex-shrink: 0 !important;
+        min-width: 0 !important;
     }
     .brand-logo-img {
-        width: 60px;
-        height: 60px;
+        width: 42px !important;
+        height: 42px !important;
         border: none !important;
         box-shadow: none !important;
         background: transparent !important;
+        flex-shrink: 0 !important;
         animation: shield3DFloat 4.5s ease-in-out infinite alternate;
     }
+    .brand-text-col {
+        display: flex !important;
+        flex-direction: column !important;
+    }
     .brand-title {
-        font-size: 1.4rem;
-        letter-spacing: 1.5px;
+        font-size: 1.15rem !important;
+        letter-spacing: 0.5px !important;
+        line-height: 1.1 !important;
     }
     .brand-subtitle {
-        font-size: 0.7rem;
+        display: none !important; /* Hide subtitle on mobile to guarantee no horizontal overflow */
     }
     .nav-menu {
-        display: none !important; /* Replaced by mobile bottom nav */
+        display: none !important; /* Transferred to mobile sidebar & bottom bar */
     }
     .nav-actions {
-        gap: 0.4rem;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 0.45rem !important;
+        flex-shrink: 0 !important;
     }
+
+    /* Requirement 3: Hide all non-essential items from top navbar on mobile (transferred to sidebar) */
+    .btn-nav-chats,
+    #btn-goto-chats,
+    #btn-mediator-deals,
+    #btn-open-sell,
+    #btn-seller-listings,
+    #nav-user-container,
+    .user-profile-pill,
+    #deals-nav-user-container,
+    .header-navbar .nav-actions a.btn-3d {
+        display: none !important;
+    }
+
+    /* Requirement 2: Keep wallet balance button always visible, compact padding */
     .wallet-pill {
-        padding: 0.35rem 0.65rem;
-        gap: 0.4rem;
+        display: flex !important;
+        align-items: center !important;
+        padding: 0.3rem 0.55rem !important;
+        gap: 0.32rem !important;
+        border-radius: 999px !important;
+        background: linear-gradient(135deg, rgba(234, 88, 12, 0.22), rgba(197, 160, 89, 0.18)) !important;
+        border: 1px solid var(--gold-primary) !important;
+        box-shadow: 0 0 10px rgba(197, 160, 89, 0.2) !important;
+        flex-shrink: 0 !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+    .wallet-pill:hover, .wallet-pill:active {
+        border-color: var(--gold-light) !important;
+        box-shadow: 0 0 14px var(--gold-glow) !important;
+    }
+    .wallet-icon {
+        color: var(--gold-light) !important;
+        font-size: 0.92rem !important;
+    }
+    .wallet-details {
+        display: flex !important;
+        flex-direction: column !important;
+        line-height: 1 !important;
     }
     .wallet-details .wallet-label {
-        display: none; /* Hide label to save space on mobile */
+        display: none !important; /* Hide label to save space on mobile */
     }
     .wallet-amount {
-        font-size: 0.82rem;
+        font-size: 0.8rem !important;
+        font-weight: 800 !important;
+        color: #fff !important;
+        font-family: var(--font-en) !important;
+        white-space: nowrap !important;
     }
-    #btn-open-sell {
-        padding: 0.45rem 0.75rem;
-        font-size: 0.82rem;
+    .wallet-locked-tag {
+        display: none !important;
     }
-    .user-profile-pill {
-        padding: 4px 10px 4px 6px;
+
+    /* Requirement 1: Hamburger Menu button visible on mobile */
+    .mobile-hamburger-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 10px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid var(--border-metal) !important;
+        color: #fff !important;
+        font-size: 1.15rem !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        transition: all 0.2s ease !important;
     }
-    .user-avatar-img {
-        width: 28px;
-        height: 28px;
-    }
-    .btn-deals-list {
-        padding: 0.45rem 0.7rem;
-        font-size: 0.82rem;
+    .mobile-hamburger-btn:hover, .mobile-hamburger-btn:active {
+        background: rgba(197, 160, 89, 0.2) !important;
+        border-color: var(--gold-primary) !important;
+        color: var(--gold-light) !important;
     }
 
     /* Hero Section on Mobile */
@@ -3423,7 +3500,34 @@ html, body {
 
 @media (max-width: 900px) {
     .mobile-hamburger-btn {
-        display: flex;
+        display: flex !important;
+    }
+    .header-navbar .nav-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 0 0.8rem !important;
+    }
+    .nav-menu,
+    .btn-nav-chats,
+    #btn-goto-chats,
+    #btn-mediator-deals,
+    #btn-open-sell,
+    #btn-seller-listings,
+    #nav-user-container,
+    .user-profile-pill,
+    #deals-nav-user-container,
+    .header-navbar .nav-actions a.btn-3d {
+        display: none !important;
+    }
+    .brand-subtitle {
+        display: none !important;
+    }
+    .wallet-details .wallet-label {
+        display: none !important;
     }
 }
 
@@ -3431,8 +3535,8 @@ html, body {
 .mobile-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
     z-index: 2000;
     opacity: 0;
     visibility: hidden;
@@ -3448,19 +3552,22 @@ html, body {
 .mobile-drawer-sidebar {
     position: fixed;
     top: 0;
-    right: -320px;
-    width: 300px;
-    max-width: 85vw;
+    right: -340px;
+    width: 310px;
+    max-width: 86vw;
     height: 100vh;
-    background: #0f131d;
-    border-left: 1px solid var(--border-metal);
-    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8);
+    height: 100dvh;
+    background: linear-gradient(180deg, #131725 0%, #0a0d14 100%);
+    border-left: 1px solid var(--gold-primary);
+    box-shadow: -15px 0 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(197, 160, 89, 0.12);
     z-index: 2001;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    padding: max(1rem, env(safe-area-inset-top, 16px)) 1rem 2rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: max(1.2rem, env(safe-area-inset-top, 16px)) 1.1rem 2.5rem 1.1rem;
+    box-sizing: border-box;
 }
 
 .mobile-drawer-sidebar.active {

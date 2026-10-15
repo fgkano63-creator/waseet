@@ -145,13 +145,15 @@ class WaseetApp {
 
         if (userCard) {
             if (user) {
-                const avatar = user.avatar || (isMediatorUser(user) 
-                    ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
-                    : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
+                const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                    || user.avatar 
+                    || (isMediatorUser(user) 
+                        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
+                        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
                 const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
                 const pts = user.wallet ? user.wallet.available : 0;
                 userCard.innerHTML = `
-                    <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
+                    <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                     <div class="drawer-user-meta">
                         <span class="drawer-user-name">${user.name}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
