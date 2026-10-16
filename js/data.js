@@ -38,7 +38,11 @@ function generateAccountsList() {
             image: SAMPLE_IMAGES[0],
             badge: 'برايم 8 ماكس',
             featured: true,
-            status: 'available'
+            status: 'available',
+            credentials: {
+                email_or_phone: 'dragon.sniper99@gmail.com',
+                password: 'FireDragon#2024Pass'
+            }
         },
         {
             id: 'acc_102',
@@ -63,7 +67,11 @@ function generateAccountsList() {
             image: SAMPLE_IMAGES[2],
             badge: 'برايم 7 نادر',
             featured: true,
-            status: 'available'
+            status: 'available',
+            credentials: {
+                email_or_phone: 'shadow_warrior_fb@outlook.com',
+                password: 'Shadow#FB2024Secret'
+            }
         },
         {
             id: 'acc_103',
@@ -88,7 +96,11 @@ function generateAccountsList() {
             image: SAMPLE_IMAGES[1],
             badge: 'برايم 5 اقتصادي',
             featured: false,
-            status: 'available'
+            status: 'pending_verification',
+            credentials: {
+                email_or_phone: 'viper.ff.mena@gmail.com',
+                password: 'ViperSecure!998'
+            }
         },
         {
             id: 'acc_104',

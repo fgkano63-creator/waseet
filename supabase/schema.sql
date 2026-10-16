@@ -164,7 +164,11 @@ create table if not exists public.marketplace_accounts (
     seller_price numeric not null check (seller_price > 0),
     images jsonb default '[]'::jsonb,
     details jsonb default '{}'::jsonb,
-    status text not null default 'available' check (status in ('available', 'in_deal', 'sold', 'hidden')),
+    -- بيانات الدخول المشفرة (خاصة بفحص الوسيط المعتمد ولا يراها المشتري العادي أبداً)
+    credentials jsonb default '{}'::jsonb,
+    encrypted_credentials text default null,
+    -- الحالة الافتراضية لأي حساب جديد: pending_verification (قيد الفحص والمراجعة)
+    status text not null default 'pending_verification' check (status in ('pending_verification', 'available', 'in_deal', 'sold', 'hidden', 'rejected')),
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -178,7 +182,8 @@ grant all on table public.marketplace_accounts to service_role;
 alter table public.marketplace_accounts enable row level security;
 
 -- سياسات RLS لحسابات المتجر:
--- القراءة: الحسابات المتاحة يراها الجميع (حتى الزوار لتصفح المتجر)، أو يرى البائع حساباته الخاصة، أو يرى المدير الكل.
+-- القراءة: الحسابات المعتمدة فقط (status = 'available') تظهر في المتجر العام أمام الجميع والزوار.
+-- الحسابات المعلقة (pending_verification) أو المرفوضة يراها فقط صاحب الحساب (البائع) أو المدير (Admin / الوسيط).
 drop policy if exists "accounts_select_policy" on public.marketplace_accounts;
 create policy "accounts_select_policy"
 on public.marketplace_accounts for select
@@ -187,7 +192,7 @@ using (
   or (auth.uid() is not null and (seller_id = auth.uid() or public.is_admin()))
 );
 
--- الإضافة: المستخدم المسجل يضيف حساباً باسمه كبائع فقط
+-- الإضافة: المستخدم المسجل يضيف حسابه وتكون حالته الافتراضية 'pending_verification'
 drop policy if exists "accounts_insert_policy" on public.marketplace_accounts;
 create policy "accounts_insert_policy"
 on public.marketplace_accounts for insert to authenticated
@@ -195,24 +200,50 @@ with check (
   seller_id = auth.uid()
 );
 
--- التعديل: البائع يعدل حسابه الخاص فقط ما دام لم يدخل في صفقة نشطة، أو المدير
+-- التعديل: البائع يعدل حسابه الخاص إذا كان قيد الفحص أو متاحاً، أو المدير يعتمد الحساب ويغير حالته إلى available أو rejected
 drop policy if exists "accounts_update_policy" on public.marketplace_accounts;
 create policy "accounts_update_policy"
 on public.marketplace_accounts for update to authenticated
 using (
-  (seller_id = auth.uid() and status in ('available', 'hidden')) or public.is_admin()
+  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
 )
 with check (
-  (seller_id = auth.uid() and status in ('available', 'hidden')) or public.is_admin()
+  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
 );
 
--- الحذف: البائع يحذف حسابه الخاص إذا كان متاحاً، أو المدير
+-- الحذف: البائع يحذف حسابه الخاص، أو المدير
 drop policy if exists "accounts_delete_policy" on public.marketplace_accounts;
 create policy "accounts_delete_policy"
 on public.marketplace_accounts for delete to authenticated
 using (
-  (seller_id = auth.uid() and status in ('available', 'hidden')) or public.is_admin()
+  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
 );
+
+-- دالة آمنة لاسترجاع بيانات دخول الحساب (حصرياً للمدير والوسيط فقط)
+create or replace function public.get_account_credentials(p_account_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+stable
+as $$
+declare
+  v_credentials jsonb;
+begin
+  if not public.is_admin() then
+    raise exception 'أمني: غير مصرح لك بالاطلاع على بيانات الدخول السرية الخاصة بالحساب';
+  end if;
+
+  select coalesce(credentials, jsonb_build_object('encrypted', encrypted_credentials))
+  into v_credentials
+  from public.marketplace_accounts
+  where id = p_account_id;
+
+  return v_credentials;
+end;
+$$;
+
+grant execute on function public.get_account_credentials(uuid) to authenticated;
 
 
 -- ==============================================================================
