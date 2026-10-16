@@ -42,6 +42,11 @@
                     </div>
                 </a>
 
+                <!-- Mobile Hamburger Menu Button (☰) -->
+                <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="window.waseetApp && window.waseetApp.toggleMobileDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                    <i class="fas fa-bars"></i>
+                </button>
+
                 <ul class="nav-menu">
                     <li><a href="#marketplace" class="nav-link active"><i class="fas fa-store"></i> المتجر</a></li>
                     <li><a href="#fee-calculator" class="nav-link"><i class="fas fa-calculator"></i> حاسبة العمولات</a></li>
@@ -85,15 +90,10 @@
                         <span class="deals-badge-count" id="seller-listings-count" style="display: none;">0</span>
                     </button>
 
-                    <!-- User Profile / Login Button Container (Visually on the physical LEFT of 'بيع حساب') -->
+                    <!-- User Profile / Login Button Container (Visually on the physical LEFT) -->
                     <div id="nav-user-container">
                         <!-- Populated by JS based on user role -->
                     </div>
-
-                    <!-- Facebook-Style 3 Lines Menu Button (Requirement 6) -->
-                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="window.waseetApp && window.waseetApp.toggleMobileDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
-                        <i class="fas fa-bars"></i>
-                    </button>
                 </div>
             </div>
         </header>

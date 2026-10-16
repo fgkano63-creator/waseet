@@ -44,6 +44,11 @@
                     </div>
                 </a>
 
+                <!-- Mobile Hamburger Menu Button (☰) -->
+                <button class="mobile-hamburger-btn" onclick="toggleChatDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                    <i class="fas fa-bars"></i>
+                </button>
+
                 <div class="nav-actions">
                     <!-- Direct Deals Table Link (Requirement 2) -->
                     <a href="deals.html" class="btn-3d btn-outline" title="عرض جدول وقائمة جميع الصفقات">
@@ -55,10 +60,8 @@
                         <i class="fas fa-store"></i> <span>المتجر</span>
                     </a>
 
-                    <!-- Facebook-Style 3 Lines Menu Button (Requirement 6) -->
-                    <button class="mobile-hamburger-btn" onclick="toggleChatDrawer()" aria-label="القائمة" title="القائمة الرئيسية">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                    <!-- User Profile / Login Container -->
+                    <div id="chat-nav-user-container"></div>
                 </div>
             </div>
         </header>
@@ -276,6 +279,31 @@
                         <a href="index.html" class="btn-3d btn-outline" style="width: 100%; margin-top: 0.6rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-store"></i> العودة للمتجر
                         </a>
+                    `;
+                }
+            }
+
+            // Sync Nav User Container
+            const navUserBox = document.getElementById('chat-nav-user-container');
+            if (navUserBox) {
+                if (user) {
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                        || user.avatar
+                        || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
+                    const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
+                    navUserBox.innerHTML = `
+                        <div class="user-profile-pill nav-user-chip" onclick="toggleChatDrawer()" title="${user.name}">
+                            <img src="${avatar}" referrerpolicy="no-referrer" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                            <span class="user-name-label">${user.name}</span>
+                            <span class="user-role-badge">${roleTag}</span>
+                        </div>
+                    `;
+                } else {
+                    navUserBox.innerHTML = `
+                        <button class="btn-3d btn-outline btn-nav-login" onclick="toggleChatDrawer()">
+                            <i class="fas fa-user-circle text-gold"></i>
+                            <span>تسجيل الدخول</span>
+                        </button>
                     `;
                 }
             }

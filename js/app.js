@@ -98,15 +98,15 @@ class WaseetApp {
 
             // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي
             container.innerHTML = `
-                <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${user.name} - انقر لإدارة الحساب أو تسجيل الخروج" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.55rem; padding: 3px 12px 3px 4px; background: rgba(14, 18, 28, 0.85); border: 1px solid var(--border-metal); border-radius: 999px;">
-                    <img src="${avatarUrl}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); display: block;">
-                    <span style="font-size: 0.88rem; font-weight: 700; color: #fff; white-space: nowrap;">${user.name}</span>
+                <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${user.name} - انقر لإدارة الحساب أو تسجيل الخروج">
+                    <img src="${avatarUrl}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                    <span class="user-name-label">${user.name}</span>
                     ${roleBadge}
                 </div>
             `;
         } else {
             container.innerHTML = `
-                <button class="btn-3d btn-outline" onclick="window.waseetApp.openLoginModal()" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; border-radius: 999px;">
+                <button class="btn-3d btn-outline btn-nav-login" onclick="window.waseetApp.openLoginModal()">
                     <i class="fas fa-user-circle text-gold"></i>
                     <span>تسجيل الدخول</span>
                 </button>

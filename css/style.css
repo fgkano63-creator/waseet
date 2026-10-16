@@ -106,23 +106,25 @@ body {
 }
 
 .header-navbar .nav-container {
-    max-width: 1560px;
-    margin-right: 2rem;
-    margin-left: auto;
-    padding-right: 0.5rem;
-    padding-left: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.75rem;
 }
 
 .brand-wrap {
     display: flex;
     align-items: center;
-    gap: 1.15rem;
+    gap: 0.75rem;
     text-decoration: none;
     perspective: 1000px;
     transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .brand-wrap:hover {
@@ -130,8 +132,8 @@ body {
 }
 
 .brand-logo-img {
-    width: 82px;
-    height: 82px;
+    width: 58px;
+    height: 58px;
     border-radius: 0;
     border: none !important;
     box-shadow: none !important;
@@ -208,23 +210,26 @@ body {
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 2.2rem;
+    gap: 0.5rem;
     list-style: none;
-    margin: 0 2rem;
+    margin: 0 0.5rem;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .nav-link {
     color: var(--silver-muted);
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     transition: color 0.2s, text-shadow 0.2s, background-color 0.2s;
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.85rem;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
     border-radius: 8px;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -236,7 +241,8 @@ body {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 /* Wallet Pill Widget */
@@ -244,13 +250,15 @@ body {
     background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(197, 160, 89, 0.12));
     border: 1px solid var(--gold-primary);
     border-radius: 999px;
-    padding: 0.4rem 0.9rem;
+    padding: 0.32rem 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.55rem;
     cursor: pointer;
     box-shadow: 0 0 12px rgba(197, 160, 89, 0.15);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .wallet-pill:hover {
@@ -294,16 +302,18 @@ body {
 /* Nav Chats Button & Pulse Badge */
 .btn-nav-chats {
     position: relative;
-    padding: 0.55rem 1.15rem;
-    font-size: 0.9rem;
+    padding: 0.42rem 0.85rem;
+    font-size: 0.86rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.45rem;
     background: rgba(14, 18, 28, 0.85);
     border: 1px solid var(--border-metal);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.25s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-nav-chats:hover {
@@ -2421,15 +2431,17 @@ body {
 }
 
 .user-profile-pill {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     background: rgba(14, 18, 28, 0.85);
     border: 1px solid var(--border-metal);
     border-radius: 999px;
-    padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+    padding: 3px 10px 3px 4px;
     cursor: pointer;
     transition: all 0.25s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .user-profile-pill:hover {
@@ -2442,7 +2454,29 @@ body {
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--gold-primary);
+    border: 1.5px solid var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
+    display: block;
+    flex-shrink: 0;
+}
+
+.user-name-label {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Nav Login Button */
+.btn-nav-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.85rem;
+    font-size: 0.85rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -2455,14 +2489,17 @@ body {
     color: var(--gold-light);
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 1.1rem;
-    border-radius: 12px;
+    gap: 0.45rem;
+    padding: 0.42rem 0.85rem;
+    border-radius: 10px;
     font-weight: 800;
+    font-size: 0.86rem;
     cursor: pointer;
     transition: all 0.25s ease;
     text-decoration: none;
     position: relative;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-deals-list:hover {
@@ -2581,36 +2618,86 @@ html, body {
         padding: 0 1rem;
     }
 
-    /* Header & Navigation on Mobile with Safe Area (Prevents Cutoff) */
+/* ==========================================================================
+   TABLET & SMALL DESKTOP NAVBAR OPTIMIZATION (901px - 1250px)
+   ========================================================================== */
+@media (max-width: 1250px) and (min-width: 901px) {
+    .header-navbar .nav-container {
+        padding: 0 0.85rem;
+        gap: 0.4rem;
+    }
+    .brand-logo-img {
+        width: 48px;
+        height: 48px;
+    }
+    .brand-title {
+        font-size: 1.35rem;
+    }
+    .brand-subtitle {
+        display: none;
+    }
+    .nav-menu {
+        gap: 0.35rem;
+        margin: 0 0.2rem;
+    }
+    .nav-link {
+        padding: 0.32rem 0.5rem;
+        font-size: 0.82rem;
+    }
+    .nav-actions {
+        gap: 0.35rem;
+    }
+    .nav-actions .btn-3d,
+    .btn-deals-list,
+    .btn-nav-chats {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.82rem;
+    }
+    .wallet-pill {
+        padding: 0.28rem 0.55rem;
+        gap: 0.4rem;
+    }
+    .wallet-label {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   MOBILE NAVBAR (3 Elements Only: Logo on Far Right, ☰ in Middle, User/Login on Far Left)
+   ========================================================================== */
+@media (max-width: 900px) {
     .header-navbar {
-        padding-top: max(0.55rem, env(safe-area-inset-top, 10px)) !important;
-        padding-bottom: 0.55rem !important;
+        padding-top: max(0.45rem, env(safe-area-inset-top, 8px)) !important;
+        padding-bottom: 0.45rem !important;
         width: 100% !important;
         overflow: hidden !important;
     }
     .header-navbar .nav-container {
-        margin-right: 0 !important;
-        margin-left: 0 !important;
-        padding: 0 0.8rem !important;
+        margin: 0 !important;
+        padding: 0 0.85rem !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
+        flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 0.45rem !important;
+        gap: 0.4rem !important;
     }
+
+    /* 1. Element 1: Logo on Far Right */
     .brand-wrap {
         display: flex !important;
         align-items: center !important;
-        gap: 0.5rem !important;
+        gap: 0.45rem !important;
         flex-shrink: 0 !important;
         min-width: 0 !important;
+        order: 1 !important;
     }
     .brand-logo-img {
-        width: 42px !important;
-        height: 42px !important;
+        width: 38px !important;
+        height: 38px !important;
         border: none !important;
         box-shadow: none !important;
         background: transparent !important;
@@ -2627,74 +2714,10 @@ html, body {
         line-height: 1.1 !important;
     }
     .brand-subtitle {
-        display: none !important; /* Hide subtitle on mobile to guarantee no horizontal overflow */
-    }
-    .nav-menu {
-        display: none !important; /* Transferred to mobile sidebar & bottom bar */
-    }
-    .nav-actions {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 0.45rem !important;
-        flex-shrink: 0 !important;
-    }
-
-    /* Requirement 3: Hide all non-essential items from top navbar on mobile (transferred to sidebar) */
-    .btn-nav-chats,
-    #btn-goto-chats,
-    #btn-mediator-deals,
-    #btn-open-sell,
-    #btn-seller-listings,
-    #nav-user-container,
-    .user-profile-pill,
-    #deals-nav-user-container,
-    .header-navbar .nav-actions a.btn-3d {
         display: none !important;
     }
 
-    /* Requirement 2: Keep wallet balance button always visible, compact padding */
-    .wallet-pill {
-        display: flex !important;
-        align-items: center !important;
-        padding: 0.3rem 0.55rem !important;
-        gap: 0.32rem !important;
-        border-radius: 999px !important;
-        background: linear-gradient(135deg, rgba(234, 88, 12, 0.22), rgba(197, 160, 89, 0.18)) !important;
-        border: 1px solid var(--gold-primary) !important;
-        box-shadow: 0 0 10px rgba(197, 160, 89, 0.2) !important;
-        flex-shrink: 0 !important;
-        cursor: pointer !important;
-        transition: all 0.2s ease !important;
-    }
-    .wallet-pill:hover, .wallet-pill:active {
-        border-color: var(--gold-light) !important;
-        box-shadow: 0 0 14px var(--gold-glow) !important;
-    }
-    .wallet-icon {
-        color: var(--gold-light) !important;
-        font-size: 0.92rem !important;
-    }
-    .wallet-details {
-        display: flex !important;
-        flex-direction: column !important;
-        line-height: 1 !important;
-    }
-    .wallet-details .wallet-label {
-        display: none !important; /* Hide label to save space on mobile */
-    }
-    .wallet-amount {
-        font-size: 0.8rem !important;
-        font-weight: 800 !important;
-        color: #fff !important;
-        font-family: var(--font-en) !important;
-        white-space: nowrap !important;
-    }
-    .wallet-locked-tag {
-        display: none !important;
-    }
-
-    /* Requirement 1: Hamburger Menu button visible on mobile */
+    /* 2. Element 2: Hamburger Menu ☰ in middle / next to logo */
     .mobile-hamburger-btn {
         display: flex !important;
         align-items: center !important;
@@ -2702,19 +2725,95 @@ html, body {
         width: 38px !important;
         height: 38px !important;
         border-radius: 10px !important;
-        background: rgba(255, 255, 255, 0.08) !important;
+        background: rgba(197, 160, 89, 0.12) !important;
         border: 1px solid var(--border-metal) !important;
-        color: #fff !important;
+        color: var(--gold-light) !important;
         font-size: 1.15rem !important;
         cursor: pointer !important;
         flex-shrink: 0 !important;
+        order: 2 !important;
         transition: all 0.2s ease !important;
     }
-    .mobile-hamburger-btn:hover, .mobile-hamburger-btn:active {
-        background: rgba(197, 160, 89, 0.2) !important;
+    .mobile-hamburger-btn:active {
+        background: rgba(197, 160, 89, 0.25) !important;
         border-color: var(--gold-primary) !important;
-        color: var(--gold-light) !important;
     }
+
+    /* Desktop navigation menu hidden on mobile */
+    .nav-menu {
+        display: none !important;
+    }
+
+    /* 3. Element 3: User Account / Login Container on Far Left */
+    .nav-actions {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        margin-inline-start: auto !important; /* In RTL, pushes firmly to the far LEFT */
+        margin-right: auto !important;        /* Fallback for RTL */
+        margin-left: 0 !important;
+        flex-shrink: 0 !important;
+        order: 3 !important;
+        gap: 0 !important;
+    }
+
+    /* Hide ALL other crowded items from mobile top navbar (transferred to sidebar) */
+    .wallet-pill,
+    .btn-nav-chats,
+    #btn-goto-chats,
+    #btn-mediator-deals,
+    #btn-open-sell,
+    #btn-seller-listings,
+    .header-navbar .nav-actions > a.btn-3d,
+    .header-navbar .nav-actions > button.btn-3d:not(.btn-nav-login) {
+        display: none !important;
+    }
+
+    /* Ensure user container is visible on mobile and styled on the far left */
+    #nav-user-container,
+    #deals-nav-user-container,
+    #chat-nav-user-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex-shrink: 0 !important;
+    }
+
+    .user-profile-pill,
+    .nav-user-chip {
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 2px 8px 2px 3px !important;
+        gap: 0.35rem !important;
+        max-width: 145px !important;
+        background: rgba(14, 18, 28, 0.85) !important;
+        border: 1px solid var(--border-metal) !important;
+        border-radius: 999px !important;
+        cursor: pointer !important;
+    }
+    .user-profile-pill .user-name-label,
+    .nav-user-chip span {
+        max-width: 65px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 0.82rem !important;
+    }
+    .user-avatar-img,
+    .nav-user-chip img {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 50% !important;
+        flex-shrink: 0 !important;
+    }
+    .btn-nav-login {
+        display: inline-flex !important;
+        padding: 0.38rem 0.75rem !important;
+        font-size: 0.82rem !important;
+        border-radius: 999px !important;
+        white-space: nowrap !important;
+    }
+}
 
     /* Hero Section on Mobile */
     .hero-section {
@@ -3496,39 +3595,6 @@ html, body {
     background: rgba(197, 160, 89, 0.2);
     border-color: var(--gold-primary);
     color: var(--gold-light);
-}
-
-@media (max-width: 900px) {
-    .mobile-hamburger-btn {
-        display: flex !important;
-    }
-    .header-navbar .nav-container {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 0 0.8rem !important;
-    }
-    .nav-menu,
-    .btn-nav-chats,
-    #btn-goto-chats,
-    #btn-mediator-deals,
-    #btn-open-sell,
-    #btn-seller-listings,
-    #nav-user-container,
-    .user-profile-pill,
-    #deals-nav-user-container,
-    .header-navbar .nav-actions a.btn-3d {
-        display: none !important;
-    }
-    .brand-subtitle {
-        display: none !important;
-    }
-    .wallet-details .wallet-label {
-        display: none !important;
-    }
 }
 
 /* Backdrop */
