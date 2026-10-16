@@ -706,11 +706,11 @@ class WaseetApp {
                                 <span class="price-main">${pricing.buyerPrice} <span style="font-size: 0.9rem; color: var(--gold-light);">نقطة</span></span>
                             </div>
                             ${isMediator ? `
-                                <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
-                                    <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.45rem 0.75rem; font-size: 0.82rem;" title="فحص بيانات ومواصفات الحساب">
+                                <div class="mediator-actions-wrap" style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                                    <button class="btn-3d btn-inspect-acc" onclick="window.waseetApp.inspectAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.45rem 0.75rem; font-size: 0.82rem;" title="فحص بيانات ومواصفات الحساب">
                                         <i class="fas fa-search-plus"></i> فحص الحساب
                                     </button>
-                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.45rem 0.65rem; font-size: 0.8rem;" title="حذف هذا الحساب للاشتباه في احتيال أو بيانات غير صحيحة">
+                                    <button class="btn-3d btn-outline btn-reject-acc" onclick="window.waseetApp.rejectAccountDirect('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.45rem 0.65rem; font-size: 0.8rem;" title="حذف هذا الحساب للاشتباه في احتيال أو بيانات غير صحيحة">
                                         <i class="fas fa-trash-alt"></i> حذف هذا الحساب
                                     </button>
                                 </div>

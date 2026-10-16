@@ -2617,6 +2617,7 @@ html, body {
     .container {
         padding: 0 1rem;
     }
+}
 
 /* ==========================================================================
    TABLET & SMALL DESKTOP NAVBAR OPTIMIZATION (901px - 1250px)
@@ -2808,6 +2809,10 @@ html, body {
     }
 }
 
+/* ==========================================================================
+   MOBILE LAYOUT & HERO, MARKETPLACE, CARDS (max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
     /* Hero Section on Mobile */
     .hero-section {
         padding: 2rem 0 1.5rem;
@@ -2882,18 +2887,30 @@ html, body {
         padding: 0.5rem 0.6rem;
     }
     /* ==========================================================================
-       Accounts Grid on Mobile (Requirement: 2 accounts per row)
+       Accounts Grid on Mobile (Requirement: 2 accounts per row strictly)
        ========================================================================== */
+    .marketplace-section {
+        padding: 1.5rem 0 2rem !important;
+    }
+
+    .marketplace-section .container {
+        padding: 0 0.45rem !important;
+    }
+
     .accounts-grid-wrapper {
         perspective: none !important;
         overflow: hidden !important;
+        width: 100% !important;
     }
 
     .accounts-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.6rem !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.45rem !important;
         perspective: none !important;
         transform: none !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .accounts-grid.phone-transition-out,
@@ -2903,28 +2920,34 @@ html, body {
     }
 
     .account-card-3d {
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         transform: none !important;
         -webkit-transform: none !important;
         perspective: none !important;
         transform-style: flat !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
         width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .account-card-3d:hover {
         transform: none !important;
         border-color: var(--gold-primary) !important;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7) !important;
     }
 
     .card-media {
+        width: 100% !important;
         height: auto !important;
         aspect-ratio: 16 / 10 !important;
         overflow: hidden !important;
-        border-radius: 12px 12px 0 0 !important;
+        border-radius: 10px 10px 0 0 !important;
+        position: relative !important;
     }
 
     .card-media .card-img {
@@ -2932,6 +2955,7 @@ html, body {
         height: 100% !important;
         object-fit: cover !important;
         transform: none !important;
+        display: block !important;
     }
 
     .account-card-3d:hover .card-img {
@@ -2939,119 +2963,143 @@ html, body {
     }
 
     .prime-badge-3d {
-        font-size: 0.62rem !important;
-        padding: 2px 5px !important;
-        top: 6px !important;
-        right: 6px !important;
-        border-radius: 6px !important;
-        gap: 0.2rem !important;
+        font-size: 0.55rem !important;
+        padding: 2px 4px !important;
+        top: 5px !important;
+        right: 5px !important;
+        border-radius: 4px !important;
+        gap: 0.15rem !important;
     }
 
     .account-num-tag {
-        font-size: 0.62rem !important;
-        padding: 2px 5px !important;
-        top: 6px !important;
-        left: 6px !important;
-        border-radius: 6px !important;
-        gap: 0.2rem !important;
+        font-size: 0.55rem !important;
+        padding: 2px 4px !important;
+        top: 5px !important;
+        left: 5px !important;
+        border-radius: 4px !important;
+        gap: 0.15rem !important;
     }
 
     .level-tag {
-        font-size: 0.58rem !important;
+        font-size: 0.52rem !important;
         padding: 1px 4px !important;
-        bottom: 6px !important;
-        right: 6px !important;
+        bottom: 5px !important;
+        right: 5px !important;
         border-radius: 4px !important;
     }
 
     .btn-gallery-badge {
-        font-size: 0.58rem !important;
+        font-size: 0.52rem !important;
         padding: 1px 4px !important;
-        bottom: 6px !important;
-        left: 6px !important;
+        bottom: 5px !important;
+        left: 5px !important;
         border-radius: 4px !important;
     }
 
     .pending-review-banner,
     .rejected-banner {
-        font-size: 0.58rem !important;
+        font-size: 0.55rem !important;
         padding: 2px 5px !important;
-        top: 6px !important;
-        right: 6px !important;
+        top: 5px !important;
+        right: 5px !important;
         border-radius: 4px !important;
     }
 
     .card-body {
-        padding: 0.55rem 0.45rem !important;
+        padding: 0.45rem 0.35rem !important;
         display: flex !important;
         flex-direction: column !important;
+        flex: 1 1 auto !important;
         justify-content: space-between !important;
+        box-sizing: border-box !important;
     }
 
     .card-title {
-        font-size: 0.82rem !important;
-        line-height: 1.3 !important;
-        margin-bottom: 0.35rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.25rem !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
     }
 
     .card-specs {
+        display: flex !important;
+        flex-wrap: wrap !important;
         gap: 0.2rem !important;
-        margin-bottom: 0.35rem !important;
-        flex-wrap: nowrap !important;
+        margin-bottom: 0.3rem !important;
+        max-height: 38px !important;
         overflow: hidden !important;
     }
 
     .spec-chip {
-        font-size: 0.58rem !important;
-        padding: 0.1rem 0.32rem !important;
+        font-size: 0.54rem !important;
+        padding: 1px 4px !important;
         border-radius: 4px !important;
         white-space: nowrap !important;
+        line-height: 1.2 !important;
     }
 
     .card-footer {
+        display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 0.35rem !important;
-        padding-top: 0.45rem !important;
+        gap: 0.3rem !important;
+        padding-top: 0.35rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
         margin-top: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .price-col {
         align-items: center !important;
         text-align: center !important;
+        margin-bottom: 0.1rem !important;
     }
 
     .price-sub {
-        font-size: 0.56rem !important;
+        font-size: 0.52rem !important;
         line-height: 1.1 !important;
         color: var(--silver-muted) !important;
+        display: block !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
     .price-main {
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 800 !important;
         line-height: 1.1 !important;
     }
 
-    .card-footer > div:last-child {
+    .card-footer > div:last-child,
+    .mediator-actions-wrap {
         width: 100% !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 0.25rem !important;
+        align-items: stretch !important;
     }
 
     .card-footer button.btn-3d,
     .card-footer .btn-orange,
-    .card-footer .btn-outline {
+    .card-footer .btn-outline,
+    .mediator-actions-wrap .btn-3d {
         width: 100% !important;
-        padding: 0.35rem 0.4rem !important;
-        font-size: 0.72rem !important;
+        padding: 0.35rem 0.25rem !important;
+        font-size: 0.7rem !important;
+        font-weight: 700 !important;
+        min-height: 28px !important;
+        display: flex !important;
+        align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
         box-sizing: border-box !important;
         margin: 0 !important;
+        border-radius: 6px !important;
     }
 
     /* Pagination on Mobile */
