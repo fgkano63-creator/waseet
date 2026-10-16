@@ -22,7 +22,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
 
     <!-- Custom 3D Design Styles -->
-    <link rel="stylesheet" href="css/style.css?v=20261016_2col">
+    <link rel="stylesheet" href="css/style.css?v=20261016_v3">
 </head>
 <body>
 
@@ -59,7 +59,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
                         </div>
                         <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 محجوز</span>
                     </div>
@@ -694,11 +694,11 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المتاح للشراء والسحب:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0 نقطة ($0)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0 نقطة (0$)</div>
                 </div>
                 <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid var(--orange-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المحجوز في صفقات الوساطة:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0 نقطة ($0)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0 نقطة (0$)</div>
                 </div>
             </div>
 
@@ -711,7 +711,7 @@
                 <div class="input-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> عدد النقاط المراد شحنها:</label>
-                        <span class="stepper-live-val" id="topup-live-preview">50 نقطة ($50)</span>
+                        <span class="stepper-live-val" id="topup-live-preview">50 نقطة (50$)</span>
                     </div>
                     
                     <div class="luxury-stepper-container">
@@ -906,122 +906,8 @@
                         </div>
                     </div>
 
-                    <!-- Live Selected Payment Details Box -->
-                    <div class="payment-details-panel" id="payment-details-panel">
-                        <div class="payment-details-header">
-                            <div class="payment-details-meta">
-                                <img src="assets/payments/binance.svg" alt="Selected Provider" class="pay-logo-img" id="pay-detail-img">
-                                <div>
-                                    <span style="font-weight: 800; color: #fff; font-size: 0.88rem;" id="pay-detail-title">Binance Pay (بينانس)</span>
-                                    <span style="color: var(--silver-muted); font-size: 0.72rem; display: block;" id="pay-detail-country">عالمي 🌐</span>
-                                </div>
-                            </div>
-                            <span class="payment-details-chip-icon"><i class="fas fa-flask text-gold"></i> وضع تجريبي</span>
-                        </div>
-
-                        <div class="payment-details-row">
-                            <span style="color: var(--silver-muted);" id="pay-detail-label">معرف بينانس التجريبي (Demo Pay ID):</span>
-                            <div class="payment-details-val-wrap">
-                                <span class="payment-details-val" id="pay-detail-account">DEMO-BINANCE-PAY-ID</span>
-                                <button type="button" class="btn-copy-pay" onclick="window.waseetCopyPaymentAccount(this)" title="نسخ">
-                                    <i class="fas fa-copy"></i> <span>نسخ</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="payment-details-note" id="pay-detail-note">
-                            <i class="fas fa-info-circle text-gold"></i> <span>محاكاة تجريبية لواجهة الشحن عبر Binance Pay (لأغراض الاختبار)</span>
-                        </div>
-                    </div>
-
-                    <!-- Custom 3D Luxury Payment Select (Quick Dropdown) -->
-                    <div class="luxury-custom-select" id="wallet-payment-select-wrap">
-                        <button type="button" class="custom-select-trigger" id="wallet-payment-trigger" onclick="window.waseetTogglePaymentDropdown()">
-                            <div class="custom-select-selected" id="wallet-payment-selected-val">
-                                <img src="assets/payments/binance.svg" class="pay-logo-img" alt="Binance">
-                                <span class="pay-title-txt">USDT / Binance Pay (بينانس)</span>
-                                <span class="pay-country-pill">عالمي 🌐</span>
-                            </div>
-                            <i class="fas fa-chevron-down custom-select-arrow" id="wallet-payment-arrow"></i>
-                        </button>
-
-                        <div class="custom-select-menu" id="wallet-payment-menu">
-                            <div class="custom-select-opt active" data-val="USDT / Binance Pay (بينانس)" data-title="Binance Pay (بينانس)" data-country="عالمي 🌐" data-img="assets/payments/binance.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/binance.svg" class="pay-logo-img" alt="Binance">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">USDT / Binance Pay (بينانس)</span>
-                                    <span class="pay-country-pill">عالمي 🌐</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="CIH Bank / كاش بلوس (المغرب)" data-title="CIH Bank / كاش بلوس" data-country="المغرب 🇲🇦" data-img="assets/payments/morocco.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/morocco.svg" class="pay-logo-img" alt="Morocco CIH">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">CIH Bank / كاش بلوس (المغرب)</span>
-                                    <span class="pay-country-pill">المغرب 🇲🇦</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="سداد / تداول (ليبيا)" data-title="سداد / تداول" data-country="ليبيا 🇱🇾" data-img="assets/payments/libya.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/libya.svg" class="pay-logo-img" alt="Libya Sadad">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">سداد / تداول (ليبيا)</span>
-                                    <span class="pay-country-pill">ليبيا 🇱🇾</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="سيريتل كاش / شام كاش (سوريا)" data-title="سيريتل كاش / شام كاش" data-country="سوريا 🇸🇾" data-img="assets/payments/syria.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/syria.svg" class="pay-logo-img" alt="Syria Syriatel">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">سيريتل كاش / شام كاش (سوريا)</span>
-                                    <span class="pay-country-pill">سوريا 🇸🇾</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="فودافون كاش / إنستاباي (مصر)" data-title="فودافون كاش / إنستاباي" data-country="مصر 🇪🇬" data-img="assets/payments/egypt.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/egypt.svg" class="pay-logo-img" alt="Egypt Vodafone">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">فودافون كاش / إنستاباي</span>
-                                    <span class="pay-country-pill">مصر 🇪🇬</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="بريدي موب - BaridiMob (الجزائر)" data-title="بريدي موب - BaridiMob" data-country="الجزائر 🇩🇿" data-img="assets/payments/algeria.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/algeria.svg" class="pay-logo-img" alt="Algeria BaridiMob">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">بريدي موب - BaridiMob</span>
-                                    <span class="pay-country-pill">الجزائر 🇩🇿</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="زين كاش - ZainCash (العراق)" data-title="زين كاش - ZainCash" data-country="العراق 🇮🇶" data-img="assets/payments/iraq.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/iraq.svg" class="pay-logo-img" alt="Iraq ZainCash">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">زين كاش - ZainCash</span>
-                                    <span class="pay-country-pill">العراق 🇮🇶</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-
-                            <div class="custom-select-opt" data-val="STC Pay / مدى (السعودية والخليج)" data-title="STC Pay / مدى" data-country="السعودية والخليج 🇸🇦" data-img="assets/payments/saudi.svg" onclick="window.waseetSelectPayment(this)">
-                                <img src="assets/payments/saudi.svg" class="pay-logo-img" alt="Saudi STC Pay">
-                                <div class="pay-opt-text">
-                                    <span class="pay-title-txt">STC Pay / مدى</span>
-                                    <span class="pay-country-pill">السعودية والخليج 🇸🇦</span>
-                                </div>
-                                <i class="fas fa-check pay-check-icon"></i>
-                            </div>
-                        </div>
-
-                        <!-- Hidden synced value -->
-                        <input type="hidden" id="selected-payment-method-val" value="USDT / Binance Pay (بينانس)">
-                    </div>
+                    <!-- Hidden synced value for selected card -->
+                    <input type="hidden" id="selected-payment-method-val" value="USDT / Binance Pay (بينانس)">
                 </div>
 
                 <button class="btn-3d btn-gold" style="width: 100%; margin-top: 0.8rem;" onclick="window.waseetApp.topupSimulation()">
@@ -1131,6 +1017,6 @@
     <script src="js/escrow.js"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/app.js?v=20261016_2col"></script>
+    <script src="js/app.js?v=20261016_v3"></script>
 </body>
 </html>

@@ -201,7 +201,7 @@ class WaseetApp {
                     <div class="drawer-user-meta" style="flex: 1;">
                         <span class="drawer-user-name">${user.name}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
-                        <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة متاحة</span>
+                        <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة (${pts}$) متاحة</span>
                     </div>
                     <i class="fas fa-user-cog text-gold" style="font-size: 1.05rem; opacity: 0.85;" title="إدارة الحساب"></i>
                 `;
@@ -469,17 +469,17 @@ class WaseetApp {
         const modalLockEl = document.getElementById('modal-wallet-lock');
         const chatsBadge = document.getElementById('nav-chats-badge');
 
-        if (totalEl) totalEl.innerText = `${wallet.available} نقطة`;
+        if (totalEl) totalEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
         if (lockedEl) {
             if (wallet.locked > 0) {
-                lockedEl.innerText = `${wallet.locked} محجوز`;
+                lockedEl.innerText = `${wallet.locked} محجوز (${wallet.locked}$)`;
                 lockedEl.style.display = 'inline-block';
             } else {
                 lockedEl.style.display = 'none';
             }
         }
-        if (modalAvailEl) modalAvailEl.innerText = `${wallet.available} نقطة ($${wallet.available})`;
-        if (modalLockEl) modalLockEl.innerText = `${wallet.locked} نقطة ($${wallet.locked})`;
+        if (modalAvailEl) modalAvailEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
+        if (modalLockEl) modalLockEl.innerText = `${wallet.locked} نقطة (${wallet.locked}$)`;
 
         if (chatsBadge) {
             let userChatsCount = 0;
@@ -1417,7 +1417,7 @@ class WaseetApp {
             if (WASEET_STATE.user.wallet.available < pricing.buyerPrice) {
                 const addPts = await waseetConfirm(
                     'رصيد النقاط غير كافٍ',
-                    `رصيدك المتاح (${WASEET_STATE.user.wallet.available} نقطة) لا يكفي لشراء الحساب (${pricing.buyerPrice} نقطة).\nهل تود شحن نقاط المحفظة الآن؟`,
+                    `رصيدك المتاح (${WASEET_STATE.user.wallet.available} نقطة (${WASEET_STATE.user.wallet.available}$)) لا يكفي لشراء الحساب (${pricing.buyerPrice} نقطة (${pricing.buyerPrice}$)).\nهل تود شحن نقاط المحفظة الآن؟`,
                     'فتح نافذة الشحن',
                     'إلغاء',
                     'warning'
@@ -1556,7 +1556,7 @@ class WaseetApp {
         document.getElementById('modal-wallet').classList.remove('active');
         await waseetAlert(
             'تم شحن النقاط بنجاح',
-            `تم شحن ${amount} نقطة بنجاح إلى محفظتك الآمنة عبر [${paymentMethod}]!\nالرصيد المتاح الآن: ${WASEET_STATE.user.wallet.available} نقطة ($${WASEET_STATE.user.wallet.available}).`,
+            `تم شحن ${amount} نقطة بنجاح إلى محفظتك الآمنة عبر [${paymentMethod}]!\nالرصيد المتاح الآن: ${WASEET_STATE.user.wallet.available} نقطة (${WASEET_STATE.user.wallet.available}$).`,
             'success'
         );
     }
@@ -2145,7 +2145,7 @@ window.waseetSyncTopupInput = function() {
     if (!input) return;
     const val = parseFloat(input.value) || 0;
     if (preview) {
-        preview.textContent = `${val} نقطة ($${val})`;
+        preview.textContent = `${val} نقطة (${val}$)`;
     }
     // Update active preset pill
     const pills = document.querySelectorAll('#topup-presets-container .preset-pill');
@@ -2159,22 +2159,9 @@ window.waseetSyncTopupInput = function() {
     });
 };
 
-window.waseetTogglePaymentDropdown = function() {
-    const wrap = document.getElementById('wallet-payment-select-wrap');
-    if (wrap) {
-        wrap.classList.toggle('open');
-    }
-};
-
 window.waseetSelectPaymentCard = function(el) {
     if (!el) return;
     const val = el.getAttribute('data-val') || '';
-    const title = el.getAttribute('data-title') || '';
-    const country = el.getAttribute('data-country') || '';
-    const img = el.getAttribute('data-img') || '';
-    const account = el.getAttribute('data-account') || '';
-    const label = el.getAttribute('data-account-label') || 'رقم الحساب / المحفظة:';
-    const note = el.getAttribute('data-note') || '';
 
     // Update hidden input
     const hidden = document.getElementById('selected-payment-method-val');
@@ -2184,103 +2171,7 @@ window.waseetSelectPaymentCard = function(el) {
     const cards = document.querySelectorAll('#payment-cards-grid .payment-card-item');
     cards.forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-
-    // Update live details panel
-    const detailImg = document.getElementById('pay-detail-img');
-    const detailTitle = document.getElementById('pay-detail-title');
-    const detailCountry = document.getElementById('pay-detail-country');
-    const detailLabel = document.getElementById('pay-detail-label');
-    const detailAccount = document.getElementById('pay-detail-account');
-    const detailNote = document.getElementById('pay-detail-note');
-
-    if (detailImg && img) detailImg.src = img;
-    if (detailTitle) detailTitle.textContent = title;
-    if (detailCountry) detailCountry.textContent = country;
-    if (detailLabel) detailLabel.textContent = label;
-    if (detailAccount) detailAccount.textContent = account;
-    if (detailNote) {
-        detailNote.innerHTML = `<i class="fas fa-info-circle text-gold"></i> <span>${note}</span>`;
-    }
-
-    // Sync custom dropdown trigger
-    const selectedDisplay = document.getElementById('wallet-payment-selected-val');
-    if (selectedDisplay) {
-        selectedDisplay.innerHTML = `
-            <img src="${img}" class="pay-logo-img" alt="${title}">
-            <span class="pay-title-txt">${val}</span>
-            <span class="pay-country-pill">${country}</span>
-        `;
-    }
-
-    // Sync active class in dropdown menu
-    const options = document.querySelectorAll('#wallet-payment-menu .custom-select-opt');
-    options.forEach(opt => {
-        if (opt.getAttribute('data-val') === val) {
-            opt.classList.add('active');
-        } else {
-            opt.classList.remove('active');
-        }
-    });
 };
-
-window.waseetSelectPayment = function(el) {
-    if (!el) return;
-    const val = el.getAttribute('data-val') || '';
-    const title = el.getAttribute('data-title') || '';
-    const country = el.getAttribute('data-country') || '';
-    const img = el.getAttribute('data-img') || '';
-
-    // Find corresponding card in grid and trigger its selection
-    const card = document.querySelector(`#payment-cards-grid .payment-card-item[data-val="${val}"]`);
-    if (card) {
-        window.waseetSelectPaymentCard(card);
-    } else {
-        // Fallback
-        const hidden = document.getElementById('selected-payment-method-val');
-        if (hidden) hidden.value = val;
-
-        const selectedDisplay = document.getElementById('wallet-payment-selected-val');
-        if (selectedDisplay) {
-            selectedDisplay.innerHTML = `
-                <img src="${img}" class="pay-logo-img" alt="${title}">
-                <span class="pay-title-txt">${title}</span>
-                <span class="pay-country-pill">${country}</span>
-            `;
-        }
-    }
-
-    // Close dropdown
-    const wrap = document.getElementById('wallet-payment-select-wrap');
-    if (wrap) wrap.classList.remove('open');
-};
-
-window.waseetCopyPaymentAccount = function(btn) {
-    const valEl = document.getElementById('pay-detail-account');
-    if (!valEl) return;
-    const text = valEl.textContent.trim();
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text);
-    }
-    const origHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-check"></i> <span>تم النسخ!</span>';
-    btn.style.background = 'var(--gold-primary)';
-    btn.style.color = '#0b0e14';
-    setTimeout(() => {
-        btn.innerHTML = origHtml;
-        btn.style.background = '';
-        btn.style.color = '';
-    }, 1500);
-};
-
-// Global click outside to close luxury custom dropdown
-document.addEventListener('click', (e) => {
-    const wrap = document.getElementById('wallet-payment-select-wrap');
-    if (wrap && wrap.classList.contains('open')) {
-        if (!wrap.contains(e.target)) {
-            wrap.classList.remove('open');
-        }
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     window.waseetApp = new WaseetApp();
