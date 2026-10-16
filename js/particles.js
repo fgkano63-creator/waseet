@@ -143,9 +143,22 @@ class WaseetBackground {
  * 3D Interactive Tilt on Hover for Cards & Elements
  */
 function init3DTilt() {
+    // إيقاف تأثيرات الميلان تماماً في الهاتف (شاشات <= 768px) وأجهزة اللمس
+    if (window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0)) {
+        const cards = document.querySelectorAll('.card-3d, .account-card-3d');
+        cards.forEach(card => {
+            card.style.transform = 'none';
+        });
+        return;
+    }
+
     const cards = document.querySelectorAll('.card-3d');
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
+            if (window.innerWidth <= 768) {
+                card.style.transform = 'none';
+                return;
+            }
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -160,7 +173,7 @@ function init3DTilt() {
         });
 
         card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+            card.style.transform = (window.innerWidth <= 768) ? 'none' : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
         });
     });
 }

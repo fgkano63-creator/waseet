@@ -185,7 +185,10 @@ class WaseetApp {
         const user = WASEET_STATE.user;
 
         if (userCard) {
+            userCard.style.cursor = 'pointer';
             if (user) {
+                userCard.title = 'إدارة الحساب الشخصي وتسجيل الخروج';
+                userCard.onclick = () => { this.closeMobileDrawer(); this.openLoginModal(); };
                 const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                     || user.avatar 
                     || (isMediatorUser(user) 
@@ -195,21 +198,25 @@ class WaseetApp {
                 const pts = user.wallet ? user.wallet.available : 0;
                 userCard.innerHTML = `
                     <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                    <div class="drawer-user-meta">
+                    <div class="drawer-user-meta" style="flex: 1;">
                         <span class="drawer-user-name">${user.name}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
                         <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة متاحة</span>
                     </div>
+                    <i class="fas fa-user-cog text-gold" style="font-size: 1.05rem; opacity: 0.85;" title="إدارة الحساب"></i>
                 `;
             } else {
+                userCard.title = 'تسجيل الدخول أو إنشاء حساب';
+                userCard.onclick = () => { this.closeMobileDrawer(); this.openLoginModal(); };
                 userCard.innerHTML = `
                     <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-circle text-gold"></i>
                     </div>
-                    <div class="drawer-user-meta">
-                        <span class="drawer-user-name">زائر المتجر</span>
-                        <span class="drawer-user-role" style="color: var(--silver-muted);">سجل الدخول لحفظ صفقاتك ونقاطك</span>
+                    <div class="drawer-user-meta" style="flex: 1;">
+                        <span class="drawer-user-name">تسجيل الدخول / حساب جديد</span>
+                        <span class="drawer-user-role" style="color: var(--gold-light);">انقر للدخول بحساب Google أو Facebook</span>
                     </div>
+                    <i class="fas fa-sign-in-alt text-gold" style="font-size: 1.05rem; opacity: 0.85;"></i>
                 `;
             }
         }
@@ -665,10 +672,10 @@ class WaseetApp {
 
             // Status Badge for pending review or rejected
             let statusTagHtml = '';
-            if (acc.status === 'pending_review') {
-                statusTagHtml = `<div class="pending-review-banner" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(245, 158, 11, 0.95); color: #000; font-weight: 800; font-size: 0.72rem; padding: 3px 9px; border-radius: 6px; box-shadow: 0 0 10px rgba(245,158,11,0.5);"><i class="fas fa-clock"></i> قيد الفحص (أقل من 24h)</div>`;
+            if (acc.status === 'pending_review' || acc.status === 'pending_verification') {
+                statusTagHtml = `<div class="pending-review-banner" style="position: absolute; top: 8px; right: 8px; z-index: 6; background: rgba(245, 158, 11, 0.95); color: #000; font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 6px; box-shadow: 0 0 10px rgba(245,158,11,0.5);"><i class="fas fa-clock"></i> قيد الفحص</div>`;
             } else if (acc.status === 'rejected') {
-                statusTagHtml = `<div class="rejected-banner" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(239, 68, 68, 0.95); color: #fff; font-weight: 800; font-size: 0.72rem; padding: 3px 9px; border-radius: 6px;"><i class="fas fa-ban"></i> مرفوض</div>`;
+                statusTagHtml = `<div class="rejected-banner" style="position: absolute; top: 8px; right: 8px; z-index: 6; background: rgba(239, 68, 68, 0.95); color: #fff; font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 6px;"><i class="fas fa-ban"></i> مرفوض</div>`;
             }
 
             return `
