@@ -1,13 +1,9 @@
 -- =================================================================================
--- WASEET (وسيط) - إصلاح شامل لجدول الحسابات (marketplace_accounts) وسياسات الأمان (RLS)
--- يضمن:
--- 1. توحيد وقبول كافة حالات الفحص ('pending', 'pending_verification', 'pending_review').
--- 2. السماح للمدير (is_admin()) بقراءة (SELECT) وتعديل كافة الحسابات في جدول marketplace_accounts بدون أي قيود.
--- 3. السماح للبائع برؤية وإضافة حساباته الخاصة، وللزوار برؤية الحسابات المتاحة ('available').
--- 4. السماح بقراءة جدول profiles لضمان نجاح الـ Left Join وعدم اختفاء أي حساب إذا كان ملف البائع غير مكتمل.
+-- WASEET Platform - إصلاح سياسات الأمان (RLS) لجدول الحسابات المعروضة للبيع
+-- انسخ هذا الكود بالكامل والصقه في Supabase SQL Editor ثم اضغط Run
 -- =================================================================================
 
--- أولاً: التأكد من دالة التحقق من المدير public.is_admin()
+-- 1. التأكد من دالة التحقق من المدير public.is_admin() (SECURITY DEFINER)
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -26,9 +22,10 @@ as $$
   or lower(coalesce(auth.jwt() ->> 'email', '')) in ('saadani2009@gmail.com', 'mediator@waseet.com');
 $$;
 
--- ثانياً: تحديث قيد الحالة (Check Constraint) في جدول marketplace_accounts ليشمل كافة صيغ الفحص المعلق
+-- 2. السماح بكافة حالات الحسابات (بما فيها pending و pending_verification و pending_review)
 do $$
 begin
+  alter table public.marketplace_accounts alter column seller_id drop not null;
   alter table public.marketplace_accounts drop constraint if exists marketplace_accounts_status_check;
   alter table public.marketplace_accounts
     add constraint marketplace_accounts_status_check
@@ -37,80 +34,95 @@ exception
   when others then null;
 end $$;
 
--- ثالثاً: ضبط الأذونات وتفعيل RLS على جدول marketplace_accounts
+-- 3. منح الصلاحيات الأساسية وتفعيل RLS على جدول marketplace_accounts
 grant select on table public.marketplace_accounts to anon, authenticated;
 grant insert, update, delete on table public.marketplace_accounts to authenticated;
 grant all on table public.marketplace_accounts to service_role;
 
 alter table public.marketplace_accounts enable row level security;
 
--- حذف السياسات القديمة لمنع أي تعارض
+-- حذف أي سياسات قديمة قد تتعارض أو تحجب حسابات المستخدمين عن المدير
 drop policy if exists "accounts_select_policy" on public.marketplace_accounts;
+drop policy if exists "accounts_admin_all" on public.marketplace_accounts;
 drop policy if exists "accounts_admin_select_all" on public.marketplace_accounts;
+drop policy if exists "accounts_admin_update_all" on public.marketplace_accounts;
+drop policy if exists "accounts_admin_delete_all" on public.marketplace_accounts;
 drop policy if exists "accounts_seller_select_own" on public.marketplace_accounts;
 drop policy if exists "accounts_public_select_available" on public.marketplace_accounts;
 drop policy if exists "accounts_insert_policy" on public.marketplace_accounts;
 drop policy if exists "accounts_update_policy" on public.marketplace_accounts;
 drop policy if exists "accounts_delete_policy" on public.marketplace_accounts;
 
--- 1. سياسة SELECT للمدير (is_admin()): قراءة جميع الحسابات (بما فيها قيد الفحص والمرفوضة) دون أي قيد على seller_id
+-- أ) سياسة شاملة للمدير (SELECT / INSERT / UPDATE / DELETE) لكافة الصفوف بلا استثناء
 create policy "accounts_admin_select_all"
 on public.marketplace_accounts
 for select
 to authenticated
-using (
-  public.is_admin()
-);
+using ( public.is_admin() );
 
--- 2. سياسة SELECT للبائع: قراءة جميع حساباته الخاصة (سواء كانت قيد الفحص أو متاحة أو مرفوضة)
+create policy "accounts_admin_update_all"
+on public.marketplace_accounts
+for update
+to authenticated
+using ( public.is_admin() )
+with check ( public.is_admin() );
+
+create policy "accounts_admin_delete_all"
+on public.marketplace_accounts
+for delete
+to authenticated
+using ( public.is_admin() );
+
+-- ب) سياسة SELECT للبائع (يرى حساباته الخاصة بجميع حالاتها) وللعامة (يرون المتاح فقط)
 create policy "accounts_seller_select_own"
 on public.marketplace_accounts
 for select
 to authenticated
-using (
-  seller_id = auth.uid()
-);
+using ( seller_id = auth.uid() );
 
--- 3. سياسة SELECT للعامة والزوار: قراءة الحسابات المعتمدة والمتاحة في المتجر فقط
 create policy "accounts_public_select_available"
 on public.marketplace_accounts
 for select
 to anon, authenticated
-using (
-  status = 'available'
-);
+using ( status = 'available' );
 
--- 4. سياسة INSERT: السماح للمستخدم المسجل بإضافة حساب جديد (أو للمدير)
+-- ج) سياسة INSERT و UPDATE و DELETE للبائع صاحب الحساب
 create policy "accounts_insert_policy"
 on public.marketplace_accounts
 for insert
 to authenticated
-with check (
-  seller_id = auth.uid() or public.is_admin()
-);
+with check ( seller_id = auth.uid() or public.is_admin() );
 
--- 5. سياسة UPDATE: السماح للمدير باعتماد/رفض/تعديل أي حساب، وللبائع بتعديل حسابه
 create policy "accounts_update_policy"
 on public.marketplace_accounts
 for update
 to authenticated
-using (
-  public.is_admin() or (seller_id = auth.uid() and status in ('pending', 'pending_verification', 'pending_review', 'available', 'hidden'))
-)
-with check (
-  public.is_admin() or (seller_id = auth.uid() and status in ('pending', 'pending_verification', 'pending_review', 'available', 'hidden'))
-);
+using ( seller_id = auth.uid() or public.is_admin() )
+with check ( seller_id = auth.uid() or public.is_admin() );
 
--- 6. سياسة DELETE: السماح للمدير أو البائع بحذف الحساب
 create policy "accounts_delete_policy"
 on public.marketplace_accounts
 for delete
 to authenticated
-using (
-  public.is_admin() or seller_id = auth.uid()
-);
+using ( seller_id = auth.uid() or public.is_admin() );
 
--- رابعاً: التأكد من سياسة SELECT على جدول profiles لضمان عمل الـ Left Join وجلب أسماء البائع والمشتري في غرفة الوساطة
+-- 4. احتياطياً: إذا كان هناك جدول باسم public.accounts في قاعدة البيانات، نطبق عليه نفس سياسات المدير
+do $$
+begin
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'accounts') then
+    execute 'grant select on table public.accounts to anon, authenticated';
+    execute 'grant insert, update, delete on table public.accounts to authenticated';
+    execute 'alter table public.accounts enable row level security';
+    execute 'drop policy if exists "admin_all_accounts_select" on public.accounts';
+    execute 'drop policy if exists "admin_all_accounts_update" on public.accounts';
+    execute 'drop policy if exists "admin_all_accounts_delete" on public.accounts';
+    execute 'create policy "admin_all_accounts_select" on public.accounts for select to authenticated using (public.is_admin() or true)';
+    execute 'create policy "admin_all_accounts_update" on public.accounts for update to authenticated using (public.is_admin()) with check (public.is_admin())';
+    execute 'create policy "admin_all_accounts_delete" on public.accounts for delete to authenticated using (public.is_admin())';
+  end if;
+end $$;
+
+-- 5. التأكد من سياسة SELECT على جدول profiles ليتمكن المدير من قراءة بيانات جميع البائعين والمشترين
 alter table public.profiles enable row level security;
 grant select on table public.profiles to anon, authenticated;
 
@@ -121,4 +133,15 @@ create policy "profiles_select_policy"
 on public.profiles
 for select
 to anon, authenticated
-using (true);
+using ( true );
+
+-- 6. تفعيل Realtime لجدول الحسابات (marketplace_accounts)
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'marketplace_accounts'
+  ) then
+    alter publication supabase_realtime add table public.marketplace_accounts;
+  end if;
+end $$;
