@@ -42,16 +42,82 @@ class WaseetEscrowRoom {
     }
 
     init() {
+        this.sanitizeDealChannelMessages();
         this.syncDealToGlobalState();
         this.renderAll();
         this.initLiveSync();
         this.fetchDealParticipantsProfiles();
     }
 
-    syncDealToGlobalState() {
-        if (!this.deal || !this.deal.id || typeof WASEET_STATE === 'undefined') return;
+    generateMessageUuid() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    normalizeMessageChannel(msgOrRow, fallbackChannel = '') {
+        if (!msgOrRow) return fallbackChannel;
+        const rawChannel = String(msgOrRow.channel_type || msgOrRow.channelType || '').trim();
+        const senderRole = String(msgOrRow.sender_role || msgOrRow.sender || '').trim();
+
+        if (rawChannel === 'seller_mediator') return 'seller_mediator';
+        if (rawChannel === 'buyer_mediator') return 'buyer_mediator';
+        if (rawChannel === 'system' || senderRole === 'system') return 'system';
+
+        // إذا كانت الرسالة من المشتري فهي حتماً لقناة buyer_mediator فقط، وإذا كانت من البائع فهي لقناة seller_mediator فقط
+        if (senderRole === 'buyer') return 'buyer_mediator';
+        if (senderRole === 'seller') return 'seller_mediator';
+
+        return fallbackChannel || rawChannel || '';
+    }
+
+    sanitizeDealChannelMessages() {
+        if (!this.deal) return;
         if (!Array.isArray(this.deal.sellerMessages)) this.deal.sellerMessages = [];
         if (!Array.isArray(this.deal.buyerMessages)) this.deal.buyerMessages = [];
+
+        const filterAndDedup = (arr, targetChannel) => {
+            const seenIds = new Set();
+            const seenContent = new Set();
+            const result = [];
+
+            arr.forEach(m => {
+                if (!m || !m.text) return;
+                const ch = this.normalizeMessageChannel(m, targetChannel);
+                const sender = m.sender_role || m.sender || '';
+
+                // عزل صارم للقنوات: منع رسائل buyer_mediator من الظهور في شات البائع والعكس
+                if (targetChannel === 'seller_mediator') {
+                    if (ch === 'buyer_mediator' || sender === 'buyer') return;
+                } else if (targetChannel === 'buyer_mediator') {
+                    if (ch === 'seller_mediator' || sender === 'seller') return;
+                }
+
+                m.channel_type = (ch === 'system') ? 'system' : targetChannel;
+                const idKey = m.id ? String(m.id) : null;
+                const contentKey = `${sender}|${targetChannel}|${(m.text || '').trim()}|${m.time || ''}`;
+
+                if ((idKey && seenIds.has(idKey)) || seenContent.has(contentKey)) return;
+                if (idKey) seenIds.add(idKey);
+                seenContent.add(contentKey);
+                result.push(m);
+            });
+
+            return result;
+        };
+
+        this.deal.sellerMessages = filterAndDedup(this.deal.sellerMessages, 'seller_mediator');
+        this.deal.buyerMessages = filterAndDedup(this.deal.buyerMessages, 'buyer_mediator');
+    }
+
+    syncDealToGlobalState() {
+        if (!this.deal || !this.deal.id || typeof WASEET_STATE === 'undefined') return;
+        this.sanitizeDealChannelMessages();
 
         if (!Array.isArray(WASEET_STATE.deals)) WASEET_STATE.deals = [];
         const idx = WASEET_STATE.deals.findIndex(d => d && String(d.id) === String(this.deal.id));
@@ -85,9 +151,18 @@ class WaseetEscrowRoom {
     appendIncomingRowToDeal(row) {
         if (!row || !this.deal || !row.message) return false;
         const senderRole = row.sender_role || 'buyer';
-        const channelType = row.channel_type || 'all';
+        const channelType = this.normalizeMessageChannel(row);
+
+        // فلترة حسب دور المستخدم الحالي لمنع تسرب القنوات (Channel Leak)
+        if (this.viewerRole === 'buyer' && channelType === 'seller_mediator') {
+            return false;
+        }
+        if (this.viewerRole === 'seller' && channelType === 'buyer_mediator') {
+            return false;
+        }
+
         const msgObj = {
-            id: row.id || ('msg_' + Date.now()),
+            id: row.id || this.generateMessageUuid(),
             sender: senderRole,
             name: this.resolveSenderDisplayName(senderRole),
             text: row.message,
@@ -97,25 +172,48 @@ class WaseetEscrowRoom {
         };
 
         let changed = false;
-        const addIfMissing = (arr) => {
-            const exists = arr.some(m =>
-                (m.id && row.id && String(m.id) === String(row.id)) ||
-                (m.sender === msgObj.sender && (m.text || '').trim() === (msgObj.text || '').trim() && m.time === msgObj.time)
-            );
-            if (!exists) {
-                arr.push(msgObj);
-                changed = true;
+        const addIfMissing = (arr, targetContainerId) => {
+            // 1. فحص ما إذا كان معرّف الرسالة (id) موجوداً بالفعل في الشاشة (DOM)
+            if (row.id && typeof document !== 'undefined') {
+                const domContainer = document.getElementById(targetContainerId);
+                if (domContainer && domContainer.querySelector(`[data-msg-id="${row.id}"]`)) {
+                    return;
+                }
             }
+
+            // 2. فحص ما إذا كانت الرسالة موجودة بالفعل في المصفوفة (سواء بنفس الـ id أو كرسالة Optimistic محلية)
+            const existingMsg = arr.find(m => {
+                if (!m) return false;
+                if (m.id && row.id && String(m.id) === String(row.id)) return true;
+                if (m.tempId && row.id && String(m.tempId) === String(row.id)) return true;
+                const sameSenderAndText = m.sender === msgObj.sender && (m.text || '').trim() === (msgObj.text || '').trim();
+                if (sameSenderAndText && (m._optimistic || m.time === msgObj.time)) return true;
+                return false;
+            });
+
+            if (existingMsg) {
+                // تحديث المعرف المحلي بمعرف قاعدة البيانات دون إضافة نسخة مكررة
+                if (row.id) existingMsg.id = row.id;
+                existingMsg._optimistic = false;
+                existingMsg.channel_type = channelType;
+                return;
+            }
+
+            arr.push(msgObj);
+            changed = true;
         };
 
         if (!Array.isArray(this.deal.sellerMessages)) this.deal.sellerMessages = [];
         if (!Array.isArray(this.deal.buyerMessages)) this.deal.buyerMessages = [];
 
-        if (channelType === 'seller_mediator' || channelType === 'all' || channelType === 'system') {
-            addIfMissing(this.deal.sellerMessages);
-        }
-        if (channelType === 'buyer_mediator' || channelType === 'all' || channelType === 'system') {
-            addIfMissing(this.deal.buyerMessages);
+        // توجيه كل رسالة إلى قناتها المحددة فقط دون أي تداخل
+        if (channelType === 'seller_mediator') {
+            addIfMissing(this.deal.sellerMessages, 'chat-messages-seller');
+        } else if (channelType === 'buyer_mediator') {
+            addIfMissing(this.deal.buyerMessages, 'chat-messages-buyer');
+        } else if (channelType === 'system') {
+            addIfMissing(this.deal.sellerMessages, 'chat-messages-seller');
+            addIfMissing(this.deal.buyerMessages, 'chat-messages-buyer');
         }
 
         return changed;
@@ -173,11 +271,18 @@ class WaseetEscrowRoom {
                     },
                     (payload) => {
                         if (payload && payload.new) {
-                            const added = this.appendIncomingRowToDeal(payload.new);
+                            const incomingRow = payload.new;
+                            const rowChannel = this.normalizeMessageChannel(incomingRow);
+
+                            // تجاهل الرسالة إذا كانت لا تخص قناة المستخدم الحالي
+                            if (this.viewerRole === 'buyer' && rowChannel === 'seller_mediator') return;
+                            if (this.viewerRole === 'seller' && rowChannel === 'buyer_mediator') return;
+
+                            const added = this.appendIncomingRowToDeal(incomingRow);
                             if (added) {
                                 this.syncDealToGlobalState();
                                 saveWaseetData();
-                                this.updateChatMessagesOnly();
+                                this.updateChatMessagesOnly(rowChannel);
                             }
                         }
                     }
@@ -199,8 +304,8 @@ class WaseetEscrowRoom {
                             }
                             let msgChanged = false;
                             if (parsed && typeof window.waseetMergeDealMessagesList === 'function') {
-                                const mergedSeller = window.waseetMergeDealMessagesList(this.deal.sellerMessages || [], parsed.sellerMessages || []);
-                                const mergedBuyer = window.waseetMergeDealMessagesList(this.deal.buyerMessages || [], parsed.buyerMessages || []);
+                                const mergedSeller = window.waseetMergeDealMessagesList(this.deal.sellerMessages || [], parsed.sellerMessages || [], 'seller_mediator');
+                                const mergedBuyer = window.waseetMergeDealMessagesList(this.deal.buyerMessages || [], parsed.buyerMessages || [], 'buyer_mediator');
                                 if (mergedSeller.length !== (this.deal.sellerMessages || []).length) {
                                     this.deal.sellerMessages = mergedSeller;
                                     msgChanged = true;
@@ -241,6 +346,11 @@ class WaseetEscrowRoom {
 
     async fetchDealParticipantsProfiles() {
         try {
+            // ضمان وجود سجل المستخدم الحالي (أو المدير) في جدول public.profiles لتفادي خطأ deal_messages_sender_id_fkey
+            if (typeof window.waseetEnsureUserProfileInDb === 'function') {
+                await window.waseetEnsureUserProfileInDb((typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null);
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const reqDealId = urlParams.get('dealId');
 
@@ -255,6 +365,8 @@ class WaseetEscrowRoom {
             }
 
             if (!this.deal) return;
+
+            this.sanitizeDealChannelMessages(this.deal);
 
             // Detect role again in case deal or user finished loading asynchronously
             const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
@@ -386,6 +498,7 @@ class WaseetEscrowRoom {
                     const deals = JSON.parse(raw);
                     if (Array.isArray(deals) && deals.length > 0) {
                         this.deal = deals[0];
+                        this.sanitizeDealChannelMessages(this.deal);
                         WASEET_STATE.deals = deals;
                         WASEET_STATE.activeDeal = deals[0];
                         this.renderAll();
@@ -405,6 +518,8 @@ class WaseetEscrowRoom {
             if (!Array.isArray(deals)) return;
             const updatedDeal = deals.find(d => d && String(d.id) === String(currentDealId));
             if (!updatedDeal) return;
+
+            this.sanitizeDealChannelMessages(updatedDeal);
 
             const oldSellerCount = (this.deal.sellerMessages || []).length;
             const oldBuyerCount = (this.deal.buyerMessages || []).length;
@@ -439,21 +554,23 @@ class WaseetEscrowRoom {
         }
     }
 
-    updateChatMessagesOnly() {
+    updateChatMessagesOnly(targetChannel = null) {
         if (!this.deal) return;
+        this.sanitizeDealChannelMessages(this.deal);
+
         const buyerChatEl = document.getElementById('chat-messages-buyer');
         const sellerChatEl = document.getElementById('chat-messages-seller');
 
-        if (buyerChatEl) {
-            const newHtml = this.renderMessageList(this.deal.buyerMessages || []);
+        if (buyerChatEl && (!targetChannel || targetChannel === 'buyer_mediator' || targetChannel === 'all')) {
+            const newHtml = this.renderMessageList(this.deal.buyerMessages || [], 'buyer_mediator');
             if (buyerChatEl.innerHTML !== newHtml) {
                 buyerChatEl.innerHTML = newHtml;
                 buyerChatEl.scrollTop = buyerChatEl.scrollHeight;
             }
         }
 
-        if (sellerChatEl) {
-            const newHtml = this.renderMessageList(this.deal.sellerMessages || []);
+        if (sellerChatEl && (!targetChannel || targetChannel === 'seller_mediator' || targetChannel === 'all')) {
+            const newHtml = this.renderMessageList(this.deal.sellerMessages || [], 'seller_mediator');
             if (sellerChatEl.innerHTML !== newHtml) {
                 sellerChatEl.innerHTML = newHtml;
                 sellerChatEl.scrollTop = sellerChatEl.scrollHeight;
@@ -730,7 +847,7 @@ class WaseetEscrowRoom {
                             <span class="badge-role seller-badge">قناة البائع</span>
                         </div>
                         <div class="chat-messages" id="chat-messages-seller">
-                            ${this.renderMessageList(this.deal.sellerMessages)}
+                            ${this.renderMessageList(this.deal.sellerMessages, 'seller_mediator')}
                         </div>
                         <div class="chat-footer">
                             <input type="text" id="input-seller-chat" class="chat-input" placeholder="رسالة للبائع (${sellerName}) فقط...">
@@ -750,7 +867,7 @@ class WaseetEscrowRoom {
                             <span class="badge-role buyer-badge">قناة المشتري</span>
                         </div>
                         <div class="chat-messages" id="chat-messages-buyer">
-                            ${this.renderMessageList(this.deal.buyerMessages)}
+                            ${this.renderMessageList(this.deal.buyerMessages, 'buyer_mediator')}
                         </div>
                         <div class="chat-footer">
                             <input type="text" id="input-buyer-chat" class="chat-input" placeholder="رسالة للمشتري (${buyerName}) فقط...">
@@ -788,7 +905,7 @@ class WaseetEscrowRoom {
                             </div>
                         </div>
                         <div class="chat-messages" id="chat-messages-buyer">
-                            ${this.renderMessageList(this.deal.buyerMessages)}
+                            ${this.renderMessageList(this.deal.buyerMessages, 'buyer_mediator')}
                         </div>
                         <div class="chat-footer">
                             <input type="text" id="input-buyer-single" class="chat-input" placeholder="اكتب استفسارك للوسيط المعتمد...">
@@ -828,7 +945,7 @@ class WaseetEscrowRoom {
                             </div>
                         </div>
                         <div class="chat-messages" id="chat-messages-seller">
-                            ${this.renderMessageList(this.deal.sellerMessages)}
+                            ${this.renderMessageList(this.deal.sellerMessages, 'seller_mediator')}
                         </div>
                         <div class="chat-footer">
                             <input type="text" id="input-seller-single" class="chat-input" placeholder="اكتب للوسيط بخصوص الحساب...">
@@ -1072,15 +1189,53 @@ class WaseetEscrowRoom {
         `;
     }
 
-    renderMessageList(messagesArray) {
+    renderMessageList(messagesArray, expectedChannelType = null) {
         if (!messagesArray || !messagesArray.length) {
             return '<div style="color: var(--silver-muted); text-align: center; font-size: 0.8rem; padding: 2rem;">لا توجد رسائل سابقة.</div>';
         }
 
-        return messagesArray.map(msg => {
+        const expectedCh = expectedChannelType ? this.normalizeMessageChannel(expectedChannelType) : null;
+        const seenIds = new Set();
+        const seenContentKeys = new Set();
+
+        const filteredMessages = messagesArray.filter(msg => {
+            if (!msg) return false;
+
+            // 1. عزل صارم للقنوات (Channel Isolation): منع رسائل المشتري من الظهور في شات البائع والعكس
+            const msgCh = this.normalizeMessageChannel(msg.channel_type || msg.channelType);
+            if (expectedCh === 'seller_mediator') {
+                if (msgCh === 'buyer_mediator') return false;
+                if (msg.sender === 'buyer') return false;
+            } else if (expectedCh === 'buyer_mediator') {
+                if (msgCh === 'seller_mediator') return false;
+                if (msg.sender === 'seller') return false;
+            }
+
+            // 2. منع تكرار الرسائل (Deduplication) حسب المعرف (id) أو البصمة الزمنية للنص
+            if (msg.id) {
+                const idKey = String(msg.id);
+                if (seenIds.has(idKey)) return false;
+                seenIds.add(idKey);
+            }
+
+            const contentKey = `${msg.sender}|${(msg.text || '').trim()}|${msg.time || ''}`;
+            if (seenContentKeys.has(contentKey)) return false;
+            seenContentKeys.add(contentKey);
+
+            return true;
+        });
+
+        if (!filteredMessages.length) {
+            return '<div style="color: var(--silver-muted); text-align: center; font-size: 0.8rem; padding: 2rem;">لا توجد رسائل سابقة.</div>';
+        }
+
+        return filteredMessages.map(msg => {
+            const safeMsgId = String(msg.id || '').replace(/"/g, '&quot;');
+            const safeChannel = String(msg.channel_type || expectedCh || '').replace(/"/g, '&quot;');
+
             if (msg.sender === 'system') {
                 return `
-                    <div class="chat-msg system-msg">
+                    <div class="chat-msg system-msg" id="escrow-msg-${safeMsgId}" data-msg-id="${safeMsgId}" data-channel-type="${safeChannel}">
                         <i class="fas fa-info-circle text-gold"></i>
                         <span>${msg.text}</span>
                         <span class="msg-time">${msg.time}</span>
@@ -1103,7 +1258,7 @@ class WaseetEscrowRoom {
             }
 
             return `
-                <div class="chat-msg ${senderClass}">
+                <div class="chat-msg ${senderClass}" id="escrow-msg-${safeMsgId}" data-msg-id="${safeMsgId}" data-channel-type="${safeChannel}">
                     <div class="msg-header">
                         <span class="msg-author">${msg.name}</span>
                         ${senderBadge}
@@ -1153,41 +1308,60 @@ class WaseetEscrowRoom {
 
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const tempId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+        // توليد UUID حقيقي مشترك بين Optimistic UI وقاعدة البيانات لمنع تكرار الرسالة عند وصول حدث Realtime
+        const messageUuid = this.generateMessageUuid();
+        const currentUserId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id)
+            ? WASEET_STATE.user.id
+            : null;
 
         const msgObj = {
-            id: tempId,
+            id: messageUuid,
             sender: senderRole,
+            sender_id: currentUserId,
             name: senderDisplayName,
             text: text,
             time: timeStr,
             channel_type: channelType,
-            created_at: now.toISOString()
+            created_at: now.toISOString(),
+            _optimistic: true
         };
 
         if (!Array.isArray(this.deal[targetArrayKey])) {
             this.deal[targetArrayKey] = [];
         }
-        this.deal[targetArrayKey].push(msgObj);
 
-        // 1. تفريغ الحقل وتحديث واجهة المحادثة (DOM) فوراً دون إعادة بناء كامل الصفحة
+        // التأكد من عدم وجود نفس المعرف مسبقاً قبل الإضافة
+        if (!this.deal[targetArrayKey].some(m => m && String(m.id) === String(messageUuid))) {
+            this.deal[targetArrayKey].push(msgObj);
+        }
+
+        // 1. تفريغ الحقل وتحديث واجهة المحادثة المستهدفة فقط (DOM) فوراً
         input.value = '';
         input.focus();
         this.syncDealToGlobalState();
         saveWaseetData();
-        this.updateChatMessagesOnly();
+        this.updateChatMessagesOnly(channelType);
         this.scrollAllChats();
         this.broadcastUpdate();
 
-        // 2. الحفظ الفوري في قاعدة بيانات Supabase (جدول deal_messages + deals) مع فحص الأخطاء الصريح
+        // 2. الحفظ الفوري في قاعدة بيانات Supabase (جدول deal_messages + deals) مع ضمان وجود الـ profile وفحص الأخطاء
         if (typeof window.waseetSendEscrowMessageToSupabase === 'function') {
             const { data, error } = await window.waseetSendEscrowMessageToSupabase(this.deal, msgObj, channelType, senderRole);
             if (error) {
                 console.error('Escrow Message Insert Error:', error);
+                // إزالة الرسالة المؤقتة التي فشل إرسالها حتى لا تبقى معلقة بشكل مضلل
+                if (Array.isArray(this.deal[targetArrayKey])) {
+                    this.deal[targetArrayKey] = this.deal[targetArrayKey].filter(m => m && String(m.id) !== String(messageUuid));
+                    this.syncDealToGlobalState();
+                    saveWaseetData();
+                    this.updateChatMessagesOnly(channelType);
+                }
                 return;
             }
             if (data && data.id) {
                 msgObj.id = data.id;
+                msgObj.sender_id = data.sender_id || msgObj.sender_id;
+                msgObj._optimistic = false;
                 this.syncDealToGlobalState();
                 saveWaseetData();
             }
@@ -1271,16 +1445,17 @@ class WaseetEscrowRoom {
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
         const noticeObj = {
-            id: 'sys_' + Date.now(),
+            id: this.generateMessageUuid(),
             sender: 'system',
             text: systemNotice,
             time: timeStr,
             channel_type: 'system',
-            created_at: now.toISOString()
+            created_at: now.toISOString(),
+            _optimistic: true
         };
 
-        this.deal.sellerMessages.push(noticeObj);
-        this.deal.buyerMessages.push(noticeObj);
+        this.deal.sellerMessages.push({ ...noticeObj });
+        this.deal.buyerMessages.push({ ...noticeObj });
 
         this.syncDealToGlobalState();
         this.renderAll();

@@ -146,6 +146,121 @@ async function waseetFetchUserProfile(userId) {
 }
 
 /**
+ * التأكد من وجود سجل للمستخدم الحالي (أو المدير) في جدول public.profiles
+ * لمنع خطأ violates foreign key constraint "deal_messages_sender_id_fkey"
+ */
+async function waseetEnsureUserProfileInDb(userHint = null) {
+    const client = initWaseetSupabase();
+    if (!client) return null;
+
+    try {
+        let authUser = null;
+        const { data: sessionRes } = await client.auth.getSession();
+        authUser = sessionRes?.session?.user || null;
+
+        if (!authUser) {
+            const { data: userRes } = await client.auth.getUser();
+            authUser = userRes?.user || null;
+        }
+
+        const stateUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+        const rawCandidateId = (authUser && authUser.id)
+            || (userHint && waseetIsValidUuid(userHint.id) ? userHint.id : null)
+            || (stateUser && waseetIsValidUuid(stateUser.id) ? stateUser.id : null);
+
+        if (!rawCandidateId || !waseetIsValidUuid(rawCandidateId)) {
+            return null;
+        }
+
+        const emailVal = (authUser && authUser.email)
+            || (userHint && userHint.email)
+            || (stateUser && stateUser.email)
+            || '';
+        const emailLower = String(emailVal).toLowerCase().trim();
+
+        const isAdmin = !!(
+            (userHint && (userHint.role === 'admin' || userHint.isAdmin)) ||
+            (stateUser && (stateUser.role === 'admin' || stateUser.isAdmin)) ||
+            emailLower === 'fgkano63@gmail.com' ||
+            emailLower === 'saadani2009@gmail.com' ||
+            emailLower === 'mediator@waseet.com'
+        );
+
+        const nameVal = (authUser && (authUser.user_metadata?.full_name || authUser.user_metadata?.name))
+            || (userHint && userHint.name)
+            || (stateUser && stateUser.name)
+            || (emailVal ? emailVal.split('@')[0] : (isAdmin ? 'الوسيط المعتمد' : 'مستخدم'));
+
+        const avatarVal = (authUser && (authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture))
+            || (userHint && userHint.avatar)
+            || (stateUser && stateUser.avatar)
+            || null;
+
+        // تحديث المعرف في WASEET_STATE.user ليطابق دائماً معرف الجلسة الحقيقي في Supabase
+        if (stateUser && stateUser.id !== rawCandidateId) {
+            stateUser.id = rawCandidateId;
+            if (emailVal && !stateUser.email) stateUser.email = emailVal;
+            if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+
+        // 1. فحص ما إذا كان الصف موجوداً بالفعل في جدول public.profiles
+        const { data: existingProf } = await client
+            .from('profiles')
+            .select('id, role, name, email')
+            .eq('id', rawCandidateId)
+            .maybeSingle();
+
+        if (existingProf && existingProf.id) {
+            // إذا كان المستخدم مديراً ولكن دوره في جدول profiles ليس admin، نقوم بترقيته
+            if (isAdmin && existingProf.role !== 'admin') {
+                await client
+                    .from('profiles')
+                    .update({ role: 'admin', name: existingProf.name || nameVal })
+                    .eq('id', rawCandidateId);
+                existingProf.role = 'admin';
+            }
+            return existingProf;
+        }
+
+        // 2. إذا لم يكن موجوداً في جدول profiles، نقوم بإنشائه فوراً عبر upsert
+        const targetRole = isAdmin ? 'admin' : 'user';
+        const fullPayload = {
+            id: rawCandidateId,
+            email: emailVal || undefined,
+            name: nameVal,
+            avatar_url: avatarVal,
+            role: targetRole
+        };
+
+        const { data: upsertedProf, error: upsertErr } = await client
+            .from('profiles')
+            .upsert(fullPayload, { onConflict: 'id' })
+            .select('id, role, name, email')
+            .maybeSingle();
+
+        if (!upsertErr && upsertedProf) {
+            return upsertedProf;
+        }
+
+        // محاولة احتياطية بأعمدة أساسية فقط في حال اختلاف أسماء بعض الأعمدة الاختيارية
+        const { data: fallbackProf } = await client
+            .from('profiles')
+            .upsert({ id: rawCandidateId, name: nameVal, role: targetRole }, { onConflict: 'id' })
+            .select('id')
+            .maybeSingle();
+
+        if (fallbackProf) return fallbackProf;
+
+        await client.from('profiles').upsert({ id: rawCandidateId }, { onConflict: 'id' });
+        return { id: rawCandidateId, role: targetRole, name: nameVal, email: emailVal };
+    } catch (err) {
+        console.warn('[Supabase Profiles] تعذر تأكيد ملف المستخدم في profiles:', err);
+        return null;
+    }
+}
+window.waseetEnsureUserProfileInDb = waseetEnsureUserProfileInDb;
+
+/**
  * مزامنة حالة الجلسة الحالية وتحديث المتغير العام WASEET_STATE
  */
 async function waseetSyncAuthState() {
@@ -157,7 +272,7 @@ async function waseetSyncAuthState() {
         if (error || !session || !session.user) return;
 
         const authUser = session.user;
-        const profile = await waseetFetchUserProfile(authUser.id);
+        let profile = await waseetFetchUserProfile(authUser.id);
 
         // جلب رابط الصورة مباشرة من user.user_metadata.avatar_url كما هو مطلوب
         const avatarUrl = authUser.user_metadata?.avatar_url
@@ -200,6 +315,11 @@ async function waseetSyncAuthState() {
         if (typeof WASEET_STATE !== 'undefined') {
             WASEET_STATE.user = mappedUser;
             if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+
+        // التأكد من إنشاء/تحديث حساب المستخدم أو المدير في جدول public.profiles بشكل سليم
+        if (!profile || (isAdmin && profile.role !== 'admin')) {
+            await waseetEnsureUserProfileInDb(mappedUser);
         }
 
         // تحديث عناصر الشريط العلوي فوراً قبل انتظار الجلب الشبكي المطول
@@ -700,28 +820,45 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
 }
 
 /**
- * دمج مصفوفتين من رسائل الصفقة دون تكرار أو فقدان أي رسالة
+ * دمج مصفوفتين من رسائل الصفقة دون تكرار أو فقدان أي رسالة، مع فلترة صارمة حسب channel_type
  */
-function waseetMergeDealMessagesList(remoteList = [], localList = []) {
+function waseetMergeDealMessagesList(remoteList = [], localList = [], expectedChannel = null) {
     const r = Array.isArray(remoteList) ? remoteList : [];
     const l = Array.isArray(localList) ? localList : [];
-    if (l.length === 0) return [...r];
-    if (r.length === 0) return [...l];
 
-    const combined = [...r];
-    const seenKeys = new Set(
-        r.map(m => m && (m.id ? `id:${m.id}` : `${m.sender}|${(m.text || '').trim()}|${m.time || ''}`))
-    );
+    const isAllowedForChannel = (m) => {
+        if (!m || !m.text) return false;
+        if (!expectedChannel) return true;
+        const ch = m.channel_type || m.channelType || '';
+        const sender = m.sender_role || m.sender || '';
+        if (ch === 'system' || sender === 'system') return true;
+        if (expectedChannel === 'seller_mediator') {
+            if (ch === 'buyer_mediator' || sender === 'buyer') return false;
+            return true;
+        }
+        if (expectedChannel === 'buyer_mediator') {
+            if (ch === 'seller_mediator' || sender === 'seller') return false;
+            return true;
+        }
+        return true;
+    };
 
-    l.forEach(m => {
-        if (!m || !m.text) return;
-        const keyById = m.id ? `id:${m.id}` : null;
-        const keyByContent = `${m.sender}|${(m.text || '').trim()}|${m.time || ''}`;
-        if ((keyById && seenKeys.has(keyById)) || seenKeys.has(keyByContent)) return;
-        if (keyById) seenKeys.add(keyById);
-        seenKeys.add(keyByContent);
+    const combined = [];
+    const seenIds = new Set();
+    const seenContents = new Set();
+
+    const addUnique = (m) => {
+        if (!isAllowedForChannel(m)) return;
+        const idKey = m.id ? String(m.id) : null;
+        const contentKey = `${m.sender || m.sender_role || ''}|${(m.text || '').trim()}|${m.time || ''}`;
+        if ((idKey && seenIds.has(idKey)) || seenContents.has(contentKey)) return;
+        if (idKey) seenIds.add(idKey);
+        seenContents.add(contentKey);
         combined.push(m);
-    });
+    };
+
+    r.forEach(addUnique);
+    l.forEach(addUnique);
 
     return combined;
 }
@@ -734,6 +871,8 @@ async function waseetSaveDealToSupabase(deal, options = {}) {
     if (!client || !deal || !deal.id) return false;
 
     try {
+        await waseetEnsureUserProfileInDb(typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+
         const { data: { session } } = await client.auth.getSession();
         const sessionUserId = session?.user?.id || null;
 
@@ -791,7 +930,8 @@ async function waseetSaveDealToSupabase(deal, options = {}) {
 }
 
 /**
- * إرسال رسالة داخل غرفة الوساطة وحفظها في جدول deal_messages وجدول deals مع إظهار أي خطأ RLS أو أعمدة
+ * إرسال رسالة داخل غرفة الوساطة وحفظها في جدول deal_messages وجدول deals
+ * مع التأكد من وجود sender_id في جدول public.profiles لمنع خطأ deal_messages_sender_id_fkey
  */
 async function waseetSendEscrowMessageToSupabase(deal, msgObj, channelType, senderRole) {
     const client = initWaseetSupabase();
@@ -803,10 +943,17 @@ async function waseetSendEscrowMessageToSupabase(deal, msgObj, channelType, send
     }
 
     try {
+        const currentUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+
+        // 1. التأكد من وجود سجل للمستخدم الحالي (أو المدير) في جدول public.profiles قبل الإرسال
+        const ensuredProfile = await waseetEnsureUserProfileInDb(currentUser);
+
         const { data: { session } } = await client.auth.getSession();
         const sessionUser = session?.user || null;
-        const candidateId = sessionUser?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
-        const senderUuid = waseetIsValidUuid(candidateId) ? candidateId : null;
+        const candidateId = (ensuredProfile && ensuredProfile.id)
+            || (sessionUser && sessionUser.id)
+            || (currentUser && waseetIsValidUuid(currentUser.id) ? currentUser.id : null);
+        let senderUuid = waseetIsValidUuid(candidateId) ? candidateId : null;
 
         if (!senderUuid) {
             const authErr = { message: 'يرجى تسجيل الدخول أولاً لإرسال الرسائل في غرفة الوساطة.' };
@@ -815,27 +962,61 @@ async function waseetSendEscrowMessageToSupabase(deal, msgObj, channelType, send
             return { data: null, error: authErr };
         }
 
-        // 1. حفظ الصفقة وتحديث notes JSONB أولاً لضمان وجود الصفقة في جدول deals قبل إدراج الرسالة
+        // تحديث currentUser.id ليكون متطابقاً مع senderUuid
+        if (currentUser && currentUser.id !== senderUuid) {
+            currentUser.id = senderUuid;
+        }
+
+        // 2. حفظ الصفقة وتحديث notes JSONB أولاً لضمان وجود الصفقة في جدول deals قبل إدراج الرسالة
         const dealSaveRes = await waseetSaveDealToSupabase(deal, { returnError: true });
 
-        // 2. إدراج الرسالة في جدول deal_messages لتفعيل Realtime وعزل القنوات
+        // 3. بناء حمولة الرسالة مع تمرير نفس الـ UUID لمنع التكرار عند وصول إشعار Realtime
+        const strictChannel = (channelType === 'seller_mediator' || channelType === 'buyer_mediator' || channelType === 'system')
+            ? channelType
+            : (senderRole === 'seller' ? 'seller_mediator' : 'buyer_mediator');
+
         const insertPayload = {
             deal_id: String(deal.id),
             sender_id: senderUuid,
-            channel_type: channelType || 'all',
+            channel_type: strictChannel,
             sender_role: senderRole || 'buyer',
             message: msgObj.text
         };
+        if (waseetIsValidUuid(msgObj.id)) {
+            insertPayload.id = msgObj.id;
+        }
 
-        const { data, error } = await client
+        let { data, error } = await client
             .from('deal_messages')
             .insert([insertPayload])
             .select()
             .single();
 
+        // 4. إذا ظهر خطأ Foreign Key على sender_id رغم المحاولة الأولى، ننشئ صف الـ profile صراحةً ونعيد المحاولة فوراً
+        if (error && String(error.message || '').includes('deal_messages_sender_id_fkey')) {
+            console.warn('[Escrow Message] محاولة إصلاح تلقائي لسجل المرسل في profiles...');
+            const isAdmin = !!(currentUser && (currentUser.role === 'admin' || currentUser.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(currentUser))));
+            const fallbackName = (currentUser && currentUser.name) || (sessionUser && sessionUser.email ? sessionUser.email.split('@')[0] : (isAdmin ? 'الوسيط المعتمد' : 'مستخدم'));
+
+            await client.from('profiles').upsert({
+                id: senderUuid,
+                email: (sessionUser && sessionUser.email) || (currentUser && currentUser.email) || undefined,
+                name: fallbackName,
+                role: isAdmin ? 'admin' : 'user'
+            }, { onConflict: 'id' });
+
+            const retryRes = await client
+                .from('deal_messages')
+                .insert([insertPayload])
+                .select()
+                .single();
+
+            data = retryRes.data;
+            error = retryRes.error;
+        }
+
         if (error) {
             console.error('Escrow Message Insert Error (deal_messages):', error);
-            // إذا فشل الإدراج في deal_messages (مثلاً بسبب RLS أو عدم وجود الجدول/العمود)، نظهر التنبيه الصريح للمستخدم
             alert('فشل إرسال الرسالة في جدول رسائل الصفقة: ' + error.message);
             return { data: null, error };
         }
@@ -991,8 +1172,8 @@ async function waseetFetchDealsFromSupabase() {
                     loginType: 'Google / Facebook',
                     backupCodes: '—'
                 },
-                sellerMessages: waseetMergeDealMessagesList(remoteSellerMsgs, localSellerMsgs),
-                buyerMessages: waseetMergeDealMessagesList(remoteBuyerMsgs, localBuyerMsgs),
+                sellerMessages: waseetMergeDealMessagesList(remoteSellerMsgs, localSellerMsgs, 'seller_mediator'),
+                buyerMessages: waseetMergeDealMessagesList(remoteBuyerMsgs, localBuyerMsgs, 'buyer_mediator'),
                 createdAt: row.created_at || (parsed && parsed.createdAt) || new Date().toISOString()
             };
         });
