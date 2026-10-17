@@ -5427,11 +5427,18 @@ div[class*="netlify"],
 }
 
 @media (max-width: 868px) {
-    #modal-sell {
+    #modal-sell.active {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         padding: 0.5rem !important;
+    }
+
+    #modal-sell:not(.active) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 
     #modal-sell .modal-box-3d {
@@ -5668,9 +5675,41 @@ div[class*="netlify"],
     body.is-admin-mode .nav-left-group #wallet-pill-btn {
         display: inline-flex !important;
     }
+}
+
 #navbar-compat-hidden,
 #navbar-compat-hidden * {
     display: none !important;
 }
+
+/* ===================================================
+   ضمان عدم حجب الشريط السفلي بواسطة أي خلفية شفافة غير نشطة
+=================================================== */
+.modal-overlay:not(.active),
+.waseet-dialog-overlay:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.mobile-drawer-overlay:not(.active),
+.drawer-overlay:not(.active) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.mobile-bottom-nav {
+    z-index: 1500 !important;
+    pointer-events: auto !important;
+}
+
+.mobile-bottom-nav .mobile-nav-item {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1501;
+}
+
 
 

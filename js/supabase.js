@@ -197,7 +197,8 @@ async function waseetSyncAuthState() {
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
 
-        // جلب ومزامنة جميع الصفقات من قاعدة بيانات Supabase (بما في ذلك كافة الحالات للمدير)
+        // جلب ومزامنة جميع الصفقات والحسابات من قاعدة بيانات Supabase
+        await waseetFetchAccountsFromSupabase();
         await waseetFetchDealsFromSupabase();
 
         // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
@@ -207,9 +208,17 @@ async function waseetSyncAuthState() {
             if (typeof window.waseetApp.renderUserProfile === 'function') {
                 window.waseetApp.renderUserProfile();
             }
+            if (typeof window.waseetApp.renderMarketplace === 'function') {
+                window.waseetApp.renderMarketplace();
+            }
             if (typeof window.waseetApp.updateWalletDisplay === 'function') {
                 window.waseetApp.updateWalletDisplay();
             }
+        }
+
+        // إذا كان في صفحة الحسابات قيد الفحص، تحديث القائمة فوراً
+        if (typeof loadPendingAccounts === 'function') {
+            loadPendingAccounts();
         }
 
         // إذا كان في صفحة الصفقات، تحديث جدول الصفقات فوراً لظهور لوحة الوسيط المعتمد
@@ -232,6 +241,288 @@ async function waseetSyncAuthState() {
 function waseetIsValidUuid(val) {
     if (!val || typeof val !== 'string') return false;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val.trim());
+}
+
+/**
+ * حفظ أو تحديث حساب معروض للبيع في جدول marketplace_accounts على Supabase
+ */
+async function waseetSaveAccountToSupabase(account) {
+    const client = initWaseetSupabase();
+    if (!client || !account || !account.title) return null;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const sessionUserId = session?.user?.id || null;
+        const sellerUuid = waseetIsValidUuid(account.sellerId) ? account.sellerId : sessionUserId;
+        if (!sellerUuid) return null;
+
+        // توحيد حالة الفحص للحسابات المعلقة
+        let dbStatus = 'pending_verification';
+        if (account.status === 'available') dbStatus = 'available';
+        else if (account.status === 'rejected') dbStatus = 'rejected';
+        else if (account.status === 'sold') dbStatus = 'sold';
+        else if (account.status === 'in_deal') dbStatus = 'in_deal';
+        else if (account.status === 'hidden') dbStatus = 'hidden';
+
+        // توافق اسم اللعبة مع قيود قاعدة البيانات مع حفظ اللعبة الأصلية داخل details
+        const allowedGames = ['free_fire', 'pubg', 'other'];
+        const dbGame = allowedGames.includes(account.game) ? account.game : 'other';
+
+        const imagesArr = Array.isArray(account.images) && account.images.length > 0
+            ? account.images
+            : (account.image ? [account.image] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']);
+
+        const detailsObj = {
+            ...(account.details || {}),
+            localId: String(account.id || ''),
+            originalGame: account.game || 'free_fire',
+            sellerName: account.sellerName || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.name : 'بائع موثق'),
+            evoGunsCount: Number(account.evoGunsCount || 0),
+            evoGuns: account.evoGuns || [],
+            rareSkins: account.rareSkins || [],
+            iconicPants: account.iconicPants || [],
+            accountNotes: account.accountNotes || '',
+            notes: account.accountNotes || '',
+            badge: account.badge || '',
+            reviewStatus: account.reviewStatus || (dbStatus === 'available' ? 'approved' : 'pending'),
+            rejectionReason: account.rejectionReason || ''
+        };
+
+        const credsObj = account.credentials || {
+            email_or_phone: '',
+            password: ''
+        };
+
+        const payload = {
+            seller_id: sellerUuid,
+            game: dbGame,
+            title: String(account.title).trim(),
+            level: Math.max(1, parseInt(account.level) || 50),
+            prime_level: Math.max(0, parseInt(account.primeLevel) || 1),
+            login_type: account.loginType || 'google',
+            bind_status: account.bindStatus || 'single',
+            server: account.server || 'mena',
+            seller_price: Math.max(1, parseFloat(account.sellerPrice) || 10),
+            images: imagesArr,
+            details: detailsObj,
+            credentials: credsObj,
+            encrypted_credentials: JSON.stringify(credsObj),
+            status: dbStatus,
+            updated_at: new Date().toISOString()
+        };
+
+        let resultRow = null;
+        if (waseetIsValidUuid(account.id)) {
+            payload.id = account.id;
+            const { data, error } = await client
+                .from('marketplace_accounts')
+                .upsert(payload, { onConflict: 'id' })
+                .select('*')
+                .maybeSingle();
+            if (error) {
+                console.warn('[Supabase Accounts] تعذر تحديث الحساب:', error.message);
+                return null;
+            }
+            resultRow = data;
+        } else {
+            const { data, error } = await client
+                .from('marketplace_accounts')
+                .insert(payload)
+                .select('*')
+                .maybeSingle();
+            if (error) {
+                console.warn('[Supabase Accounts] تعذر إدراج الحساب:', error.message);
+                return null;
+            }
+            resultRow = data;
+        }
+
+        if (resultRow) {
+            const oldId = account.id;
+            account.id = resultRow.id;
+            account.accountNumber = resultRow.account_number || account.accountNumber;
+            account.syncedToSupabase = true;
+
+            // تحديث المعرف في localStorage حتى لا يتكرر الرفع
+            try {
+                const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const idx = saved.findIndex(a => String(a.id) === String(oldId) || String(a.id) === String(resultRow.id) || a.title === account.title);
+                if (idx !== -1) {
+                    saved[idx].id = resultRow.id;
+                    saved[idx].accountNumber = account.accountNumber;
+                    saved[idx].syncedToSupabase = true;
+                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(saved));
+                }
+            } catch (e) {}
+        }
+
+        return resultRow;
+    } catch (err) {
+        console.warn('[Supabase Accounts] استثناء حفظ الحساب:', err);
+        return null;
+    }
+}
+
+/**
+ * تحويل صف قادم من جدول marketplace_accounts إلى كائن حساب متوافق مع واجهة الموقع
+ */
+function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
+    const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
+    const profileObj = (acc.profiles && typeof acc.profiles === 'object' && !Array.isArray(acc.profiles))
+        ? acc.profiles
+        : (Array.isArray(acc.profiles) && acc.profiles[0] ? acc.profiles[0] : (profilesMap[acc.seller_id] || null));
+
+    const sellerName = (profileObj && (profileObj.name || profileObj.username || profileObj.full_name))
+        || details.sellerName
+        || acc.seller_name
+        || (profileObj && profileObj.email ? profileObj.email.split('@')[0] : 'بائع موثق');
+
+    let parsedCreds = acc.credentials;
+    if ((!parsedCreds || Object.keys(parsedCreds).length === 0) && acc.encrypted_credentials) {
+        if (typeof acc.encrypted_credentials === 'string' && acc.encrypted_credentials.trim().startsWith('{')) {
+            try { parsedCreds = JSON.parse(acc.encrypted_credentials); } catch (e) {}
+        }
+    }
+    if (!parsedCreds || typeof parsedCreds !== 'object') {
+        parsedCreds = {
+            email_or_phone: acc.login_identifier || 'غير متوفر',
+            password: acc.raw_password || '••••••••'
+        };
+    }
+
+    const imgs = (Array.isArray(acc.images) && acc.images.length > 0)
+        ? acc.images
+        : (Array.isArray(acc.gallery_images) && acc.gallery_images.length > 0
+            ? acc.gallery_images
+            : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']));
+
+    const rareSkinsVal = details.rareSkins || acc.rare_skins || ['سكنات نادرة'];
+    const iconicPantsVal = details.iconicPants || acc.iconic_pants || ['بنطلون مميز'];
+
+    return {
+        id: acc.id,
+        localId: details.localId || null,
+        accountNumber: acc.account_number || 1001,
+        game: details.originalGame || acc.game || 'free_fire',
+        title: acc.title || 'حساب ألعاب مميز',
+        level: Number(acc.level) || 50,
+        primeLevel: Number(acc.prime_level) || 1,
+        loginType: acc.login_type || 'google',
+        bindStatus: acc.bind_status || 'single',
+        server: acc.server || 'mena',
+        sellerName: sellerName,
+        sellerAvatar: (profileObj && profileObj.avatar_url) || null,
+        sellerId: acc.seller_id,
+        sellerRating: 5.0,
+        sellerDeals: 1,
+        sellerPrice: parseFloat(acc.seller_price) || 0,
+        evoGunsCount: Number(details.evoGunsCount ?? acc.evo_guns_count ?? 0),
+        evoGuns: Array.isArray(details.evoGuns) ? details.evoGuns : (Number(details.evoGunsCount || acc.evo_guns_count) > 0 ? [`${details.evoGunsCount || acc.evo_guns_count} أسلحة إيفو مطورة`] : []),
+        rareSkins: Array.isArray(rareSkinsVal) ? rareSkinsVal : String(rareSkinsVal).split('،').map(s => s.trim()),
+        iconicPants: Array.isArray(iconicPantsVal) ? iconicPantsVal : String(iconicPantsVal).split('،').map(s => s.trim()),
+        accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
+        image: imgs[0],
+        images: imgs,
+        badge: details.badge || ((details.originalGame || acc.game) === 'free_fire' ? `برايم ${acc.prime_level || 1}` : 'مميز'),
+        featured: false,
+        status: acc.status || 'pending_verification',
+        credentials: parsedCreds,
+        createdAt: acc.created_at,
+        submittedAt: acc.created_at,
+        reviewStatus: details.reviewStatus || acc.review_status || (acc.status === 'available' ? 'approved' : 'pending'),
+        rejectionReason: details.rejectionReason || acc.rejection_reason || '',
+        details: details,
+        syncedToSupabase: true
+    };
+}
+
+/**
+ * جلب كافة الحسابات من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
+ * بحيث لا يختفي أي حساب حتى لو كان ملف البائع الشخصي غير مكتمل
+ */
+async function waseetFetchAccountsFromSupabase() {
+    const client = initWaseetSupabase();
+    if (!client || typeof WASEET_STATE === 'undefined') return [];
+
+    try {
+        // أولاً: رفع أي حسابات محلية في WASEET_USER_ACCOUNTS لم يتم رفعها بعد إلى السحابة (مثل حساب 'تجربة')
+        try {
+            const localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+            for (const localAcc of localSaved) {
+                if (localAcc && !waseetIsValidUuid(localAcc.id) && !localAcc.syncedToSupabase) {
+                    await waseetSaveAccountToSupabase(localAcc);
+                }
+            }
+        } catch (e) {}
+
+        // ثانياً: جلب الحسابات من Supabase مع Left Join غير مقيد على profiles، مع fallback فوري إلى select('*')
+        let rows = null;
+        const { data: joinData, error: joinError } = await client
+            .from('marketplace_accounts')
+            .select('*, profiles(id, name, email, avatar_url)')
+            .order('created_at', { ascending: false });
+
+        if (!joinError && Array.isArray(joinData)) {
+            rows = joinData;
+        } else {
+            const { data: plainData, error: plainError } = await client
+                .from('marketplace_accounts')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (!plainError && Array.isArray(plainData)) {
+                rows = plainData;
+            }
+        }
+
+        if (!Array.isArray(rows)) return WASEET_STATE.accounts || [];
+
+        // جلب أسماء البائعين من profiles بشكل منفصل وآمن في حال لم يرجع الـ Join بياناتهم
+        const sellerIds = [...new Set(rows.map(r => r.seller_id).filter(id => waseetIsValidUuid(id)))];
+        const profilesMap = {};
+        if (sellerIds.length > 0) {
+            try {
+                const { data: profs } = await client
+                    .from('profiles')
+                    .select('id, name, email, avatar_url')
+                    .in('id', sellerIds);
+                if (Array.isArray(profs)) {
+                    profs.forEach(p => { if (p && p.id) profilesMap[p.id] = p; });
+                }
+            } catch (e) {}
+        }
+
+        const remoteAccounts = rows.map(r => waseetMapRemoteAccountRow(r, profilesMap));
+
+        // دمج الحسابات السحابية مع الحسابات المحلية دون تكرار
+        const existingAccounts = WASEET_STATE.accounts || [];
+        const mergedMap = new Map();
+
+        remoteAccounts.forEach(acc => {
+            mergedMap.set(String(acc.id), acc);
+        });
+
+        existingAccounts.forEach(localAcc => {
+            if (!localAcc) return;
+            const alreadyInRemote = remoteAccounts.some(r =>
+                String(r.id) === String(localAcc.id) ||
+                (r.localId && String(r.localId) === String(localAcc.id)) ||
+                (r.title === localAcc.title && Number(r.sellerPrice) === Number(localAcc.sellerPrice))
+            );
+            if (!alreadyInRemote) {
+                mergedMap.set(String(localAcc.id), localAcc);
+            }
+        });
+
+        WASEET_STATE.accounts = Array.from(mergedMap.values());
+        if (window.waseetApp) {
+            window.waseetApp.updatePendingAccountsCounter();
+            window.waseetApp.updateSellerListingsCounter();
+        }
+        return WASEET_STATE.accounts;
+    } catch (err) {
+        console.warn('[Supabase Accounts] استثناء جلب الحسابات:', err);
+        return WASEET_STATE.accounts || [];
+    }
 }
 
 /**
@@ -292,14 +583,13 @@ async function waseetSaveDealToSupabase(deal) {
 
 /**
  * جلب جميع الصفقات من جدول deals في Supabase (دون تصفية أو استثناء لأي حالة)
- * لضمان رؤية المدير (is_admin()) لكافة الصفقات في جميع المراحل والحالات
+ * مع جلب الأسماء الحقيقية لأطراف الصفقة (البائع والمشتري) من جدول profiles
  */
 async function waseetFetchDealsFromSupabase() {
     const client = initWaseetSupabase();
     if (!client || typeof WASEET_STATE === 'undefined') return [];
 
     try {
-        // استعلام شامل بدون أي فلتر على status لكي يجلب للمدير جميع الصفقات (بانتظار الوسيط، قيد الفحص، نشطة، معلقة، مكتملة، ملغاة)
         const { data, error } = await client
             .from('deals')
             .select('*')
@@ -308,6 +598,23 @@ async function waseetFetchDealsFromSupabase() {
         if (error || !Array.isArray(data)) {
             if (error) console.warn('[Supabase Deals] تعذر جلب الصفقات:', error.message);
             return WASEET_STATE.deals || [];
+        }
+
+        // جلب الأسماء الحقيقية للمشترين والبائعين من جدول profiles بناءً على buyer_id و seller_id
+        const participantIds = [...new Set(
+            data.flatMap(r => [r.buyer_id, r.seller_id]).filter(id => waseetIsValidUuid(id))
+        )];
+        const profilesMap = {};
+        if (participantIds.length > 0) {
+            try {
+                const { data: profs } = await client
+                    .from('profiles')
+                    .select('id, name, email, avatar_url')
+                    .in('id', participantIds);
+                if (Array.isArray(profs)) {
+                    profs.forEach(p => { if (p && p.id) profilesMap[p.id] = p; });
+                }
+            } catch (e) {}
         }
 
         const remoteDeals = data.map((row, index) => {
@@ -320,9 +627,21 @@ async function waseetFetchDealsFromSupabase() {
                 }
             }
 
+            const buyerProfile = profilesMap[row.buyer_id] || null;
+            const sellerProfile = profilesMap[row.seller_id] || null;
+
+            const realBuyerName = (buyerProfile && (buyerProfile.name || buyerProfile.username || buyerProfile.full_name))
+                || (parsed && parsed.buyer && parsed.buyer.name)
+                || (buyerProfile && buyerProfile.email ? buyerProfile.email.split('@')[0] : 'المشتري');
+
+            // إذا كان seller_id مساوياً لـ buyer_id بسبب حساب تجريبي، نستخدم اسم البائع المحفوظ في الصفقة إن وجد
+            const sameDummyId = row.seller_id && row.buyer_id && row.seller_id === row.buyer_id && parsed && parsed.seller && parsed.seller.name && parsed.seller.name !== realBuyerName;
+            const realSellerName = (!sameDummyId && sellerProfile && (sellerProfile.name || sellerProfile.username || sellerProfile.full_name))
+                || (parsed && parsed.seller && parsed.seller.name)
+                || (sellerProfile && sellerProfile.email ? sellerProfile.email.split('@')[0] : 'البائع');
+
             const dealNumber = (parsed && parsed.dealNumber) || (data.length - index);
             const rawStatus = (parsed && parsed.status) || row.status || 'active';
-            // توحيد الحالة بحيث تعتبر أي صفقة غير مكتملة وغير ملغاة صفقة نشطة/جارية تظهر في القائمة الرئيسية
             const normalizedStatus = (row.status === 'completed' || rawStatus === 'completed')
                 ? 'completed'
                 : ((row.status === 'cancelled' || rawStatus === 'cancelled') ? 'cancelled' : rawStatus);
@@ -335,8 +654,16 @@ async function waseetFetchDealsFromSupabase() {
                 accountId: (parsed && parsed.accountId) || row.account_id || `acc_${row.account_number || 1001}`,
                 accountNumber: row.account_number || (parsed && parsed.accountNumber) || null,
                 accountTitle: (parsed && parsed.accountTitle) || `حساب وساطة #${row.account_number || dealNumber}`,
-                buyer: (parsed && parsed.buyer) || { id: row.buyer_id, name: 'مشتري موثق', phone: '' },
-                seller: (parsed && parsed.seller) || { id: row.seller_id, name: 'بائع موثق', phone: '' },
+                buyer: {
+                    ...((parsed && parsed.buyer) || {}),
+                    id: row.buyer_id || (parsed && parsed.buyer && parsed.buyer.id),
+                    name: realBuyerName
+                },
+                seller: {
+                    ...((parsed && parsed.seller) || {}),
+                    id: row.seller_id || (parsed && parsed.seller && parsed.seller.id),
+                    name: realSellerName
+                },
                 mediator: (parsed && parsed.mediator) || { id: 'admin_waseet', name: 'الوسيط المعتمد' },
                 sellerPrice: Number(row.seller_price ?? (parsed && parsed.sellerPrice) ?? 0),
                 fee: Number(row.fee ?? (parsed && parsed.fee) ?? 0),
@@ -365,7 +692,6 @@ async function waseetFetchDealsFromSupabase() {
         (WASEET_STATE.deals || []).forEach(d => {
             if (d && d.id && !mergedMap.has(String(d.id))) {
                 mergedMap.set(String(d.id), d);
-                // رفع أي صفقة محلية لم تُحفظ بعد إلى السحابة
                 waseetSaveDealToSupabase(d);
             }
         });
@@ -376,10 +702,8 @@ async function waseetFetchDealsFromSupabase() {
         });
 
         const allMerged = Array.from(mergedMap.values());
-        // ترتيب تنازلي حسب رقم الصفقة أو التاريخ
         allMerged.sort((a, b) => (Number(b.dealNumber) || 0) - (Number(a.dealNumber) || 0));
 
-        // ضمان ترقيم متسلسل نظيف إذا كان هناك صفقات بدون dealNumber
         let maxDealNum = 0;
         allMerged.forEach(d => {
             if (Number(d.dealNumber) > maxDealNum) maxDealNum = Number(d.dealNumber);
@@ -403,6 +727,9 @@ async function waseetFetchDealsFromSupabase() {
     }
 }
 
+window.waseetSaveAccountToSupabase = waseetSaveAccountToSupabase;
+window.waseetFetchAccountsFromSupabase = waseetFetchAccountsFromSupabase;
+window.waseetMapRemoteAccountRow = waseetMapRemoteAccountRow;
 window.waseetSaveDealToSupabase = waseetSaveDealToSupabase;
 window.waseetFetchDealsFromSupabase = waseetFetchDealsFromSupabase;
 
@@ -436,6 +763,7 @@ if (typeof window !== 'undefined') {
         initWaseetSupabase();
         initWaseetAuthListener();
         waseetSyncAuthState();
+        waseetFetchAccountsFromSupabase();
         waseetFetchDealsFromSupabase();
     });
 }

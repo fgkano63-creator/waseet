@@ -168,7 +168,7 @@ create table if not exists public.marketplace_accounts (
     credentials jsonb default '{}'::jsonb,
     encrypted_credentials text default null,
     -- الحالة الافتراضية لأي حساب جديد: pending_verification (قيد الفحص والمراجعة)
-    status text not null default 'pending_verification' check (status in ('pending_verification', 'available', 'in_deal', 'sold', 'hidden', 'rejected')),
+    status text not null default 'pending_verification' check (status in ('pending', 'pending_verification', 'pending_review', 'available', 'in_deal', 'sold', 'hidden', 'rejected')),
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -182,33 +182,48 @@ grant all on table public.marketplace_accounts to service_role;
 alter table public.marketplace_accounts enable row level security;
 
 -- سياسات RLS لحسابات المتجر:
--- القراءة: الحسابات المعتمدة فقط (status = 'available') تظهر في المتجر العام أمام الجميع والزوار.
--- الحسابات المعلقة (pending_verification) أو المرفوضة يراها فقط صاحب الحساب (البائع) أو المدير (Admin / الوسيط).
-drop policy if exists "accounts_select_policy" on public.marketplace_accounts;
-create policy "accounts_select_policy"
-on public.marketplace_accounts for select
+-- 1. المدير (is_admin()) يرى كافة الحسابات دون أي قيد
+drop policy if exists "accounts_admin_select_all" on public.marketplace_accounts;
+create policy "accounts_admin_select_all"
+on public.marketplace_accounts for select to authenticated
 using (
-  status = 'available'
-  or (auth.uid() is not null and (seller_id = auth.uid() or public.is_admin()))
+  public.is_admin()
 );
 
--- الإضافة: المستخدم المسجل يضيف حسابه وتكون حالته الافتراضية 'pending_verification'
+-- 2. البائع يرى جميع حساباته الخاصة (سواء قيد الفحص أو متاحة أو مرفوضة)
+drop policy if exists "accounts_seller_select_own" on public.marketplace_accounts;
+create policy "accounts_seller_select_own"
+on public.marketplace_accounts for select to authenticated
+using (
+  seller_id = auth.uid()
+);
+
+-- 3. العامة والزوار يرون الحسابات المعتمدة (status = 'available') فقط
+drop policy if exists "accounts_select_policy" on public.marketplace_accounts;
+drop policy if exists "accounts_public_select_available" on public.marketplace_accounts;
+create policy "accounts_public_select_available"
+on public.marketplace_accounts for select to anon, authenticated
+using (
+  status = 'available'
+);
+
+-- الإضافة: المستخدم المسجل يضيف حسابه (أو المدير)
 drop policy if exists "accounts_insert_policy" on public.marketplace_accounts;
 create policy "accounts_insert_policy"
 on public.marketplace_accounts for insert to authenticated
 with check (
-  seller_id = auth.uid()
+  seller_id = auth.uid() or public.is_admin()
 );
 
--- التعديل: البائع يعدل حسابه الخاص إذا كان قيد الفحص أو متاحاً، أو المدير يعتمد الحساب ويغير حالته إلى available أو rejected
+-- التعديل: البائع يعدل حسابه الخاص، أو المدير يعتمد الحساب ويغير حالته إلى available أو rejected
 drop policy if exists "accounts_update_policy" on public.marketplace_accounts;
 create policy "accounts_update_policy"
 on public.marketplace_accounts for update to authenticated
 using (
-  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
+  public.is_admin() or (seller_id = auth.uid() and status in ('pending', 'pending_verification', 'pending_review', 'available', 'hidden'))
 )
 with check (
-  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
+  public.is_admin() or (seller_id = auth.uid() and status in ('pending', 'pending_verification', 'pending_review', 'available', 'hidden'))
 );
 
 -- الحذف: البائع يحذف حسابه الخاص، أو المدير
@@ -216,7 +231,7 @@ drop policy if exists "accounts_delete_policy" on public.marketplace_accounts;
 create policy "accounts_delete_policy"
 on public.marketplace_accounts for delete to authenticated
 using (
-  (seller_id = auth.uid() and status in ('pending_verification', 'available', 'hidden')) or public.is_admin()
+  public.is_admin() or seller_id = auth.uid()
 );
 
 -- دالة آمنة لاسترجاع بيانات دخول الحساب (حصرياً للمدير والوسيط فقط)

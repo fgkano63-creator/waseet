@@ -44,6 +44,77 @@ class WaseetEscrowRoom {
     init() {
         this.renderAll();
         this.initLiveSync();
+        this.fetchDealParticipantsProfiles();
+    }
+
+    async fetchDealParticipantsProfiles() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reqDealId = urlParams.get('dealId');
+
+            // If deal isn't found locally yet, sync deals from Supabase first
+            if ((!this.deal || (reqDealId && this.deal.id !== reqDealId)) && typeof window.waseetFetchDealsFromSupabase === 'function') {
+                await window.waseetFetchDealsFromSupabase();
+                if (reqDealId && WASEET_STATE.deals) {
+                    this.deal = WASEET_STATE.deals.find(d => d.id === reqDealId) || this.deal;
+                } else if (!this.deal && WASEET_STATE.deals && WASEET_STATE.deals.length > 0) {
+                    this.deal = WASEET_STATE.deals[0];
+                }
+            }
+
+            if (!this.deal) return;
+
+            if (!this.deal.seller) this.deal.seller = { name: 'البائع' };
+            if (!this.deal.buyer) this.deal.buyer = { name: 'المشتري' };
+
+            const sellerId = this.deal.seller.id || this.deal.seller_id || this.deal.sellerId || null;
+            const buyerId = this.deal.buyer.id || this.deal.buyer_id || this.deal.buyerId || null;
+
+            let updated = false;
+
+            // 1. Fetch from Supabase profiles table using seller_id and buyer_id
+            if (window.waseetSupabaseClient) {
+                const uuidList = [sellerId, buyerId].filter(id => id && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(id)));
+                if (uuidList.length > 0) {
+                    const { data: profs, error } = await window.waseetSupabaseClient
+                        .from('profiles')
+                        .select('id, name, email, avatar_url')
+                        .in('id', uuidList);
+
+                    if (!error && Array.isArray(profs)) {
+                        profs.forEach(p => {
+                            const realName = p.name || (p.email ? p.email.split('@')[0] : null);
+                            if (realName) {
+                                if (String(p.id) === String(sellerId) && this.deal.seller.name !== realName) {
+                                    this.deal.seller.name = realName;
+                                    updated = true;
+                                }
+                                if (String(p.id) === String(buyerId) && this.deal.buyer.name !== realName) {
+                                    this.deal.buyer.name = realName;
+                                    updated = true;
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            // 2. Fallback: Check linked account in WASEET_STATE.accounts if seller name is still generic
+            if ((!this.deal.seller.name || this.deal.seller.name === 'البائع' || this.deal.seller.name === 'سامي') && this.deal.accountId && Array.isArray(WASEET_STATE.accounts)) {
+                const linkedAcc = WASEET_STATE.accounts.find(a => String(a.id) === String(this.deal.accountId));
+                if (linkedAcc && linkedAcc.sellerName && linkedAcc.sellerName !== 'البائع') {
+                    this.deal.seller.name = linkedAcc.sellerName;
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                saveWaseetData();
+            }
+            this.renderAll();
+        } catch (err) {
+            console.warn('Could not fetch deal participant profiles:', err);
+        }
     }
 
     initLiveSync() {
@@ -417,6 +488,9 @@ class WaseetEscrowRoom {
         const container = document.getElementById('escrow-workspace-container');
         if (!container) return;
 
+        const sellerName = (this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
+        const buyerName = (this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
+
         // ==========================================
         // 1. MEDIATOR VIEW (3 SCREENS / 3 COLUMNS)
         // Screen 1: الوسيط ↔ البائع
@@ -427,12 +501,12 @@ class WaseetEscrowRoom {
             container.innerHTML = `
                 <div class="escrow-tri-split">
                     
-                    <!-- Screen 1: الشات بين الوسيط والبائع (سامي) -->
+                    <!-- Screen 1: الشات بين الوسيط والبائع (${sellerName}) -->
                     <div class="chat-pane chat-pane-seller">
                         <div class="chat-header">
                             <div class="chat-title chat-card-title-seller">
                                 <i class="fas fa-store text-silver"></i>
-                                <span>شات مع البائع (سامي)</span>
+                                <span>شات مع البائع (${sellerName})</span>
                             </div>
                             <span class="badge-role seller-badge">قناة البائع</span>
                         </div>
@@ -440,19 +514,19 @@ class WaseetEscrowRoom {
                             ${this.renderMessageList(this.deal.sellerMessages)}
                         </div>
                         <div class="chat-footer">
-                            <input type="text" id="input-seller-chat" class="chat-input" placeholder="رسالة للبائع فقط...">
+                            <input type="text" id="input-seller-chat" class="chat-input" placeholder="رسالة للبائع (${sellerName}) فقط...">
                             <button class="btn-3d btn-outline" onclick="window.escrowRoom.sendMessageToSeller()">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Screen 2: الشات بين الوسيط والمشتري (أحمد) -->
+                    <!-- Screen 2: الشات بين الوسيط والمشتري (${buyerName}) -->
                     <div class="chat-pane chat-pane-buyer">
                         <div class="chat-header">
                             <div class="chat-title chat-card-title-buyer">
                                 <i class="fas fa-shopping-cart text-orange"></i>
-                                <span>شات مع المشتري (أحمد)</span>
+                                <span>شات مع المشتري (${buyerName})</span>
                             </div>
                             <span class="badge-role buyer-badge">قناة المشتري</span>
                         </div>
@@ -460,7 +534,7 @@ class WaseetEscrowRoom {
                             ${this.renderMessageList(this.deal.buyerMessages)}
                         </div>
                         <div class="chat-footer">
-                            <input type="text" id="input-buyer-chat" class="chat-input" placeholder="رسالة للمشتري فقط...">
+                            <input type="text" id="input-buyer-chat" class="chat-input" placeholder="رسالة للمشتري (${buyerName}) فقط...">
                             <button class="btn-3d btn-orange" onclick="window.escrowRoom.sendMessageToBuyer()">
                                 <i class="fas fa-paper-plane"></i>
                             </button>

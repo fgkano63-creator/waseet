@@ -472,59 +472,146 @@
                 </div>
             `;
 
-            let accounts = [];
             const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
 
-            // 1. جلب من Supabase
+            // مزامنة أي حسابات محلية لم تُرفع بعد إلى السحابة
+            if (typeof window.waseetFetchAccountsFromSupabase === 'function') {
+                try {
+                    await window.waseetFetchAccountsFromSupabase();
+                } catch (e) {}
+            }
+
+            let remoteList = [];
+
+            // 1. جلب الحسابات المعلقة من Supabase (كل حساب ليست حالته available ولا rejected) مع Left Join آمن لجدول profiles
             if (client) {
                 try {
-                    const { data, error } = await client
+                    let data = null;
+                    const { data: joinData, error: joinError } = await client
                         .from('marketplace_accounts')
-                        .select('*')
-                        .in('status', ['pending_verification', 'pending_review'])
+                        .select('*, profiles(id, name, email, avatar_url)')
+                        .neq('status', 'available')
+                        .neq('status', 'rejected')
+                        .neq('status', 'sold')
+                        .neq('status', 'in_deal')
                         .order('created_at', { ascending: false });
 
-                    if (!error && Array.isArray(data)) {
-                        accounts = data.map(acc => ({
-                            id: acc.id,
-                            accountNumber: acc.account_number || `FF-${String(acc.id).slice(0, 4)}`,
-                            title: acc.title,
-                            game: acc.game || 'free_fire',
-                            level: acc.level,
-                            primeLevel: acc.prime_level,
-                            sellerPrice: parseFloat(acc.seller_price) || 0,
-                            sellerId: acc.seller_id,
-                            sellerName: acc.seller_name || 'بائع موثق',
-                            status: acc.status,
-                            createdAt: acc.created_at,
-                            bindStatus: acc.bind_status || 'single',
-                            loginType: acc.login_type || 'google',
-                            accountNotes: acc.account_notes || acc.notes || '',
-                            evoGunsCount: acc.evo_guns_count || 0,
-                            iconicPants: acc.iconic_pants || '',
-                            rareSkins: acc.rare_skins || '',
-                            image: acc.image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
-                            images: Array.isArray(acc.gallery_images) && acc.gallery_images.length ? acc.gallery_images : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']),
-                            credentials: acc.encrypted_credentials || acc.credentials || {
-                                email_or_phone: acc.login_identifier || 'غير متوفر',
-                                password: acc.raw_password || '••••••••'
+                    if (!joinError && Array.isArray(joinData)) {
+                        data = joinData;
+                    } else {
+                        // احتياط فوري بدون Join لضمان عدم اختفاء أي حساب إذا كان الـ profile غير مكتمل
+                        const { data: plainData, error: plainError } = await client
+                            .from('marketplace_accounts')
+                            .select('*')
+                            .neq('status', 'available')
+                            .neq('status', 'rejected')
+                            .neq('status', 'sold')
+                            .neq('status', 'in_deal')
+                            .order('created_at', { ascending: false });
+                        if (!plainError && Array.isArray(plainData)) {
+                            data = plainData;
+                        }
+                    }
+
+                    if (Array.isArray(data)) {
+                        // جلب ملفات البائعين بشكل مستقل لتعويض أي نقص في الـ Join دون حجب الحساب الأساسي
+                        const sellerIds = [...new Set(data.map(r => r.seller_id).filter(Boolean))];
+                        const profilesMap = {};
+                        if (sellerIds.length > 0) {
+                            try {
+                                const { data: profs } = await client
+                                    .from('profiles')
+                                    .select('id, name, email, avatar_url')
+                                    .in('id', sellerIds);
+                                if (Array.isArray(profs)) {
+                                    profs.forEach(p => { if (p && p.id) profilesMap[p.id] = p; });
+                                }
+                            } catch (e) {}
+                        }
+
+                        remoteList = data.map(acc => {
+                            if (typeof window.waseetMapRemoteAccountRow === 'function') {
+                                const mapped = window.waseetMapRemoteAccountRow(acc, profilesMap);
+                                return {
+                                    ...mapped,
+                                    iconicPants: Array.isArray(mapped.iconicPants) ? mapped.iconicPants.join('، ') : (mapped.iconicPants || ''),
+                                    rareSkins: Array.isArray(mapped.rareSkins) ? mapped.rareSkins.join('، ') : (mapped.rareSkins || '')
+                                };
                             }
-                        }));
+                            const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
+                            const prof = (acc.profiles && !Array.isArray(acc.profiles)) ? acc.profiles : (Array.isArray(acc.profiles) ? acc.profiles[0] : profilesMap[acc.seller_id]);
+                            const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : (Array.isArray(acc.gallery_images) && acc.gallery_images.length ? acc.gallery_images : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']));
+                            return {
+                                id: acc.id,
+                                localId: details.localId || null,
+                                accountNumber: acc.account_number || `FF-${String(acc.id).slice(0, 4)}`,
+                                title: acc.title,
+                                game: details.originalGame || acc.game || 'free_fire',
+                                level: acc.level || 50,
+                                primeLevel: acc.prime_level || 1,
+                                sellerPrice: parseFloat(acc.seller_price) || 0,
+                                sellerId: acc.seller_id,
+                                sellerName: (prof && (prof.name || prof.username || prof.full_name)) || details.sellerName || acc.seller_name || 'بائع موثق',
+                                status: acc.status || 'pending_verification',
+                                createdAt: acc.created_at,
+                                bindStatus: acc.bind_status || 'single',
+                                loginType: acc.login_type || 'google',
+                                accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
+                                evoGunsCount: details.evoGunsCount || acc.evo_guns_count || 0,
+                                iconicPants: Array.isArray(details.iconicPants) ? details.iconicPants.join('، ') : (details.iconicPants || acc.iconic_pants || ''),
+                                rareSkins: Array.isArray(details.rareSkins) ? details.rareSkins.join('، ') : (details.rareSkins || acc.rare_skins || ''),
+                                image: imgs[0],
+                                images: imgs,
+                                details: details,
+                                credentials: (acc.credentials && Object.keys(acc.credentials).length ? acc.credentials : null) || {
+                                    email_or_phone: acc.login_identifier || 'غير متوفر',
+                                    password: acc.raw_password || '••••••••'
+                                }
+                            };
+                        });
                     }
                 } catch (err) {
                     console.warn('[Pending Accounts] Supabase Exception:', err);
                 }
             }
 
-            // 2. دمج الحسابات المعلقة من الحالة المحلية كاحتياط
-            if (accounts.length === 0) {
-                const local = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review');
-                if (local.length > 0) accounts = local;
-            }
+            // 2. دمج الحسابات المعلقة من الحالة المحلية و localStorage دائماً (دون تجاهلها حتى لو وُجدت حسابات في السحابة)
+            const mergedMap = new Map();
+            remoteList.forEach(acc => {
+                if (acc && acc.id) mergedMap.set(String(acc.id), acc);
+            });
 
-            allPendingAccounts = accounts;
+            const isPendingStatus = (st) => st && st !== 'available' && st !== 'rejected' && st !== 'sold' && st !== 'in_deal' && st !== 'hidden';
+
+            let savedUserAccounts = [];
+            try {
+                savedUserAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+            } catch (e) {}
+
+            const localCandidates = [
+                ...(WASEET_STATE.accounts || []),
+                ...savedUserAccounts
+            ].filter(a => a && isPendingStatus(a.status));
+
+            localCandidates.forEach(localAcc => {
+                const alreadyExists = Array.from(mergedMap.values()).some(r =>
+                    String(r.id) === String(localAcc.id) ||
+                    (r.localId && String(r.localId) === String(localAcc.id)) ||
+                    (r.title === localAcc.title && Number(r.sellerPrice) === Number(localAcc.sellerPrice))
+                );
+                if (!alreadyExists) {
+                    mergedMap.set(String(localAcc.id), {
+                        ...localAcc,
+                        iconicPants: Array.isArray(localAcc.iconicPants) ? localAcc.iconicPants.join('، ') : (localAcc.iconicPants || ''),
+                        rareSkins: Array.isArray(localAcc.rareSkins) ? localAcc.rareSkins.join('، ') : (localAcc.rareSkins || '')
+                    });
+                }
+            });
+
+            allPendingAccounts = Array.from(mergedMap.values());
             updatePendingStats();
             applyPendingFilters();
+            renderNavbarUser();
         }
 
         function updatePendingStats() {
@@ -907,15 +994,20 @@
 
             const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
 
-            // تحديث في Supabase
+            // تحديث في Supabase بشكل آمن عبر حقل status وحقل details JSONB
             if (client) {
                 try {
+                    const updatedDetails = {
+                        ...(acc.details || {}),
+                        reviewStatus: 'approved',
+                        approvedAt: new Date().toISOString()
+                    };
                     const { error } = await client
                         .from('marketplace_accounts')
                         .update({
                             status: 'available',
-                            review_status: 'approved',
-                            approved_at: new Date().toISOString()
+                            details: updatedDetails,
+                            updated_at: new Date().toISOString()
                         })
                         .eq('id', accId);
 
@@ -927,7 +1019,7 @@
 
             // تحديث الحالة المحلية
             acc.status = 'available';
-            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());
+            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString() || (acc.localId && a.id.toString() === acc.localId.toString()));
             if (globalAcc) {
                 globalAcc.status = 'available';
                 globalAcc.reviewStatus = 'approved';
@@ -936,7 +1028,7 @@
 
             try {
                 const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-                const idx = saved.findIndex(a => a.id.toString() === accId.toString());
+                const idx = saved.findIndex(a => a.id.toString() === accId.toString() || (acc.localId && a.id.toString() === acc.localId.toString()));
                 if (idx !== -1) {
                     saved[idx].status = 'available';
                     saved[idx].reviewStatus = 'approved';
@@ -947,6 +1039,7 @@
             allPendingAccounts = allPendingAccounts.filter(a => a.id.toString() !== accId.toString());
             updatePendingStats();
             applyPendingFilters();
+            renderNavbarUser();
 
             if (typeof waseetAlert === 'function') {
                 await waseetAlert(
@@ -976,13 +1069,18 @@
 
             if (client) {
                 try {
+                    const updatedDetails = {
+                        ...(acc.details || {}),
+                        reviewStatus: 'rejected',
+                        rejectionReason: reason,
+                        rejectedAt: new Date().toISOString()
+                    };
                     const { error } = await client
                         .from('marketplace_accounts')
                         .update({
                             status: 'rejected',
-                            review_status: 'rejected',
-                            rejection_reason: reason,
-                            rejected_at: new Date().toISOString()
+                            details: updatedDetails,
+                            updated_at: new Date().toISOString()
                         })
                         .eq('id', accId);
 
@@ -995,7 +1093,7 @@
             acc.status = 'rejected';
             acc.rejectionReason = reason;
 
-            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());
+            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString() || (acc.localId && a.id.toString() === acc.localId.toString()));
             if (globalAcc) {
                 globalAcc.status = 'rejected';
                 globalAcc.rejectionReason = reason;
@@ -1004,7 +1102,7 @@
 
             try {
                 const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-                const idx = saved.findIndex(a => a.id.toString() === accId.toString());
+                const idx = saved.findIndex(a => a.id.toString() === accId.toString() || (acc.localId && a.id.toString() === acc.localId.toString()));
                 if (idx !== -1) {
                     saved[idx].status = 'rejected';
                     saved[idx].rejectionReason = reason;
@@ -1015,6 +1113,7 @@
             allPendingAccounts = allPendingAccounts.filter(a => a.id.toString() !== accId.toString());
             updatePendingStats();
             applyPendingFilters();
+            renderNavbarUser();
 
             if (typeof waseetAlert === 'function') {
                 await waseetAlert(
@@ -1049,6 +1148,12 @@
 
         /* ================= Page Initialization ================= */
         async function initPendingAccountsPage() {
+            if (typeof waseetSyncAuthState === 'function') {
+                try {
+                    await waseetSyncAuthState();
+                } catch (e) {}
+            }
+
             renderNavbarUser();
 
             const user = WASEET_STATE.user;

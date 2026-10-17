@@ -532,7 +532,7 @@
                     <i class="fas fa-plus-circle text-orange"></i>
                     عرض حساب للبيع في WASEET
                 </h3>
-                <button class="btn-close-modal" id="btn-close-sell">&times;</button>
+                <button type="button" class="btn-close-modal" id="btn-close-sell" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal(); else document.getElementById('modal-sell')?.classList.remove('active');" aria-label="إغلاق النافذة">&times;</button>
             </div>
 
             <form id="sell-account-form">
@@ -931,15 +931,15 @@
     </div>
     <!-- ================= Mobile App Bottom Navigation Bar ================= -->
     <nav class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item active">
+        <a href="index.html" class="mobile-nav-item active" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal();">
             <i class="fas fa-home"></i>
             <span>الرئيسية</span>
         </a>
-        <a href="#marketplace" class="mobile-nav-item">
+        <a href="index.html#marketplace" class="mobile-nav-item" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal();">
             <i class="fas fa-gamepad"></i>
             <span>المتجر</span>
         </a>
-        <button class="mobile-nav-item mobile-nav-center-action" onclick="window.waseetApp.openSellModal()" title="بيع حساب جديد">
+        <button type="button" class="mobile-nav-item mobile-nav-center-action" onclick="if(window.waseetApp) window.waseetApp.openSellModal();" title="بيع حساب جديد">
             <div class="center-action-circle">
                 <i class="fas fa-plus"></i>
             </div>
@@ -949,10 +949,10 @@
             <i class="fas fa-shield-alt"></i>
             <span>الصفقات</span>
         </a>
-        <button class="mobile-nav-item" onclick="window.waseetApp.openLoginModal()">
+        <a href="my-accounts.html" class="mobile-nav-item">
             <i class="fas fa-user"></i>
             <span>حسابي</span>
-        </button>
+        </a>
     </nav>
 
     <!-- Facebook-style Sliding Drawer Menu (Requirement 6 & Images 4 & 5) -->

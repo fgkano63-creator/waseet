@@ -324,7 +324,24 @@ class WaseetApp {
 
     openSellModal() {
         const modal = document.getElementById('modal-sell');
-        if (modal) modal.classList.add('active');
+        if (modal) {
+            modal.style.display = '';
+            modal.classList.add('active');
+        }
+    }
+
+    closeSellModal() {
+        const modal = document.getElementById('modal-sell');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) {
+                    modal.style.display = '';
+                }
+            }, 60);
+        }
+        document.body.style.overflow = '';
     }
 
     async loginWithProvider(provider) {
@@ -1148,10 +1165,19 @@ class WaseetApp {
         const btnCloseSell = document.getElementById('btn-close-sell');
 
         if (btnOpenSell && modalSell) {
-            btnOpenSell.onclick = () => modalSell.classList.add('active');
+            btnOpenSell.onclick = (e) => {
+                if (e) e.preventDefault();
+                this.openSellModal();
+            };
         }
         if (btnCloseSell && modalSell) {
-            btnCloseSell.onclick = () => modalSell.classList.remove('active');
+            btnCloseSell.onclick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                this.closeSellModal();
+            };
         }
 
         // Open Wallet Modal
@@ -1195,7 +1221,11 @@ class WaseetApp {
         // Close on background overlay click
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
-                e.target.classList.remove('active');
+                if (e.target.id === 'modal-sell') {
+                    this.closeSellModal();
+                } else {
+                    e.target.classList.remove('active');
+                }
             }
         });
     }
@@ -1250,91 +1280,120 @@ class WaseetApp {
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const game = selectedGameInput ? selectedGameInput.value : 'free_fire';
-                const title = document.getElementById('form-title').value;
-                const level = parseInt(document.getElementById('form-level').value) || 50;
-                const primeLevel = parseInt(document.getElementById('form-prime').value) || 1;
-                const loginType = document.getElementById('form-login-type').value;
-                const bindStatus = document.getElementById('form-bind-status').value;
-                const sellerPrice = parseFloat(document.getElementById('form-seller-price').value) || 30;
 
-                // Free fire detailed attributes
-                const evoCount = parseInt(document.getElementById('form-evo-count')?.value) || 0;
-                const iconicPantsStr = document.getElementById('form-iconic-pants')?.value || '';
-                const rareSkinsStr = document.getElementById('form-rare-skins')?.value || '';
-                const notesStr = document.getElementById('form-account-notes')?.value || '';
-
-                const iconicPants = iconicPantsStr ? iconicPantsStr.split('،').map(s => s.trim()) : ['بنطلون مميز'];
-                const rareSkins = rareSkinsStr ? rareSkinsStr.split('،').map(s => s.trim()) : ['سكنات نادرة'];
-
-                let finalImages = [];
-                if (this.uploadedImages.length > 0) {
-                    finalImages = [...this.uploadedImages];
-                } else {
-                    finalImages = [
-                        'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000',
-                        'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000',
-                        'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1000'
-                    ];
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري إرسال الحساب للفحص...';
                 }
 
-                const newAccount = {
-                    id: 'acc_' + Date.now(),
-                    accountNumber: 1001 + WASEET_STATE.accounts.length, // Sequential number
-                    game: game,
-                    title: title,
-                    level: level,
-                    primeLevel: primeLevel,
-                    loginType: loginType,
-                    bindStatus: bindStatus,
-                    server: 'mena',
-                    sellerName: WASEET_STATE.user.name,
-                    sellerId: WASEET_STATE.user.id,
-                    sellerRating: 5.0,
-                    sellerDeals: 1,
-                    sellerPrice: sellerPrice,
-                    evoGunsCount: evoCount,
-                    evoGuns: evoCount > 0 ? [`${evoCount} أسلحة إيفو مطورة`] : [],
-                    rareSkins: rareSkins,
-                    iconicPants: iconicPants,
-                    accountNotes: notesStr || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.',
-                    image: finalImages[0],
-                    images: finalImages,
-                    badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
-                    featured: false,
-                    status: 'pending_verification',
-                    credentials: {
-                        email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
-                        password: document.getElementById('form-seller-password')?.value?.trim() || ''
-                    },
-                    submittedAt: new Date().toISOString(),
-                    reviewStatus: 'pending',
-                    reviewMessage: 'الحساب قيد الفحص والتدقيق من قبل الوسيط المعتمد. المراجعة تكون في أقل من 24 ساعة.'
-                };
-
-                WASEET_STATE.accounts.unshift(newAccount);
-                // Save new account to localStorage so it persists on reload
                 try {
-                    const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-                    savedAccounts.unshift(newAccount);
-                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
-                } catch(e) { console.warn('Could not save account', e); }
-                saveWaseetData();
-                this.renderMarketplace();
-                this.updateSellerListingsCounter();
-                this.updatePendingAccountsCounter();
+                    const game = selectedGameInput ? selectedGameInput.value : 'free_fire';
+                    const title = (document.getElementById('form-title')?.value || '').trim() || 'حساب مميز';
+                    const level = parseInt(document.getElementById('form-level')?.value) || 50;
+                    const primeLevel = parseInt(document.getElementById('form-prime')?.value) || 1;
+                    const loginType = document.getElementById('form-login-type')?.value || 'Google';
+                    const bindStatus = document.getElementById('form-bind-status')?.value || 'صافي (بدون بريد استرداد)';
+                    const sellerPrice = parseFloat(document.getElementById('form-seller-price')?.value) || 30;
 
-                // Reset and close
-                this.uploadedImages = [];
-                this.renderImagePreviews();
-                document.getElementById('modal-sell').classList.remove('active');
-                form.reset();
+                    // Free fire detailed attributes
+                    const evoCount = parseInt(document.getElementById('form-evo-count')?.value) || 0;
+                    const iconicPantsStr = document.getElementById('form-iconic-pants')?.value || '';
+                    const rareSkinsStr = document.getElementById('form-rare-skins')?.value || '';
+                    const notesStr = document.getElementById('form-account-notes')?.value || '';
 
-                await waseetAlert(
-                    'الحساب قيد الفحص (أقل من 24 ساعة)',
-                    'تم استلام بيانات حسابك بنجاح وهو الآن قيد الفحص والتدقيق من قبل الوسيط المعتمد.\n\nعند إنهاء الفحص والتأكد من صحة البيانات سيتم وضعه ونشره فوراً في السوق المفتوح. تتم المراجعة عادةً في أقل من 24 ساعة.\n\nيمكنك متابعة حالة حسابك من زر "حساباتي المعروضة".',
-                    'info'
-                );
+                    const iconicPants = iconicPantsStr ? iconicPantsStr.split('،').map(s => s.trim()) : ['بنطلون مميز'];
+                    const rareSkins = rareSkinsStr ? rareSkinsStr.split('،').map(s => s.trim()) : ['سكنات نادرة'];
+
+                    let finalImages = [];
+                    if (this.uploadedImages.length > 0) {
+                        finalImages = [...this.uploadedImages];
+                    } else {
+                        finalImages = [
+                            'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000',
+                            'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000',
+                            'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1000'
+                        ];
+                    }
+
+                    const currentUser = (window.WASEET_STATE && window.WASEET_STATE.user) || { id: 'local_seller', name: 'بائع معتمد' };
+                    const newAccount = {
+                        id: 'acc_' + Date.now(),
+                        accountNumber: 1001 + (WASEET_STATE.accounts ? WASEET_STATE.accounts.length : 0),
+                        game: game,
+                        title: title,
+                        level: level,
+                        primeLevel: primeLevel,
+                        loginType: loginType,
+                        bindStatus: bindStatus,
+                        server: 'mena',
+                        sellerName: currentUser.name || 'بائع معتمد',
+                        sellerId: currentUser.id || 'local_seller',
+                        sellerEmail: currentUser.email || '',
+                        sellerRating: 5.0,
+                        sellerDeals: 1,
+                        sellerPrice: sellerPrice,
+                        evoGunsCount: evoCount,
+                        evoGuns: evoCount > 0 ? [`${evoCount} أسلحة إيفو مطورة`] : [],
+                        rareSkins: rareSkins,
+                        iconicPants: iconicPants,
+                        accountNotes: notesStr || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.',
+                        image: finalImages[0],
+                        images: finalImages,
+                        badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
+                        featured: false,
+                        status: 'pending_verification',
+                        credentials: {
+                            email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
+                            password: document.getElementById('form-seller-password')?.value?.trim() || ''
+                        },
+                        submittedAt: new Date().toISOString(),
+                        reviewStatus: 'pending',
+                        reviewMessage: 'الحساب قيد الفحص والتدقيق من قبل الوسيط المعتمد. المراجعة تكون في أقل من 24 ساعة.'
+                    };
+
+                    // Save to Supabase marketplace_accounts so Admin sees it immediately in pending-accounts.html
+                    if (typeof window.waseetSaveAccountToSupabase === 'function') {
+                        const savedRemote = await window.waseetSaveAccountToSupabase(newAccount);
+                        if (savedRemote && savedRemote.id) {
+                            newAccount.id = savedRemote.id;
+                            newAccount._syncedToSupabase = true;
+                        }
+                    }
+
+                    WASEET_STATE.accounts.unshift(newAccount);
+                    // Save new account to localStorage so it persists on reload
+                    try {
+                        const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                        savedAccounts.unshift(newAccount);
+                        localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(savedAccounts));
+                    } catch (err) { console.warn('Could not save account', err); }
+
+                    saveWaseetData();
+                    this.renderMarketplace();
+                    this.updateSellerListingsCounter();
+                    this.updatePendingAccountsCounter();
+
+                    // Reset form and close Sell Modal immediately
+                    this.uploadedImages = [];
+                    this.renderImagePreviews();
+                    this.closeSellModal();
+                    form.reset();
+
+                    this.showAutoDismissToast('تم إرسال الحساب للفحص', 'تم استلام حسابك بنجاح وهو الآن قيد الفحص لدى الإدارة.', 3500);
+
+                    await waseetAlert(
+                        'الحساب قيد الفحص (أقل من 24 ساعة)',
+                        'تم استلام بيانات حسابك بنجاح وهو الآن قيد الفحص والتدقيق من قبل الوسيط المعتمد.\n\nعند إنهاء الفحص والتأكد من صحة البيانات سيتم وضعه ونشره فوراً في السوق المفتوح. تتم المراجعة عادةً في أقل من 24 ساعة.\n\nيمكنك متابعة حالة حسابك من زر "حساباتي المعروضة".',
+                        'info'
+                    );
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = origBtnHtml || '<i class="fa-solid fa-paper-plane"></i> نشر الحساب وعرضه بضمان WASEET';
+                    }
+                }
             });
         }
     }
@@ -1978,6 +2037,16 @@ class WaseetApp {
         acc.reviewStatus = 'approved';
         acc.approvedAt = new Date().toISOString();
 
+        // Update Supabase marketplace_accounts if UUID
+        if (window.waseetSupabaseClient && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accId))) {
+            try {
+                await window.waseetSupabaseClient
+                    .from('marketplace_accounts')
+                    .update({ status: 'available' })
+                    .eq('id', accId);
+            } catch (e) { console.warn('Could not update status in Supabase:', e); }
+        }
+
         // Update localStorage
         try {
             const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
@@ -2029,6 +2098,16 @@ class WaseetApp {
         acc.reviewStatus = 'rejected';
         acc.rejectionReason = reason;
         acc.rejectedAt = new Date().toISOString();
+
+        // Update Supabase marketplace_accounts if UUID
+        if (window.waseetSupabaseClient && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accId))) {
+            try {
+                await window.waseetSupabaseClient
+                    .from('marketplace_accounts')
+                    .update({ status: 'rejected' })
+                    .eq('id', accId);
+            } catch (e) { console.warn('Could not update rejected status in Supabase:', e); }
+        }
 
         // Update localStorage
         try {
@@ -2148,10 +2227,32 @@ window.waseetSelectPaymentCard = function(el) {
     el.classList.add('active');
 };
 
+window.waseetCloseSellModal = function() {
+    if (window.waseetApp && typeof window.waseetApp.closeSellModal === 'function') {
+        window.waseetApp.closeSellModal();
+    } else {
+        const modalSell = document.getElementById('modal-sell');
+        if (modalSell) {
+            modalSell.classList.remove('active');
+            modalSell.style.removeProperty('display');
+            modalSell.style.removeProperty('visibility');
+            modalSell.style.removeProperty('opacity');
+            modalSell.style.removeProperty('pointer-events');
+        }
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     window.waseetApp = new WaseetApp();
     if (typeof window.waseetSyncTopupInput === 'function') {
         window.waseetSyncTopupInput();
     }
+    if (window.location.hash === '#open-sell' && window.waseetApp) {
+        setTimeout(() => {
+            window.waseetApp.openSellModal();
+            history.replaceState(null, '', window.location.pathname);
+        }, 120);
+    }
 });
+
 
