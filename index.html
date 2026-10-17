@@ -91,11 +91,17 @@
                     </button>
 
                     <!-- Seller My Listings Button -->
-                    <button class="btn-3d btn-outline" id="btn-seller-listings" onclick="window.waseetApp && window.waseetApp.openSellerListingsModal()" style="display: none;" title="متابعة حالة حساباتي المعروضة للبيع">
+                    <a href="my-accounts.html" class="btn-3d btn-outline" id="btn-seller-listings" style="display: none; text-decoration: none;" title="إدارة حساباتي المعروضة للبيع">
                         <i class="fas fa-boxes text-gold"></i>
-                        <span>حساباتي المعروضة</span>
+                        <span>حساباتي</span>
                         <span class="deals-badge-count" id="seller-listings-count" style="display: none;">0</span>
-                    </button>
+                    </a>
+
+                    <!-- Admin Support Inbox (Shows to Mediator) -->
+                    <a href="admin-chats.html" class="btn-3d btn-outline" id="btn-admin-chats" style="display: none; text-decoration: none; border-color: var(--gold-primary); color: var(--gold-light);" title="صندوق محادثات الدعم">
+                        <i class="fas fa-headset text-gold"></i>
+                        <span>محادثات الإدارة</span>
+                    </a>
 
                     <!-- User Profile / Login Button Container (Visually on the physical LEFT) -->
                     <div id="nav-user-container">
@@ -976,10 +982,18 @@
                     <i class="fas fa-plus-circle text-orange"></i>
                     <span>بيع حساب</span>
                 </button>
-                <button class="drawer-shortcut-card" id="drawer-btn-seller-listings" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetApp && window.waseetApp.openSellerListingsModal()">
+                <a href="my-accounts.html" class="drawer-shortcut-card" id="drawer-btn-seller-listings">
                     <i class="fas fa-boxes text-gold"></i>
-                    <span>حساباتي المعروضة</span>
+                    <span>حساباتي</span>
+                </a>
+                <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetOpenSupportChat && window.waseetOpenSupportChat();">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
                 </button>
+                <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;">
+                    <i class="fas fa-inbox text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
                 <a href="#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-calculator text-silver"></i>
                     <span>حاسبة العمولات</span>
@@ -1017,6 +1031,7 @@
     <script src="js/escrow.js"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/app.js?v=20261016_v3"></script>
+    <script src="js/app.js?v=20261017_v1"></script>
+    <script src="js/support.js?v=20261017"></script>
 </body>
 </html>

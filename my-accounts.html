@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | حساباتي المعروضة للبيع وإدارتها</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon / شعار التبويب البارز -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261017_myaccounts">
+
+    <!-- Official Facebook JavaScript SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
+</head>
+<body>
+
+    <!-- Ambient 3D Background Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <a href="index.html" class="brand-wrap">
+                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">وسيط • حساباتي المعروضة للبيع</span>
+                    </div>
+                </a>
+
+                <!-- Mobile Hamburger Menu Button (☰) -->
+                <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link"><i class="fas fa-store"></i> المتجر العام</a></li>
+                    <li><a href="my-accounts.html" class="nav-link active"><i class="fas fa-boxes text-gold"></i> حساباتي</a></li>
+                    <li><a href="deals.html" class="nav-link"><i class="fas fa-handshake"></i> صفقاتي</a></li>
+                    <li><a href="chat.html" class="nav-link"><i class="fas fa-comments"></i> غرفة الوساطة</a></li>
+                </ul>
+
+                <div class="nav-actions">
+                    <!-- Secure Wallet Pill -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
+
+                    <!-- Direct Chat / Conversations Button -->
+                    <a href="chat.html" class="btn-3d btn-outline btn-nav-chats" title="غرفة المحادثات والوساطة">
+                        <i class="fas fa-comments text-orange"></i>
+                        <span>المحادثات</span>
+                    </a>
+
+                    <!-- Mediator Deals List Button (Shows to Mediator) -->
+                    <a href="deals.html" class="btn-deals-list" id="btn-mediator-deals" style="display: none;" title="قائمة صفقات الوساطة">
+                        <i class="fas fa-crown text-gold"></i>
+                        <span>صفقات الوساطة</span>
+                    </a>
+
+                    <!-- Admin Direct Chats Link (Shows to Mediator) -->
+                    <a href="admin-chats.html" class="btn-3d btn-outline" id="btn-admin-chats" style="display: none; border-color: var(--gold-primary); color: var(--gold-light);" title="محادثات الدعم الفني">
+                        <i class="fas fa-headset text-gold"></i>
+                        <span>محادثات الإدارة</span>
+                    </a>
+
+                    <!-- Sell Account Button -->
+                    <a href="index.html#open-sell" class="btn-3d btn-orange" title="نشر وعرض حساب جديد">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </a>
+
+                    <!-- User Profile / Login Button Container -->
+                    <div id="nav-user-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Main Content Container ================= -->
+        <main class="my-accounts-container">
+
+            <!-- Hero Section Header -->
+            <div class="my-accounts-hero">
+                <div>
+                    <div class="hero-badge" style="display: inline-flex; margin-bottom: 0.6rem;">
+                        <i class="fas fa-user-tag text-gold"></i>
+                        <span>لوحة تحكم البائع الموثق</span>
+                    </div>
+                    <h1 style="color: #fff; font-size: 1.8rem; font-weight: 900; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-boxes text-orange"></i>
+                        حساباتي المعروضة للبيع
+                    </h1>
+                    <p style="color: var(--silver-muted); font-size: 0.92rem; margin: 0; max-width: 650px; line-height: 1.5;">
+                        هنا تظهر فقط الحسابات التي قمت بنشرها. يمكنك تعديل أسعار وتفاصيل حساباتك، أو حذفها نهائياً من السوق في أي وقت.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                    <a href="index.html" class="btn-3d btn-outline" style="text-decoration: none;">
+                        <i class="fas fa-store"></i> تصفح السوق
+                    </a>
+                    <a href="index.html#open-sell" class="btn-3d btn-gold" style="text-decoration: none;">
+                        <i class="fas fa-plus-circle"></i> نشر حساب جديد
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="my-accounts-stats-bar">
+                <div class="my-account-stat-card">
+                    <div class="my-account-stat-icon" style="background: rgba(197, 160, 89, 0.15); color: var(--gold-light);">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #fff;" id="stat-total-accounts">0</div>
+                        <div style="font-size: 0.76rem; color: var(--silver-muted);">إجمالي حساباتي</div>
+                    </div>
+                </div>
+                <div class="my-account-stat-card">
+                    <div class="my-account-stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #10b981;" id="stat-available-accounts">0</div>
+                        <div style="font-size: 0.76rem; color: var(--silver-muted);">معتمدة في المتجر</div>
+                    </div>
+                </div>
+                <div class="my-account-stat-card">
+                    <div class="my-account-stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #f59e0b;" id="stat-pending-accounts">0</div>
+                        <div style="font-size: 0.76rem; color: var(--silver-muted);">قيد الفحص والمراجعة</div>
+                    </div>
+                </div>
+                <div class="my-account-stat-card">
+                    <div class="my-account-stat-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #ef4444;" id="stat-rejected-accounts">0</div>
+                        <div style="font-size: 0.76rem; color: var(--silver-muted);">مرفوضة أو ملغاة</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accounts Grid Area -->
+            <div id="my-accounts-grid-container">
+                <!-- Rendered dynamically by JS -->
+            </div>
+
+        </main>
+
+        <!-- ================= Footer ================= -->
+        <footer style="text-align: center; padding: 2rem 1rem; color: var(--silver-muted); font-size: 0.85rem; border-top: 1px solid var(--border-metal); margin-top: 3rem;">
+            منصة WASEET للوساطة الآمنة • جميع الحقوق محفوظة &copy; 2026
+        </footer>
+
+    </div>
+
+    <!-- ================= Edit Account Modal ================= -->
+    <div class="modal-overlay" id="modal-edit-account" style="display: none; z-index: 10006;">
+        <div class="modal-card card-3d" style="max-width: 580px; width: 95%;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-edit text-gold"></i> تعديل بيانات الحساب المعروض
+                </h3>
+                <button type="button" class="btn-close-modal" id="btn-close-edit-modal">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.2rem 1.4rem;">
+                <form id="form-edit-account">
+                    <input type="hidden" id="edit-account-id">
+                    
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <label class="input-label"><i class="fas fa-heading text-gold"></i> عنوان الحساب في المتجر:</label>
+                        <input type="text" id="edit-account-title" class="input-field" required maxlength="120" placeholder="مثال: حساب فري فاير برايم 8 مع سكنات نادرة...">
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <label class="input-label"><i class="fas fa-dollar-sign text-orange"></i> السعر الصافي الذي ترغب باستلامه ($ بالدولار):</label>
+                        <input type="number" id="edit-account-price" class="input-field" required min="5" max="50000" step="1" placeholder="مثال: 50">
+                        <div id="edit-fee-preview" style="margin-top: 0.5rem;"></div>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <label class="input-label"><i class="fas fa-link text-gold"></i> حالة الربط:</label>
+                        <select id="edit-account-bind" class="input-field" style="background: rgba(14, 18, 28, 0.95); color: #fff;">
+                            <option value="single">ربط أحادي آمن (Google فقط أو Facebook فقط)</option>
+                            <option value="dual">ربط ثنائي (Google + Facebook)</option>
+                            <option value="vk">ربط VK أو تويتر</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 1.2rem;">
+                        <label class="input-label"><i class="fas fa-align-right text-gold"></i> الملاحظات والتفاصيل الإضافية:</label>
+                        <textarea id="edit-account-notes" class="input-field" rows="4" placeholder="اكتب أي تفاصيل إضافية عن السكنات، الليفل، الأسلحة، والضمان..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 0.6rem; justify-content: flex-end;">
+                        <button type="button" class="btn-3d btn-outline" id="btn-cancel-edit">إلغاء</button>
+                        <button type="submit" class="btn-3d btn-gold" id="btn-submit-edit">
+                            <i class="fas fa-save"></i> حفظ التعديلات في قاعدة البيانات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Mobile Drawer Navigation ================= -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleMyAccountsDrawer()"></div>
+    <aside class="mobile-drawer" id="mobile-drawer">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="assets/logo.png" alt="WASEET" class="drawer-logo">
+                <span class="drawer-title">WASEET</span>
+            </div>
+            <button class="drawer-close-btn" onclick="toggleMyAccountsDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card">
+            <!-- Populated by JS -->
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">التنقل السريع</h4>
+            <ul class="drawer-links-list">
+                <li><a href="index.html"><i class="fas fa-store text-gold"></i> المتجر وسوق الحسابات</a></li>
+                <li><a href="my-accounts.html" class="active"><i class="fas fa-boxes text-orange"></i> حساباتي المعروضة للبيع</a></li>
+                <li><a href="deals.html"><i class="fas fa-handshake text-gold"></i> صفقات الوساطة</a></li>
+                <li><a href="chat.html"><i class="fas fa-comments text-orange"></i> غرفة الوساطة المباشرة</a></li>
+                <li><a href="#" onclick="window.waseetOpenSupportChat(); toggleMyAccountsDrawer(); return false;"><i class="fas fa-headset text-gold"></i> تواصل مع الوسيط المعتمد</a></li>
+                <li id="drawer-admin-chats-link" style="display: none;"><a href="admin-chats.html"><i class="fas fa-crown text-gold"></i> محادثات الإدارة والوساطة</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ================= Mobile App Bottom Navigation Bar ================= -->
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#marketplace" class="mobile-nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <a href="my-accounts.html" class="mobile-nav-item active">
+            <i class="fas fa-boxes"></i>
+            <span>حساباتي</span>
+        </a>
+        <a href="deals.html" class="mobile-nav-item">
+            <i class="fas fa-handshake"></i>
+            <span>الصفقات</span>
+        </a>
+        <a href="chat.html" class="mobile-nav-item">
+            <i class="fas fa-comments"></i>
+            <span>المحادثات</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/support.js"></script>
+
+    <!-- My Accounts Page Script -->
+    <script>
+        let myAccountsList = [];
+
+        function toggleMyAccountsDrawer() {
+            const drawer = document.getElementById('mobile-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer) drawer.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
+        function openWalletQuickAlert() {
+            const user = WASEET_STATE.user;
+            const pts = user && user.wallet ? user.wallet.available : 0;
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts} نقطة (${pts}$). يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
+            }
+        }
+
+        async function initMyAccountsPage() {
+            renderMyAccountsNavbarUser();
+
+            // Setup edit modal close listeners
+            const editModal = document.getElementById('modal-edit-account');
+            const btnCloseEdit = document.getElementById('btn-close-edit-modal');
+            const btnCancelEdit = document.getElementById('btn-cancel-edit');
+            const editForm = document.getElementById('form-edit-account');
+            const editPriceInput = document.getElementById('edit-account-price');
+            const editFeePreview = document.getElementById('edit-fee-preview');
+
+            if (btnCloseEdit && editModal) {
+                btnCloseEdit.onclick = () => editModal.style.display = 'none';
+            }
+            if (btnCancelEdit && editModal) {
+                btnCancelEdit.onclick = () => editModal.style.display = 'none';
+            }
+
+            if (editPriceInput && editFeePreview) {
+                const updatePreview = () => {
+                    const price = parseFloat(editPriceInput.value) || 0;
+                    if (typeof calculateWaseetFee === 'function') {
+                        const feeCalc = calculateWaseetFee(price);
+                        editFeePreview.innerHTML = `
+                            <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
+                                <div>صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong> | عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></div>
+                                <div style="color: #fff; font-weight: 700; margin-top: 2px;">سعر الظهور للمشتري: ${feeCalc.buyerPrice} نقطة (${feeCalc.buyerPrice}$)</div>
+                            </div>
+                        `;
+                    }
+                };
+                editPriceInput.addEventListener('input', updatePreview);
+            }
+
+            if (editForm) {
+                editForm.onsubmit = handleSaveAccountEdit;
+            }
+
+            await loadMyAccountsData();
+        }
+
+        function renderMyAccountsNavbarUser() {
+            const user = WASEET_STATE.user;
+            const container = document.getElementById('nav-user-container');
+            const drawerUser = document.getElementById('drawer-user-card');
+            const adminChatsBtn = document.getElementById('btn-admin-chats');
+            const mediatorDealsBtn = document.getElementById('btn-mediator-deals');
+            const drawerAdminLink = document.getElementById('drawer-admin-chats-link');
+            const walletPtsEl = document.getElementById('wallet-total-pts');
+
+            const pts = user && user.wallet ? user.wallet.available : 0;
+            if (walletPtsEl) {
+                walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            }
+
+            const isAdmin = user && (user.role === 'admin' || user.isAdmin);
+            if (adminChatsBtn) adminChatsBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+            if (mediatorDealsBtn) mediatorDealsBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+            if (drawerAdminLink) drawerAdminLink.style.display = isAdmin ? 'block' : 'none';
+
+            if (container) {
+                if (user) {
+                    const avatar = user.avatar || 'assets/logo.png';
+                    container.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleMyAccountsDrawer()">
+                            <img src="${avatar}" alt="${user.name}" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--gold-primary); object-fit: cover;">
+                            <span style="font-weight: 700; color: #fff; font-size: 0.88rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user.name}</span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <button class="btn-3d btn-gold" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();" style="padding: 0.45rem 0.9rem; font-size: 0.82rem;">
+                            <i class="fab fa-google"></i> تسجيل الدخول
+                        </button>
+                    `;
+                }
+            }
+
+            if (drawerUser) {
+                if (user) {
+                    const avatar = user.avatar || 'assets/logo.png';
+                    const roleBadge = isAdmin ? '👑 الوسيط المعتمد' : '🏷️ بائع موثق';
+                    drawerUser.innerHTML = `
+                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
+                        <div class="drawer-user-meta" style="flex: 1;">
+                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-role">${roleBadge}</span>
+                            <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة (${pts}$) متاحة</span>
+                        </div>
+                    `;
+                } else {
+                    drawerUser.innerHTML = `
+                        <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
+                            <i class="fas fa-user-circle text-gold"></i>
+                        </div>
+                        <div class="drawer-user-meta" style="flex: 1;">
+                            <span class="drawer-user-name">زائر غير مسجل</span>
+                            <span class="drawer-user-role" style="color: var(--gold-light);">انقر للدخول بحساب Google</span>
+                        </div>
+                    `;
+                    drawerUser.onclick = () => { if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle(); };
+                }
+            }
+        }
+
+        async function loadMyAccountsData() {
+            const container = document.getElementById('my-accounts-grid-container');
+            if (!container) return;
+
+            const user = WASEET_STATE.user;
+            if (!user) {
+                container.innerHTML = `
+                    <div class="empty-deals-box" style="margin-top: 1.5rem;">
+                        <i class="fas fa-lock" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 1rem; display: block;"></i>
+                        <h3 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.3rem;">تسجيل الدخول مطلوب</h3>
+                        <p style="color: var(--silver-muted); margin-bottom: 1.4rem;">
+                            يرجى تسجيل الدخول بحسابك لعرض الحسابات التي نشرتها للبيع، ومتابعة مراجعة الوسيط المعتمد لها.
+                        </p>
+                        <button class="btn-3d btn-gold" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();" style="padding: 0.6rem 1.6rem;">
+                            <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--silver-muted);">
+                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
+                    جاري تحميل وتحديث قائمة حساباتك...
+                </div>
+            `;
+
+            let accounts = [];
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            // 1. استعلام Supabase للحسابات التي قام المستخدم الحالي بنشرها (seller_id = auth.uid())
+            if (client && user.id) {
+                try {
+                    const { data, error } = await client
+                        .from('marketplace_accounts')
+                        .select('*')
+                        .eq('seller_id', user.id)
+                        .order('created_at', { ascending: false });
+
+                    if (!error && Array.isArray(data)) {
+                        accounts = data.map(acc => ({
+                            id: acc.id,
+                            accountNumber: acc.account_number,
+                            game: acc.game,
+                            title: acc.title,
+                            level: acc.level,
+                            bindStatus: acc.bind_status,
+                            server: acc.server,
+                            sellerPrice: Number(acc.seller_price),
+                            images: Array.isArray(acc.images) && acc.images.length ? acc.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'],
+                            image: Array.isArray(acc.images) && acc.images.length ? acc.images[0] : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+                            status: acc.status,
+                            accountNotes: acc.details?.notes || acc.details?.accountNotes || '',
+                            details: acc.details || {}
+                        }));
+                    }
+                } catch (e) {
+                    console.warn('[My Accounts] خطأ جلب الحسابات من Supabase:', e);
+                }
+            }
+
+            // 2. دمج الحسابات المنشأة محلياً لهذا المستخدم (Local State fallback)
+            const localAccounts = (WASEET_STATE.accounts || []).filter(a => 
+                (a.sellerId && a.sellerId === user.id) ||
+                (a.sellerName && a.sellerName === user.name)
+            );
+
+            // دمج غير المكرر
+            localAccounts.forEach(localAcc => {
+                if (!accounts.some(a => a.id === localAcc.id || a.title === localAcc.title)) {
+                    accounts.push(localAcc);
+                }
+            });
+
+            myAccountsList = accounts;
+            updateMyAccountsStats(accounts);
+            renderMyAccountsGrid(accounts);
+        }
+
+        function updateMyAccountsStats(accounts) {
+            const totalEl = document.getElementById('stat-total-accounts');
+            const availEl = document.getElementById('stat-available-accounts');
+            const pendEl = document.getElementById('stat-pending-accounts');
+            const rejEl = document.getElementById('stat-rejected-accounts');
+
+            const total = accounts.length;
+            const avail = accounts.filter(a => a.status === 'available').length;
+            const pend = accounts.filter(a => a.status === 'pending_verification' || a.status === 'pending_review' || !a.status).length;
+            const rej = accounts.filter(a => a.status === 'rejected' || a.status === 'sold' || a.status === 'hidden').length;
+
+            if (totalEl) totalEl.innerText = total;
+            if (availEl) availEl.innerText = avail;
+            if (pendEl) pendEl.innerText = pend;
+            if (rejEl) rejEl.innerText = rej;
+        }
+
+        function renderMyAccountsGrid(accounts) {
+            const container = document.getElementById('my-accounts-grid-container');
+            if (!container) return;
+
+            if (!accounts || accounts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-deals-box" style="margin-top: 1.5rem;">
+                        <i class="fas fa-boxes" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 1rem; display: block;"></i>
+                        <h3 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.3rem;">لم تقم بنشر أي حساب للبيع بعد</h3>
+                        <p style="color: var(--silver-muted); margin-bottom: 1.4rem;">
+                            يمكنك عرض حسابك للبيع بضمان كامل وبدون أي مخاطرة، وسيتم فحصه ونشره أمام آلاف المشترين فوراً.
+                        </p>
+                        <a href="index.html#open-sell" class="btn-3d btn-orange" style="padding: 0.6rem 1.6rem; text-decoration: none;">
+                            <i class="fas fa-plus-circle"></i> نشر وعرض حساب جديد للبيع
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="accounts-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                    ${accounts.map(acc => {
+                        const pricing = typeof calculateWaseetFee === 'function' 
+                            ? calculateWaseetFee(acc.sellerPrice) 
+                            : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
+                        
+                        let statusTag = '';
+                        if (acc.status === 'available') {
+                            statusTag = `<span style="background: rgba(16, 185, 129, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-check-circle"></i> معتمد في المتجر</span>`;
+                        } else if (acc.status === 'rejected') {
+                            statusTag = `<span style="background: rgba(239, 68, 68, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                        } else {
+                            statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد فحص الوسيط</span>`;
+                        }
+
+                        const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+
+                        return `
+                            <div class="account-card-3d card-3d" id="card-${acc.id}">
+                                <div class="card-media">
+                                    <img src="${imgUrl}" alt="${acc.title}" class="card-img">
+                                    <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
+                                        ${statusTag}
+                                    </div>
+                                    <div class="account-num-tag" style="position: absolute; top: 8px; left: 8px;">
+                                        #${acc.accountNumber || acc.id.toString().substring(0, 5)}
+                                    </div>
+                                    <div class="level-tag" style="position: absolute; bottom: 8px; right: 8px;">
+                                        Lv. ${acc.level || 50}
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
+                                    <div class="card-specs">
+                                        <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
+                                        <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
+                                    </div>
+                                    <div class="card-footer" style="padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto;">
+                                        <div class="price-col" style="margin-bottom: 0.4rem;">
+                                            <span class="price-sub">صافي ربحك: $${pricing.sellerPrice} (يظهر للمشتري: ${pricing.buyerPrice} نقطة)</span>
+                                            <span class="price-main">$${pricing.sellerPrice} <span style="font-size: 0.85rem; color: var(--gold-light);">دولار</span></span>
+                                        </div>
+                                        <div class="my-account-card-actions">
+                                            <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">
+                                                <i class="fas fa-edit"></i> تعديل الحساب
+                                            </button>
+                                            <button type="button" class="btn-account-delete" onclick="handleDeleteAccount('${acc.id}')">
+                                                <i class="fas fa-trash-alt"></i> حذف الحساب
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function openEditAccountModal(accId) {
+            const acc = myAccountsList.find(a => a.id.toString() === accId.toString());
+            if (!acc) return;
+
+            document.getElementById('edit-account-id').value = acc.id;
+            document.getElementById('edit-account-title').value = acc.title || '';
+            document.getElementById('edit-account-price').value = acc.sellerPrice || '';
+            document.getElementById('edit-account-bind').value = acc.bindStatus || 'single';
+            document.getElementById('edit-account-notes').value = acc.accountNotes || acc.details?.notes || '';
+
+            const editPriceInput = document.getElementById('edit-account-price');
+            if (editPriceInput) {
+                editPriceInput.dispatchEvent(new Event('input'));
+            }
+
+            const modal = document.getElementById('modal-edit-account');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        async function handleSaveAccountEdit(e) {
+            e.preventDefault();
+            const accId = document.getElementById('edit-account-id').value;
+            const newTitle = document.getElementById('edit-account-title').value.trim();
+            const newPrice = parseFloat(document.getElementById('edit-account-price').value);
+            const newBind = document.getElementById('edit-account-bind').value;
+            const newNotes = document.getElementById('edit-account-notes').value.trim();
+
+            if (!accId || !newTitle || isNaN(newPrice) || newPrice <= 0) {
+                waseetAlert('خطأ في البيانات', 'يرجى إدخال عنوان صحيح وسعر مناسب للحساب.', 'warning');
+                return;
+            }
+
+            const user = WASEET_STATE.user;
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            // تحديث قاعدة بيانات Supabase
+            if (client && user && user.id) {
+                try {
+                    const { error } = await client
+                        .from('marketplace_accounts')
+                        .update({
+                            title: newTitle,
+                            seller_price: newPrice,
+                            bind_status: newBind,
+                            details: { notes: newNotes },
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', accId)
+                        .eq('seller_id', user.id);
+
+                    if (error) {
+                        console.warn('[Edit Account] خطأ Supabase:', error.message);
+                    }
+                } catch (err) {
+                    console.warn('[Edit Account] استثناء التحديث:', err);
+                }
+            }
+
+            // تحديث الحالة المحلية
+            const targetAcc = myAccountsList.find(a => a.id.toString() === accId.toString());
+            if (targetAcc) {
+                targetAcc.title = newTitle;
+                targetAcc.sellerPrice = newPrice;
+                targetAcc.bindStatus = newBind;
+                targetAcc.accountNotes = newNotes;
+            }
+
+            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());
+            if (globalAcc) {
+                globalAcc.title = newTitle;
+                globalAcc.sellerPrice = newPrice;
+                globalAcc.bindStatus = newBind;
+                globalAcc.accountNotes = newNotes;
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+            }
+
+            // إغلاق النافذة وإعادة العرض
+            document.getElementById('modal-edit-account').style.display = 'none';
+            renderMyAccountsGrid(myAccountsList);
+
+            await waseetAlert(
+                'تم حفظ التعديلات بنجاح',
+                'تم تحديث سعر وبيانات الحساب وحفظها في قاعدة بيانات المتجر بنجاح.',
+                'success'
+            );
+        }
+
+        async function handleDeleteAccount(accId) {
+            const confirmed = await waseetConfirm(
+                'تأكيد حذف الحساب',
+                'هل أنت متأكد من رغبتك في حذف هذا الحساب نهائياً من المتجر؟ لن يظهر الحساب للمشترين بعد الحذف.',
+                'نعم، احذف الحساب',
+                'إلغاء',
+                'danger'
+            );
+
+            if (!confirmed) return;
+
+            const user = WASEET_STATE.user;
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            // حذف من Supabase
+            if (client && user && user.id) {
+                try {
+                    const { error } = await client
+                        .from('marketplace_accounts')
+                        .delete()
+                        .eq('id', accId)
+                        .eq('seller_id', user.id);
+
+                    if (error) {
+                        console.warn('[Delete Account] خطأ Supabase:', error.message);
+                    }
+                } catch (err) {
+                    console.warn('[Delete Account] استثناء الحذف:', err);
+                }
+            }
+
+            // حذف من الحالة المحلية
+            myAccountsList = myAccountsList.filter(a => a.id.toString() !== accId.toString());
+            if (WASEET_STATE.accounts) {
+                WASEET_STATE.accounts = WASEET_STATE.accounts.filter(a => a.id.toString() !== accId.toString());
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+            }
+
+            try {
+                const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const filtered = saved.filter(a => a.id.toString() !== accId.toString());
+                localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(filtered));
+            } catch (e) {}
+
+            updateMyAccountsStats(myAccountsList);
+            renderMyAccountsGrid(myAccountsList);
+
+            await waseetAlert(
+                'تم حذف الحساب',
+                'تم مسح الحساب نهائياً وإخفاؤه من متجر الحسابات بنجاح.',
+                'info'
+            );
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initMyAccountsPage();
+        });
+    </script>
+</body>
+</html>

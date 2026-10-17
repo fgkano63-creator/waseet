@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | محادثات الإدارة والدعم المباشر</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261017_adminchats">
+
+    <style>
+        /* في واجهة المدير: رسائل الإدارة على اليمين ورسائل المستخدم على اليسار */
+        .admin-view .support-msg-row.admin-row { justify-content: flex-start; }
+        .admin-view .support-msg-row.user-row { justify-content: flex-end; }
+        .admin-view .support-msg-bubble.admin-bubble {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.85), rgba(197, 160, 89, 0.9));
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .admin-view .support-msg-bubble.user-bubble {
+            background: linear-gradient(135deg, rgba(26, 34, 52, 0.95), rgba(15, 20, 32, 0.98));
+            color: #f1f5f9;
+            border: 1px solid rgba(197, 160, 89, 0.4);
+        }
+        .wa-topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+            max-width: 1300px; margin: 1rem auto 0; padding: 0 1rem;
+        }
+        .wa-topbar .brand-wrap { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+        .wa-topbar .brand-logo-img { width: 42px; height: 42px; object-fit: contain; }
+        .wa-back-btn {
+            display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none;
+            padding: 0.5rem 1rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+            border: 1px solid var(--gold-primary); color: var(--gold-light); background: rgba(197,160,89,0.08);
+        }
+        .wa-unread-badge {
+            min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+            background: var(--orange-bright, #ea580c); color: #fff; font-size: 0.7rem; font-weight: 800;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .wa-empty-state {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; color: var(--silver-muted); padding: 2rem;
+        }
+        .wa-empty-state i { font-size: 3.4rem; color: var(--gold-primary); margin-bottom: 1rem; }
+        .wa-chat-input {
+            flex: 1; background: rgba(22, 28, 44, 0.85); border: 1px solid var(--border-metal);
+            border-radius: 12px; padding: 0.7rem 1rem; font-size: 0.9rem; color: #fff;
+            font-family: var(--font-ar); outline: none; resize: none; max-height: 120px;
+        }
+        .wa-chat-input:focus { border-color: var(--gold-primary); box-shadow: 0 0 15px rgba(197,160,89,0.25); }
+        .wa-mobile-back {
+            display: none; background: none; border: none; color: var(--gold-light);
+            font-size: 1.2rem; cursor: pointer; padding: 0.2rem 0.5rem;
+        }
+        .wa-denied-box {
+            max-width: 560px; margin: 4rem auto; text-align: center; padding: 2.5rem 1.5rem;
+            background: rgba(14,18,28,0.85); border: 2px dashed rgba(239,68,68,0.45); border-radius: 20px;
+        }
+        @media (max-width: 868px) {
+            .wa-mobile-back { display: inline-flex; }
+            .whatsapp-admin-wrapper { height: calc(100vh - 90px); min-height: 480px; margin-top: 0.8rem; padding: 0 0.5rem; }
+            .wa-topbar .brand-subtitle { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ambient-canvas"></canvas>
+
+    <!-- Top Bar -->
+    <div class="wa-topbar">
+        <a href="index.html" class="brand-wrap">
+            <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+            <div class="brand-text-col">
+                <span class="brand-title">WASEET</span>
+                <span class="brand-subtitle">وسيط • محادثات الإدارة والدعم المباشر</span>
+            </div>
+        </a>
+        <a href="index.html" class="wa-back-btn"><i class="fas fa-store"></i> العودة للمتجر</a>
+    </div>
+
+    <!-- Access denied (non-admin) -->
+    <div id="wa-access-denied" class="wa-denied-box" style="display: none;">
+        <i class="fas fa-lock" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
+        <h2 style="color: #fff; margin: 0 0 0.6rem;">صلاحية الوسيط مطلوبة</h2>
+        <p style="color: var(--silver-muted); margin: 0 0 1.4rem; line-height: 1.6;">
+            هذه الصفحة مخصصة للوسيط المعتمد (المدير) فقط لإدارة محادثات الدعم مع المستخدمين.
+        </p>
+        <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> العودة للمتجر</a>
+    </div>
+
+    <!-- WhatsApp Layout -->
+    <div class="whatsapp-admin-wrapper admin-view" id="wa-admin-wrapper" style="display: none;">
+        <div class="whatsapp-container">
+
+            <!-- Sidebar: Contacts -->
+            <aside class="whatsapp-sidebar" id="wa-sidebar">
+                <div class="whatsapp-sidebar-header">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-headset text-gold" style="font-size: 1.3rem;"></i>
+                        <div>
+                            <div style="color: #fff; font-weight: 800; font-size: 0.98rem;">محادثات الدعم</div>
+                            <div style="color: var(--silver-muted); font-size: 0.72rem;" id="wa-contacts-count">0 محادثة</div>
+                        </div>
+                    </div>
+                    <button type="button" class="wa-back-btn" style="padding: 0.35rem 0.7rem;" onclick="AdminChats.reload()" title="تحديث">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="whatsapp-search-wrap">
+                    <input type="text" id="wa-search" class="whatsapp-search-input" placeholder="ابحث باسم المستخدم أو البريد...">
+                </div>
+                <div class="whatsapp-contacts-list" id="wa-contacts-list">
+                    <div class="wa-empty-state"><i class="fas fa-spinner fa-spin"></i>جاري تحميل المحادثات...</div>
+                </div>
+            </aside>
+
+            <!-- Main Chat -->
+            <section class="whatsapp-chat-main mobile-hidden" id="wa-chat-main">
+                <div class="wa-empty-state" id="wa-chat-placeholder">
+                    <i class="fas fa-comments"></i>
+                    <h3 style="color: #fff; margin: 0 0 0.4rem;">اختر محادثة للبدء</h3>
+                    <p style="margin: 0; font-size: 0.88rem;">اختر مستخدماً من القائمة لعرض سجل رسائله والرد عليه مباشرة.</p>
+                </div>
+
+                <div id="wa-chat-active" style="display: none; flex-direction: column; height: 100%;">
+                    <div class="whatsapp-chat-header">
+                        <div style="display: flex; align-items: center; gap: 0.7rem; min-width: 0;">
+                            <button type="button" class="wa-mobile-back" onclick="AdminChats.backToList()" title="رجوع">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <img id="wa-active-avatar" class="whatsapp-contact-avatar" style="width: 42px; height: 42px;" src="" alt="" referrerpolicy="no-referrer">
+                            <div style="min-width: 0;">
+                                <div id="wa-active-name" style="color: #fff; font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+                                <div id="wa-active-email" style="color: var(--silver-muted); font-size: 0.74rem; direction: ltr; text-align: right;"></div>
+                            </div>
+                        </div>
+                        <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> مزامنة لحظية</span>
+                    </div>
+
+                    <div class="whatsapp-chat-body" id="wa-chat-body"></div>
+
+                    <form class="whatsapp-chat-footer" id="wa-reply-form">
+                        <textarea id="wa-reply-input" class="wa-chat-input" rows="1" maxlength="1500" placeholder="اكتب ردك كوسيط معتمد..." required></textarea>
+                        <button type="submit" class="btn-send-support" title="إرسال الرد">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/dialog.js"></script>
+
+    <script>
+    const AdminChats = (function () {
+        'use strict';
+
+        const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+        let client = null;
+        let allMessages = [];           // جميع رسائل support_messages
+        let profilesMap = {};           // user_id -> { name, email, avatar_url }
+        let activeUserId = null;
+        let realtimeChannel = null;
+        const unread = {};              // user_id -> عدد الرسائل غير المقروءة
+
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function fmtTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            const now = new Date();
+            if (d.toDateString() === now.toDateString()) {
+                return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            }
+            return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+        }
+
+        function playChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(660, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.25);
+            } catch (e) {}
+        }
+
+        function isAdmin(user) {
+            if (!user) return false;
+            if (typeof isMediatorUser === 'function') return isMediatorUser(user);
+            return user.role === 'admin';
+        }
+
+        /* ================= تحميل البيانات ================= */
+        async function loadMessages() {
+            let messages = [];
+            if (client) {
+                try {
+                    const { data, error } = await client
+                        .from('support_messages')
+                        .select('*')
+                        .order('created_at', { ascending: true })
+                        .limit(5000);
+                    if (error) console.warn('[Admin Chats] خطأ جلب الرسائل:', error.message);
+                    else if (Array.isArray(data)) messages = data;
+                } catch (err) {
+                    console.warn('[Admin Chats] استثناء جلب الرسائل:', err);
+                }
+            }
+
+            // احتياطي محلي (وضع العرض بدون Supabase)
+            if (messages.length === 0) {
+                try {
+                    Object.keys(localStorage)
+                        .filter(k => k.startsWith('WASEET_SUPPORT_MSGS_'))
+                        .forEach(k => {
+                            const list = JSON.parse(localStorage.getItem(k) || '[]');
+                            if (Array.isArray(list)) messages.push(...list);
+                        });
+                    messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                } catch (e) {}
+            }
+
+            allMessages = messages;
+            await loadProfiles([...new Set(messages.map(m => m.user_id))]);
+        }
+
+        async function loadProfiles(userIds) {
+            const missing = userIds.filter(id => id && !profilesMap[id]);
+            if (!missing.length || !client) return;
+            try {
+                const { data, error } = await client
+                    .from('profiles')
+                    .select('id, name, email, avatar_url')
+                    .in('id', missing);
+                if (!error && Array.isArray(data)) {
+                    data.forEach(p => { profilesMap[p.id] = p; });
+                }
+            } catch (err) {
+                console.warn('[Admin Chats] تعذر جلب الملفات الشخصية:', err);
+            }
+        }
+
+        function getProfile(userId) {
+            const p = profilesMap[userId] || {};
+            return {
+                name: p.name || (p.email ? p.email.split('@')[0] : `مستخدم #${String(userId).slice(0, 6)}`),
+                email: p.email || '',
+                avatar: p.avatar_url || DEFAULT_AVATAR
+            };
+        }
+
+        /* ================= بناء قائمة جهات الاتصال ================= */
+        function buildContacts() {
+            const map = {};
+            allMessages.forEach(m => {
+                if (!m.user_id) return;
+                if (!map[m.user_id]) map[m.user_id] = { userId: m.user_id, last: m, count: 0 };
+                map[m.user_id].last = m;
+                map[m.user_id].count++;
+            });
+            return Object.values(map).sort((a, b) => new Date(b.last.created_at) - new Date(a.last.created_at));
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('wa-contacts-list');
+            const countEl = document.getElementById('wa-contacts-count');
+            const term = (document.getElementById('wa-search').value || '').trim().toLowerCase();
+            let contacts = buildContacts();
+            if (countEl) countEl.innerText = `${contacts.length} محادثة`;
+
+            if (term) {
+                contacts = contacts.filter(c => {
+                    const p = getProfile(c.userId);
+                    return p.name.toLowerCase().includes(term) || p.email.toLowerCase().includes(term);
+                });
+            }
+
+            if (!contacts.length) {
+                list.innerHTML = `
+                    <div class="wa-empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <div style="color:#fff; font-weight:700; margin-bottom:0.3rem;">لا توجد محادثات</div>
+                        <div style="font-size:0.8rem;">ستظهر هنا رسائل المستخدمين فور تواصلهم مع الوسيط.</div>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = contacts.map(c => {
+                const p = getProfile(c.userId);
+                const prefix = c.last.sender_role === 'admin' ? '<i class="fas fa-reply text-gold" style="font-size:0.65rem;"></i> أنت: ' : '';
+                const badge = unread[c.userId] ? `<span class="wa-unread-badge">${unread[c.userId]}</span>` : '';
+                return `
+                    <div class="whatsapp-contact-item ${c.userId === activeUserId ? 'active' : ''}" data-user-id="${esc(c.userId)}">
+                        <div class="whatsapp-contact-avatar-wrap">
+                            <img class="whatsapp-contact-avatar" src="${esc(p.avatar)}" referrerpolicy="no-referrer" onerror="this.src='${DEFAULT_AVATAR}'" alt="">
+                        </div>
+                        <div class="whatsapp-contact-meta">
+                            <div class="whatsapp-contact-top">
+                                <span class="whatsapp-contact-name">${esc(p.name)}</span>
+                                <span class="whatsapp-contact-time">${fmtTime(c.last.created_at)}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
+                                <div class="whatsapp-contact-last-msg">${prefix}${esc(c.last.message)}</div>
+                                ${badge}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            list.querySelectorAll('.whatsapp-contact-item').forEach(el => {
+                el.addEventListener('click', () => openConversation(el.getAttribute('data-user-id')));
+            });
+        }
+
+        /* ================= نافذة المحادثة ================= */
+        function bubbleHtml(m) {
+            const isUser = m.sender_role === 'user';
+            const time = new Date(m.created_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            if (isUser) {
+                return `
+                    <div class="support-msg-row user-row" data-msg-id="${esc(m.id)}">
+                        <div class="support-msg-bubble user-bubble">
+                            <div class="support-msg-text">${esc(m.message)}</div>
+                            <div class="support-msg-time">${time}</div>
+                        </div>
+                    </div>`;
+            }
+            return `
+                <div class="support-msg-row admin-row" data-msg-id="${esc(m.id)}">
+                    <div class="support-msg-bubble admin-bubble">
+                        <div class="support-admin-sender-tag" style="color:#fff;"><i class="fas fa-crown"></i> الوسيط المعتمد</div>
+                        <div class="support-msg-text">${esc(m.message)}</div>
+                        <div class="support-msg-time">${time} <i class="fas fa-check-double" style="font-size:0.65rem;"></i></div>
+                    </div>
+                </div>`;
+        }
+
+        function renderConversation() {
+            const body = document.getElementById('wa-chat-body');
+            if (!body || !activeUserId) return;
+            const msgs = allMessages.filter(m => m.user_id === activeUserId);
+            body.innerHTML = msgs.map(bubbleHtml).join('') ||
+                '<div class="wa-empty-state"><i class="fas fa-comment-slash"></i>لا توجد رسائل بعد.</div>';
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function openConversation(userId) {
+            activeUserId = userId;
+            unread[userId] = 0;
+            const p = getProfile(userId);
+
+            document.getElementById('wa-chat-placeholder').style.display = 'none';
+            document.getElementById('wa-chat-active').style.display = 'flex';
+            const avatar = document.getElementById('wa-active-avatar');
+            avatar.src = p.avatar;
+            avatar.onerror = () => { avatar.src = DEFAULT_AVATAR; };
+            document.getElementById('wa-active-name').innerText = p.name;
+            document.getElementById('wa-active-email').innerText = p.email;
+
+            // تبديل العرض على الهاتف
+            document.getElementById('wa-sidebar').classList.add('mobile-hidden');
+            document.getElementById('wa-chat-main').classList.remove('mobile-hidden');
+
+            renderContacts();
+            renderConversation();
+            const input = document.getElementById('wa-reply-input');
+            if (input && window.innerWidth > 868) input.focus();
+        }
+
+        function backToList() {
+            document.getElementById('wa-sidebar').classList.remove('mobile-hidden');
+            document.getElementById('wa-chat-main').classList.add('mobile-hidden');
+        }
+
+        /* ================= إرسال رد المدير ================= */
+        async function sendReply(e) {
+            e.preventDefault();
+            const input = document.getElementById('wa-reply-input');
+            const text = (input.value || '').trim();
+            if (!text || !activeUserId) return;
+            input.value = '';
+
+            const tempMsg = {
+                id: 'temp_' + Date.now(),
+                user_id: activeUserId,
+                sender_role: 'admin',
+                message: text,
+                created_at: new Date().toISOString()
+            };
+            allMessages.push(tempMsg);
+            renderConversation();
+            renderContacts();
+
+            // نسخة محلية احتياطية (تصل للمستخدم على نفس الجهاز في وضع العرض)
+            try {
+                const key = `WASEET_SUPPORT_MSGS_${activeUserId}`;
+                const local = JSON.parse(localStorage.getItem(key) || '[]');
+                local.push(tempMsg);
+                localStorage.setItem(key, JSON.stringify(local));
+            } catch (err) {}
+
+            if (!client) return;
+            try {
+                const { data, error } = await client
+                    .from('support_messages')
+                    .insert([{ user_id: activeUserId, sender_role: 'admin', message: text }])
+                    .select();
+                if (error) {
+                    console.warn('[Admin Chats] فشل إرسال الرد:', error.message);
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تعذر إرسال الرد', 'لم يتم حفظ الرد في قاعدة البيانات: ' + error.message, 'danger');
+                    }
+                } else if (data && data[0]) {
+                    tempMsg.id = data[0].id;   // استبدال المعرف المؤقت لمنع التكرار مع Realtime
+                    renderConversation();
+                }
+            } catch (err) {
+                console.warn('[Admin Chats] استثناء إرسال الرد:', err);
+            }
+        }
+
+        /* ================= المزامنة اللحظية ================= */
+        function setupRealtime() {
+            if (!client) return;
+            if (realtimeChannel) { try { client.removeChannel(realtimeChannel); } catch (e) {} }
+            try {
+                realtimeChannel = client
+                    .channel('admin-support-inbox')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, async (payload) => {
+                        const m = payload.new;
+                        if (!m) return;
+                        if (allMessages.some(x => x.id === m.id)) return;
+                        // تجاهل صدى ردود المدير المرسلة من هذه الصفحة (المعرف المؤقت قيد الاستبدال)
+                        if (m.sender_role === 'admin' && allMessages.some(x =>
+                            String(x.id).startsWith('temp_') && x.user_id === m.user_id && x.message === m.message)) {
+                            const t = allMessages.find(x => String(x.id).startsWith('temp_') && x.user_id === m.user_id && x.message === m.message);
+                            if (t) t.id = m.id;
+                            return;
+                        }
+                        allMessages.push(m);
+                        await loadProfiles([m.user_id]);
+
+                        if (m.sender_role === 'user') {
+                            playChime();
+                            if (m.user_id !== activeUserId) unread[m.user_id] = (unread[m.user_id] || 0) + 1;
+                        }
+                        if (m.user_id === activeUserId) renderConversation();
+                        renderContacts();
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.warn('[Admin Chats] فشل تهيئة البث اللحظي:', err);
+            }
+        }
+
+        async function reload() {
+            await loadMessages();
+            renderContacts();
+            if (activeUserId) renderConversation();
+        }
+
+        async function init() {
+            const user = WASEET_STATE.user;
+            if (!isAdmin(user)) {
+                document.getElementById('wa-access-denied').style.display = 'block';
+                return;
+            }
+            document.getElementById('wa-admin-wrapper').style.display = 'block';
+            client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            document.getElementById('wa-reply-form').addEventListener('submit', sendReply);
+            document.getElementById('wa-search').addEventListener('input', renderContacts);
+            const input = document.getElementById('wa-reply-input');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('wa-reply-form').requestSubmit();
+                }
+            });
+
+            await reload();
+            setupRealtime();
+
+            // فتح محادثة محددة عبر الرابط ?user=<id>
+            const qUser = new URLSearchParams(window.location.search).get('user');
+            if (qUser) openConversation(qUser);
+        }
+
+        return { init, reload, backToList, openConversation };
+    })();
+
+    window.addEventListener('DOMContentLoaded', () => AdminChats.init());
+    </script>
+</body>
+</html>

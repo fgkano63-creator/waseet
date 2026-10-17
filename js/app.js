@@ -95,6 +95,13 @@ class WaseetApp {
         }
         this.updatePendingAccountsCounter();
 
+        // Show/Hide Admin Support Inbox links (Mediator only)
+        const isAdminViewer = !!(user && isMediatorUser(user));
+        const adminChatsBtn = document.getElementById('btn-admin-chats');
+        if (adminChatsBtn) adminChatsBtn.style.display = isAdminViewer ? 'inline-flex' : 'none';
+        const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
+        if (drawerAdminChats) drawerAdminChats.style.display = isAdminViewer ? '' : 'none';
+
         if (!container) return;
 
         if (user) {

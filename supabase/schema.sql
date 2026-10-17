@@ -412,15 +412,52 @@ using (
 
 
 -- ==============================================================================
--- 7. تفعيل البث اللحظي الفوري (Supabase Realtime)
+-- ==============================================================================
+-- 7. جدول رسائل الدعم والمحادثة المباشرة مع الوسيط (support_messages)
+-- ==============================================================================
+create table if not exists public.support_messages (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references public.profiles(id) on delete cascade,
+    sender_role text not null check (sender_role in ('user', 'admin')),
+    message text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create index if not exists idx_support_messages_user_created 
+on public.support_messages(user_id, created_at asc);
+
+grant select, insert on table public.support_messages to authenticated;
+grant all on table public.support_messages to service_role;
+
+alter table public.support_messages enable row level security;
+
+drop policy if exists "support_messages_select_policy" on public.support_messages;
+create policy "support_messages_select_policy"
+on public.support_messages for select to authenticated
+using (
+    auth.uid() = user_id or public.is_admin()
+);
+
+drop policy if exists "support_messages_insert_policy" on public.support_messages;
+create policy "support_messages_insert_policy"
+on public.support_messages for insert to authenticated
+with check (
+    (auth.uid() = user_id and sender_role = 'user')
+    or (public.is_admin() and sender_role = 'admin')
+);
+
+-- ==============================================================================
+-- 8. تفعيل البث اللحظي الفوري (Supabase Realtime)
 -- ==============================================================================
 -- تفعيل المزامنة اللحظية للرسائل والصفقات لتحديث الشاشات فوراً عند إرسال رسالة
 alter publication supabase_realtime add table public.deals;
 alter publication supabase_realtime add table public.deal_messages;
 alter publication supabase_realtime add table public.marketplace_accounts;
+alter publication supabase_realtime add table public.support_messages;
 
 
 -- ==============================================================================
--- 8. ترقية حساب المدير (تُنفّذ لمرة واحدة في Supabase SQL Editor لترقية الحساب بعد التسجيل)
+-- 9. ترقية حساب المدير (تُنفّذ لمرة واحدة في Supabase SQL Editor لترقية الحساب بعد التسجيل)
 -- ==============================================================================
 update public.profiles set role = 'admin' where email = 'fgkano63@gmail.com';
+
