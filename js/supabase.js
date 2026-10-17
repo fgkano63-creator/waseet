@@ -593,9 +593,36 @@ async function waseetFetchAccountsFromSupabase() {
 }
 
 /**
+ * دمج مصفوفتين من رسائل الصفقة دون تكرار أو فقدان أي رسالة
+ */
+function waseetMergeDealMessagesList(remoteList = [], localList = []) {
+    const r = Array.isArray(remoteList) ? remoteList : [];
+    const l = Array.isArray(localList) ? localList : [];
+    if (l.length === 0) return [...r];
+    if (r.length === 0) return [...l];
+
+    const combined = [...r];
+    const seenKeys = new Set(
+        r.map(m => m && (m.id ? `id:${m.id}` : `${m.sender}|${(m.text || '').trim()}|${m.time || ''}`))
+    );
+
+    l.forEach(m => {
+        if (!m || !m.text) return;
+        const keyById = m.id ? `id:${m.id}` : null;
+        const keyByContent = `${m.sender}|${(m.text || '').trim()}|${m.time || ''}`;
+        if ((keyById && seenKeys.has(keyById)) || seenKeys.has(keyByContent)) return;
+        if (keyById) seenKeys.add(keyById);
+        seenKeys.add(keyByContent);
+        combined.push(m);
+    });
+
+    return combined;
+}
+
+/**
  * حفظ أو تحديث صفقة وساطة في جدول deals على Supabase
  */
-async function waseetSaveDealToSupabase(deal) {
+async function waseetSaveDealToSupabase(deal, options = {}) {
     const client = initWaseetSupabase();
     if (!client || !deal || !deal.id) return false;
 
@@ -603,8 +630,10 @@ async function waseetSaveDealToSupabase(deal) {
         const { data: { session } } = await client.auth.getSession();
         const sessionUserId = session?.user?.id || null;
 
-        const buyerUuid = waseetIsValidUuid(deal.buyer?.id) ? deal.buyer.id : sessionUserId;
-        const sellerUuid = waseetIsValidUuid(deal.seller?.id) ? deal.seller.id : buyerUuid;
+        const rawBuyerId = deal.buyer?.id || deal.buyer_id || deal.buyerId || null;
+        const rawSellerId = deal.seller?.id || deal.seller_id || deal.sellerId || null;
+        const buyerUuid = waseetIsValidUuid(rawBuyerId) ? rawBuyerId : sessionUserId;
+        const sellerUuid = waseetIsValidUuid(rawSellerId) ? rawSellerId : buyerUuid;
         if (!buyerUuid) return false;
 
         // مطابقة حقل الحالة مع قيود جدول deals مع حفظ الحالة الدقيقة الكاملة في notes JSON
@@ -638,13 +667,107 @@ async function waseetSaveDealToSupabase(deal) {
             .upsert(payload, { onConflict: 'id' });
 
         if (error) {
-            console.warn('[Supabase Deals] تعذر حفظ الصفقة في السحابة:', error.message);
-            return false;
+            console.error('[Supabase Deals] تعذر حفظ الصفقة في السحابة:', error);
+            if (options.showAlert) {
+                alert('فشل حفظ بيانات الصفقة: ' + error.message);
+            }
+            return options.returnError ? { ok: false, error } : false;
         }
-        return true;
+        return options.returnError ? { ok: true, error: null } : true;
     } catch (err) {
-        console.warn('[Supabase Deals] استثناء أثناء حفظ الصفقة:', err);
-        return false;
+        console.error('[Supabase Deals] استثناء أثناء حفظ الصفقة:', err);
+        if (options.showAlert) {
+            alert('فشل حفظ بيانات الصفقة: ' + (err.message || String(err)));
+        }
+        return options.returnError ? { ok: false, error: err } : false;
+    }
+}
+
+/**
+ * إرسال رسالة داخل غرفة الوساطة وحفظها في جدول deal_messages وجدول deals مع إظهار أي خطأ RLS أو أعمدة
+ */
+async function waseetSendEscrowMessageToSupabase(deal, msgObj, channelType, senderRole) {
+    const client = initWaseetSupabase();
+    if (!client || !deal || !deal.id || !msgObj || !msgObj.text) {
+        const err = { message: 'تعذر الاتصال بقاعدة البيانات أو بيانات الصفقة غير مكتملة.' };
+        console.error('Escrow Message Insert Error:', err);
+        alert('فشل إرسال الرسالة: ' + err.message);
+        return { data: null, error: err };
+    }
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const sessionUser = session?.user || null;
+        const candidateId = sessionUser?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        const senderUuid = waseetIsValidUuid(candidateId) ? candidateId : null;
+
+        if (!senderUuid) {
+            const authErr = { message: 'يرجى تسجيل الدخول أولاً لإرسال الرسائل في غرفة الوساطة.' };
+            console.error('Escrow Message Auth Error:', authErr);
+            alert('فشل إرسال الرسالة: ' + authErr.message);
+            return { data: null, error: authErr };
+        }
+
+        // 1. حفظ الصفقة وتحديث notes JSONB أولاً لضمان وجود الصفقة في جدول deals قبل إدراج الرسالة
+        const dealSaveRes = await waseetSaveDealToSupabase(deal, { returnError: true });
+
+        // 2. إدراج الرسالة في جدول deal_messages لتفعيل Realtime وعزل القنوات
+        const insertPayload = {
+            deal_id: String(deal.id),
+            sender_id: senderUuid,
+            channel_type: channelType || 'all',
+            sender_role: senderRole || 'buyer',
+            message: msgObj.text
+        };
+
+        const { data, error } = await client
+            .from('deal_messages')
+            .insert([insertPayload])
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Escrow Message Insert Error (deal_messages):', error);
+            // إذا فشل الإدراج في deal_messages (مثلاً بسبب RLS أو عدم وجود الجدول/العمود)، نظهر التنبيه الصريح للمستخدم
+            alert('فشل إرسال الرسالة في جدول رسائل الصفقة: ' + error.message);
+            return { data: null, error };
+        }
+
+        if (dealSaveRes && dealSaveRes.error) {
+            console.warn('[Supabase Deals] تم حفظ الرسالة في deal_messages ولكن تعذر تحديث notes في deals:', dealSaveRes.error.message);
+        }
+
+        return { data, error: null };
+    } catch (err) {
+        console.error('Escrow Message Unexpected Error:', err);
+        alert('خطأ غير متوقع أثناء إرسال الرسالة: ' + (err.message || String(err)));
+        return { data: null, error: err };
+    }
+}
+
+/**
+ * جلب رسائل صفقة معينة من جدول deal_messages في Supabase
+ */
+async function waseetFetchDealMessagesFromSupabase(dealId) {
+    const client = initWaseetSupabase();
+    if (!client || !dealId) return { data: [], error: null };
+
+    try {
+        const { data, error } = await client
+            .from('deal_messages')
+            .select('*')
+            .eq('deal_id', String(dealId))
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            console.warn('[Supabase Deal Messages] تعذر جلب رسائل الصفقة:', error.message);
+            return { data: [], error };
+        }
+
+        return { data: Array.isArray(data) ? data : [], error: null };
+    } catch (err) {
+        console.warn('[Supabase Deal Messages] استثناء جلب رسائل الصفقة:', err);
+        return { data: [], error: err };
     }
 }
 
@@ -684,6 +807,14 @@ async function waseetFetchDealsFromSupabase() {
             } catch (e) {}
         }
 
+        // بناء خريطة الصفقات المحلية الحالية للحفاظ على أي رسائل أُرسلت محلياً ولم تكتمل مزامنتها بعد
+        const localDealsById = new Map();
+        (WASEET_STATE.deals || []).forEach(d => { if (d && d.id) localDealsById.set(String(d.id), d); });
+        (WASEET_STATE.completedDeals || []).forEach(d => { if (d && d.id) localDealsById.set(String(d.id), d); });
+        if (typeof window !== 'undefined' && window.escrowRoom && window.escrowRoom.deal && window.escrowRoom.deal.id) {
+            localDealsById.set(String(window.escrowRoom.deal.id), window.escrowRoom.deal);
+        }
+
         const remoteDeals = data.map((row, index) => {
             let parsed = null;
             if (row.notes && typeof row.notes === 'string' && row.notes.trim().startsWith('{')) {
@@ -693,6 +824,9 @@ async function waseetFetchDealsFromSupabase() {
                     parsed = null;
                 }
             }
+
+            const dealIdStr = String(row.id || (parsed && parsed.id));
+            const existingLocal = localDealsById.get(dealIdStr) || null;
 
             const buyerProfile = profilesMap[row.buyer_id] || null;
             const sellerProfile = profilesMap[row.seller_id] || null;
@@ -713,9 +847,14 @@ async function waseetFetchDealsFromSupabase() {
                 ? 'completed'
                 : ((row.status === 'cancelled' || rawStatus === 'cancelled') ? 'cancelled' : rawStatus);
 
+            const remoteSellerMsgs = (parsed && Array.isArray(parsed.sellerMessages)) ? parsed.sellerMessages : [];
+            const remoteBuyerMsgs = (parsed && Array.isArray(parsed.buyerMessages)) ? parsed.buyerMessages : [];
+            const localSellerMsgs = (existingLocal && Array.isArray(existingLocal.sellerMessages)) ? existingLocal.sellerMessages : [];
+            const localBuyerMsgs = (existingLocal && Array.isArray(existingLocal.buyerMessages)) ? existingLocal.buyerMessages : [];
+
             return {
                 ...(parsed || {}),
-                id: row.id || (parsed && parsed.id),
+                id: dealIdStr,
                 dealNumber: dealNumber,
                 title: (parsed && parsed.title) || `صفقة رقم ${dealNumber} • حساب #${row.account_number || ''}`,
                 accountId: (parsed && parsed.accountId) || row.account_id || `acc_${row.account_number || 1001}`,
@@ -745,8 +884,8 @@ async function waseetFetchDealsFromSupabase() {
                     loginType: 'Google / Facebook',
                     backupCodes: '—'
                 },
-                sellerMessages: (parsed && Array.isArray(parsed.sellerMessages)) ? parsed.sellerMessages : [],
-                buyerMessages: (parsed && Array.isArray(parsed.buyerMessages)) ? parsed.buyerMessages : [],
+                sellerMessages: waseetMergeDealMessagesList(remoteSellerMsgs, localSellerMsgs),
+                buyerMessages: waseetMergeDealMessagesList(remoteBuyerMsgs, localBuyerMsgs),
                 createdAt: row.created_at || (parsed && parsed.createdAt) || new Date().toISOString()
             };
         });
@@ -786,6 +925,18 @@ async function waseetFetchDealsFromSupabase() {
             WASEET_STATE.activeDeal = WASEET_STATE.deals[0];
         }
 
+        // إذا كانت غرفة الوساطة مفتوحة، نحدّث مرجع الصفقة فيها دون فقدان أي رسالة
+        if (typeof window !== 'undefined' && window.escrowRoom && window.escrowRoom.deal) {
+            const matched = mergedMap.get(String(window.escrowRoom.deal.id));
+            if (matched) {
+                window.escrowRoom.deal = matched;
+                WASEET_STATE.activeDeal = matched;
+                if (typeof window.escrowRoom.updateChatMessagesOnly === 'function') {
+                    window.escrowRoom.updateChatMessagesOnly();
+                }
+            }
+        }
+
         if (typeof saveWaseetData === 'function') saveWaseetData();
         return allMerged;
     } catch (err) {
@@ -794,10 +945,13 @@ async function waseetFetchDealsFromSupabase() {
     }
 }
 
+window.waseetMergeDealMessagesList = waseetMergeDealMessagesList;
 window.waseetSaveAccountToSupabase = waseetSaveAccountToSupabase;
 window.waseetFetchAccountsFromSupabase = waseetFetchAccountsFromSupabase;
 window.waseetMapRemoteAccountRow = waseetMapRemoteAccountRow;
 window.waseetSaveDealToSupabase = waseetSaveDealToSupabase;
+window.waseetSendEscrowMessageToSupabase = waseetSendEscrowMessageToSupabase;
+window.waseetFetchDealMessagesFromSupabase = waseetFetchDealMessagesFromSupabase;
 window.waseetFetchDealsFromSupabase = waseetFetchDealsFromSupabase;
 
 /**

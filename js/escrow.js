@@ -42,9 +42,201 @@ class WaseetEscrowRoom {
     }
 
     init() {
+        this.syncDealToGlobalState();
         this.renderAll();
         this.initLiveSync();
         this.fetchDealParticipantsProfiles();
+    }
+
+    syncDealToGlobalState() {
+        if (!this.deal || !this.deal.id || typeof WASEET_STATE === 'undefined') return;
+        if (!Array.isArray(this.deal.sellerMessages)) this.deal.sellerMessages = [];
+        if (!Array.isArray(this.deal.buyerMessages)) this.deal.buyerMessages = [];
+
+        if (!Array.isArray(WASEET_STATE.deals)) WASEET_STATE.deals = [];
+        const idx = WASEET_STATE.deals.findIndex(d => d && String(d.id) === String(this.deal.id));
+        if (idx !== -1) {
+            WASEET_STATE.deals[idx] = this.deal;
+        } else if (this.deal.status !== 'completed' && this.deal.status !== 'cancelled') {
+            WASEET_STATE.deals.unshift(this.deal);
+        }
+        WASEET_STATE.activeDeal = this.deal;
+    }
+
+    formatRowTime(isoStr) {
+        try {
+            const dt = isoStr ? new Date(isoStr) : new Date();
+            if (isNaN(dt.getTime())) return 'الآن';
+            return `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+        } catch (e) {
+            return 'الآن';
+        }
+    }
+
+    resolveSenderDisplayName(senderRole) {
+        const sellerName = (this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
+        const buyerName = (this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
+        if (senderRole === 'mediator') return 'الوسيط المعتمد';
+        if (senderRole === 'seller') return `${sellerName} (البائع)`;
+        if (senderRole === 'buyer') return `${buyerName} (المشتري)`;
+        return 'النظام';
+    }
+
+    appendIncomingRowToDeal(row) {
+        if (!row || !this.deal || !row.message) return false;
+        const senderRole = row.sender_role || 'buyer';
+        const channelType = row.channel_type || 'all';
+        const msgObj = {
+            id: row.id || ('msg_' + Date.now()),
+            sender: senderRole,
+            name: this.resolveSenderDisplayName(senderRole),
+            text: row.message,
+            time: this.formatRowTime(row.created_at),
+            channel_type: channelType,
+            created_at: row.created_at || new Date().toISOString()
+        };
+
+        let changed = false;
+        const addIfMissing = (arr) => {
+            const exists = arr.some(m =>
+                (m.id && row.id && String(m.id) === String(row.id)) ||
+                (m.sender === msgObj.sender && (m.text || '').trim() === (msgObj.text || '').trim() && m.time === msgObj.time)
+            );
+            if (!exists) {
+                arr.push(msgObj);
+                changed = true;
+            }
+        };
+
+        if (!Array.isArray(this.deal.sellerMessages)) this.deal.sellerMessages = [];
+        if (!Array.isArray(this.deal.buyerMessages)) this.deal.buyerMessages = [];
+
+        if (channelType === 'seller_mediator' || channelType === 'all' || channelType === 'system') {
+            addIfMissing(this.deal.sellerMessages);
+        }
+        if (channelType === 'buyer_mediator' || channelType === 'all' || channelType === 'system') {
+            addIfMissing(this.deal.buyerMessages);
+        }
+
+        return changed;
+    }
+
+    async loadDealMessagesFromSupabase() {
+        if (!this.deal || !this.deal.id || typeof window.waseetFetchDealMessagesFromSupabase !== 'function') return;
+        try {
+            const { data: rows, error } = await window.waseetFetchDealMessagesFromSupabase(this.deal.id);
+            if (error || !Array.isArray(rows) || rows.length === 0) return;
+
+            let anyAdded = false;
+            rows.forEach(row => {
+                if (this.appendIncomingRowToDeal(row)) {
+                    anyAdded = true;
+                }
+            });
+
+            if (anyAdded) {
+                this.syncDealToGlobalState();
+                saveWaseetData();
+                this.updateChatMessagesOnly();
+            }
+        } catch (err) {
+            console.warn('Could not load deal messages from Supabase:', err);
+        }
+    }
+
+    initSupabaseRealtime() {
+        const client = window.waseetSupabaseClient || (typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null);
+        if (!client || !this.deal || !this.deal.id) return;
+
+        const targetDealId = String(this.deal.id);
+        if (this.realtimeDealId === targetDealId && this.realtimeChannel) return;
+
+        if (this.realtimeChannel) {
+            try {
+                client.removeChannel(this.realtimeChannel);
+            } catch (e) {}
+            this.realtimeChannel = null;
+        }
+
+        this.realtimeDealId = targetDealId;
+
+        try {
+            this.realtimeChannel = client
+                .channel('escrow_room_' + targetDealId)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'deal_messages',
+                        filter: `deal_id=eq.${targetDealId}`
+                    },
+                    (payload) => {
+                        if (payload && payload.new) {
+                            const added = this.appendIncomingRowToDeal(payload.new);
+                            if (added) {
+                                this.syncDealToGlobalState();
+                                saveWaseetData();
+                                this.updateChatMessagesOnly();
+                            }
+                        }
+                    }
+                )
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'deals',
+                        filter: `id=eq.${targetDealId}`
+                    },
+                    (payload) => {
+                        if (payload && payload.new && this.deal) {
+                            const row = payload.new;
+                            let parsed = null;
+                            if (row.notes && typeof row.notes === 'string' && row.notes.trim().startsWith('{')) {
+                                try { parsed = JSON.parse(row.notes); } catch (e) {}
+                            }
+                            let msgChanged = false;
+                            if (parsed && typeof window.waseetMergeDealMessagesList === 'function') {
+                                const mergedSeller = window.waseetMergeDealMessagesList(this.deal.sellerMessages || [], parsed.sellerMessages || []);
+                                const mergedBuyer = window.waseetMergeDealMessagesList(this.deal.buyerMessages || [], parsed.buyerMessages || []);
+                                if (mergedSeller.length !== (this.deal.sellerMessages || []).length) {
+                                    this.deal.sellerMessages = mergedSeller;
+                                    msgChanged = true;
+                                }
+                                if (mergedBuyer.length !== (this.deal.buyerMessages || []).length) {
+                                    this.deal.buyerMessages = mergedBuyer;
+                                    msgChanged = true;
+                                }
+                            }
+                            const newStep = Number(row.current_step ?? (parsed && parsed.currentStep) ?? this.deal.currentStep);
+                            const newStatus = (row.status === 'completed' || (parsed && parsed.status === 'completed'))
+                                ? 'completed'
+                                : ((row.status === 'cancelled' || (parsed && parsed.status === 'cancelled')) ? 'cancelled' : this.deal.status);
+
+                            const stepOrStatusChanged = (newStep !== this.deal.currentStep) || (newStatus !== this.deal.status);
+                            this.deal.currentStep = newStep;
+                            this.deal.status = newStatus;
+
+                            if (msgChanged || stepOrStatusChanged) {
+                                this.syncDealToGlobalState();
+                                saveWaseetData();
+                                this.updateChatMessagesOnly();
+                                if (stepOrStatusChanged) {
+                                    this.renderPipeline();
+                                    this.renderTopAmountPill();
+                                    const credsPane = document.getElementById('mediator-control-pane');
+                                    if (credsPane) credsPane.innerHTML = this.renderMediatorControlPanel();
+                                }
+                            }
+                        }
+                    }
+                )
+                .subscribe();
+        } catch (err) {
+            console.warn('Supabase Realtime subscription warning:', err);
+        }
     }
 
     async fetchDealParticipantsProfiles() {
@@ -63,6 +255,16 @@ class WaseetEscrowRoom {
             }
 
             if (!this.deal) return;
+
+            // Detect role again in case deal or user finished loading asynchronously
+            const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+            if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
+                this.viewerRole = 'mediator';
+            } else if (currentUser && this.deal.seller && (String(this.deal.seller.id) === String(currentUser.id) || this.deal.seller.name === currentUser.name)) {
+                this.viewerRole = 'seller';
+            } else {
+                this.viewerRole = 'buyer';
+            }
 
             if (!this.deal.seller) this.deal.seller = { name: 'البائع' };
             if (!this.deal.buyer) this.deal.buyer = { name: 'المشتري' };
@@ -108,10 +310,15 @@ class WaseetEscrowRoom {
                 }
             }
 
+            this.syncDealToGlobalState();
             if (updated) {
                 saveWaseetData();
             }
             this.renderAll();
+
+            // 3. Load messages from deal_messages table and subscribe to Supabase Realtime
+            await this.loadDealMessagesFromSupabase();
+            this.initSupabaseRealtime();
         } catch (err) {
             console.warn('Could not fetch deal participant profiles:', err);
         }
@@ -141,11 +348,18 @@ class WaseetEscrowRoom {
             }
         });
 
-        // 3. Fallback polling loop (checks every 1200ms)
+        // 3. Fallback local polling loop (checks every 1200ms)
         if (!this.syncInterval) {
             this.syncInterval = setInterval(() => {
                 this.syncDealFromStorage();
             }, 1200);
+        }
+
+        // 4. Periodic Supabase cloud sync every 4000ms (backup for Realtime across devices)
+        if (!this.cloudPollInterval) {
+            this.cloudPollInterval = setInterval(() => {
+                this.loadDealMessagesFromSupabase();
+            }, 4000);
         }
     }
 
@@ -175,6 +389,8 @@ class WaseetEscrowRoom {
                         WASEET_STATE.deals = deals;
                         WASEET_STATE.activeDeal = deals[0];
                         this.renderAll();
+                        this.loadDealMessagesFromSupabase();
+                        this.initSupabaseRealtime();
                     }
                 }
             } catch (e) {}
@@ -187,7 +403,7 @@ class WaseetEscrowRoom {
             if (!raw) return;
             const deals = JSON.parse(raw);
             if (!Array.isArray(deals)) return;
-            const updatedDeal = deals.find(d => d.id === currentDealId);
+            const updatedDeal = deals.find(d => d && String(d.id) === String(currentDealId));
             if (!updatedDeal) return;
 
             const oldSellerCount = (this.deal.sellerMessages || []).length;
@@ -197,13 +413,16 @@ class WaseetEscrowRoom {
             const stepChanged = this.deal.currentStep !== updatedDeal.currentStep;
             const statusChanged = this.deal.status !== updatedDeal.status;
 
-            if (newSellerCount !== oldSellerCount || newBuyerCount !== oldBuyerCount || stepChanged || statusChanged) {
+            // حماية صارمة: لا نقوم أبداً باستبدال الرسائل المحلية بنسخة أقدم/أقل رسائل من localStorage
+            if (oldSellerCount > newSellerCount || oldBuyerCount > newBuyerCount) {
+                this.syncDealToGlobalState();
+                saveWaseetData();
+                return;
+            }
+
+            if (newSellerCount > oldSellerCount || newBuyerCount > oldBuyerCount || stepChanged || statusChanged) {
                 this.deal = updatedDeal;
-                if (WASEET_STATE.deals) {
-                    const idx = WASEET_STATE.deals.findIndex(d => d.id === this.deal.id);
-                    if (idx !== -1) WASEET_STATE.deals[idx] = updatedDeal;
-                }
-                WASEET_STATE.activeDeal = updatedDeal;
+                this.syncDealToGlobalState();
 
                 this.updateChatMessagesOnly();
                 if (stepChanged || statusChanged) {
@@ -921,94 +1140,111 @@ class WaseetEscrowRoom {
         }
     }
 
-    sendMessageToSeller() {
-        const input = document.getElementById('input-seller-chat');
+    async handleSendEscrowMessage({ inputId, targetArrayKey, channelType, senderRole, senderDisplayName }) {
+        const input = document.getElementById(inputId);
         if (!input) return;
         const text = input.value.trim();
         if (!text) return;
 
+        if (!this.deal || !this.deal.id) {
+            alert('لا توجد صفقة نشطة حالياً لإرسال الرسالة فيها.');
+            return;
+        }
+
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const tempId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
 
-        this.deal.sellerMessages.push({
-            sender: 'mediator',
-            name: 'الوسيط المعتمد (أنت)',
+        const msgObj = {
+            id: tempId,
+            sender: senderRole,
+            name: senderDisplayName,
             text: text,
-            time: timeStr
-        });
+            time: timeStr,
+            channel_type: channelType,
+            created_at: now.toISOString()
+        };
 
+        if (!Array.isArray(this.deal[targetArrayKey])) {
+            this.deal[targetArrayKey] = [];
+        }
+        this.deal[targetArrayKey].push(msgObj);
+
+        // 1. تفريغ الحقل وتحديث واجهة المحادثة (DOM) فوراً دون إعادة بناء كامل الصفحة
         input.value = '';
-        this.renderWorkspace();
+        input.focus();
+        this.syncDealToGlobalState();
         saveWaseetData();
+        this.updateChatMessagesOnly();
+        this.scrollAllChats();
         this.broadcastUpdate();
+
+        // 2. الحفظ الفوري في قاعدة بيانات Supabase (جدول deal_messages + deals) مع فحص الأخطاء الصريح
+        if (typeof window.waseetSendEscrowMessageToSupabase === 'function') {
+            const { data, error } = await window.waseetSendEscrowMessageToSupabase(this.deal, msgObj, channelType, senderRole);
+            if (error) {
+                console.error('Escrow Message Insert Error:', error);
+                return;
+            }
+            if (data && data.id) {
+                msgObj.id = data.id;
+                this.syncDealToGlobalState();
+                saveWaseetData();
+            }
+        } else if (typeof window.waseetSaveDealToSupabase === 'function') {
+            const res = await window.waseetSaveDealToSupabase(this.deal, { returnError: true, showAlert: true });
+            if (res && res.error) {
+                console.error('Escrow Deal Save Error:', res.error);
+            }
+        }
+    }
+
+    sendMessageToSeller() {
+        return this.handleSendEscrowMessage({
+            inputId: 'input-seller-chat',
+            targetArrayKey: 'sellerMessages',
+            channelType: 'seller_mediator',
+            senderRole: 'mediator',
+            senderDisplayName: 'الوسيط المعتمد'
+        });
     }
 
     sendMessageToBuyer() {
-        const input = document.getElementById('input-buyer-chat');
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
-
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-        this.deal.buyerMessages.push({
-            sender: 'mediator',
-            name: 'الوسيط المعتمد (أنت)',
-            text: text,
-            time: timeStr
+        return this.handleSendEscrowMessage({
+            inputId: 'input-buyer-chat',
+            targetArrayKey: 'buyerMessages',
+            channelType: 'buyer_mediator',
+            senderRole: 'mediator',
+            senderDisplayName: 'الوسيط المعتمد'
         });
-
-        input.value = '';
-        this.renderWorkspace();
-        saveWaseetData();
-        this.broadcastUpdate();
     }
 
     sendBuyerMessage() {
-        const input = document.getElementById('input-buyer-single');
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
+        const buyerName = (WASEET_STATE.user && WASEET_STATE.user.name)
+            ? WASEET_STATE.user.name + ' (المشتري)'
+            : ((this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name + ' (المشتري)' : 'المشتري');
 
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const buyerName = (WASEET_STATE.user && WASEET_STATE.user.name) ? WASEET_STATE.user.name + ' (المشتري)' : ((this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name + ' (المشتري)' : 'المشتري');
-
-        this.deal.buyerMessages.push({
-            sender: 'buyer',
-            name: buyerName,
-            text: text,
-            time: timeStr
+        return this.handleSendEscrowMessage({
+            inputId: 'input-buyer-single',
+            targetArrayKey: 'buyerMessages',
+            channelType: 'buyer_mediator',
+            senderRole: 'buyer',
+            senderDisplayName: buyerName
         });
-
-        input.value = '';
-        this.renderWorkspace();
-        saveWaseetData();
-        this.broadcastUpdate();
     }
 
     sendSellerMessage() {
-        const input = document.getElementById('input-seller-single');
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
+        const sellerName = (WASEET_STATE.user && WASEET_STATE.user.name)
+            ? WASEET_STATE.user.name + ' (البائع)'
+            : ((this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name + ' (البائع)' : 'البائع');
 
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const sellerName = (WASEET_STATE.user && WASEET_STATE.user.name) ? WASEET_STATE.user.name + ' (البائع)' : ((this.deal.seller && this.deal.seller.name) ? this.deal.seller.name + ' (البائع)' : 'البائع');
-
-        this.deal.sellerMessages.push({
-            sender: 'seller',
-            name: sellerName,
-            text: text,
-            time: timeStr
+        return this.handleSendEscrowMessage({
+            inputId: 'input-seller-single',
+            targetArrayKey: 'sellerMessages',
+            channelType: 'seller_mediator',
+            senderRole: 'seller',
+            senderDisplayName: sellerName
         });
-
-        input.value = '';
-        this.renderWorkspace();
-        saveWaseetData();
-        this.broadcastUpdate();
     }
 
     scrollAllChats() {
@@ -1029,26 +1265,33 @@ class WaseetEscrowRoom {
         }
     }
 
-    advanceStep(nextStep, systemNotice) {
+    async advanceStep(nextStep, systemNotice) {
         this.deal.currentStep = nextStep;
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
         const noticeObj = {
+            id: 'sys_' + Date.now(),
             sender: 'system',
             text: systemNotice,
-            time: timeStr
+            time: timeStr,
+            channel_type: 'system',
+            created_at: now.toISOString()
         };
 
         this.deal.sellerMessages.push(noticeObj);
         this.deal.buyerMessages.push(noticeObj);
 
+        this.syncDealToGlobalState();
         this.renderAll();
         saveWaseetData();
-        if (typeof window.waseetSaveDealToSupabase === 'function') {
-            window.waseetSaveDealToSupabase(this.deal);
-        }
         this.broadcastUpdate();
+
+        if (typeof window.waseetSendEscrowMessageToSupabase === 'function') {
+            await window.waseetSendEscrowMessageToSupabase(this.deal, noticeObj, 'system', 'system');
+        } else if (typeof window.waseetSaveDealToSupabase === 'function') {
+            await window.waseetSaveDealToSupabase(this.deal, { showAlert: true });
+        }
     }
 
     async completeDeal() {
