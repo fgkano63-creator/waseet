@@ -117,7 +117,7 @@
         </div>
 
         <!-- ================= Main Content Container ================= -->
-        <main class="pending-page-container" id="pending-main-content" style="display: none;">
+        <main class="pending-page-container" id="pending-main-content">
 
             <!-- Hero Section Header -->
             <div class="pending-hero-card">
@@ -461,29 +461,59 @@
             }
         }
 
+        function safeParsePendingJson(val, fallback = {}) {
+            if (val === null || val === undefined) return fallback;
+            if (typeof val === 'object') return val;
+            if (typeof val === 'string') {
+                const t = val.trim();
+                if ((t.startsWith('{') && t.endsWith('}')) || (t.startsWith('[') && t.endsWith(']'))) {
+                    try { return JSON.parse(t); } catch (e) { return fallback; }
+                }
+            }
+            return fallback;
+        }
+
+        function safeExtractPendingCreds(acc, details = {}) {
+            if (typeof window.waseetSafeParseCredentials === 'function') {
+                return window.waseetSafeParseCredentials(acc, details);
+            }
+            let c = null;
+            if (acc && acc.credentials) {
+                if (typeof acc.credentials === 'object' && !Array.isArray(acc.credentials)) {
+                    c = acc.credentials;
+                } else if (typeof acc.credentials === 'string') {
+                    const parsed = safeParsePendingJson(acc.credentials, null);
+                    c = (parsed && typeof parsed === 'object') ? parsed : { email_or_phone: acc.credentials, password: details.password || '••••••••' };
+                }
+            }
+            if ((!c || (!c.email_or_phone && !c.password)) && details && details.credentials) {
+                const dc = safeParsePendingJson(details.credentials, null);
+                if (dc && typeof dc === 'object') c = dc;
+            }
+            if (!c || typeof c !== 'object') c = {};
+            return {
+                email_or_phone: String(c.email_or_phone || c.email || c.login || (acc && acc.login_identifier) || details.email_or_phone || 'غير متوفر'),
+                password: String(c.password || c.pass || (acc && acc.raw_password) || details.password || '••••••••')
+            };
+        }
+
         async function loadPendingAccounts() {
             const container = document.getElementById('pending-accounts-list-container');
             if (!container) return;
 
-            container.innerHTML = `
-                <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
-                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
-                    جاري جلب وتحديث الحسابات المعلقة من قاعدة البيانات...
-                </div>
-            `;
-
-            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
-
-            // مزامنة أي حسابات محلية لم تُرفع بعد إلى السحابة
-            if (typeof window.waseetFetchAccountsFromSupabase === 'function') {
-                try {
-                    await window.waseetFetchAccountsFromSupabase();
-                } catch (e) {}
+            if (!allPendingAccounts || allPendingAccounts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
+                        <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
+                        جاري جلب وتحديث الحسابات المعلقة من قاعدة البيانات...
+                    </div>
+                `;
             }
 
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
             let remoteList = [];
 
-            // 1. جلب الحسابات المعلقة من Supabase (كل حساب ليست حالته available ولا rejected) مع Left Join آمن لجدول profiles
+            // 1. جلب الحسابات المعلقة من Supabase (كل حساب ليست حالته available ولا approved ولا rejected)
             if (client) {
                 try {
                     let data = null;
@@ -491,6 +521,7 @@
                         .from('marketplace_accounts')
                         .select('*, profiles(id, name, email, avatar_url)')
                         .neq('status', 'available')
+                        .neq('status', 'approved')
                         .neq('status', 'rejected')
                         .neq('status', 'sold')
                         .neq('status', 'in_deal')
@@ -499,23 +530,26 @@
                     if (!joinError && Array.isArray(joinData)) {
                         data = joinData;
                     } else {
-                        // احتياط فوري بدون Join لضمان عدم اختفاء أي حساب إذا كان الـ profile غير مكتمل
+                        // احتياط فوري بدون Join لضمان عدم اختفاء أي حساب
                         const { data: plainData, error: plainError } = await client
                             .from('marketplace_accounts')
                             .select('*')
                             .neq('status', 'available')
+                            .neq('status', 'approved')
                             .neq('status', 'rejected')
                             .neq('status', 'sold')
                             .neq('status', 'in_deal')
                             .order('created_at', { ascending: false });
                         if (!plainError && Array.isArray(plainData)) {
                             data = plainData;
+                        } else if (plainError) {
+                            console.error('[Pending Accounts] Query error:', plainError);
                         }
                     }
 
                     if (Array.isArray(data)) {
                         // جلب ملفات البائعين بشكل مستقل لتعويض أي نقص في الـ Join دون حجب الحساب الأساسي
-                        const sellerIds = [...new Set(data.map(r => r.seller_id).filter(Boolean))];
+                        const sellerIds = [...new Set(data.map(r => r && r.seller_id).filter(Boolean))];
                         const profilesMap = {};
                         if (sellerIds.length > 0) {
                             try {
@@ -530,60 +564,65 @@
                         }
 
                         remoteList = data.map(acc => {
-                            if (typeof window.waseetMapRemoteAccountRow === 'function') {
-                                const mapped = window.waseetMapRemoteAccountRow(acc, profilesMap);
-                                return {
-                                    ...mapped,
-                                    iconicPants: Array.isArray(mapped.iconicPants) ? mapped.iconicPants.join('، ') : (mapped.iconicPants || ''),
-                                    rareSkins: Array.isArray(mapped.rareSkins) ? mapped.rareSkins.join('، ') : (mapped.rareSkins || '')
-                                };
-                            }
-                            const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
-                            const prof = (acc.profiles && !Array.isArray(acc.profiles)) ? acc.profiles : (Array.isArray(acc.profiles) ? acc.profiles[0] : profilesMap[acc.seller_id]);
-                            const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : (Array.isArray(acc.gallery_images) && acc.gallery_images.length ? acc.gallery_images : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']));
-                            return {
-                                id: acc.id,
-                                localId: details.localId || null,
-                                accountNumber: acc.account_number || `FF-${String(acc.id).slice(0, 4)}`,
-                                title: acc.title,
-                                game: details.originalGame || acc.game || 'free_fire',
-                                level: acc.level || 50,
-                                primeLevel: acc.prime_level || 1,
-                                sellerPrice: parseFloat(acc.seller_price) || 0,
-                                sellerId: acc.seller_id,
-                                sellerName: (prof && (prof.name || prof.username || prof.full_name)) || details.sellerName || acc.seller_name || 'بائع موثق',
-                                status: acc.status || 'pending_verification',
-                                createdAt: acc.created_at,
-                                bindStatus: acc.bind_status || 'single',
-                                loginType: acc.login_type || 'google',
-                                accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
-                                evoGunsCount: details.evoGunsCount || acc.evo_guns_count || 0,
-                                iconicPants: Array.isArray(details.iconicPants) ? details.iconicPants.join('، ') : (details.iconicPants || acc.iconic_pants || ''),
-                                rareSkins: Array.isArray(details.rareSkins) ? details.rareSkins.join('، ') : (details.rareSkins || acc.rare_skins || ''),
-                                image: imgs[0],
-                                images: imgs,
-                                details: details,
-                                credentials: (acc.credentials && Object.keys(acc.credentials).length ? acc.credentials : null)
-                                    || (details.credentials && Object.keys(details.credentials).length ? details.credentials : null)
-                                    || {
-                                        email_or_phone: acc.login_identifier || details.email_or_phone || 'غير متوفر',
-                                        password: acc.raw_password || details.password || '••••••••'
+                            try {
+                                if (typeof window.waseetMapRemoteAccountRow === 'function') {
+                                    const mapped = window.waseetMapRemoteAccountRow(acc, profilesMap);
+                                    if (mapped) {
+                                        return {
+                                            ...mapped,
+                                            credentials: safeExtractPendingCreds(acc, mapped.details || {}),
+                                            iconicPants: Array.isArray(mapped.iconicPants) ? mapped.iconicPants.join('، ') : String(mapped.iconicPants || ''),
+                                            rareSkins: Array.isArray(mapped.rareSkins) ? mapped.rareSkins.join('، ') : String(mapped.rareSkins || '')
+                                        };
                                     }
-                            };
-                        });
+                                }
+                                const details = safeParsePendingJson(acc.details, {});
+                                const prof = (acc.profiles && !Array.isArray(acc.profiles)) ? acc.profiles : (Array.isArray(acc.profiles) ? acc.profiles[0] : profilesMap[acc.seller_id]);
+                                const parsedImgs = Array.isArray(acc.images) ? acc.images : safeParsePendingJson(acc.images, []);
+                                const imgs = (Array.isArray(parsedImgs) && parsedImgs.length) ? parsedImgs : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']);
+                                return {
+                                    id: acc.id,
+                                    localId: details.localId || null,
+                                    accountNumber: acc.account_number || `FF-${String(acc.id).slice(0, 4)}`,
+                                    title: acc.title || 'حساب قيد الفحص',
+                                    game: details.originalGame || acc.game || 'free_fire',
+                                    level: acc.level || 50,
+                                    primeLevel: acc.prime_level || 1,
+                                    sellerPrice: parseFloat(acc.seller_price) || 0,
+                                    sellerId: acc.seller_id,
+                                    seller_id: acc.seller_id,
+                                    sellerName: (prof && (prof.name || prof.username || prof.full_name)) || details.sellerName || acc.seller_name || 'بائع موثق',
+                                    status: acc.status || 'pending_verification',
+                                    createdAt: acc.created_at,
+                                    bindStatus: acc.bind_status || 'single',
+                                    loginType: acc.login_type || 'google',
+                                    accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
+                                    evoGunsCount: details.evoGunsCount || acc.evo_guns_count || 0,
+                                    iconicPants: Array.isArray(details.iconicPants) ? details.iconicPants.join('، ') : String(details.iconicPants || acc.iconic_pants || ''),
+                                    rareSkins: Array.isArray(details.rareSkins) ? details.rareSkins.join('، ') : String(details.rareSkins || acc.rare_skins || ''),
+                                    image: imgs[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+                                    images: imgs,
+                                    details: details,
+                                    credentials: safeExtractPendingCreds(acc, details)
+                                };
+                            } catch (mapErr) {
+                                console.warn('[Pending Accounts] Row map error:', mapErr);
+                                return null;
+                            }
+                        }).filter(Boolean);
                     }
                 } catch (err) {
                     console.warn('[Pending Accounts] Supabase Exception:', err);
                 }
             }
 
-            // 2. دمج الحسابات المعلقة من الحالة المحلية و localStorage دائماً (دون تجاهلها حتى لو وُجدت حسابات في السحابة)
+            // 2. دمج الحسابات المعلقة من الحالة المحلية و localStorage دائماً
             const mergedMap = new Map();
             remoteList.forEach(acc => {
                 if (acc && acc.id) mergedMap.set(String(acc.id), acc);
             });
 
-            const isPendingStatus = (st) => st && st !== 'available' && st !== 'rejected' && st !== 'sold' && st !== 'in_deal' && st !== 'hidden';
+            const isPendingStatus = (st) => st && st !== 'available' && st !== 'approved' && st !== 'rejected' && st !== 'sold' && st !== 'in_deal' && st !== 'hidden';
 
             let savedUserAccounts = [];
             try {
@@ -601,11 +640,12 @@
                     (r.localId && String(r.localId) === String(localAcc.id)) ||
                     (r.title === localAcc.title && Number(r.sellerPrice) === Number(localAcc.sellerPrice))
                 );
-                if (!alreadyExists) {
+                if (!alreadyExists && localAcc.id) {
                     mergedMap.set(String(localAcc.id), {
                         ...localAcc,
-                        iconicPants: Array.isArray(localAcc.iconicPants) ? localAcc.iconicPants.join('، ') : (localAcc.iconicPants || ''),
-                        rareSkins: Array.isArray(localAcc.rareSkins) ? localAcc.rareSkins.join('، ') : (localAcc.rareSkins || '')
+                        credentials: safeExtractPendingCreds(localAcc, localAcc.details || {}),
+                        iconicPants: Array.isArray(localAcc.iconicPants) ? localAcc.iconicPants.join('، ') : String(localAcc.iconicPants || ''),
+                        rareSkins: Array.isArray(localAcc.rareSkins) ? localAcc.rareSkins.join('، ') : String(localAcc.rareSkins || '')
                     });
                 }
             });
@@ -620,7 +660,7 @@
             const total = allPendingAccounts.length;
             const ff = allPendingAccounts.filter(a => a.game === 'free_fire').length;
             const pubg = allPendingAccounts.filter(a => a.game === 'pubg').length;
-            const approvedCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'available').length;
+            const approvedCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'available' || a.status === 'approved').length;
 
             const elTotal = document.getElementById('stat-pending-total');
             const elFf = document.getElementById('stat-pending-ff');
@@ -677,7 +717,7 @@
             const container = document.getElementById('pending-accounts-list-container');
             if (!container) return;
 
-            if (accounts.length === 0) {
+            if (!Array.isArray(accounts) || accounts.length === 0) {
                 container.innerHTML = `
                     <div style="background: rgba(14, 18, 28, 0.7); border: 2px dashed rgba(197, 160, 89, 0.3); border-radius: 20px; padding: 4rem 2rem; text-align: center; color: var(--silver-muted);">
                         <i class="fas fa-check-circle text-gold" style="font-size: 3.5rem; margin-bottom: 1.2rem; display: block;"></i>
@@ -691,74 +731,88 @@
             }
 
             container.innerHTML = accounts.map(acc => {
-                const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(acc.sellerPrice) : { sellerPrice: acc.sellerPrice, fee: 0, buyerPrice: acc.sellerPrice };
-                const imgCount = acc.images && acc.images.length ? acc.images.length : 1;
-                const dateStr = acc.createdAt ? new Date(acc.createdAt).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'اليوم';
-                const mainImg = (acc.images && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+                try {
+                    const sellerPriceNum = Number(acc.sellerPrice) || 0;
+                    const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(sellerPriceNum) : { sellerPrice: sellerPriceNum, fee: 0, buyerPrice: sellerPriceNum };
+                    const imagesArr = Array.isArray(acc.images) && acc.images.length ? acc.images : [acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
+                    const imgCount = imagesArr.length;
+                    let dateStr = 'اليوم';
+                    if (acc.createdAt) {
+                        const d = new Date(acc.createdAt);
+                        if (!isNaN(d.getTime())) {
+                            dateStr = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                        }
+                    }
+                    const mainImg = imagesArr[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+                    const safeId = String(acc.id || '').replace(/'/g, "\\'");
 
-                return `
-                    <div class="pending-account-card">
-                        <!-- Top Header -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-                            <div style="display: flex; align-items: center; gap: 0.6rem;">
-                                <span style="background: rgba(197, 160, 89, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.85rem; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--gold-primary);">
-                                    #${acc.accountNumber || acc.id}
-                                </span>
-                                <h3 style="color: #fff; margin: 0; font-size: 1.15rem; font-weight: 800;">${acc.title}</h3>
-                            </div>
-                            <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
-                                <i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)
-                            </span>
-                        </div>
-
-                        <!-- Card Body Grid -->
-                        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: start;">
-                            <!-- Thumbnail -->
-                            <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal); cursor: pointer;" onclick="openInspectionModal('${acc.id}')">
-                                <img src="${mainImg}" alt="${acc.title}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
-                                <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">
-                                    <i class="fas fa-camera"></i> ${imgCount} صور
-                                </span>
-                            </div>
-
-                            <!-- Meta & Pricing -->
-                            <div>
-                                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--silver-muted);">
-                                    <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName}</strong></span>
-                                    <span><i class="fas fa-gamepad text-orange"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></span>
-                                    <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${dateStr}</span>
+                    return `
+                        <div class="pending-account-card">
+                            <!-- Top Header -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <span style="background: rgba(197, 160, 89, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.85rem; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--gold-primary);">
+                                        #${acc.accountNumber || String(acc.id || '').slice(0, 6)}
+                                    </span>
+                                    <h3 style="color: #fff; margin: 0; font-size: 1.15rem; font-weight: 800;">${acc.title || 'حساب قيد الفحص'}</h3>
                                 </div>
+                                <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                    <i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)
+                                </span>
+                            </div>
 
-                                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; font-size: 0.85rem;">
-                                    <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong></span>
-                                    <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></span>
-                                    <span style="background: rgba(234, 88, 12, 0.15); border: 1px solid var(--orange-bright); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800;">
-                                        سعر الظهور للمشتري: ${feeCalc.buyerPrice}$
+                            <!-- Card Body Grid -->
+                            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: start;">
+                                <!-- Thumbnail -->
+                                <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal); cursor: pointer;" onclick="openInspectionModal('${safeId}')">
+                                    <img src="${mainImg}" alt="${acc.title || ''}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                                    <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">
+                                        <i class="fas fa-camera"></i> ${imgCount} صور
                                     </span>
                                 </div>
 
-                                <!-- Specs Chips -->
-                                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                                    <span class="evo-chip"><i class="fas fa-shield-alt text-gold"></i> ليفيل ${acc.level || 50}</span>
-                                    <span class="evo-chip"><i class="fas fa-crown text-gold"></i> برايم ${acc.primeLevel || 1}</span>
-                                    ${acc.evoGunsCount ? `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${acc.evoGunsCount} أسلحة إيفو</span>` : ''}
-                                    <span class="evo-chip"><i class="fas fa-link text-silver"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
-                                    <span class="evo-chip"><i class="fas fa-key text-silver"></i> دخول ${acc.loginType || 'Google'}</span>
+                                <!-- Meta & Pricing -->
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--silver-muted);">
+                                        <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName || 'بائع موثق'}</strong></span>
+                                        <span><i class="fas fa-gamepad text-orange"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></span>
+                                        <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${dateStr}</span>
+                                    </div>
+
+                                    <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; font-size: 0.85rem;">
+                                        <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong></span>
+                                        <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></span>
+                                        <span style="background: rgba(234, 88, 12, 0.15); border: 1px solid var(--orange-bright); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800;">
+                                            سعر الظهور للمشتري: ${feeCalc.buyerPrice}$
+                                        </span>
+                                    </div>
+
+                                    <!-- Specs Chips -->
+                                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                        <span class="evo-chip"><i class="fas fa-shield-alt text-gold"></i> ليفيل ${acc.level || 50}</span>
+                                        <span class="evo-chip"><i class="fas fa-crown text-gold"></i> برايم ${acc.primeLevel || 1}</span>
+                                        ${acc.evoGunsCount ? `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${acc.evoGunsCount} أسلحة إيفو</span>` : ''}
+                                        <span class="evo-chip"><i class="fas fa-link text-silver"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
+                                        <span class="evo-chip"><i class="fas fa-key text-silver"></i> دخول ${acc.loginType || 'Google'}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Action Decision Buttons -->
-                        <div style="display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center; margin-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; flex-wrap: wrap;">
-                            <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${acc.id}')" title="رفض الحساب وحذفه">
-                                <i class="fas fa-trash-alt"></i> رفض الحساب (تحايل/خطأ)
-                            </button>
-                            <button type="button" class="btn-inspect-large" onclick="openInspectionModal('${acc.id}')" title="فتح نافذة الفحص الشامل والصور وكلمة المرور">
-                                <i class="fas fa-microscope"></i> فحص الحساب والصور
-                            </button>
+                            <!-- Action Decision Buttons -->
+                            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center; margin-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; flex-wrap: wrap;">
+                                <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${safeId}')" title="رفض الحساب وحذفه">
+                                    <i class="fas fa-trash-alt"></i> رفض الحساب (تحايل/خطأ)
+                                </button>
+                                <button type="button" class="btn-inspect-large" onclick="openInspectionModal('${safeId}')" title="فتح نافذة الفحص الشامل والصور وكلمة المرور">
+                                    <i class="fas fa-microscope"></i> فحص الحساب والصور
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } catch (cardErr) {
+                    console.warn('[Pending Grid] Card render error:', cardErr);
+                    return '';
+                }
             }).join('');
         }
 
@@ -766,11 +820,11 @@
         let currentInspectingAccount = null;
 
         function openInspectionModal(accId) {
-            const acc = allPendingAccounts.find(a => a.id.toString() === accId.toString());
+            const acc = allPendingAccounts.find(a => String(a.id) === String(accId));
             if (!acc) return;
 
             currentInspectingAccount = acc;
-            inspectActiveImages = (acc.images && acc.images.length) ? acc.images : [acc.image];
+            inspectActiveImages = (Array.isArray(acc.images) && acc.images.length) ? acc.images : [acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
             inspectActiveImgIdx = 0;
 
             const modal = document.getElementById('modal-inspect-account-detail');
@@ -783,7 +837,9 @@
             }
 
             const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(acc.sellerPrice) : { sellerPrice: acc.sellerPrice, fee: 0, buyerPrice: acc.sellerPrice };
-            const creds = acc.credentials || {};
+            const creds = safeExtractPendingCreds(acc, acc.details || {});
+            acc.credentials = creds;
+            const safeId = String(acc.id || '').replace(/'/g, "\\'");
 
             body.innerHTML = `
                 <!-- Large Image Slider (عارض الصور بحجم كبير) -->
@@ -859,8 +915,8 @@
                         <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
                             <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">البريد الإلكتروني / رقم الحساب:</span>
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                <code style="color: #fff; font-size: 1rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.email_or_phone || 'غير مدخل'}</code>
-                                <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${creds.email_or_phone || ''}', 'تم نسخ البريد الإلكتروني')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                <code id="inspect-email-display" style="color: #fff; font-size: 1rem; font-weight: 800; font-family: monospace; word-break: break-all;"></code>
+                                <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('email')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -872,10 +928,10 @@
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                                 <span id="inspect-pw-display" style="color: var(--orange-bright); font-size: 1.05rem; font-weight: 800; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
                                 <div style="display: flex; gap: 0.35rem;">
-                                    <button type="button" class="btn-3d btn-outline" id="btn-toggle-pw" onclick="toggleInspectPwVisibility('${creds.password || ''}')" style="padding: 4px 10px; font-size: 0.8rem;" title="إظهار/إخفاء">
+                                    <button type="button" class="btn-3d btn-outline" id="btn-toggle-pw" onclick="toggleInspectPwVisibility()" style="padding: 4px 10px; font-size: 0.8rem;" title="إظهار/إخفاء">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${creds.password || ''}', 'تم نسخ كلمة المرور')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('password')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -890,15 +946,20 @@
                         إغلاق النافذة
                     </button>
                     <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${acc.id}'); closeInspectionModal();" style="padding: 0.7rem 1.4rem; font-size: 0.95rem;">
+                        <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${safeId}'); closeInspectionModal();" style="padding: 0.7rem 1.4rem; font-size: 0.95rem;">
                             <i class="fas fa-times-circle"></i> رفض الحساب وحذفه (تحايل)
                         </button>
-                        <button type="button" class="btn-inspect-large" onclick="approvePendingAccount('${acc.id}'); closeInspectionModal();" style="padding: 0.7rem 1.6rem; font-size: 1rem;">
+                        <button type="button" class="btn-inspect-large" onclick="approvePendingAccount('${safeId}'); closeInspectionModal();" style="padding: 0.7rem 1.6rem; font-size: 1rem;">
                             <i class="fas fa-check-circle"></i> اعتماد ونشر الحساب في السوق
                         </button>
                     </div>
                 </div>
             `;
+
+            const emailEl = document.getElementById('inspect-email-display');
+            if (emailEl) {
+                emailEl.textContent = creds.email_or_phone || 'غير مدخل';
+            }
 
             modal.style.display = 'flex';
         }
@@ -956,19 +1017,31 @@
             }
         }
 
-        function toggleInspectPwVisibility(rawPw) {
+        function toggleInspectPwVisibility(rawPwArg) {
             const displayEl = document.getElementById('inspect-pw-display');
             const btn = document.getElementById('btn-toggle-pw');
             if (!displayEl) return;
 
-            if (displayEl.innerText === '••••••••••') {
-                displayEl.innerText = rawPw || 'غير متوفر';
+            const creds = (currentInspectingAccount && currentInspectingAccount.credentials) || {};
+            const rawPw = rawPwArg !== undefined ? rawPwArg : (creds.password || 'غير متوفر');
+
+            if (displayEl.textContent === '••••••••••') {
+                displayEl.textContent = rawPw || 'غير متوفر';
                 displayEl.style.letterSpacing = 'normal';
                 if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
             } else {
-                displayEl.innerText = '••••••••••';
+                displayEl.textContent = '••••••••••';
                 displayEl.style.letterSpacing = '2px';
                 if (btn) btn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+        function copyInspectCred(type) {
+            const creds = (currentInspectingAccount && currentInspectingAccount.credentials) || {};
+            if (type === 'email') {
+                copyInspectText(creds.email_or_phone || '', 'تم نسخ البريد الإلكتروني');
+            } else {
+                copyInspectText(creds.password || '', 'تم نسخ كلمة المرور');
             }
         }
 
@@ -1150,9 +1223,42 @@
 
         /* ================= Page Initialization ================= */
         async function initPendingAccountsPage() {
-            if (typeof waseetSyncAuthState === 'function') {
+            const deniedBox = document.getElementById('access-denied-box');
+            const mainContent = document.getElementById('pending-main-content');
+
+            // إظهار محتوى الصفحة فوراً لمنع الشاشة البيضاء/الفارغة أثناء انتظار الاستجابة
+            if (deniedBox) deniedBox.style.display = 'none';
+            if (mainContent) mainContent.style.display = 'block';
+
+            renderNavbarUser();
+
+            // تحميل الحسابات المعلقة مباشرة بالتوازي مع فحص الجلسة
+            loadPendingAccounts();
+            setupPendingRealtime();
+
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
+            if (client && client.auth) {
                 try {
-                    await waseetSyncAuthState();
+                    const { data: sessionRes } = await client.auth.getSession();
+                    const sUser = sessionRes?.session?.user;
+                    if (sUser && (!WASEET_STATE.user || !WASEET_STATE.user.email)) {
+                        const emailLower = (sUser.email || '').toLowerCase();
+                        const isKnownAdmin = emailLower === 'fgkano63@gmail.com' || emailLower === 'saadani2009@gmail.com' || emailLower === 'mediator@waseet.com';
+                        WASEET_STATE.user = {
+                            ...(WASEET_STATE.user || {}),
+                            id: sUser.id,
+                            email: sUser.email,
+                            role: isKnownAdmin ? 'admin' : ((WASEET_STATE.user && WASEET_STATE.user.role) || 'admin'),
+                            isAdmin: isKnownAdmin || !!(WASEET_STATE.user && WASEET_STATE.user.isAdmin)
+                        };
+                        renderNavbarUser();
+                    }
+                } catch (e) {}
+            }
+
+            if (typeof window.waseetSyncAuthState === 'function') {
+                try {
+                    await window.waseetSyncAuthState();
                 } catch (e) {}
             }
 
@@ -1160,9 +1266,6 @@
 
             const user = WASEET_STATE.user;
             const isMed = isMediatorUser(user);
-
-            const deniedBox = document.getElementById('access-denied-box');
-            const mainContent = document.getElementById('pending-main-content');
 
             if (!isMed) {
                 if (deniedBox) deniedBox.style.display = 'block';
@@ -1172,9 +1275,7 @@
 
             if (deniedBox) deniedBox.style.display = 'none';
             if (mainContent) mainContent.style.display = 'block';
-
             await loadPendingAccounts();
-            setupPendingRealtime();
         }
 
         window.addEventListener('DOMContentLoaded', () => {

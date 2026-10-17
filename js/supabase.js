@@ -171,8 +171,13 @@ async function waseetSyncAuthState() {
             || authUser.email?.split('@')[0]
             || 'مستخدم';
 
-        const isAdmin = (profile && profile.role === 'admin')
-            || (authUser.email && authUser.email.toLowerCase() === 'fgkano63@gmail.com');
+        const emailLower = (authUser.email || (profile ? profile.email : '') || '').toLowerCase().trim();
+        const isAdmin = !!(
+            (profile && (profile.role === 'admin' || profile.role === 'mediator')) ||
+            emailLower === 'fgkano63@gmail.com' ||
+            emailLower === 'saadani2009@gmail.com' ||
+            emailLower === 'mediator@waseet.com'
+        );
 
         const userRole = isAdmin ? 'admin' : ((profile && profile.role) || 'user');
 
@@ -197,6 +202,12 @@ async function waseetSyncAuthState() {
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
 
+        // تحديث عناصر الشريط العلوي فوراً قبل انتظار الجلب الشبكي المطول
+        if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
+        if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
+        if (typeof renderNavbarUser === 'function') renderNavbarUser();
+        if (typeof renderMyAccountsNavbarUser === 'function') renderMyAccountsNavbarUser();
+
         // جلب ومزامنة جميع الصفقات والحسابات من قاعدة بيانات Supabase
         await waseetFetchAccountsFromSupabase();
         await waseetFetchDealsFromSupabase();
@@ -204,6 +215,8 @@ async function waseetSyncAuthState() {
         // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
         if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
+        if (typeof renderNavbarUser === 'function') renderNavbarUser();
+        if (typeof renderMyAccountsNavbarUser === 'function') renderMyAccountsNavbarUser();
         if (window.waseetApp) {
             if (typeof window.waseetApp.renderUserProfile === 'function') {
                 window.waseetApp.renderUserProfile();
@@ -214,6 +227,11 @@ async function waseetSyncAuthState() {
             if (typeof window.waseetApp.updateWalletDisplay === 'function') {
                 window.waseetApp.updateWalletDisplay();
             }
+        }
+
+        // إذا كان في صفحة حساباتي، تحديث حسابات البائع فوراً
+        if (typeof loadMyAccountsData === 'function') {
+            loadMyAccountsData();
         }
 
         // إذا كان في صفحة الحسابات قيد الفحص، تحديث القائمة فوراً
@@ -234,6 +252,8 @@ async function waseetSyncAuthState() {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);
     }
 }
+
+window.waseetSyncAuthState = waseetSyncAuthState;
 
 /**
  * التحقق مما إذا كان المعرف بصيغة UUID صحيحة
@@ -429,10 +449,80 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
 }
 
 /**
+ * دالة مساعدة لتحليل قيم JSON بأمان تام (سواء كانت Object جاهزاً أو نص JSON أو نصاً عادياً أو null)
+ */
+function waseetSafeParseJson(val, fallback = {}) {
+    if (val === null || val === undefined) return fallback;
+    if (typeof val === 'object') return val;
+    if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (!trimmed) return fallback;
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+            try {
+                return JSON.parse(trimmed);
+            } catch (e) {
+                return fallback;
+            }
+        }
+    }
+    return fallback;
+}
+
+/**
+ * استخراج بيانات الدخول (credentials) بأمان تام دون رمي أي خطأ برمجي
+ * يدعم عمود credentials سواء كان JSONB أو TEXT أو داخل details
+ */
+function waseetSafeParseCredentials(acc, details = {}) {
+    let parsedCreds = null;
+
+    if (acc && acc.credentials) {
+        if (typeof acc.credentials === 'object' && !Array.isArray(acc.credentials)) {
+            parsedCreds = acc.credentials;
+        } else if (typeof acc.credentials === 'string') {
+            const trimmed = acc.credentials.trim();
+            if (trimmed.startsWith('{')) {
+                try {
+                    parsedCreds = JSON.parse(trimmed);
+                } catch (e) {
+                    parsedCreds = { email_or_phone: trimmed, password: details.password || '••••••••' };
+                }
+            } else if (trimmed.length > 0) {
+                parsedCreds = { email_or_phone: trimmed, password: details.password || '••••••••' };
+            }
+        }
+    }
+
+    if ((!parsedCreds || typeof parsedCreds !== 'object' || (!parsedCreds.email_or_phone && !parsedCreds.password)) && details && details.credentials) {
+        const detCreds = waseetSafeParseJson(details.credentials, null);
+        if (detCreds && typeof detCreds === 'object') {
+            parsedCreds = detCreds;
+        }
+    }
+
+    if ((!parsedCreds || typeof parsedCreds !== 'object' || (!parsedCreds.email_or_phone && !parsedCreds.password)) && acc && acc.encrypted_credentials) {
+        const encCreds = waseetSafeParseJson(acc.encrypted_credentials, null);
+        if (encCreds && typeof encCreds === 'object') {
+            parsedCreds = encCreds;
+        }
+    }
+
+    if (!parsedCreds || typeof parsedCreds !== 'object') {
+        parsedCreds = {};
+    }
+
+    return {
+        email_or_phone: String(parsedCreds.email_or_phone || parsedCreds.email || parsedCreds.login || (acc && acc.login_identifier) || details.email_or_phone || 'غير متوفر'),
+        password: String(parsedCreds.password || parsedCreds.pass || (acc && acc.raw_password) || details.password || '••••••••')
+    };
+}
+
+/**
  * تحويل صف قادم من جدول marketplace_accounts إلى كائن حساب متوافق مع واجهة الموقع
  */
 function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
-    const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
+    if (!acc || typeof acc !== 'object') return null;
+
+    const details = waseetSafeParseJson(acc.details, {});
     const profileObj = (acc.profiles && typeof acc.profiles === 'object' && !Array.isArray(acc.profiles))
         ? acc.profiles
         : (Array.isArray(acc.profiles) && acc.profiles[0] ? acc.profiles[0] : (profilesMap[acc.seller_id] || null));
@@ -442,26 +532,21 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         || acc.seller_name
         || (profileObj && profileObj.email ? profileObj.email.split('@')[0] : 'بائع موثق');
 
-    let parsedCreds = (acc.credentials && Object.keys(acc.credentials).length > 0)
-        ? acc.credentials
-        : (details.credentials && Object.keys(details.credentials).length > 0 ? details.credentials : null);
-    if ((!parsedCreds || Object.keys(parsedCreds).length === 0) && acc.encrypted_credentials) {
-        if (typeof acc.encrypted_credentials === 'string' && acc.encrypted_credentials.trim().startsWith('{')) {
-            try { parsedCreds = JSON.parse(acc.encrypted_credentials); } catch (e) {}
-        }
-    }
-    if (!parsedCreds || typeof parsedCreds !== 'object') {
-        parsedCreds = {
-            email_or_phone: acc.login_identifier || details.email_or_phone || 'غير متوفر',
-            password: acc.raw_password || details.password || '••••••••'
-        };
-    }
+    const sellerEmail = (profileObj && profileObj.email) || details.sellerEmail || null;
+    const parsedCreds = waseetSafeParseCredentials(acc, details);
 
-    const imgs = (Array.isArray(acc.images) && acc.images.length > 0)
+    const parsedImagesField = Array.isArray(acc.images)
         ? acc.images
-        : (Array.isArray(acc.gallery_images) && acc.gallery_images.length > 0
-            ? acc.gallery_images
-            : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']));
+        : waseetSafeParseJson(acc.images, []);
+    const parsedGalleryField = Array.isArray(acc.gallery_images)
+        ? acc.gallery_images
+        : waseetSafeParseJson(acc.gallery_images, []);
+
+    const imgs = (Array.isArray(parsedImagesField) && parsedImagesField.length > 0)
+        ? parsedImagesField
+        : (Array.isArray(parsedGalleryField) && parsedGalleryField.length > 0
+            ? parsedGalleryField
+            : (acc.image_url ? [acc.image_url] : (Array.isArray(details.images) && details.images.length > 0 ? details.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'])));
 
     const rareSkinsVal = details.rareSkins || acc.rare_skins || ['سكنات نادرة'];
     const iconicPantsVal = details.iconicPants || acc.iconic_pants || ['بنطلون مميز'];
@@ -478,8 +563,10 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         bindStatus: acc.bind_status || 'single',
         server: acc.server || 'mena',
         sellerName: sellerName,
+        sellerEmail: sellerEmail,
         sellerAvatar: (profileObj && profileObj.avatar_url) || null,
         sellerId: acc.seller_id,
+        seller_id: acc.seller_id,
         sellerRating: 5.0,
         sellerDeals: 1,
         sellerPrice: parseFloat(acc.seller_price) || 0,
@@ -488,7 +575,7 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         rareSkins: Array.isArray(rareSkinsVal) ? rareSkinsVal : String(rareSkinsVal).split('،').map(s => s.trim()),
         iconicPants: Array.isArray(iconicPantsVal) ? iconicPantsVal : String(iconicPantsVal).split('،').map(s => s.trim()),
         accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
-        image: imgs[0],
+        image: imgs[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
         images: imgs,
         badge: details.badge || ((details.originalGame || acc.game) === 'free_fire' ? `برايم ${acc.prime_level || 1}` : 'مميز'),
         featured: false,
@@ -496,23 +583,27 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         credentials: parsedCreds,
         createdAt: acc.created_at,
         submittedAt: acc.created_at,
-        reviewStatus: details.reviewStatus || acc.review_status || (acc.status === 'available' ? 'approved' : 'pending'),
+        reviewStatus: details.reviewStatus || acc.review_status || ((acc.status === 'available' || acc.status === 'approved') ? 'approved' : 'pending'),
         rejectionReason: details.rejectionReason || acc.rejection_reason || '',
         details: details,
         syncedToSupabase: true
     };
 }
+window.waseetMapRemoteAccountRow = waseetMapRemoteAccountRow;
+window.waseetSafeParseCredentials = waseetSafeParseCredentials;
 
 /**
- * جلب كافة الحسابات من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
- * بحيث لا يختفي أي حساب حتى لو كان ملف البائع الشخصي غير مكتمل
+ * جلب الحسابات المعتمدة للمتجر العام من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
+ * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو مرفوض.
  */
-async function waseetFetchAccountsFromSupabase() {
+async function waseetFetchAccountsFromSupabase(options = {}) {
     const client = initWaseetSupabase();
     if (!client || typeof WASEET_STATE === 'undefined') return [];
 
+    const includeAllStatuses = !!(options && options.includeAllStatuses);
+
     try {
-        // أولاً: رفع أي حسابات محلية في WASEET_USER_ACCOUNTS لم يتم رفعها بعد إلى السحابة (مثل حساب 'تجربة')
+        // أولاً: رفع أي حسابات محلية في WASEET_USER_ACCOUNTS لم يتم رفعها بعد إلى السحابة
         try {
             const localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
             for (const localAcc of localSaved) {
@@ -522,20 +613,27 @@ async function waseetFetchAccountsFromSupabase() {
             }
         } catch (e) {}
 
-        // ثانياً: جلب الحسابات من Supabase مع Left Join غير مقيد على profiles، مع fallback فوري إلى select('*')
+        // ثانياً: جلب الحسابات من Supabase:
+        // في المتجر العام (الوضع الافتراضي) نجلب فقط الحسابات المعتمدة ('available' أو 'approved')
         let rows = null;
-        const { data: joinData, error: joinError } = await client
+        let joinQuery = client
             .from('marketplace_accounts')
-            .select('*, profiles(id, name, email, avatar_url)')
-            .order('created_at', { ascending: false });
+            .select('*, profiles(id, name, email, avatar_url)');
+        if (!includeAllStatuses) {
+            joinQuery = joinQuery.in('status', ['available', 'approved']);
+        }
+        const { data: joinData, error: joinError } = await joinQuery.order('created_at', { ascending: false });
 
         if (!joinError && Array.isArray(joinData)) {
             rows = joinData;
         } else {
-            const { data: plainData, error: plainError } = await client
+            let plainQuery = client
                 .from('marketplace_accounts')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('*');
+            if (!includeAllStatuses) {
+                plainQuery = plainQuery.in('status', ['available', 'approved']);
+            }
+            const { data: plainData, error: plainError } = await plainQuery.order('created_at', { ascending: false });
             if (!plainError && Array.isArray(plainData)) {
                 rows = plainData;
             }
@@ -558,9 +656,11 @@ async function waseetFetchAccountsFromSupabase() {
             } catch (e) {}
         }
 
-        const remoteAccounts = rows.map(r => waseetMapRemoteAccountRow(r, profilesMap));
+        const remoteAccounts = rows
+            .map(r => waseetMapRemoteAccountRow(r, profilesMap))
+            .filter(Boolean);
 
-        // دمج الحسابات السحابية مع الحسابات المحلية دون تكرار
+        // دمج الحسابات السحابية مع الحسابات المحلية المعتمدة فقط للمتجر العام
         const existingAccounts = WASEET_STATE.accounts || [];
         const mergedMap = new Map();
 
@@ -570,6 +670,10 @@ async function waseetFetchAccountsFromSupabase() {
 
         existingAccounts.forEach(localAcc => {
             if (!localAcc) return;
+            // في المتجر العام، لا ندمج أي حساب معلق أو مرفوض
+            if (!includeAllStatuses && localAcc.status && localAcc.status !== 'available' && localAcc.status !== 'approved') {
+                return;
+            }
             const alreadyInRemote = remoteAccounts.some(r =>
                 String(r.id) === String(localAcc.id) ||
                 (r.localId && String(r.localId) === String(localAcc.id)) ||
@@ -584,6 +688,9 @@ async function waseetFetchAccountsFromSupabase() {
         if (window.waseetApp) {
             window.waseetApp.updatePendingAccountsCounter();
             window.waseetApp.updateSellerListingsCounter();
+            if (document.getElementById('accounts-grid')) {
+                window.waseetApp.renderMarketplace();
+            }
         }
         return WASEET_STATE.accounts;
     } catch (err) {

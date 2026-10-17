@@ -482,8 +482,35 @@
             const container = document.getElementById('my-accounts-grid-container');
             if (!container) return;
 
-            const user = WASEET_STATE.user;
-            if (!user) {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
+            let currentUser = WASEET_STATE.user || null;
+
+            // التحقق المباشر من جلسة Supabase لضمان توفر معرف البائع (currentUser.id) حتى قبل اكتمال المزامنة الخلفية
+            if (client && client.auth) {
+                try {
+                    const { data: sessionRes } = await client.auth.getSession();
+                    const sessionUser = sessionRes?.session?.user;
+                    if (sessionUser && sessionUser.id) {
+                        if (!currentUser) {
+                            currentUser = {
+                                id: sessionUser.id,
+                                email: sessionUser.email || '',
+                                name: (sessionUser.user_metadata && (sessionUser.user_metadata.full_name || sessionUser.user_metadata.name)) || (sessionUser.email ? sessionUser.email.split('@')[0] : 'بائع موثق'),
+                                avatar: (sessionUser.user_metadata && sessionUser.user_metadata.avatar_url) || null
+                            };
+                            WASEET_STATE.user = currentUser;
+                            renderMyAccountsNavbarUser();
+                        } else if (!currentUser.id || !/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUser.id))) {
+                            currentUser.id = sessionUser.id;
+                            currentUser.email = currentUser.email || sessionUser.email || '';
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[My Accounts] Session check error:', e);
+                }
+            }
+
+            if (!currentUser) {
                 container.innerHTML = `
                     <div class="empty-deals-box" style="margin-top: 1.5rem;">
                         <i class="fas fa-lock" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 1rem; display: block;"></i>
@@ -506,53 +533,82 @@
                 </div>
             `;
 
-            let accounts = [];
-            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            const mergedMap = new Map();
 
-            // 1. استعلام Supabase للحسابات التي قام المستخدم الحالي بنشرها (seller_id = auth.uid())
-            if (client && user.id) {
+            // 1. استعلام Supabase للحسابات التي قام المستخدم الحالي بنشرها (.eq('seller_id', currentUser.id))
+            if (client && currentUser.id && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUser.id))) {
                 try {
                     const { data, error } = await client
                         .from('marketplace_accounts')
                         .select('*')
-                        .eq('seller_id', user.id)
+                        .eq('seller_id', currentUser.id)
                         .order('created_at', { ascending: false });
 
-                    if (!error && Array.isArray(data)) {
-                        accounts = data.map(acc => ({
-                            id: acc.id,
-                            accountNumber: acc.account_number,
-                            game: acc.game,
-                            title: acc.title,
-                            level: acc.level,
-                            bindStatus: acc.bind_status,
-                            server: acc.server,
-                            sellerPrice: Number(acc.seller_price),
-                            images: Array.isArray(acc.images) && acc.images.length ? acc.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'],
-                            image: Array.isArray(acc.images) && acc.images.length ? acc.images[0] : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
-                            status: acc.status,
-                            accountNotes: acc.details?.notes || acc.details?.accountNotes || '',
-                            details: acc.details || {}
-                        }));
+                    if (error) {
+                        console.error('[My Accounts] Supabase fetch error:', error);
+                    } else if (Array.isArray(data)) {
+                        data.forEach(acc => {
+                            let mapped = null;
+                            if (typeof window.waseetMapRemoteAccountRow === 'function') {
+                                mapped = window.waseetMapRemoteAccountRow(acc);
+                            } else {
+                                const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
+                                const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
+                                mapped = {
+                                    id: acc.id,
+                                    accountNumber: acc.account_number,
+                                    game: details.originalGame || acc.game || 'free_fire',
+                                    title: acc.title,
+                                    level: acc.level,
+                                    bindStatus: acc.bind_status,
+                                    server: acc.server,
+                                    sellerId: acc.seller_id,
+                                    seller_id: acc.seller_id,
+                                    sellerPrice: Number(acc.seller_price) || 0,
+                                    images: imgs,
+                                    image: imgs[0],
+                                    status: acc.status || 'pending_verification',
+                                    accountNotes: details.notes || details.accountNotes || '',
+                                    details: details
+                                };
+                            }
+                            if (mapped && mapped.id) {
+                                mergedMap.set(String(mapped.id), mapped);
+                            }
+                        });
                     }
                 } catch (e) {
                     console.warn('[My Accounts] خطأ جلب الحسابات من Supabase:', e);
                 }
             }
 
-            // 2. دمج الحسابات المنشأة محلياً لهذا المستخدم (Local State fallback)
-            const localAccounts = (WASEET_STATE.accounts || []).filter(a => 
-                (a.sellerId && a.sellerId === user.id) ||
-                (a.sellerName && a.sellerName === user.name)
-            );
+            // 2. دمج الحسابات المنشأة محلياً لهذا المستخدم من WASEET_USER_ACCOUNTS و WASEET_STATE.accounts
+            let savedUserAccounts = [];
+            try {
+                savedUserAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+            } catch (e) {}
 
-            // دمج غير المكرر
-            localAccounts.forEach(localAcc => {
-                if (!accounts.some(a => a.id === localAcc.id || a.title === localAcc.title)) {
-                    accounts.push(localAcc);
+            const localCandidates = [...(WASEET_STATE.accounts || []), ...savedUserAccounts];
+            localCandidates.forEach(localAcc => {
+                if (!localAcc) return;
+                const isMine =
+                    (currentUser.id && (String(localAcc.seller_id) === String(currentUser.id) || String(localAcc.sellerId) === String(currentUser.id))) ||
+                    (currentUser.email && localAcc.sellerEmail && String(localAcc.sellerEmail).toLowerCase() === String(currentUser.email).toLowerCase()) ||
+                    (currentUser.name && localAcc.sellerName && localAcc.sellerName === currentUser.name);
+
+                if (isMine) {
+                    const alreadyExists = Array.from(mergedMap.values()).some(a =>
+                        String(a.id) === String(localAcc.id) ||
+                        (a.localId && String(a.localId) === String(localAcc.id)) ||
+                        (a.title === localAcc.title && Number(a.sellerPrice) === Number(localAcc.sellerPrice))
+                    );
+                    if (!alreadyExists && localAcc.id) {
+                        mergedMap.set(String(localAcc.id), localAcc);
+                    }
                 }
             });
 
+            const accounts = Array.from(mergedMap.values());
             myAccountsList = accounts;
             updateMyAccountsStats(accounts);
             renderMyAccountsGrid(accounts);
@@ -565,8 +621,8 @@
             const rejEl = document.getElementById('stat-rejected-accounts');
 
             const total = accounts.length;
-            const avail = accounts.filter(a => a.status === 'available').length;
-            const pend = accounts.filter(a => a.status === 'pending_verification' || a.status === 'pending_review' || !a.status).length;
+            const avail = accounts.filter(a => a.status === 'available' || a.status === 'approved').length;
+            const pend = accounts.filter(a => a.status === 'pending' || a.status === 'pending_verification' || a.status === 'pending_review' || !a.status).length;
             const rej = accounts.filter(a => a.status === 'rejected' || a.status === 'sold' || a.status === 'hidden').length;
 
             if (totalEl) totalEl.innerText = total;
@@ -603,7 +659,7 @@
                             : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
                         
                         let statusTag = '';
-                        if (acc.status === 'available') {
+                        if (acc.status === 'available' || acc.status === 'approved') {
                             statusTag = `<span style="background: rgba(16, 185, 129, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-check-circle"></i> معتمد في المتجر</span>`;
                         } else if (acc.status === 'rejected') {
                             statusTag = `<span style="background: rgba(239, 68, 68, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-times-circle"></i> مرفوض</span>`;

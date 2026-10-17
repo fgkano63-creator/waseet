@@ -326,8 +326,11 @@ const WASEET_STATE = {
 
 function isMediatorUser(user = WASEET_STATE.user) {
     if (!user) return false;
-    if (user.role === 'mediator' || user.role === 'admin') return true;
-    if (user.email && user.email.toLowerCase() === 'fgkano63@gmail.com') return true;
+    if (user.role === 'mediator' || user.role === 'admin' || user.isAdmin === true) return true;
+    if (user.email) {
+        const em = String(user.email).toLowerCase().trim();
+        if (em === 'fgkano63@gmail.com' || em === 'saadani2009@gmail.com' || em === 'mediator@waseet.com') return true;
+    }
     return false;
 }
 

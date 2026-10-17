@@ -138,11 +138,9 @@ class WaseetApp {
         this.updateMobileDrawer();
     }
 
-    updatePendingAccountsCounter() {
+    async updatePendingAccountsCounter() {
         const user = WASEET_STATE.user;
         const isMediator = user && isMediatorUser(user);
-        const pending = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review');
-        const count = pending.length;
 
         const navBtn = document.getElementById('btn-pending-accounts');
         const navBadge = document.getElementById('nav-pending-count');
@@ -152,6 +150,45 @@ class WaseetApp {
         const modalBadge = document.getElementById('pending-modal-badge');
 
         if (navBtn) navBtn.style.display = isMediator ? 'inline-flex' : 'none';
+        if (drawerBtn) drawerBtn.style.display = isMediator ? 'flex' : 'none';
+
+        if (!isMediator) {
+            if (navBadge) navBadge.style.display = 'none';
+            if (adminNavBadge) adminNavBadge.style.display = 'none';
+            if (drawerBadge) drawerBadge.style.display = 'none';
+            return;
+        }
+
+        const isPendingStatus = (st) => st === 'pending' || st === 'pending_verification' || st === 'pending_review';
+        let localSaved = [];
+        try {
+            localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+        } catch (e) {}
+
+        const pendingIds = new Set();
+        [...(WASEET_STATE.accounts || []), ...localSaved].forEach(a => {
+            if (a && a.id && isPendingStatus(a.status)) pendingIds.add(String(a.id));
+        });
+
+        const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
+        if (client) {
+            try {
+                const { data } = await client
+                    .from('marketplace_accounts')
+                    .select('id, status')
+                    .neq('status', 'available')
+                    .neq('status', 'approved')
+                    .neq('status', 'rejected')
+                    .neq('status', 'sold')
+                    .neq('status', 'in_deal');
+                if (Array.isArray(data)) {
+                    data.forEach(r => { if (r && r.id) pendingIds.add(String(r.id)); });
+                }
+            } catch (e) {}
+        }
+
+        const count = pendingIds.size;
+
         if (navBadge) {
             navBadge.innerText = count;
             navBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
@@ -160,13 +197,10 @@ class WaseetApp {
             adminNavBadge.innerText = count;
             adminNavBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
         }
-
-        if (drawerBtn) drawerBtn.style.display = isMediator ? 'flex' : 'none';
         if (drawerBadge) {
             drawerBadge.innerText = count;
             drawerBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
         }
-
         if (modalBadge) {
             modalBadge.innerText = count;
         }
@@ -645,24 +679,16 @@ class WaseetApp {
     }
 
     renderMarketplace(filteredAccounts = null) {
-        const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
-        const currentUser = WASEET_STATE.user;
-
         let baseAccounts = filteredAccounts !== null ? filteredAccounts : [...WASEET_STATE.accounts];
 
-        // Public filter:
-        // Visitors & normal buyers only see approved/available accounts
-        // The mediator sees ALL accounts (including pending_review & rejected)
-        // Sellers can also see their own pending_review accounts in the marketplace or in their dashboard
-        if (!isMediator) {
-            baseAccounts = baseAccounts.filter(a => {
-                if (a.status === 'available' || !a.status) return true;
-                if (currentUser && (a.sellerId === currentUser.id || a.sellerName === currentUser.name)) {
-                    return a.status !== 'rejected';
-                }
-                return false;
-            });
-        }
+        // تصفية السوق العام (Public Marketplace Filter):
+        // يجب أن يعرض المتجر العام فقط الحسابات المعتمدة والمتاحة للشراء ('available' أو 'approved')
+        // ولا يظهر أي حساب معلق ('pending' / 'pending_verification' / 'pending_review') أو مرفوض للمشترين أبداً
+        baseAccounts = baseAccounts.filter(a => {
+            if (!a) return false;
+            const st = a.status;
+            return st === 'available' || st === 'approved' || !st;
+        });
 
         this.currentFilteredAccounts = baseAccounts;
         this.currentPage = (filteredAccounts !== null) ? 1 : (this.currentPage || 1);
@@ -1760,7 +1786,80 @@ class WaseetApp {
        SELLER LISTINGS & MEDIATOR INSPECTION SYSTEM
        ========================================================================== */
 
-    updateSellerListingsCounter() {
+    async getSellerOwnAccounts() {
+        const user = WASEET_STATE.user;
+        const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
+        let currentUserId = user ? user.id : null;
+        let currentUserEmail = user ? user.email : null;
+        let currentUserName = user ? user.name : null;
+
+        if (client && client.auth) {
+            try {
+                const { data: sessionRes } = await client.auth.getSession();
+                const sessionUser = sessionRes?.session?.user;
+                if (sessionUser && sessionUser.id) {
+                    currentUserId = sessionUser.id;
+                    currentUserEmail = currentUserEmail || sessionUser.email;
+                }
+            } catch (e) {}
+        }
+
+        const mergedMap = new Map();
+
+        // 1. جلب حسابات البائع من Supabase باستخدام .eq('seller_id', currentUser.id)
+        if (client && currentUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUserId))) {
+            try {
+                const { data, error } = await client
+                    .from('marketplace_accounts')
+                    .select('*')
+                    .eq('seller_id', currentUserId)
+                    .order('created_at', { ascending: false });
+
+                if (!error && Array.isArray(data)) {
+                    data.forEach(row => {
+                        const mapped = typeof window.waseetMapRemoteAccountRow === 'function'
+                            ? window.waseetMapRemoteAccountRow(row)
+                            : row;
+                        if (mapped && mapped.id) {
+                            mergedMap.set(String(mapped.id), mapped);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('[Seller Accounts] Supabase error:', e);
+            }
+        }
+
+        // 2. دمج الحسابات المحفوظة محلياً لهذا البائع
+        let localSaved = [];
+        try {
+            localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+        } catch (e) {}
+
+        const allLocalCandidates = [...(WASEET_STATE.accounts || []), ...localSaved];
+        allLocalCandidates.forEach(a => {
+            if (!a) return;
+            const matchesSeller =
+                (currentUserId && (String(a.seller_id) === String(currentUserId) || String(a.sellerId) === String(currentUserId))) ||
+                (currentUserEmail && a.sellerEmail && String(a.sellerEmail).toLowerCase() === String(currentUserEmail).toLowerCase()) ||
+                (currentUserName && a.sellerName && a.sellerName === currentUserName);
+
+            if (matchesSeller) {
+                const alreadyInMap = Array.from(mergedMap.values()).some(r =>
+                    String(r.id) === String(a.id) ||
+                    (r.localId && String(r.localId) === String(a.id)) ||
+                    (r.title === a.title && Number(r.sellerPrice) === Number(a.sellerPrice))
+                );
+                if (!alreadyInMap && a.id) {
+                    mergedMap.set(String(a.id), a);
+                }
+            }
+        });
+
+        return Array.from(mergedMap.values());
+    }
+
+    async updateSellerListingsCounter() {
         const badge = document.getElementById('seller-listings-count');
         const user = WASEET_STATE.user;
         if (!badge || !user) {
@@ -1768,7 +1867,7 @@ class WaseetApp {
             return;
         }
 
-        const myAccounts = (WASEET_STATE.accounts || []).filter(a => a.sellerId === user.id || a.sellerName === user.name);
+        const myAccounts = await this.getSellerOwnAccounts();
         if (myAccounts.length > 0) {
             badge.innerText = myAccounts.length;
             badge.style.display = 'inline-flex';
@@ -1777,7 +1876,7 @@ class WaseetApp {
         }
     }
 
-    openSellerListingsModal() {
+    async openSellerListingsModal() {
         const user = WASEET_STATE.user;
         if (!user) {
             this.openLoginModal();
@@ -1788,7 +1887,15 @@ class WaseetApp {
         const body = document.getElementById('seller-listings-modal-body');
         if (!modal || !body) return;
 
-        const myAccounts = (WASEET_STATE.accounts || []).filter(a => a.sellerId === user.id || a.sellerName === user.name);
+        modal.classList.add('active');
+        body.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
+                جاري تحميل حساباتك المعروضة...
+            </div>
+        `;
+
+        const myAccounts = await this.getSellerOwnAccounts();
 
         if (myAccounts.length === 0) {
             body.innerHTML = `
@@ -1817,7 +1924,7 @@ class WaseetApp {
                     ${myAccounts.map(acc => {
                         let statusBadge = '';
                         let statusNote = '';
-                        if (acc.status === 'pending_review' || acc.status === 'pending_verification') {
+                        if (acc.status === 'pending' || acc.status === 'pending_review' || acc.status === 'pending_verification') {
                             statusBadge = '<span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)</span>';
                             statusNote = '<div style="background: rgba(245, 158, 11, 0.08); border-right: 3px solid #f59e0b; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: var(--silver-light); margin-top: 0.6rem;"><i class="fas fa-info-circle text-orange"></i> الحساب قيد المراجعة والتدقيق الأمني من قبل الوسيط المعتمد للتأكد من نظافة الروابط وخلوه من المشاكل قبل عرضه للمشترين.</div>';
                         } else if (acc.status === 'rejected') {
@@ -1851,8 +1958,6 @@ class WaseetApp {
                 </div>
             `;
         }
-
-        modal.classList.add('active');
     }
 
     openPendingAccountsModal() {
