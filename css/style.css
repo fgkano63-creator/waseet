@@ -5343,11 +5343,16 @@ input[type=number] {
 }
 
 /* ===================================================
-   1. إخفاء شعار Netlify العائم إجبارياً
+   1. إخفاء علامة Netlify بقوة
 =================================================== */
 div[id*="netlify"],
+a[href*="netlify.com"] {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 div[class*="netlify"],
-a[href*="netlify.com"],
 [data-netlify-deploy-id],
 #netlify-badge,
 .netlify-badge {
@@ -5358,32 +5363,166 @@ a[href*="netlify.com"],
 }
 
 /* ===================================================
-   2. إصلاح تمرير نموذج بيع الحساب ومنع انقطاعه خلف شريط التنقل السفلي
+   2. إصلاح تمرير نموذج بيع الحساب (Form Internal Scroll & Compact Design)
 =================================================== */
-#modal-sell {
+#sell-account-form {
+    max-height: 65vh;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 1.5rem 0.8rem 4rem !important;
+    overscroll-behavior: contain !important;
+    padding-right: 6px;
+    padding-left: 2px;
 }
 
-#modal-sell .modal-box-3d {
-    max-height: none !important;
-    overflow-y: visible !important;
-    margin: auto !important;
+#sell-account-form::-webkit-scrollbar {
+    width: 6px;
+}
+#sell-account-form::-webkit-scrollbar-track {
+    background: rgba(10, 14, 22, 0.5);
+    border-radius: 999px;
+}
+#sell-account-form::-webkit-scrollbar-thumb {
+    background: rgba(197, 160, 89, 0.4);
+    border-radius: 999px;
 }
 
-#sell-account-form {
-    padding-bottom: 140px !important; /* مساحة كافية تضمن ظهور زر النشر فوق شريط التنقل السفلي */
+#sell-account-form button[type="submit"],
+#btn-submit-sell {
+    margin-bottom: 150px !important;
 }
 
 @media (max-width: 868px) {
     #modal-sell {
-        align-items: flex-start !important;
-        padding-top: 1rem !important;
-        padding-bottom: 3rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
     }
+
+    #modal-sell .modal-box-3d {
+        max-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0.85rem 0.75rem 0.4rem !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+    }
+
+    #modal-sell .modal-header {
+        flex-shrink: 0 !important;
+        margin-bottom: 0.55rem !important;
+        padding-bottom: 0.35rem !important;
+    }
+
+    #modal-sell .modal-title {
+        font-size: 0.98rem !important;
+    }
+
+    /* 2. إصلاح التمرير الداخلي (Scroll Fix) */
     #sell-account-form {
-        padding-bottom: 160px !important;
+        max-height: 65vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding: 0 4px !important;
+    }
+
+    /* 1. تصميم مضغوط (Compact Design) */
+    #sell-account-form .input-group {
+        margin-bottom: 0.5rem !important;
+    }
+
+    #sell-account-form .input-label {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    #sell-account-form .input-3d,
+    #sell-account-form .filter-select {
+        font-size: 0.82rem !important;
+        padding: 0.45rem 0.65rem !important;
+        border-radius: 8px !important;
+        min-height: auto !important;
+    }
+
+    #sell-account-form .form-grid-2 {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.4rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    #sell-account-form .game-select-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.35rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    #sell-account-form .game-tab-btn {
+        padding: 0.4rem 0.5rem !important;
+        font-size: 0.74rem !important;
+        border-radius: 8px !important;
+        gap: 0.3rem !important;
+    }
+
+    #sell-account-form .game-tab-btn i {
+        font-size: 0.85rem !important;
+    }
+
+    #sell-account-form .image-dropzone {
+        padding: 0.6rem 0.5rem !important;
+        min-height: 60px !important;
+        border-radius: 10px !important;
+    }
+
+    #sell-account-form .dropzone-icon {
+        font-size: 1.2rem !important;
+        margin-bottom: 0.15rem !important;
+    }
+
+    #sell-account-form .dropzone-text {
+        font-size: 0.72rem !important;
+    }
+
+    #sell-account-form .dropzone-sub {
+        display: none !important;
+    }
+
+    #sell-account-form #form-account-notes {
+        height: 50px !important;
+        font-size: 0.78rem !important;
+    }
+
+    #sell-account-form .secret-escrow-box {
+        padding: 0.6rem 0.7rem !important;
+        margin-top: 0.45rem !important;
+        margin-bottom: 0.55rem !important;
+        border-radius: 10px !important;
+    }
+
+    #sell-account-form .secret-header {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    #sell-account-form #form-fee-preview {
+        margin-bottom: 0.5rem !important;
+    }
+
+    #sell-account-form #form-fee-preview > div {
+        padding: 0.45rem 0.65rem !important;
+        font-size: 0.76rem !important;
+    }
+
+    /* 3. إبعاد الزر عن القاع */
+    #sell-account-form button[type="submit"],
+    #btn-submit-sell {
+        margin-top: 0.5rem !important;
+        margin-bottom: 150px !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 0.86rem !important;
+        border-radius: 10px !important;
     }
 }
 
