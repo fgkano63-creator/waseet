@@ -1414,9 +1414,9 @@ class WaseetApp {
                                 accountNotes: newAccount.accountNotes,
                                 notes: newAccount.accountNotes,
                                 badge: newAccount.badge,
-                                reviewStatus: 'pending'
+                                reviewStatus: 'pending',
+                                credentials: newAccount.credentials
                             },
-                            credentials: newAccount.credentials,
                             status: 'pending_verification'
                         };
                         const { data: insertedData, error: insertErr } = await client

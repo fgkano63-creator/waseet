@@ -22,7 +22,16 @@ as $$
   or lower(coalesce(auth.jwt() ->> 'email', '')) in ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com');
 $$;
 
--- 2. السماح بكافة حالات الحسابات (بما فيها pending و pending_verification و pending_review)
+-- 2. إضافة عمود credentials (إن لم يكن موجوداً) والسماح بكافة حالات الحسابات وتحديث Schema Cache
+alter table public.marketplace_accounts
+  add column if not exists credentials jsonb default '{}'::jsonb,
+  add column if not exists details jsonb default '{}'::jsonb,
+  add column if not exists images jsonb default '[]'::jsonb,
+  add column if not exists prime_level integer default 1,
+  add column if not exists login_type text default 'google',
+  add column if not exists bind_status text default 'single',
+  add column if not exists server text default 'mena';
+
 do $$
 begin
   alter table public.marketplace_accounts alter column seller_id drop not null;
@@ -33,6 +42,9 @@ begin
 exception
   when others then null;
 end $$;
+
+-- تحديث ذاكرة التخزين المؤقت للمخطط (PostgREST Schema Cache) فوراً
+notify pgrst, 'reload schema';
 
 -- 3. منح الصلاحيات الأساسية وتفعيل RLS على جدول marketplace_accounts
 grant select on table public.marketplace_accounts to anon, authenticated;

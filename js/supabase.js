@@ -306,6 +306,11 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             ? account.images
             : (account.image ? [account.image] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']);
 
+        const credsObj = account.credentials || {
+            email_or_phone: '',
+            password: ''
+        };
+
         const detailsObj = {
             ...(account.details || {}),
             localId: String(account.id || ''),
@@ -320,15 +325,12 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             notes: account.accountNotes || '',
             badge: account.badge || '',
             reviewStatus: account.reviewStatus || (dbStatus === 'available' ? 'approved' : 'pending'),
-            rejectionReason: account.rejectionReason || ''
-        };
-
-        const credsObj = account.credentials || {
-            email_or_phone: '',
-            password: ''
+            rejectionReason: account.rejectionReason || '',
+            credentials: credsObj
         };
 
         // 1. إرفاق معرف البائع إجبارياً في الـ Payload ليطابق سياسة الإدخال (RLS)
+        // وتخزين credentials داخل عمود details المعتمد في الجدول لتفادي خطأ عدم وجود عمود credentials مستقل
         const payload = {
             seller_id: sellerUuid,
             game: dbGame,
@@ -341,20 +343,37 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             seller_price: Math.max(1, parseFloat(account.sellerPrice) || 10),
             images: imagesArr,
             details: detailsObj,
-            credentials: credsObj,
             status: dbStatus
         };
 
         let resultRow = null;
         let finalError = null;
 
+        // دالة مساعدة للإدراج/التحديث مع المعالجة الذكية لأي عمود غير موجود في Schema Cache
+        const executeAccountWrite = async (isUpsert) => {
+            const workingPayload = { ...payload };
+            for (let attempt = 0; attempt < 5; attempt++) {
+                const query = isUpsert
+                    ? client.from('marketplace_accounts').upsert(workingPayload, { onConflict: 'id' }).select('*').maybeSingle()
+                    : client.from('marketplace_accounts').insert(workingPayload).select('*').maybeSingle();
+
+                const { data, error } = await query;
+                if (!error) return { data, error: null };
+
+                // إذا كان الخطأ بسبب عمود غير موجود في schema cache، نقوم بحذفه من workingPayload وإعادة المحاولة تلقائياً
+                const colMatch = error.message && error.message.match(/Could not find the '([^']+)' column/i);
+                if (colMatch && colMatch[1] && colMatch[1] in workingPayload && colMatch[1] !== 'seller_id') {
+                    delete workingPayload[colMatch[1]];
+                    continue;
+                }
+                return { data: null, error };
+            }
+            return { data: null, error: { message: 'تعذر حفظ الحساب بعد عدة محاولات.' } };
+        };
+
         if (waseetIsValidUuid(account.id)) {
             payload.id = account.id;
-            const { data, error } = await client
-                .from('marketplace_accounts')
-                .upsert(payload, { onConflict: 'id' })
-                .select('*')
-                .maybeSingle();
+            const { data, error } = await executeAccountWrite(true);
             if (error) {
                 console.error('Insert Error:', error);
                 if (options.showAlert) {
@@ -364,12 +383,7 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             }
             resultRow = data;
         } else {
-            const { data, error } = await client
-                .from('marketplace_accounts')
-                .insert(payload)
-                .select('*')
-                .maybeSingle();
-
+            const { data, error } = await executeAccountWrite(false);
             if (error) {
                 console.error('Insert Error:', error);
                 finalError = error;
@@ -428,7 +442,9 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         || acc.seller_name
         || (profileObj && profileObj.email ? profileObj.email.split('@')[0] : 'بائع موثق');
 
-    let parsedCreds = acc.credentials;
+    let parsedCreds = (acc.credentials && Object.keys(acc.credentials).length > 0)
+        ? acc.credentials
+        : (details.credentials && Object.keys(details.credentials).length > 0 ? details.credentials : null);
     if ((!parsedCreds || Object.keys(parsedCreds).length === 0) && acc.encrypted_credentials) {
         if (typeof acc.encrypted_credentials === 'string' && acc.encrypted_credentials.trim().startsWith('{')) {
             try { parsedCreds = JSON.parse(acc.encrypted_credentials); } catch (e) {}
@@ -436,8 +452,8 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
     }
     if (!parsedCreds || typeof parsedCreds !== 'object') {
         parsedCreds = {
-            email_or_phone: acc.login_identifier || 'غير متوفر',
-            password: acc.raw_password || '••••••••'
+            email_or_phone: acc.login_identifier || details.email_or_phone || 'غير متوفر',
+            password: acc.raw_password || details.password || '••••••••'
         };
     }
 

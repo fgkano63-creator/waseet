@@ -563,10 +563,12 @@
                                 image: imgs[0],
                                 images: imgs,
                                 details: details,
-                                credentials: (acc.credentials && Object.keys(acc.credentials).length ? acc.credentials : null) || {
-                                    email_or_phone: acc.login_identifier || 'غير متوفر',
-                                    password: acc.raw_password || '••••••••'
-                                }
+                                credentials: (acc.credentials && Object.keys(acc.credentials).length ? acc.credentials : null)
+                                    || (details.credentials && Object.keys(details.credentials).length ? details.credentials : null)
+                                    || {
+                                        email_or_phone: acc.login_identifier || details.email_or_phone || 'غير متوفر',
+                                        password: acc.raw_password || details.password || '••••••••'
+                                    }
                             };
                         });
                     }
