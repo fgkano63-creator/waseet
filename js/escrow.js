@@ -346,11 +346,6 @@ class WaseetEscrowRoom {
 
     async fetchDealParticipantsProfiles() {
         try {
-            // ضمان وجود سجل المستخدم الحالي (أو المدير) في جدول public.profiles لتفادي خطأ deal_messages_sender_id_fkey
-            if (typeof window.waseetEnsureUserProfileInDb === 'function') {
-                await window.waseetEnsureUserProfileInDb((typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null);
-            }
-
             const urlParams = new URLSearchParams(window.location.search);
             const reqDealId = urlParams.get('dealId');
 
@@ -378,6 +373,11 @@ class WaseetEscrowRoom {
                 this.viewerRole = 'buyer';
             }
 
+            // ضمان وجود سجل المستخدم الحالي (أو المدير) في جدول public.profiles لتفادي خطأ deal_messages_sender_id_fkey
+            if (typeof window.waseetEnsureUserProfileInDb === 'function') {
+                await window.waseetEnsureUserProfileInDb(currentUser, this.deal, this.viewerRole);
+            }
+
             if (!this.deal.seller) this.deal.seller = { name: 'البائع' };
             if (!this.deal.buyer) this.deal.buyer = { name: 'المشتري' };
 
@@ -392,12 +392,12 @@ class WaseetEscrowRoom {
                 if (uuidList.length > 0) {
                     const { data: profs, error } = await window.waseetSupabaseClient
                         .from('profiles')
-                        .select('id, name, email, avatar_url')
+                        .select('*')
                         .in('id', uuidList);
 
                     if (!error && Array.isArray(profs)) {
                         profs.forEach(p => {
-                            const realName = p.name || (p.email ? p.email.split('@')[0] : null);
+                            const realName = p.name || p.username || p.full_name || (p.email ? p.email.split('@')[0] : null);
                             if (realName) {
                                 if (String(p.id) === String(sellerId) && this.deal.seller.name !== realName) {
                                     this.deal.seller.name = realName;
@@ -1313,6 +1313,13 @@ class WaseetEscrowRoom {
         const currentUserId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id)
             ? WASEET_STATE.user.id
             : null;
+
+        console.log('[Escrow UI] Sending message with user:', (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null), {
+            sender_id: currentUserId,
+            sender_role: senderRole,
+            channel_type: channelType,
+            message_id: messageUuid
+        });
 
         const msgObj = {
             id: messageUuid,
