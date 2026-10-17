@@ -33,29 +33,48 @@
 
     <div class="app-wrapper">
 
-        <!-- ================= Header / Navbar ================= -->
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
         <header class="header-navbar">
             <div class="container nav-container">
-                <a href="index.html" class="brand-wrap">
-                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
-                    <div class="brand-text-col">
-                        <span class="brand-title">WASEET</span>
-                        <span class="brand-subtitle">وسيط • غرفة الوساطة الآمنة</span>
-                    </div>
-                </a>
-
-                <!-- 2. رصيد المحفظة -->
-                <div class="wallet-pill" id="wallet-pill-btn" onclick="if(typeof waseetAlert==='function') waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك من الصفحة الرئيسية.');" title="رصيد المحفظة">
-                    <i class="fas fa-wallet wallet-icon"></i>
-                    <div class="wallet-details">
-                        <span class="wallet-label">محفظة النقاط</span>
-                        <span class="wallet-amount" id="chat-wallet-pts">0 نقطة (0$)</span>
-                    </div>
+                <!-- المجموعة 1 (أقصى اليمين): الشعار فقط -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • غرفة الوساطة الآمنة</span>
+                        </div>
+                    </a>
                 </div>
 
-                <!-- 3. أدوات أقصى اليسار: زر الحساب الشخصي + أيقونة القائمة (☰) -->
-                <div class="nav-actions">
+                <!-- المجموعة 2 (الوسطى): أهم 3 أزرار للمستخدم -->
+                <nav class="nav-middle-group">
+                    <a href="index.html#marketplace" class="btn-nav-middle">
+                        <i class="fas fa-store"></i> المتجر
+                    </a>
+                    <a href="index.html#open-sell" class="btn-nav-middle btn-nav-middle-sell">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle">
+                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                    </a>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ مع gap: 15px -->
+                <div class="nav-left-group">
+                    <!-- 1. رصيد المحفظة -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="if(typeof waseetAlert==='function') waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك من الصفحة الرئيسية.');" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="chat-wallet-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. زر الحساب الشخصي -->
                     <div id="chat-nav-user-container"></div>
+
+                    <!-- 3. أيقونة القائمة (☰) في أقصى اليسار -->
                     <button class="mobile-hamburger-btn" onclick="toggleChatDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -146,6 +165,10 @@
                 <a href="deals.html" class="drawer-shortcut-card" onclick="closeChatDrawer()">
                     <i class="fas fa-shield-alt text-gold"></i>
                     <span>قائمة الصفقات</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" id="chat-drawer-btn-pending" onclick="closeChatDrawer()">
+                    <i class="fas fa-clipboard-check text-orange"></i>
+                    <span>حسابات قيد الفحص</span>
                 </a>
                 <a href="my-accounts.html" class="drawer-shortcut-card" onclick="closeChatDrawer()">
                     <i class="fas fa-boxes text-gold"></i>

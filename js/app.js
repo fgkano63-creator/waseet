@@ -236,9 +236,9 @@ class WaseetApp {
                             <i class="fas fa-boxes text-gold"></i> حساباتي المعروضة للبيع
                         </button>
                     ` : `
-                        <button class="btn-3d btn-outline" onclick="window.waseetApp.openPendingAccountsModal(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright);">
+                        <a href="pending-accounts.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص والمراجعة
-                        </button>
+                        </a>
                     `}
                     <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetApp.closeMobileDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
@@ -1668,87 +1668,7 @@ class WaseetApp {
     }
 
     openPendingAccountsModal() {
-        if (!isMediatorUser()) {
-            if (typeof waseetAlert === 'function') {
-                waseetAlert('صلاحية مطلوبة', 'قسم الحسابات قيد الفحص مخصص فقط للوسيط المعتمد للمنصة.', 'danger');
-            }
-            return;
-        }
-
-        const modal = document.getElementById('modal-pending-accounts');
-        const body = document.getElementById('pending-accounts-modal-body');
-        if (!modal || !body) return;
-
-        const pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review');
-        this.updatePendingAccountsCounter();
-
-        if (pendingAccounts.length === 0) {
-            body.innerHTML = `
-                <div style="text-align: center; padding: 3rem 1rem; color: var(--silver-muted);">
-                    <i class="fas fa-check-circle" style="font-size: 3.2rem; color: #10b981; margin-bottom: 0.8rem; filter: drop-shadow(0 0 14px rgba(16,185,129,0.4));"></i>
-                    <h4 style="color: #fff; font-size: 1.15rem; margin-bottom: 0.4rem;">لا توجد حسابات قيد الفحص حالياً</h4>
-                    <p style="font-size: 0.9rem; max-width: 440px; margin: 0 auto; color: var(--silver-light);">
-                        تم فحص واعتماد جميع الحسابات المعروضة، أو لم يقم أي بائع بإضافة حساب جديد مؤخراً.
-                    </p>
-                </div>
-            `;
-        } else {
-            body.innerHTML = `
-                <div style="margin-bottom: 1rem; color: var(--silver-light); font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                    <span>يوجد <strong style="color: var(--orange-bright);">${pendingAccounts.length}</strong> حساب بحاجة إلى مراجعة بيانات الدخول واعتماد النشر:</span>
-                    <span style="font-size: 0.78rem; color: var(--silver-muted);"><i class="fas fa-shield-alt text-gold"></i> معايير الفحص: التأكد من الروابط، صحة كلمة المرور، ونظافة الحساب</span>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    ${pendingAccounts.map((acc, idx) => {
-                        const pricing = calculateWaseetFee(acc.sellerPrice);
-                        const img = (acc.images && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400';
-                        const accNum = acc.accountNumber || acc.id;
-                        const creds = acc.credentials || {};
-
-                        return `
-                            <div class="pending-account-item card-3d" style="background: rgba(16, 20, 32, 0.9); border: 1px solid var(--border-metal); border-radius: 12px; padding: 1.1rem; display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: center;">
-                                <img src="${img}" alt="${acc.title}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid var(--gold-primary); cursor: pointer;" onclick="window.waseetApp.inspectAccount('${acc.id}')" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
-                                <div style="flex: 1; min-width: 260px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
-                                        <h4 style="color: #fff; font-size: 1.05rem; margin: 0; cursor: pointer;" onclick="window.waseetApp.inspectAccount('${acc.id}')">
-                                            ${acc.title} <span style="color: var(--gold-primary); font-size: 0.85rem;">#${accNum}</span>
-                                        </h4>
-                                        <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;">
-                                            <i class="fas fa-clock"></i> قيد الفحص
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: var(--silver-muted); margin-bottom: 0.4rem;">
-                                        البائع: <strong style="color: #fff;">${acc.sellerName}</strong> • اللعبة: <strong style="color: var(--orange-bright);">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong> • الرتبة: برايم ${acc.primeLevel || 1} • السيرفر: ${acc.server || 'الشرق الأوسط'}
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: var(--silver-muted); margin-bottom: 0.6rem;">
-                                        السعر المطلوب: <strong style="color: var(--gold-light);">$${acc.sellerPrice}</strong> | سعر البيع في السوق: <strong style="color: var(--orange-bright);">${pricing.buyerPrice} نقطة ($${pricing.buyerPrice})</strong>
-                                    </div>
-                                    <!-- Quick Credentials Hint for Mediator -->
-                                    <div style="background: rgba(249, 115, 22, 0.08); border: 1px dashed rgba(249, 115, 22, 0.4); border-radius: 6px; padding: 0.45rem 0.7rem; font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-                                        <span><i class="fas fa-lock text-orange"></i> بيانات الدخول: <code style="color: #fff; font-family: monospace;">${creds.email_or_phone || 'غير مدخل'}</code></span>
-                                        <span style="color: var(--silver-muted); font-size: 0.75rem;">(مشفرة ومحمية)</span>
-                                    </div>
-                                </div>
-                                <!-- Action Buttons for Mediator -->
-                                <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 170px;">
-                                    <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.55rem 0.9rem; font-size: 0.88rem; width: 100%;">
-                                        <i class="fas fa-search-plus"></i> فحص الحساب والصور
-                                    </button>
-                                    <button class="btn-3d" onclick="window.waseetApp.approveAccount('${acc.id}')" style="background: linear-gradient(135deg, #d97706, #f59e0b); border: 1px solid #f59e0b; color: #fff; padding: 0.55rem 0.9rem; font-size: 0.88rem; width: 100%;">
-                                        <i class="fas fa-check-circle"></i> اعتماد ونشر بالسوق
-                                    </button>
-                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.45rem 0.9rem; font-size: 0.82rem; width: 100%;">
-                                        <i class="fas fa-trash-alt"></i> حذف الحساب (تحايل)
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        modal.classList.add('active');
+        window.location.href = 'pending-accounts.html';
     }
 
     inspectAccount(accId) {

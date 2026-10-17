@@ -31,35 +31,51 @@
 
     <div class="app-wrapper">
 
-        <!-- ================= Header / Navbar ================= -->
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
         <header class="header-navbar">
             <div class="container nav-container">
-                <a href="#" class="brand-wrap">
-                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
-                    <div class="brand-text-col">
-                        <span class="brand-title">WASEET</span>
-                        <span class="brand-subtitle">وسيط • حماية وضمان الألعاب</span>
-                    </div>
-                </a>
-
-                <!-- 2. رصيد المحفظة (في المنتصف بتناسق) -->
-                <div class="wallet-pill" id="wallet-pill-btn" title="انقر لإدارة وشحن المحفظة">
-                    <i class="fas fa-wallet wallet-icon"></i>
-                    <div class="wallet-details">
-                        <span class="wallet-label">محفظة النقاط</span>
-                        <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
-                    </div>
-                    <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 محجوز</span>
+                <!-- المجموعة 1 (أقصى اليمين): شعار الموقع فقط -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • حماية وضمان الألعاب</span>
+                        </div>
+                    </a>
                 </div>
 
-                <!-- 3. أدوات أقصى اليسار: زر الحساب الشخصي + أيقونة القائمة (☰) -->
-                <div class="nav-actions">
-                    <!-- User Profile / Login Button Container -->
+                <!-- المجموعة 2 (الوسطى): أهم 3 أزرار للمستخدم -->
+                <nav class="nav-middle-group">
+                    <a href="#marketplace" class="btn-nav-middle">
+                        <i class="fas fa-store"></i> المتجر
+                    </a>
+                    <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.waseetApp && window.waseetApp.openSellModal()">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </button>
+                    <a href="deals.html" class="btn-nav-middle">
+                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                    </a>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ مع gap: 15px -->
+                <div class="nav-left-group">
+                    <!-- 1. رصيد المحفظة -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.waseetApp && window.waseetApp.openWalletModal && window.waseetApp.openWalletModal()" title="انقر لإدارة وشحن المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 محجوز</span>
+                    </div>
+
+                    <!-- 2. زر الحساب الشخصي -->
                     <div id="nav-user-container">
                         <!-- Populated by JS based on user role -->
                     </div>
 
-                    <!-- أيقونة القائمة الجانبية (☰) تعمل على الكمبيوتر والهاتف -->
+                    <!-- 3. أيقونة القائمة (☰) في أقصى اليسار -->
                     <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="window.waseetApp && window.waseetApp.toggleMobileDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -69,7 +85,7 @@
                 <div style="display: none !important;" id="navbar-compat-hidden" aria-hidden="true">
                     <a href="chat.html" id="btn-goto-chats"></a>
                     <a href="deals.html" id="btn-mediator-deals"><span id="nav-deals-count">0</span></a>
-                    <button id="btn-pending-accounts"><span id="nav-pending-count">0</span></button>
+                    <a href="pending-accounts.html" id="btn-pending-accounts"><span id="nav-pending-count">0</span></a>
                     <button id="btn-open-sell"></button>
                     <a href="my-accounts.html" id="btn-seller-listings"><span id="seller-listings-count">0</span></a>
                     <a href="admin-chats.html" id="btn-admin-chats"></a>
@@ -939,11 +955,11 @@
                     <i class="fas fa-shield-alt text-gold"></i>
                     <span>قائمة الصفقات</span>
                 </a>
-                <button class="drawer-shortcut-card" id="drawer-btn-pending-verification" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetApp && window.waseetApp.openPendingAccountsModal();" style="display: none;">
+                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-btn-pending-verification" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer();" style="display: none;">
                     <i class="fas fa-clipboard-check text-orange"></i>
                     <span>حسابات قيد الفحص</span>
                     <span class="deals-badge-count" id="drawer-pending-count" style="display: none;">0</span>
-                </button>
+                </a>
                 <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetApp && window.waseetApp.openSellModal()">
                     <i class="fas fa-plus-circle text-orange"></i>
                     <span>بيع حساب</span>

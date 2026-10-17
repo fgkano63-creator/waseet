@@ -2620,9 +2620,9 @@ html, body {
 }
 
 /* ==========================================================================
-   UNIFIED CLEAN NAVBAR (4 Elements Only on ALL screens: Logo, Wallet, User Profile, ☰)
+   DESKTOP NAVBAR: 3 GROUPS (Right: Logo, Middle: 3 Quick Links, Left: Wallet + User + ☰)
    ========================================================================== */
-/* إخفاء كافة العناصر المسببة للازدحام من الشريط العلوي على جميع الشاشات */
+/* إخفاء كافة العناصر المزدحمة من الشريط العلوي الأساسي */
 .nav-menu,
 .header-navbar .nav-menu,
 .btn-nav-chats,
@@ -2631,37 +2631,93 @@ html, body {
 #btn-mediator-deals,
 .btn-pending-accounts,
 #btn-pending-accounts,
-#btn-open-sell,
-#btn-seller-listings,
 #btn-admin-chats,
 .header-navbar .nav-actions > a.btn-3d:not(.btn-nav-login),
 .header-navbar .nav-actions > button.btn-3d:not(.btn-nav-login) {
     display: none !important;
 }
 
-/* توزيع عناصر الشريط العلوي بتناسق تام (الشعار، المحفظة، زر الحساب، أيقونة ☰) */
+/* الحاوية الرئيسية للشريط */
 .header-navbar .nav-container {
     max-width: 1440px;
     margin: 0 auto;
     padding: 0 1.25rem;
     width: 100%;
     box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     gap: 1rem;
 }
 
-/* 1. أقصى اليمين: الشعار */
+/* 1. المجموعة اليمنى (أقصى اليمين): شعار الموقع فقط */
+.nav-brand-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .brand-wrap {
     display: flex;
     align-items: center;
     gap: 0.65rem;
     flex-shrink: 0;
-    order: 1;
+    text-decoration: none;
 }
 
-/* 2. المنتصف: رصيد المحفظة */
+/* 2. المجموعة الوسطى: أهم 2-3 أزرار للمستخدم (المتجر، بيع حساب، قائمة الصفقات) */
+.nav-middle-group {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0 auto;
+}
+
+.btn-nav-middle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    background: rgba(18, 24, 38, 0.7);
+    border: 1px solid var(--border-metal);
+    border-radius: 12px;
+    color: var(--silver-light);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    font-family: var(--font-ar);
+}
+.btn-nav-middle:hover, .btn-nav-middle.active {
+    background: rgba(197, 160, 89, 0.15);
+    border-color: var(--gold-primary);
+    color: var(--gold-light);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.2);
+    transform: translateY(-1px);
+}
+.btn-nav-middle-sell {
+    background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(197, 160, 89, 0.15));
+    border-color: var(--orange-bright);
+    color: #fff;
+}
+.btn-nav-middle-sell:hover {
+    background: linear-gradient(135deg, var(--orange-bright), #c2410c);
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(234, 88, 12, 0.4);
+}
+
+/* 3. المجموعة اليسرى (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ مع gap: 15px */
+.nav-left-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* رصيد المحفظة */
 .wallet-pill {
     display: inline-flex;
     align-items: center;
@@ -2674,23 +2730,11 @@ html, body {
     box-shadow: 0 0 15px rgba(197, 160, 89, 0.15);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
-    order: 2;
-    margin: 0 auto;
 }
 .wallet-pill:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 22px rgba(197, 160, 89, 0.35);
     border-color: #fff;
-}
-
-/* 3. أقصى اليسار: زر الحساب الشخصي وأيقونة القائمة ☰ */
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    flex-shrink: 0;
-    order: 3;
-    margin: 0;
 }
 
 #nav-user-container,
@@ -2700,7 +2744,31 @@ html, body {
     align-items: center;
 }
 
-/* التجاوب مع شاشات الهواتف والأجهزة اللوحية */
+/* أيقونة القائمة (☰) في أقصى اليسار تماماً */
+.mobile-hamburger-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(197, 160, 89, 0.12);
+    border: 1px solid var(--border-metal);
+    color: var(--gold-light);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+.mobile-hamburger-btn:hover, .mobile-hamburger-btn:active {
+    background: rgba(197, 160, 89, 0.25);
+    border-color: var(--gold-primary);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+    transform: translateY(-1px);
+}
+
+/* التجاوب مع شاشات الهواتف والأجهزة اللوحية (Mobile View) */
 @media (max-width: 900px) {
     .header-navbar {
         padding-top: max(0.45rem, env(safe-area-inset-top, 8px)) !important;
@@ -2708,7 +2776,13 @@ html, body {
     }
     .header-navbar .nav-container {
         padding: 0 0.75rem !important;
-        gap: 0.4rem !important;
+        gap: 0.5rem !important;
+    }
+    .nav-middle-group {
+        display: none !important; /* إخفاء المجموعة الوسطى في الهاتف لأنها متاحة بالقائمة الجانبية والشريط السفلي */
+    }
+    .nav-left-group {
+        gap: 8px !important;
     }
     .brand-logo-img {
         width: 38px !important;
@@ -2722,7 +2796,7 @@ html, body {
         display: none !important;
     }
     .wallet-pill {
-        padding: 0.3rem 0.6rem !important;
+        padding: 0.3rem 0.55rem !important;
         gap: 0.35rem !important;
         max-width: 175px !important;
     }
@@ -2731,9 +2805,6 @@ html, body {
     }
     .wallet-pill .wallet-amount {
         font-size: 0.78rem !important;
-    }
-    .nav-actions {
-        gap: 0.4rem !important;
     }
     .mobile-hamburger-btn {
         width: 38px !important;
@@ -5094,4 +5165,179 @@ input[type=number] {
     .whatsapp-chat-main.mobile-hidden {
         display: none !important;
     }
+}
+
+/* ==========================================================================
+   PENDING ACCOUNTS PAGE & INSPECTION MODAL (صفحة الحسابات قيد الفحص والتفاصيل)
+   ========================================================================== */
+.pending-page-container {
+    max-width: 1200px;
+    margin: 2rem auto 5rem;
+    padding: 0 1rem;
+}
+
+.pending-hero-card {
+    background: linear-gradient(135deg, rgba(20, 26, 40, 0.95), rgba(12, 16, 26, 0.98));
+    border: 1px solid var(--border-metal);
+    border-radius: 20px;
+    padding: 1.8rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.pending-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.pending-stat-card {
+    background: rgba(14, 18, 28, 0.85);
+    border: 1px solid var(--border-metal);
+    border-radius: 14px;
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.pending-stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.pending-controls-bar {
+    background: rgba(14, 18, 28, 0.7);
+    border: 1px solid var(--border-metal);
+    border-radius: 16px;
+    padding: 1rem 1.4rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pending-search-input {
+    background: rgba(22, 28, 44, 0.85);
+    border: 1px solid var(--border-metal);
+    border-radius: 10px;
+    padding: 0.55rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: var(--font-ar);
+    width: 280px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+.pending-search-input:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 12px rgba(197, 160, 89, 0.25);
+}
+
+.pending-account-card {
+    background: linear-gradient(145deg, #131724, #0b0e17);
+    border: 1px solid var(--border-metal);
+    border-radius: 20px;
+    padding: 1.6rem 1.8rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+.pending-account-card:hover {
+    border-color: var(--gold-primary);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(197, 160, 89, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-inspect-large {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+    border: 1px solid #34d399 !important;
+    color: #fff !important;
+    padding: 0.6rem 1.4rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
+    transition: all 0.2s ease !important;
+}
+.btn-inspect-large:hover {
+    transform: scale(1.03) !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+}
+
+.btn-reject-quick {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid #ef4444 !important;
+    color: #f87171 !important;
+    padding: 0.6rem 1.2rem !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    transition: all 0.2s ease !important;
+}
+.btn-reject-quick:hover {
+    background: #ef4444 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Inspection Modal Specifics */
+.modal-inspect-box {
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #0d111a;
+    border: 1px solid var(--gold-primary);
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(197, 160, 89, 0.2);
+    padding: 1.8rem;
+}
+
+.inspect-gallery-large {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+    border: 1px solid var(--border-metal);
+}
+.inspect-gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: zoom-in;
+}
+
+.inspect-creds-container {
+    background: rgba(249, 115, 22, 0.08);
+    border: 1.5px dashed var(--orange-bright);
+    border-radius: 16px;
+    padding: 1.3rem;
+    margin-top: 1.4rem;
 }

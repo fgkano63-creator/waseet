@@ -33,34 +33,50 @@
 
     <div class="app-wrapper">
 
-        <!-- ================= Header / Navbar ================= -->
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
         <header class="header-navbar">
             <div class="container nav-container">
-                <a href="index.html" class="brand-wrap">
-                    <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
-                    <div class="brand-text-col">
-                        <span class="brand-title">WASEET</span>
-                        <span class="brand-subtitle">وسيط • حساباتي المعروضة للبيع</span>
-                    </div>
-                </a>
-
-                <!-- 2. رصيد المحفظة -->
-                <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
-                    <i class="fas fa-wallet wallet-icon"></i>
-                    <div class="wallet-details">
-                        <span class="wallet-label">محفظة النقاط</span>
-                        <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
-                    </div>
+                <!-- المجموعة 1 (أقصى اليمين): الشعار فقط -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • حساباتي المعروضة للبيع</span>
+                        </div>
+                    </a>
                 </div>
 
-                <!-- 3. أدوات أقصى اليسار: زر الحساب الشخصي + أيقونة القائمة (☰) -->
-                <div class="nav-actions">
-                    <!-- User Profile / Login Button Container -->
+                <!-- المجموعة 2 (الوسطى): أهم 3 أزرار للمستخدم -->
+                <nav class="nav-middle-group">
+                    <a href="index.html#marketplace" class="btn-nav-middle">
+                        <i class="fas fa-store"></i> المتجر
+                    </a>
+                    <a href="index.html#open-sell" class="btn-nav-middle btn-nav-middle-sell">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle">
+                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                    </a>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ مع gap: 15px -->
+                <div class="nav-left-group">
+                    <!-- 1. رصيد المحفظة -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. زر الحساب الشخصي -->
                     <div id="nav-user-container">
                         <!-- Populated by JS -->
                     </div>
 
-                    <!-- أيقونة القائمة الجانبية (☰) -->
+                    <!-- 3. أيقونة القائمة الجانبية (☰) في أقصى اليسار -->
                     <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -69,6 +85,7 @@
                 <!-- عناصر توافق مخفية -->
                 <div style="display: none !important;" aria-hidden="true">
                     <a href="deals.html" id="btn-mediator-deals"></a>
+                    <a href="pending-accounts.html" id="btn-pending-accounts"></a>
                     <a href="admin-chats.html" id="btn-admin-chats"></a>
                 </div>
             </div>
@@ -228,6 +245,7 @@
                 <li><a href="deals.html"><i class="fas fa-handshake text-gold"></i> صفقات الوساطة</a></li>
                 <li><a href="chat.html"><i class="fas fa-comments text-orange"></i> غرفة الوساطة المباشرة</a></li>
                 <li><a href="#" onclick="window.waseetOpenSupportChat(); toggleMyAccountsDrawer(); return false;"><i class="fas fa-headset text-gold"></i> تواصل مع الوسيط المعتمد</a></li>
+                <li id="drawer-pending-accounts-link" style="display: none;"><a href="pending-accounts.html"><i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص</a></li>
                 <li id="drawer-admin-chats-link" style="display: none;"><a href="admin-chats.html"><i class="fas fa-crown text-gold"></i> محادثات الإدارة والوساطة</a></li>
             </ul>
         </div>
@@ -334,6 +352,7 @@
             const adminChatsBtn = document.getElementById('btn-admin-chats');
             const mediatorDealsBtn = document.getElementById('btn-mediator-deals');
             const drawerAdminLink = document.getElementById('drawer-admin-chats-link');
+            const drawerPendingLink = document.getElementById('drawer-pending-accounts-link');
             const walletPtsEl = document.getElementById('wallet-total-pts');
 
             const pts = user && user.wallet ? user.wallet.available : 0;
@@ -341,10 +360,11 @@
                 walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
             }
 
-            const isAdmin = user && (user.role === 'admin' || user.isAdmin);
+            const isAdmin = user && (user.role === 'admin' || user.isAdmin || (user.email === 'fgkano63@gmail.com'));
             if (adminChatsBtn) adminChatsBtn.style.display = isAdmin ? 'inline-flex' : 'none';
             if (mediatorDealsBtn) mediatorDealsBtn.style.display = isAdmin ? 'inline-flex' : 'none';
             if (drawerAdminLink) drawerAdminLink.style.display = isAdmin ? 'block' : 'none';
+            if (drawerPendingLink) drawerPendingLink.style.display = isAdmin ? 'block' : 'none';
 
             if (container) {
                 if (user) {

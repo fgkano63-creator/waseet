@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | الحسابات قيد الفحص والمراجعة (Verification Desk)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261017_pending">
+</head>
+<body>
+
+    <!-- Ambient Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <!-- المجموعة اليمنى: الشعار فقط -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • لوحة فحص الحسابات</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- المجموعة الوسطى: أهم 3 أزرار للمستخدم -->
+                <nav class="nav-middle-group">
+                    <a href="index.html#marketplace" class="btn-nav-middle">
+                        <i class="fas fa-store"></i> المتجر
+                    </a>
+                    <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.location.href='index.html#open-sell'">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </button>
+                    <a href="deals.html" class="btn-nav-middle">
+                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                    </a>
+                </nav>
+
+                <!-- المجموعة اليسرى: رصيد المحفظة + زر الحساب + القائمة ☰ -->
+                <div class="nav-left-group">
+                    <!-- رصيد المحفظة -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
+
+                    <!-- زر الحساب الشخصي -->
+                    <div id="nav-user-container"></div>
+
+                    <!-- أيقونة القائمة (☰) -->
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="togglePendingDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Access Denied Guard (For non-admin users) -->
+        <div id="access-denied-box" style="display: none; max-width: 600px; margin: 5rem auto; text-align: center; padding: 2.5rem 1.5rem; background: rgba(14, 18, 28, 0.9); border: 2px dashed rgba(239, 68, 68, 0.5); border-radius: 20px;">
+            <i class="fas fa-lock" style="font-size: 3.5rem; color: #ef4444; margin-bottom: 1.2rem; display: block;"></i>
+            <h2 style="color: #fff; margin-bottom: 0.6rem;">صلاحية الوسيط المعتمد مطلوبة</h2>
+            <p style="color: var(--silver-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                هذه الصفحة مخصصة فقط لإدارة المنصة والوسيط المعتمد لفحص بيانات الحسابات وكلمات المرور قبل النشر في المتجر.
+            </p>
+            <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+                <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> العودة للمتجر</a>
+                <button class="btn-3d btn-outline" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();"><i class="fab fa-google"></i> تسجيل دخول المدير</button>
+            </div>
+        </div>
+
+        <!-- ================= Main Content Container ================= -->
+        <main class="pending-page-container" id="pending-main-content" style="display: none;">
+
+            <!-- Hero Section Header -->
+            <div class="pending-hero-card">
+                <div>
+                    <div class="hero-badge" style="display: inline-flex; margin-bottom: 0.6rem;">
+                        <i class="fas fa-clipboard-check text-orange"></i>
+                        <span>صلاحية الوسيط المعتمد • الفحص والتدقيق الفوري</span>
+                    </div>
+                    <h1 style="color: #fff; font-size: 1.85rem; font-weight: 900; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.65rem;">
+                        <i class="fas fa-microscope text-gold"></i>
+                        الحسابات قيد الفحص والمراجعة
+                    </h1>
+                    <p style="color: var(--silver-muted); font-size: 0.92rem; margin: 0; max-width: 680px; line-height: 1.6;">
+                        هنا تظهر كافة الحسابات المعلقة التي نشرها البائعون بانتظار تدقيقك في أقل من 24 ساعة. يمكنك فحص بيانات الدخول وكلمات المرور السرية والتأكد من الصور قبل اعتماد الحساب ونشره في المتجر.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                    <a href="deals.html" class="btn-3d btn-outline" style="text-decoration: none;">
+                        <i class="fas fa-shield-alt text-gold"></i> صفقات الوساطة
+                    </a>
+                    <a href="admin-chats.html" class="btn-3d btn-gold" style="text-decoration: none;">
+                        <i class="fas fa-headset"></i> محادثات الدعم
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="pending-stats-grid">
+                <div class="pending-stat-card">
+                    <div class="pending-stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #f59e0b;" id="stat-pending-total">0</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted);">قيد الفحص والمراجعة</div>
+                    </div>
+                </div>
+                <div class="pending-stat-card">
+                    <div class="pending-stat-icon" style="background: rgba(234, 88, 12, 0.15); color: var(--orange-bright);">
+                        <i class="fas fa-fire-alt"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="stat-pending-ff">0</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted);">حسابات فري فاير</div>
+                    </div>
+                </div>
+                <div class="pending-stat-card">
+                    <div class="pending-stat-icon" style="background: rgba(197, 160, 89, 0.15); color: var(--gold-light);">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="stat-pending-pubg">0</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted);">حسابات ببجي موبايل</div>
+                    </div>
+                </div>
+                <div class="pending-stat-card">
+                    <div class="pending-stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #10b981;" id="stat-approved-total">0</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted);">معتمدة في المتجر</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls & Filter Toolbar -->
+            <div class="pending-controls-bar">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="support-chip active" data-game="all" onclick="filterPendingGame('all', this)">
+                        <i class="fas fa-th-large"></i> الكل (<span id="count-chip-all">0</span>)
+                    </button>
+                    <button type="button" class="support-chip" data-game="free_fire" onclick="filterPendingGame('free_fire', this)">
+                        <i class="fas fa-fire-alt text-orange"></i> فري فاير (<span id="count-chip-ff">0</span>)
+                    </button>
+                    <button type="button" class="support-chip" data-game="pubg" onclick="filterPendingGame('pubg', this)">
+                        <i class="fas fa-crosshairs text-gold"></i> ببجي (<span id="count-chip-pubg">0</span>)
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                    <input type="text" id="pending-search-input" class="pending-search-input" placeholder="ابحث برقم الحساب أو اسم البائع..." oninput="handlePendingSearch(this.value)">
+                    <button class="btn-3d btn-outline" style="padding: 0.55rem 0.9rem;" onclick="loadPendingAccounts()" title="تحديث القائمة">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pending Accounts List Container -->
+            <div id="pending-accounts-list-container">
+                <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
+                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
+                    جاري تحميل الحسابات المعلقة وقيد الفحص...
+                </div>
+            </div>
+        </main>
+
+        <!-- ================= Modal: Detailed Account Inspection (Large Slider & Plain Credentials) ================= -->
+        <div class="modal-overlay" id="modal-inspect-account-detail" style="display: none; z-index: 9999;">
+            <div class="modal-inspect-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-metal); padding-bottom: 0.8rem;">
+                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                        <i class="fas fa-microscope text-gold" style="font-size: 1.4rem;"></i>
+                        <div>
+                            <h3 style="color: #fff; margin: 0; font-size: 1.15rem;" id="inspect-modal-title">فحص وتدقيق الحساب</h3>
+                            <span style="color: var(--silver-muted); font-size: 0.78rem;">مراجعة معرض الصور بحجم كبير والتحقق من بيانات الدخول السرية</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-modal" onclick="closeInspectionModal()">&times;</button>
+                </div>
+
+                <!-- Modal Body Content -->
+                <div id="inspect-modal-body-content">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= Modal: Image Fullscreen Zoom Lightbox ================= -->
+        <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 10005;" onclick="this.classList.remove('active')">
+            <div class="lightbox-box" onclick="event.stopPropagation()">
+                <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
+                <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                <div class="lightbox-caption" id="lightbox-caption"></div>
+            </div>
+        </div>
+
+        <!-- ================= Sliding Drawer ================= -->
+        <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="togglePendingDrawer()"></div>
+        <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <img src="assets/logo.png" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                    <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+                </div>
+                <button class="drawer-close-btn" onclick="togglePendingDrawer()">&times;</button>
+            </div>
+
+            <div class="drawer-user-card" id="drawer-user-card"></div>
+
+            <div class="drawer-section">
+                <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+                <div class="drawer-shortcuts-grid">
+                    <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-store text-gold"></i>
+                        <span>سوق الحسابات</span>
+                    </a>
+                    <a href="deals.html" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-shield-alt text-gold"></i>
+                        <span>قائمة الصفقات</span>
+                    </a>
+                    <a href="pending-accounts.html" class="drawer-shortcut-card active" onclick="togglePendingDrawer()">
+                        <i class="fas fa-clipboard-check text-orange"></i>
+                        <span>حسابات قيد الفحص</span>
+                    </a>
+                    <a href="admin-chats.html" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-inbox text-gold"></i>
+                        <span>محادثات الإدارة</span>
+                    </a>
+                    <a href="my-accounts.html" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-boxes text-gold"></i>
+                        <span>حساباتي</span>
+                    </a>
+                    <a href="chat.html" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-comments text-orange"></i>
+                        <span>غرفة الوساطة</span>
+                    </a>
+                    <button class="drawer-shortcut-card" onclick="togglePendingDrawer(); if(window.waseetOpenSupportChat) window.waseetOpenSupportChat();">
+                        <i class="fas fa-headset text-orange"></i>
+                        <span>تواصل مع الوسيط</span>
+                    </button>
+                    <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="togglePendingDrawer()">
+                        <i class="fas fa-calculator text-silver"></i>
+                        <span>حاسبة العمولات</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile App Bottom Navigation Bar -->
+        <nav class="mobile-bottom-nav">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="index.html#marketplace" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>المتجر</span>
+            </a>
+            <a href="pending-accounts.html" class="mobile-nav-item active">
+                <i class="fas fa-clipboard-check"></i>
+                <span>قيد الفحص</span>
+            </a>
+            <a href="deals.html" class="mobile-nav-item">
+                <i class="fas fa-handshake"></i>
+                <span>الصفقات</span>
+            </a>
+            <a href="chat.html" class="mobile-nav-item">
+                <i class="fas fa-comments"></i>
+                <span>المحادثات</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/support.js"></script>
+
+    <!-- Pending Accounts Page Logic -->
+    <script>
+        let allPendingAccounts = [];
+        let currentFilteredAccounts = [];
+        let currentGameFilter = 'all';
+        let currentSearchQuery = '';
+        let inspectActiveImages = [];
+        let inspectActiveImgIdx = 0;
+
+        function togglePendingDrawer() {
+            const drawer = document.getElementById('mobile-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer) drawer.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
+        function openWalletQuickAlert() {
+            const user = WASEET_STATE.user;
+            const pts = user && user.wallet ? user.wallet.available : 0;
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts} نقطة (${pts}$). يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
+            }
+        }
+
+        function renderNavbarUser() {
+            const user = WASEET_STATE.user;
+            const container = document.getElementById('nav-user-container');
+            const drawerUser = document.getElementById('drawer-user-card');
+            const walletPtsEl = document.getElementById('wallet-total-pts');
+
+            const pts = user && user.wallet ? user.wallet.available : 0;
+            if (walletPtsEl) walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+
+            if (container) {
+                if (user) {
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                        || user.avatar
+                        || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                    const isMed = isMediatorUser(user);
+                    const roleBadge = isMed ? '<i class="fas fa-crown text-gold" style="font-size: 0.8rem; margin-right: 0.25rem;"></i>' : '';
+                    container.innerHTML = `
+                        <div class="user-profile-pill" onclick="togglePendingDrawer()" title="${user.name} (الوسيط المعتمد)">
+                            <img src="${avatar}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                            <span class="user-name-label">${user.name}</span>
+                            ${roleBadge}
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <button class="btn-3d btn-outline btn-nav-login" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();">
+                            <i class="fas fa-user-circle text-gold"></i>
+                            <span>تسجيل الدخول</span>
+                        </button>
+                    `;
+                }
+            }
+
+            if (drawerUser) {
+                if (user) {
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url)
+                        || user.avatar
+                        || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                    drawerUser.innerHTML = `
+                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-role"><i class="fas fa-crown text-gold"></i> الوسيط المعتمد (إدارة)</span>
+                        </div>
+                    `;
+                } else {
+                    drawerUser.innerHTML = `
+                        <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
+                            <i class="fas fa-user-circle text-gold"></i>
+                        </div>
+                        <div class="drawer-user-meta" style="flex: 1;">
+                            <span class="drawer-user-name">زائر غير مسجل</span>
+                            <span class="drawer-user-role" style="color: var(--gold-light);">انقر للدخول بحساب Google</span>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function loadPendingAccounts() {
+            const container = document.getElementById('pending-accounts-list-container');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
+                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
+                    جاري جلب وتحديث الحسابات المعلقة من قاعدة البيانات...
+                </div>
+            `;
+
+            let accounts = [];
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            // 1. جلب من Supabase
+            if (client) {
+                try {
+                    const { data, error } = await client
+                        .from('marketplace_accounts')
+                        .select('*')
+                        .in('status', ['pending_verification', 'pending_review'])
+                        .order('created_at', { ascending: false });
+
+                    if (!error && Array.isArray(data)) {
+                        accounts = data.map(acc => ({
+                            id: acc.id,
+                            accountNumber: acc.account_number || `FF-${String(acc.id).slice(0, 4)}`,
+                            title: acc.title,
+                            game: acc.game || 'free_fire',
+                            level: acc.level,
+                            primeLevel: acc.prime_level,
+                            sellerPrice: parseFloat(acc.seller_price) || 0,
+                            sellerId: acc.seller_id,
+                            sellerName: acc.seller_name || 'بائع موثق',
+                            status: acc.status,
+                            createdAt: acc.created_at,
+                            bindStatus: acc.bind_status || 'single',
+                            loginType: acc.login_type || 'google',
+                            accountNotes: acc.account_notes || acc.notes || '',
+                            evoGunsCount: acc.evo_guns_count || 0,
+                            iconicPants: acc.iconic_pants || '',
+                            rareSkins: acc.rare_skins || '',
+                            image: acc.image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+                            images: Array.isArray(acc.gallery_images) && acc.gallery_images.length ? acc.gallery_images : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']),
+                            credentials: acc.encrypted_credentials || acc.credentials || {
+                                email_or_phone: acc.login_identifier || 'غير متوفر',
+                                password: acc.raw_password || '••••••••'
+                            }
+                        }));
+                    }
+                } catch (err) {
+                    console.warn('[Pending Accounts] Supabase Exception:', err);
+                }
+            }
+
+            // 2. دمج الحسابات المعلقة من الحالة المحلية كاحتياط
+            if (accounts.length === 0) {
+                const local = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review');
+                if (local.length > 0) accounts = local;
+            }
+
+            allPendingAccounts = accounts;
+            updatePendingStats();
+            applyPendingFilters();
+        }
+
+        function updatePendingStats() {
+            const total = allPendingAccounts.length;
+            const ff = allPendingAccounts.filter(a => a.game === 'free_fire').length;
+            const pubg = allPendingAccounts.filter(a => a.game === 'pubg').length;
+            const approvedCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'available').length;
+
+            const elTotal = document.getElementById('stat-pending-total');
+            const elFf = document.getElementById('stat-pending-ff');
+            const elPubg = document.getElementById('stat-pending-pubg');
+            const elApproved = document.getElementById('stat-approved-total');
+
+            const chipAll = document.getElementById('count-chip-all');
+            const chipFf = document.getElementById('count-chip-ff');
+            const chipPubg = document.getElementById('count-chip-pubg');
+
+            if (elTotal) elTotal.innerText = total;
+            if (elFf) elFf.innerText = ff;
+            if (elPubg) elPubg.innerText = pubg;
+            if (elApproved) elApproved.innerText = approvedCount;
+
+            if (chipAll) chipAll.innerText = total;
+            if (chipFf) chipFf.innerText = ff;
+            if (chipPubg) chipPubg.innerText = pubg;
+        }
+
+        function filterPendingGame(game, chipEl) {
+            currentGameFilter = game;
+            document.querySelectorAll('.pending-controls-bar .support-chip').forEach(c => c.classList.remove('active'));
+            if (chipEl) chipEl.classList.add('active');
+            applyPendingFilters();
+        }
+
+        function handlePendingSearch(term) {
+            currentSearchQuery = (term || '').trim().toLowerCase();
+            applyPendingFilters();
+        }
+
+        function applyPendingFilters() {
+            let filtered = [...allPendingAccounts];
+
+            if (currentGameFilter !== 'all') {
+                filtered = filtered.filter(a => a.game === currentGameFilter);
+            }
+
+            if (currentSearchQuery) {
+                filtered = filtered.filter(a => {
+                    const num = String(a.accountNumber || a.id || '').toLowerCase();
+                    const title = String(a.title || '').toLowerCase();
+                    const seller = String(a.sellerName || '').toLowerCase();
+                    return num.includes(currentSearchQuery) || title.includes(currentSearchQuery) || seller.includes(currentSearchQuery);
+                });
+            }
+
+            currentFilteredAccounts = filtered;
+            renderPendingGrid(filtered);
+        }
+
+        function renderPendingGrid(accounts) {
+            const container = document.getElementById('pending-accounts-list-container');
+            if (!container) return;
+
+            if (accounts.length === 0) {
+                container.innerHTML = `
+                    <div style="background: rgba(14, 18, 28, 0.7); border: 2px dashed rgba(197, 160, 89, 0.3); border-radius: 20px; padding: 4rem 2rem; text-align: center; color: var(--silver-muted);">
+                        <i class="fas fa-check-circle text-gold" style="font-size: 3.5rem; margin-bottom: 1.2rem; display: block;"></i>
+                        <h3 style="color: #fff; font-size: 1.4rem; margin-bottom: 0.5rem;">لا توجد حسابات معلقة حالياً</h3>
+                        <p style="margin: 0; font-size: 0.95rem;">
+                            رائع! تم تدقيق وفحص كافة الحسابات المعروضة، وسيظهر هنا أي حساب جديد يضعه البائعون للمراجعة فوراً.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = accounts.map(acc => {
+                const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(acc.sellerPrice) : { sellerPrice: acc.sellerPrice, fee: 0, buyerPrice: acc.sellerPrice };
+                const imgCount = acc.images && acc.images.length ? acc.images.length : 1;
+                const dateStr = acc.createdAt ? new Date(acc.createdAt).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'اليوم';
+                const mainImg = (acc.images && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+
+                return `
+                    <div class="pending-account-card">
+                        <!-- Top Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                <span style="background: rgba(197, 160, 89, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.85rem; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--gold-primary);">
+                                    #${acc.accountNumber || acc.id}
+                                </span>
+                                <h3 style="color: #fff; margin: 0; font-size: 1.15rem; font-weight: 800;">${acc.title}</h3>
+                            </div>
+                            <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                <i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)
+                            </span>
+                        </div>
+
+                        <!-- Card Body Grid -->
+                        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: start;">
+                            <!-- Thumbnail -->
+                            <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal); cursor: pointer;" onclick="openInspectionModal('${acc.id}')">
+                                <img src="${mainImg}" alt="${acc.title}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                                <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">
+                                    <i class="fas fa-camera"></i> ${imgCount} صور
+                                </span>
+                            </div>
+
+                            <!-- Meta & Pricing -->
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--silver-muted);">
+                                    <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName}</strong></span>
+                                    <span><i class="fas fa-gamepad text-orange"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></span>
+                                    <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${dateStr}</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; font-size: 0.85rem;">
+                                    <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong></span>
+                                    <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></span>
+                                    <span style="background: rgba(234, 88, 12, 0.15); border: 1px solid var(--orange-bright); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800;">
+                                        سعر الظهور للمشتري: ${feeCalc.buyerPrice} نقطة ($${feeCalc.buyerPrice})
+                                    </span>
+                                </div>
+
+                                <!-- Specs Chips -->
+                                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                    <span class="evo-chip"><i class="fas fa-shield-alt text-gold"></i> ليفيل ${acc.level || 50}</span>
+                                    <span class="evo-chip"><i class="fas fa-crown text-gold"></i> برايم ${acc.primeLevel || 1}</span>
+                                    ${acc.evoGunsCount ? `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${acc.evoGunsCount} أسلحة إيفو</span>` : ''}
+                                    <span class="evo-chip"><i class="fas fa-link text-silver"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
+                                    <span class="evo-chip"><i class="fas fa-key text-silver"></i> دخول ${acc.loginType || 'Google'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Decision Buttons -->
+                        <div style="display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center; margin-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; flex-wrap: wrap;">
+                            <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${acc.id}')" title="رفض الحساب وحذفه">
+                                <i class="fas fa-trash-alt"></i> رفض الحساب (تحايل/خطأ)
+                            </button>
+                            <button type="button" class="btn-inspect-large" onclick="openInspectionModal('${acc.id}')" title="فتح نافذة الفحص الشامل والصور وكلمة المرور">
+                                <i class="fas fa-microscope"></i> فحص الحساب والصور
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* ================= Inspection Modal Logic ================= */
+        let currentInspectingAccount = null;
+
+        function openInspectionModal(accId) {
+            const acc = allPendingAccounts.find(a => a.id.toString() === accId.toString());
+            if (!acc) return;
+
+            currentInspectingAccount = acc;
+            inspectActiveImages = (acc.images && acc.images.length) ? acc.images : [acc.image];
+            inspectActiveImgIdx = 0;
+
+            const modal = document.getElementById('modal-inspect-account-detail');
+            const titleEl = document.getElementById('inspect-modal-title');
+            const body = document.getElementById('inspect-modal-body-content');
+            if (!modal || !body) return;
+
+            if (titleEl) {
+                titleEl.innerText = `فحص وتدقيق الحساب #${acc.accountNumber || acc.id} - ${acc.title}`;
+            }
+
+            const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(acc.sellerPrice) : { sellerPrice: acc.sellerPrice, fee: 0, buyerPrice: acc.sellerPrice };
+            const creds = acc.credentials || {};
+
+            body.innerHTML = `
+                <!-- Large Image Slider (عارض الصور بحجم كبير) -->
+                <div style="margin-bottom: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="color: #fff; font-weight: 800; font-size: 0.95rem;">
+                            <i class="fas fa-images text-gold"></i> معرض صور الحساب (${inspectActiveImages.length} صور مفحوصة):
+                        </span>
+                        <span style="color: var(--silver-muted); font-size: 0.8rem;" id="inspect-counter-text">1 / ${inspectActiveImages.length}</span>
+                    </div>
+
+                    <div class="inspect-gallery-large" onclick="zoomInspectImage()" title="انقر لتكبير الصورة ملء الشاشة">
+                        <img id="inspect-large-display-img" class="inspect-gallery-img" src="${inspectActiveImages[0]}" alt="Account Large Photo" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        <button type="button" class="deck-nav-btn deck-nav-prev" onclick="event.stopPropagation(); prevInspectSlide();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem;" title="الصورة السابقة">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="deck-nav-btn deck-nav-next" onclick="event.stopPropagation(); nextInspectSlide();" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem;" title="الصورة التالية">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="deck-zoom-hint-badge" style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem;">
+                            <i class="fas fa-search-plus"></i> انقر للتكبير ملء الشاشة
+                        </div>
+                    </div>
+
+                    <!-- Thumbnails Strip -->
+                    <div class="deck-thumbs-strip" id="inspect-thumbs-container" style="display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.4rem 0;">
+                        ${inspectActiveImages.map((src, i) => `
+                            <div class="deck-thumb-item ${i === 0 ? 'active' : ''}" onclick="selectInspectSlide(${i})" style="width: 70px; height: 50px; border-radius: 8px; overflow: hidden; border: 2px solid ${i === 0 ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)'}; cursor: pointer; flex-shrink: 0;">
+                                <img src="${src}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150'">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Account Specifications Grid -->
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 14px; padding: 1.1rem; margin-bottom: 1.2rem;">
+                    <h4 style="color: #fff; font-size: 0.95rem; margin: 0 0 0.8rem; display: flex; align-items: center; gap: 0.45rem;">
+                        <i class="fas fa-info-circle text-gold"></i> المواصفات والتفاصيل المسجلة من البائع
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; font-size: 0.88rem;">
+                        <div><span style="color: var(--silver-muted);">اللعبة:</span> <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">مستوى الحساب:</span> <strong style="color: #fff;">Lv. ${acc.level || 50}</strong></div>
+                        <div><span style="color: var(--silver-muted);">مستوى البرايم:</span> <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong></div>
+                        <div><span style="color: var(--silver-muted);">نوع الربط:</span> <strong style="color: #fff;">${acc.bindStatus === 'single' ? 'ربط أحادي آمن' : 'ربط ثنائي'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">نوع الحساب:</span> <strong style="color: #fff;">${acc.loginType === 'google' ? 'Google Gmail' : 'Facebook'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">أسلحة إيفو المطورة:</span> <strong style="color: var(--orange-bright);">${acc.evoGunsCount || 0} أسلحة</strong></div>
+                        <div><span style="color: var(--silver-muted);">السراويل النادرة:</span> <strong style="color: #fff;">${acc.iconicPants || 'غير محدد'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">السكنات المميزة:</span> <strong style="color: #fff;">${acc.rareSkins || 'غير محدد'}</strong></div>
+                    </div>
+
+                    ${acc.accountNotes ? `
+                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                            <span style="color: var(--gold-light); font-weight: 700; display: block; margin-bottom: 0.2rem;">ملاحظات البائع:</span>
+                            <p style="color: var(--silver-light); margin: 0; line-height: 1.5; font-size: 0.88rem;">${acc.accountNotes}</p>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Requirement: Private Escrow Credentials Box (بيانات الدخول للوسيط) -->
+                <div class="inspect-creds-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--orange-bright); font-weight: 800; font-size: 1rem;">
+                            <i class="fas fa-lock"></i>
+                            <span>بيانات الدخول للوسيط المعتمد (سري للغاية ومحمي):</span>
+                        </div>
+                        <span style="background: rgba(249, 115, 22, 0.2); color: var(--orange-bright); font-size: 0.76rem; padding: 2px 8px; border-radius: 6px; font-weight: 800;">
+                            <i class="fas fa-shield-alt"></i> فحص كلمة المرور
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                        <!-- Email / ID -->
+                        <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
+                            <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">البريد الإلكتروني / رقم الحساب:</span>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                <code style="color: #fff; font-size: 1rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.email_or_phone || 'غير مدخل'}</code>
+                                <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${creds.email_or_phone || ''}', 'تم نسخ البريد الإلكتروني')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
+                            <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">كلمة المرور (انقر على العين للرؤية بوضوح):</span>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                <span id="inspect-pw-display" style="color: var(--orange-bright); font-size: 1.05rem; font-weight: 800; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
+                                <div style="display: flex; gap: 0.35rem;">
+                                    <button type="button" class="btn-3d btn-outline" id="btn-toggle-pw" onclick="toggleInspectPwVisibility('${creds.password || ''}')" style="padding: 4px 10px; font-size: 0.8rem;" title="إظهار/إخفاء">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${creds.password || ''}', 'تم نسخ كلمة المرور')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decision Action Bar -->
+                <div style="display: flex; gap: 0.9rem; justify-content: space-between; align-items: center; margin-top: 1.5rem; border-top: 1px solid var(--border-metal); padding-top: 1.2rem; flex-wrap: wrap;">
+                    <button type="button" class="btn-3d btn-outline" onclick="closeInspectionModal()" style="font-size: 0.9rem;">
+                        إغلاق النافذة
+                    </button>
+                    <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                        <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${acc.id}'); closeInspectionModal();" style="padding: 0.7rem 1.4rem; font-size: 0.95rem;">
+                            <i class="fas fa-times-circle"></i> رفض الحساب وحذفه (تحايل)
+                        </button>
+                        <button type="button" class="btn-inspect-large" onclick="approvePendingAccount('${acc.id}'); closeInspectionModal();" style="padding: 0.7rem 1.6rem; font-size: 1rem;">
+                            <i class="fas fa-check-circle"></i> اعتماد ونشر الحساب في السوق
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeInspectionModal() {
+            const modal = document.getElementById('modal-inspect-account-detail');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function prevInspectSlide() {
+            if (!inspectActiveImages.length) return;
+            inspectActiveImgIdx = (inspectActiveImgIdx - 1 + inspectActiveImages.length) % inspectActiveImages.length;
+            updateInspectSliderUI();
+        }
+
+        function nextInspectSlide() {
+            if (!inspectActiveImages.length) return;
+            inspectActiveImgIdx = (inspectActiveImgIdx + 1) % inspectActiveImages.length;
+            updateInspectSliderUI();
+        }
+
+        function selectInspectSlide(idx) {
+            inspectActiveImgIdx = idx;
+            updateInspectSliderUI();
+        }
+
+        function updateInspectSliderUI() {
+            const img = document.getElementById('inspect-large-display-img');
+            const counter = document.getElementById('inspect-counter-text');
+            const thumbs = document.querySelectorAll('#inspect-thumbs-container .deck-thumb-item');
+
+            if (img && inspectActiveImages[inspectActiveImgIdx]) {
+                img.src = inspectActiveImages[inspectActiveImgIdx];
+            }
+            if (counter) {
+                counter.innerText = `${inspectActiveImgIdx + 1} / ${inspectActiveImages.length}`;
+            }
+            thumbs.forEach((t, i) => {
+                t.style.borderColor = (i === inspectActiveImgIdx) ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)';
+            });
+        }
+
+        function zoomInspectImage() {
+            const src = inspectActiveImages[inspectActiveImgIdx];
+            if (!src) return;
+            const lightbox = document.getElementById('modal-image-lightbox');
+            const lightboxImg = document.getElementById('lightbox-enlarged-img');
+            const caption = document.getElementById('lightbox-caption');
+            if (lightbox && lightboxImg) {
+                lightboxImg.src = src;
+                if (caption && currentInspectingAccount) {
+                    caption.innerText = `حساب #${currentInspectingAccount.accountNumber || currentInspectingAccount.id} - صورة ${inspectActiveImgIdx + 1} من ${inspectActiveImages.length}`;
+                }
+                lightbox.classList.add('active');
+            }
+        }
+
+        function toggleInspectPwVisibility(rawPw) {
+            const displayEl = document.getElementById('inspect-pw-display');
+            const btn = document.getElementById('btn-toggle-pw');
+            if (!displayEl) return;
+
+            if (displayEl.innerText === '••••••••••') {
+                displayEl.innerText = rawPw || 'غير متوفر';
+                displayEl.style.letterSpacing = 'normal';
+                if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                displayEl.innerText = '••••••••••';
+                displayEl.style.letterSpacing = '2px';
+                if (btn) btn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+        function copyInspectText(text, msg) {
+            if (!text) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (typeof waseetAlert === 'function') waseetAlert('تم النسخ', msg, 'info');
+                });
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (typeof waseetAlert === 'function') waseetAlert('تم النسخ', msg, 'info');
+            }
+        }
+
+        /* ================= Approval & Rejection Logic ================= */
+        async function approvePendingAccount(accId) {
+            const acc = allPendingAccounts.find(a => a.id.toString() === accId.toString());
+            if (!acc) return;
+
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            // تحديث في Supabase
+            if (client) {
+                try {
+                    const { error } = await client
+                        .from('marketplace_accounts')
+                        .update({
+                            status: 'available',
+                            review_status: 'approved',
+                            approved_at: new Date().toISOString()
+                        })
+                        .eq('id', accId);
+
+                    if (error) console.warn('[Approve] Supabase Error:', error.message);
+                } catch (e) {
+                    console.warn('[Approve] Exception:', e);
+                }
+            }
+
+            // تحديث الحالة المحلية
+            acc.status = 'available';
+            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());
+            if (globalAcc) {
+                globalAcc.status = 'available';
+                globalAcc.reviewStatus = 'approved';
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+            }
+
+            try {
+                const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const idx = saved.findIndex(a => a.id.toString() === accId.toString());
+                if (idx !== -1) {
+                    saved[idx].status = 'available';
+                    saved[idx].reviewStatus = 'approved';
+                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(saved));
+                }
+            } catch (e) {}
+
+            allPendingAccounts = allPendingAccounts.filter(a => a.id.toString() !== accId.toString());
+            updatePendingStats();
+            applyPendingFilters();
+
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert(
+                    'تم اعتماد الحساب بنجاح',
+                    `تم فحص بيانات الدخول والصور واعتماد الحساب #${acc.accountNumber || acc.id} ونشره رسمياً في متجر WASEET.`,
+                    'success'
+                );
+            }
+        }
+
+        async function rejectPendingAccount(accId) {
+            const acc = allPendingAccounts.find(a => a.id.toString() === accId.toString());
+            if (!acc) return;
+
+            let reason = 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.';
+            if (typeof waseetPrompt === 'function') {
+                const input = await waseetPrompt(
+                    'سبب رفض وحذف الحساب',
+                    'اكتب سبب رفض الحساب ليظهر للبائع في صفحة "حساباتي":',
+                    reason
+                );
+                if (input === null) return;
+                if (input.trim()) reason = input.trim();
+            }
+
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            if (client) {
+                try {
+                    const { error } = await client
+                        .from('marketplace_accounts')
+                        .update({
+                            status: 'rejected',
+                            review_status: 'rejected',
+                            rejection_reason: reason,
+                            rejected_at: new Date().toISOString()
+                        })
+                        .eq('id', accId);
+
+                    if (error) console.warn('[Reject] Supabase Error:', error.message);
+                } catch (e) {
+                    console.warn('[Reject] Exception:', e);
+                }
+            }
+
+            acc.status = 'rejected';
+            acc.rejectionReason = reason;
+
+            const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());
+            if (globalAcc) {
+                globalAcc.status = 'rejected';
+                globalAcc.rejectionReason = reason;
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+            }
+
+            try {
+                const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+                const idx = saved.findIndex(a => a.id.toString() === accId.toString());
+                if (idx !== -1) {
+                    saved[idx].status = 'rejected';
+                    saved[idx].rejectionReason = reason;
+                    localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(saved));
+                }
+            } catch (e) {}
+
+            allPendingAccounts = allPendingAccounts.filter(a => a.id.toString() !== accId.toString());
+            updatePendingStats();
+            applyPendingFilters();
+
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert(
+                    'تم رفض الحساب وإشعار البائع',
+                    `تم حذف الحساب #${acc.accountNumber || acc.id} من قائمة الفحص وتسجيل سبب الرفض بنجاح.`,
+                    'warning'
+                );
+            }
+        }
+
+        /* ================= Supabase Realtime Listener ================= */
+        function setupPendingRealtime() {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            try {
+                client
+                    .channel('pending-accounts-realtime')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'marketplace_accounts'
+                    }, (payload) => {
+                        console.log('[Pending Realtime] تحديث لحظي للحسابات:', payload.eventType);
+                        loadPendingAccounts();
+                    })
+                    .subscribe();
+            } catch (e) {
+                console.warn('[Pending Realtime] Exception:', e);
+            }
+        }
+
+        /* ================= Page Initialization ================= */
+        async function initPendingAccountsPage() {
+            renderNavbarUser();
+
+            const user = WASEET_STATE.user;
+            const isMed = isMediatorUser(user);
+
+            const deniedBox = document.getElementById('access-denied-box');
+            const mainContent = document.getElementById('pending-main-content');
+
+            if (!isMed) {
+                if (deniedBox) deniedBox.style.display = 'block';
+                if (mainContent) mainContent.style.display = 'none';
+                return;
+            }
+
+            if (deniedBox) deniedBox.style.display = 'none';
+            if (mainContent) mainContent.style.display = 'block';
+
+            await loadPendingAccounts();
+            setupPendingRealtime();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initPendingAccountsPage();
+        });
+    </script>
+</body>
+</html>
