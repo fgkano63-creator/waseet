@@ -5563,3 +5563,79 @@ div[class*="netlify"],
     }
 }
 
+/* ===================================================
+   تخصيص شريط التنقل العلوي للمدير (Admin Desktop Navbar)
+=================================================== */
+.nav-admin-middle-group {
+    display: none;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0 auto;
+}
+
+.btn-nav-admin {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.95rem;
+    background: rgba(18, 24, 38, 0.75);
+    border: 1px solid var(--border-metal);
+    border-radius: 12px;
+    color: var(--silver-light);
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    font-family: var(--font-ar);
+}
+
+.btn-nav-admin:hover,
+.btn-nav-admin.active {
+    background: rgba(197, 160, 89, 0.18);
+    border-color: var(--gold-primary);
+    color: var(--gold-light);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-nav-admin .deals-badge-count {
+    background: var(--orange-bright);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 1px 6px;
+    border-radius: 999px;
+    margin-right: 0.25rem;
+    line-height: 1.2;
+}
+
+/* شاشات الكمبيوتر: تبديل الشريط حسب وضع المدير */
+@media (min-width: 901px) {
+    body.is-admin-mode #nav-user-middle-group {
+        display: none !important;
+    }
+    body.is-admin-mode #nav-admin-middle-group {
+        display: flex !important;
+    }
+    body.is-admin-mode .nav-left-group #wallet-pill-btn {
+        display: none !important; /* إخفاء المحفظة من أقصى اليسار لأنها في المنتصف بين الأزرار الـ 5 */
+    }
+}
+
+@media (max-width: 900px) {
+    .nav-admin-middle-group,
+    #nav-admin-middle-group {
+        display: none !important; /* على الهواتف يقتصر الشريط على الشعار والمحفظة والقائمة */
+    }
+    body.is-admin-mode .nav-left-group #wallet-pill-btn {
+        display: inline-flex !important;
+    }
+#navbar-compat-hidden,
+#navbar-compat-hidden * {
+    display: none !important;
+}
+
+

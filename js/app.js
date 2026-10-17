@@ -61,46 +61,50 @@ class WaseetApp {
 
     renderUserProfile() {
         const container = document.getElementById('nav-user-container');
-        const dealsBtn = document.getElementById('btn-mediator-deals');
-        const dealsCountBadge = document.getElementById('nav-deals-count');
         const user = WASEET_STATE.user;
+        const isAdmin = !!(user && isMediatorUser(user));
 
-        // Show/Hide Mediator Deals Button on left of Sell Account
-        if (dealsBtn) {
-            if (user && isMediatorUser(user)) {
-                dealsBtn.style.display = 'inline-flex';
-                if (dealsCountBadge && WASEET_STATE.deals) {
-                    dealsCountBadge.innerText = WASEET_STATE.deals.length;
-                }
-            } else {
-                dealsBtn.style.display = 'none';
+        // 1. تبديل وضع المدير على body
+        if (isAdmin) {
+            document.body.classList.add('is-admin-mode');
+        } else {
+            document.body.classList.remove('is-admin-mode');
+        }
+
+        // 2. تحديث المجموعات في الشريط العلوي (Navbar Groups)
+        const userNavMiddle = document.getElementById('nav-user-middle-group');
+        const adminNavMiddle = document.getElementById('nav-admin-middle-group');
+        const defaultWalletPill = document.getElementById('wallet-pill-btn');
+        const adminWalletPill = document.getElementById('admin-wallet-pill');
+
+        if (isAdmin) {
+            if (userNavMiddle) userNavMiddle.style.display = 'none';
+            if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+            if (defaultWalletPill && window.innerWidth > 900) {
+                defaultWalletPill.style.display = 'none';
             }
+            if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+        } else {
+            if (userNavMiddle) userNavMiddle.style.display = 'flex';
+            if (adminNavMiddle) adminNavMiddle.style.display = 'none';
+            if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
+            if (adminWalletPill) adminWalletPill.style.display = 'none';
         }
 
-        // Show/Hide Seller Listings Button
-        const sellerListingsBtn = document.getElementById('btn-seller-listings');
-        if (sellerListingsBtn) {
-            if (user && !isMediatorUser(user)) {
-                sellerListingsBtn.style.display = 'inline-flex';
-            } else {
-                sellerListingsBtn.style.display = 'none';
-            }
+        // شارات المدير في الشريط العلوي
+        const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
+        if (adminDealsBadge && WASEET_STATE.deals) {
+            const dCount = WASEET_STATE.deals.length;
+            adminDealsBadge.innerText = dCount;
+            adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
         }
-        this.updateSellerListingsCounter();
 
-        // Show/Hide Mediator Pending Accounts Button
-        const pendingBtn = document.getElementById('btn-pending-accounts');
-        if (pendingBtn) {
-            pendingBtn.style.display = (user && isMediatorUser(user)) ? 'inline-flex' : 'none';
-        }
-        this.updatePendingAccountsCounter();
-
-        // Show/Hide Admin Support Inbox links (Mediator only)
-        const isAdminViewer = !!(user && isMediatorUser(user));
-        const adminChatsBtn = document.getElementById('btn-admin-chats');
-        if (adminChatsBtn) adminChatsBtn.style.display = isAdminViewer ? 'inline-flex' : 'none';
+        // روابط القائمة الجانبية للمدير
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = isAdminViewer ? '' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.display = isAdmin ? '' : 'none';
+
+        this.updatePendingAccountsCounter();
+        this.updateSellerListingsCounter();
 
         if (!container) return;
 
@@ -142,6 +146,7 @@ class WaseetApp {
 
         const navBtn = document.getElementById('btn-pending-accounts');
         const navBadge = document.getElementById('nav-pending-count');
+        const adminNavBadge = document.getElementById('admin-nav-pending-badge');
         const drawerBtn = document.getElementById('drawer-btn-pending-verification');
         const drawerBadge = document.getElementById('drawer-pending-count');
         const modalBadge = document.getElementById('pending-modal-badge');
@@ -150,6 +155,10 @@ class WaseetApp {
         if (navBadge) {
             navBadge.innerText = count;
             navBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
+        }
+        if (adminNavBadge) {
+            adminNavBadge.innerText = count;
+            adminNavBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
         }
 
         if (drawerBtn) drawerBtn.style.display = isMediator ? 'flex' : 'none';
@@ -476,7 +485,9 @@ class WaseetApp {
         const modalLockEl = document.getElementById('modal-wallet-lock');
         const chatsBadge = document.getElementById('nav-chats-badge');
 
+        const adminTotalEl = document.getElementById('admin-wallet-total-pts');
         if (totalEl) totalEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
+        if (adminTotalEl) adminTotalEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
         if (lockedEl) {
             if (wallet.locked > 0) {
                 lockedEl.innerText = `${wallet.locked} محجوز (${wallet.locked}$)`;

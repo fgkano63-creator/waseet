@@ -92,17 +92,42 @@
                     </a>
                 </div>
 
-                <!-- المجموعة 2 (الوسطى): أهم 3 أزرار للمستخدم -->
-                <nav class="nav-middle-group">
+                <!-- المجموعة 2 (الوسطى للمستخدم العادي): أهم 3 أزرار -->
+                <nav class="nav-middle-group" id="nav-user-middle-group">
                     <a href="index.html#marketplace" class="btn-nav-middle">
-                        <i class="fas fa-store"></i> المتجر
+                        <i class="fas fa-store text-gold"></i> المتجر
                     </a>
                     <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.location.href='index.html#open-sell'">
-                        <i class="fas fa-plus-circle"></i> بيع حساب
+                        <i class="fas fa-plus-circle text-orange"></i> بيع حساب
                     </button>
                     <a href="deals.html" class="btn-nav-middle">
-                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                        <i class="fas fa-shield-alt text-gold"></i> قائمة الصفقات
                     </a>
+                </nav>
+
+                <!-- المجموعة 2 المخصصة للمدير (الـ 5 أزرار الأساسية فقط في المنتصف بتناسق) -->
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                        <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                    </a>
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                        <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قائمة الصفقات الحية">
+                        <i class="fas fa-crown text-gold"></i> قائمة الصفقات
+                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
+                        <i class="fas fa-comments text-orange"></i> المحادثات
+                    </a>
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="openWalletQuickAlert()" title="محفظة النقاط">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
                 </nav>
 
                 <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ مع gap: 15px -->
@@ -399,6 +424,47 @@
             const pts = currentUser && currentUser.wallet ? currentUser.wallet.available : 0;
             if (walletPtsEl) {
                 walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            }
+
+            // Sync Admin Mode & Desktop Nav Groups
+            const isAdmin = !!(currentUser && (currentUser.role === 'admin' || (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) || currentUser.email === 'fgkano63@gmail.com'));
+            if (isAdmin) {
+                document.body.classList.add('is-admin-mode');
+            } else {
+                document.body.classList.remove('is-admin-mode');
+            }
+
+            const userNavMiddle = document.getElementById('nav-user-middle-group');
+            const adminNavMiddle = document.getElementById('nav-admin-middle-group');
+            const defaultWalletPill = document.getElementById('wallet-pill-btn');
+            const adminWalletPill = document.getElementById('admin-wallet-pill');
+
+            if (isAdmin) {
+                if (userNavMiddle) userNavMiddle.style.display = 'none';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+                if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
+                if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+            } else {
+                if (userNavMiddle) userNavMiddle.style.display = 'flex';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'none';
+                if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
+                if (adminWalletPill) adminWalletPill.style.display = 'none';
+            }
+
+            const adminTotalEl = document.getElementById('admin-wallet-total-pts');
+            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة (${pts}$)`;
+
+            const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
+            if (adminDealsBadge && typeof WASEET_STATE !== 'undefined' && WASEET_STATE.deals) {
+                const dCount = WASEET_STATE.deals.length;
+                adminDealsBadge.innerText = dCount;
+                adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
+            }
+            const adminPendingBadge = document.getElementById('admin-nav-pending-badge');
+            if (adminPendingBadge && typeof WASEET_STATE !== 'undefined') {
+                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review').length;
+                adminPendingBadge.innerText = pCount;
+                adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-block' : 'none';
             }
 
             if (container) {
