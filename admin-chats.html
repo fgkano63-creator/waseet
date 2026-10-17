@@ -117,7 +117,7 @@
                             <div style="color: var(--silver-muted); font-size: 0.72rem;" id="wa-contacts-count">0 محادثة</div>
                         </div>
                     </div>
-                    <button type="button" class="wa-back-btn" style="padding: 0.35rem 0.7rem;" onclick="AdminChats.reload()" title="تحديث">
+                    <button type="button" class="wa-back-btn" id="wa-refresh-btn" style="padding: 0.35rem 0.7rem;" onclick="AdminChats.reload()" title="تحديث">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -346,34 +346,58 @@
         }
 
         /* ================= نافذة المحادثة ================= */
-        function bubbleHtml(m) {
+        function createAdminMessageBubble(m) {
             const isUser = m.sender_role === 'user';
             const time = new Date(m.created_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-            if (isUser) {
-                return `
-                    <div class="support-msg-row user-row" data-msg-id="${esc(m.id)}">
-                        <div class="support-msg-bubble user-bubble">
-                            <div class="support-msg-text">${esc(m.message)}</div>
-                            <div class="support-msg-time">${time}</div>
-                        </div>
-                    </div>`;
+
+            const row = document.createElement('div');
+            row.className = `support-msg-row ${isUser ? 'user-row' : 'admin-row'}`;
+            if (m.id) row.setAttribute('data-msg-id', String(m.id));
+
+            const bubble = document.createElement('div');
+            bubble.className = `support-msg-bubble ${isUser ? 'user-bubble' : 'admin-bubble'}`;
+
+            if (!isUser) {
+                const tag = document.createElement('div');
+                tag.className = 'support-admin-sender-tag';
+                tag.style.color = '#fff';
+                tag.innerHTML = '<i class="fas fa-crown text-gold"></i> الوسيط المعتمد';
+                bubble.appendChild(tag);
             }
-            return `
-                <div class="support-msg-row admin-row" data-msg-id="${esc(m.id)}">
-                    <div class="support-msg-bubble admin-bubble">
-                        <div class="support-admin-sender-tag" style="color:#fff;"><i class="fas fa-crown"></i> الوسيط المعتمد</div>
-                        <div class="support-msg-text">${esc(m.message)}</div>
-                        <div class="support-msg-time">${time} <i class="fas fa-check-double" style="font-size:0.65rem;"></i></div>
-                    </div>
-                </div>`;
+
+            // نص خام بحت عبر textContent: حماية تامة ومنع تحويل الروابط تماماً
+            const textDiv = document.createElement('div');
+            textDiv.className = 'support-msg-text';
+            textDiv.textContent = String(m.message || '');
+            bubble.appendChild(textDiv);
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'support-msg-time';
+            timeDiv.textContent = `${time} `;
+            if (!isUser) {
+                const checkIcon = document.createElement('i');
+                checkIcon.className = 'fas fa-check-double text-gold';
+                checkIcon.style.fontSize = '0.65rem';
+                timeDiv.appendChild(checkIcon);
+            }
+            bubble.appendChild(timeDiv);
+
+            row.appendChild(bubble);
+            return row;
         }
 
         function renderConversation() {
             const body = document.getElementById('wa-chat-body');
             if (!body || !activeUserId) return;
             const msgs = allMessages.filter(m => m.user_id === activeUserId);
-            body.innerHTML = msgs.map(bubbleHtml).join('') ||
-                '<div class="wa-empty-state"><i class="fas fa-comment-slash"></i>لا توجد رسائل بعد.</div>';
+            body.innerHTML = '';
+            if (!msgs.length) {
+                body.innerHTML = '<div class="wa-empty-state"><i class="fas fa-comment-slash"></i>لا توجد رسائل بعد.</div>';
+                return;
+            }
+            msgs.forEach(m => {
+                body.appendChild(createAdminMessageBubble(m));
+            });
             body.scrollTop = body.scrollHeight;
         }
 
@@ -397,7 +421,7 @@
             renderContacts();
             renderConversation();
             const input = document.getElementById('wa-reply-input');
-            if (input && window.innerWidth > 868) input.focus();
+            if (input && window.innerWidth > 868) input.focus({ preventScroll: true });
         }
 
         function backToList() {
@@ -412,6 +436,7 @@
             const text = (input.value || '').trim();
             if (!text || !activeUserId) return;
             input.value = '';
+            input.focus({ preventScroll: true });
 
             const tempMsg = {
                 id: 'temp_' + Date.now(),
@@ -445,7 +470,11 @@
                     }
                 } else if (data && data[0]) {
                     tempMsg.id = data[0].id;   // استبدال المعرف المؤقت لمنع التكرار مع Realtime
-                    renderConversation();
+                    const body = document.getElementById('wa-chat-body');
+                    if (body) {
+                        const tempEl = body.querySelector(`[data-msg-id="${tempMsg.id}"]`) || body.querySelector(`[data-msg-id^="temp_"]`);
+                        if (tempEl) tempEl.setAttribute('data-msg-id', String(data[0].id));
+                    }
                 }
             } catch (err) {
                 console.warn('[Admin Chats] استثناء إرسال الرد:', err);
@@ -487,9 +516,16 @@
         }
 
         async function reload() {
-            await loadMessages();
-            renderContacts();
-            if (activeUserId) renderConversation();
+            const refreshBtn = document.getElementById('wa-refresh-btn');
+            const icon = refreshBtn ? refreshBtn.querySelector('i') : null;
+            if (icon) icon.classList.add('fa-spin');
+            try {
+                await loadMessages();
+                renderContacts();
+                if (activeUserId) renderConversation();
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
         }
 
         async function init() {
@@ -500,6 +536,14 @@
             }
             document.getElementById('wa-admin-wrapper').style.display = 'block';
             client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            const refreshBtn = document.getElementById('wa-refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    reload();
+                });
+            }
 
             document.getElementById('wa-reply-form').addEventListener('submit', sendReply);
             document.getElementById('wa-search').addEventListener('input', renderContacts);
@@ -522,6 +566,7 @@
         return { init, reload, backToList, openConversation };
     })();
 
+    window.AdminChats = AdminChats;
     window.addEventListener('DOMContentLoaded', () => AdminChats.init());
     </script>
 </body>

@@ -148,47 +148,69 @@
             return;
         }
 
-        let html = welcomeHtml;
+        container.innerHTML = welcomeHtml;
+        const seen = new Set();
         messages.forEach(msg => {
-            html += generateMessageBubbleHtml(msg);
+            if (msg.id && seen.has(String(msg.id))) return;
+            if (msg.id) seen.add(String(msg.id));
+            container.appendChild(createSupportMessageElement(msg));
         });
 
-        container.innerHTML = html;
         scrollToSupportBottom();
     }
 
     /**
-     * توليد HTML لفقاعة الرسالة
+     * توليد عنصر الرسالة باستخدام DOM و textContent للحماية ومنع تشغيل السكربتات والروابط
      */
-    function generateMessageBubbleHtml(msg) {
+    function createSupportMessageElement(msg) {
         const isUser = msg.sender_role === 'user';
         const timeStr = formatMsgTime(msg.created_at);
 
-        if (isUser) {
-            return `
-                <div class="support-msg-row user-row">
-                    <div class="support-msg-bubble user-bubble">
-                        <div class="support-msg-text">${escapeHtml(msg.message)}</div>
-                        <div class="support-msg-time">${timeStr} <i class="fas fa-check-double text-gold" style="font-size: 0.65rem;"></i></div>
-                    </div>
-                </div>
-            `;
-        } else {
-            return `
-                <div class="support-msg-row admin-row">
-                    <div class="support-admin-avatar-tiny" title="الوسيط المعتمد">
-                        <img src="assets/logo.png" alt="الوسيط">
-                    </div>
-                    <div class="support-msg-bubble admin-bubble">
-                        <div class="support-admin-sender-tag">
-                            <i class="fas fa-crown text-gold"></i> الوسيط المعتمد (الإدارة)
-                        </div>
-                        <div class="support-msg-text">${escapeHtml(msg.message)}</div>
-                        <div class="support-msg-time">${timeStr}</div>
-                    </div>
-                </div>
-            `;
+        const row = document.createElement('div');
+        row.className = `support-msg-row ${isUser ? 'user-row' : 'admin-row'}`;
+        if (msg.id) row.setAttribute('data-msg-id', String(msg.id));
+        if (msg.isPending) row.setAttribute('data-pending', 'true');
+
+        if (!isUser) {
+            const avatarWrap = document.createElement('div');
+            avatarWrap.className = 'support-admin-avatar-tiny';
+            avatarWrap.title = 'الوسيط المعتمد';
+            const avatarImg = document.createElement('img');
+            avatarImg.src = 'assets/logo.png';
+            avatarImg.alt = 'الوسيط';
+            avatarWrap.appendChild(avatarImg);
+            row.appendChild(avatarWrap);
         }
+
+        const bubble = document.createElement('div');
+        bubble.className = `support-msg-bubble ${isUser ? 'user-bubble' : 'admin-bubble'}`;
+
+        if (!isUser) {
+            const senderTag = document.createElement('div');
+            senderTag.className = 'support-admin-sender-tag';
+            senderTag.innerHTML = '<i class="fas fa-crown text-gold"></i> الوسيط المعتمد (الإدارة)';
+            bubble.appendChild(senderTag);
+        }
+
+        // نص خام بحت عبر textContent: منع أي سكربتات وحظر أي روابط تفاعلية
+        const textDiv = document.createElement('div');
+        textDiv.className = 'support-msg-text';
+        textDiv.textContent = String(msg.message || '');
+        bubble.appendChild(textDiv);
+
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'support-msg-time';
+        timeDiv.textContent = timeStr ? `${timeStr} ` : '';
+        if (isUser) {
+            const checkIcon = document.createElement('i');
+            checkIcon.className = 'fas fa-check-double text-gold';
+            checkIcon.style.fontSize = '0.65rem';
+            timeDiv.appendChild(checkIcon);
+        }
+        bubble.appendChild(timeDiv);
+
+        row.appendChild(bubble);
+        return row;
     }
 
     /**
@@ -207,14 +229,16 @@
         }
 
         input.value = '';
-        input.focus();
+        input.focus({ preventScroll: true });
 
+        const tempId = 'temp_' + Date.now();
         const newMsg = {
-            id: 'temp_' + Date.now(),
+            id: tempId,
             user_id: user.id,
             sender_role: 'user',
             message: text,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            isPending: true
         };
 
         // إضافة متفائلة فورية للواجهة (Optimistic UI)
@@ -244,8 +268,14 @@
                 if (error) {
                     console.warn('[Support Chat] فشل الإرسال إلى جدول support_messages:', error.message);
                 } else if (data && data[0]) {
-                    // تحديث المعرف المؤقت
-                    newMsg.id = data[0].id;
+                    const container = document.getElementById('support-chat-messages');
+                    if (container) {
+                        const pendingEl = container.querySelector(`[data-msg-id="${tempId}"]`);
+                        if (pendingEl) {
+                            pendingEl.setAttribute('data-msg-id', String(data[0].id));
+                            pendingEl.removeAttribute('data-pending');
+                        }
+                    }
                 }
             } catch (err) {
                 console.warn('[Support Chat] استثناء في إرسال الرسالة:', err);
@@ -260,19 +290,27 @@
         const container = document.getElementById('support-chat-messages');
         if (!container) return;
 
-        // منع التكرار بناء على id أو النص والوقت المتطابق
-        if (msg.id && !msg.id.startsWith('temp_')) {
-            const existing = document.querySelector(`[data-msg-id="${msg.id}"]`);
+        // 1. منع التكرار بناء على id الدائم إن كان موجوداً
+        if (msg.id && !String(msg.id).startsWith('temp_')) {
+            const existing = container.querySelector(`[data-msg-id="${msg.id}"]`);
             if (existing) return;
         }
 
-        const div = document.createElement('div');
-        div.innerHTML = generateMessageBubbleHtml(msg);
-        const child = div.firstElementChild;
-        if (child && msg.id) {
-            child.setAttribute('data-msg-id', msg.id);
+        // 2. إذا كانت الرسالة من المستخدم، نتحقق من وجود رسالة معلقة مؤقتة مطابقة
+        if (msg.sender_role === 'user') {
+            const pendingEls = container.querySelectorAll('.support-msg-row.user-row[data-pending="true"], .support-msg-row.user-row[data-msg-id^="temp_"]');
+            for (const el of pendingEls) {
+                const textEl = el.querySelector('.support-msg-text');
+                if (textEl && textEl.textContent.trim() === String(msg.message || '').trim()) {
+                    if (msg.id) el.setAttribute('data-msg-id', String(msg.id));
+                    el.removeAttribute('data-pending');
+                    return;
+                }
+            }
         }
-        container.appendChild(child);
+
+        const element = createSupportMessageElement(msg);
+        container.appendChild(element);
         scrollToSupportBottom();
     }
 
