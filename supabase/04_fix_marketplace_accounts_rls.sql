@@ -16,10 +16,10 @@ as $$
     where id = auth.uid()
       and (
         role in ('admin', 'mediator')
-        or lower(email) in ('saadani2009@gmail.com', 'mediator@waseet.com')
+        or lower(email) in ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com')
       )
   )
-  or lower(coalesce(auth.jwt() ->> 'email', '')) in ('saadani2009@gmail.com', 'mediator@waseet.com');
+  or lower(coalesce(auth.jwt() ->> 'email', '')) in ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com');
 $$;
 
 -- 2. السماح بكافة حالات الحسابات (بما فيها pending و pending_verification و pending_review)
