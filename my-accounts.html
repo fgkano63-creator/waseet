@@ -44,55 +44,32 @@
                     </div>
                 </a>
 
-                <!-- Mobile Hamburger Menu Button (☰) -->
-                <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
-                    <i class="fas fa-bars"></i>
-                </button>
-
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="nav-link"><i class="fas fa-store"></i> المتجر العام</a></li>
-                    <li><a href="my-accounts.html" class="nav-link active"><i class="fas fa-boxes text-gold"></i> حساباتي</a></li>
-                    <li><a href="deals.html" class="nav-link"><i class="fas fa-handshake"></i> صفقاتي</a></li>
-                    <li><a href="chat.html" class="nav-link"><i class="fas fa-comments"></i> غرفة الوساطة</a></li>
-                </ul>
-
-                <div class="nav-actions">
-                    <!-- Secure Wallet Pill -->
-                    <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
-                        <i class="fas fa-wallet wallet-icon"></i>
-                        <div class="wallet-details">
-                            <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
-                        </div>
+                <!-- 2. رصيد المحفظة -->
+                <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
+                    <i class="fas fa-wallet wallet-icon"></i>
+                    <div class="wallet-details">
+                        <span class="wallet-label">محفظة النقاط</span>
+                        <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
                     </div>
+                </div>
 
-                    <!-- Direct Chat / Conversations Button -->
-                    <a href="chat.html" class="btn-3d btn-outline btn-nav-chats" title="غرفة المحادثات والوساطة">
-                        <i class="fas fa-comments text-orange"></i>
-                        <span>المحادثات</span>
-                    </a>
-
-                    <!-- Mediator Deals List Button (Shows to Mediator) -->
-                    <a href="deals.html" class="btn-deals-list" id="btn-mediator-deals" style="display: none;" title="قائمة صفقات الوساطة">
-                        <i class="fas fa-crown text-gold"></i>
-                        <span>صفقات الوساطة</span>
-                    </a>
-
-                    <!-- Admin Direct Chats Link (Shows to Mediator) -->
-                    <a href="admin-chats.html" class="btn-3d btn-outline" id="btn-admin-chats" style="display: none; border-color: var(--gold-primary); color: var(--gold-light);" title="محادثات الدعم الفني">
-                        <i class="fas fa-headset text-gold"></i>
-                        <span>محادثات الإدارة</span>
-                    </a>
-
-                    <!-- Sell Account Button -->
-                    <a href="index.html#open-sell" class="btn-3d btn-orange" title="نشر وعرض حساب جديد">
-                        <i class="fas fa-plus-circle"></i> بيع حساب
-                    </a>
-
+                <!-- 3. أدوات أقصى اليسار: زر الحساب الشخصي + أيقونة القائمة (☰) -->
+                <div class="nav-actions">
                     <!-- User Profile / Login Button Container -->
                     <div id="nav-user-container">
                         <!-- Populated by JS -->
                     </div>
+
+                    <!-- أيقونة القائمة الجانبية (☰) -->
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
+                <!-- عناصر توافق مخفية -->
+                <div style="display: none !important;" aria-hidden="true">
+                    <a href="deals.html" id="btn-mediator-deals"></a>
+                    <a href="admin-chats.html" id="btn-admin-chats"></a>
                 </div>
             </div>
         </header>
@@ -229,8 +206,8 @@
     </div>
 
     <!-- ================= Mobile Drawer Navigation ================= -->
-    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleMyAccountsDrawer()"></div>
-    <aside class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleMyAccountsDrawer()"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
         <div class="drawer-header">
             <div class="drawer-brand">
                 <img src="assets/logo.png" alt="WASEET" class="drawer-logo">

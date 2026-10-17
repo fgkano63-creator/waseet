@@ -182,21 +182,21 @@
                     </div>
                 </a>
 
-                <!-- Mobile Hamburger Menu Button (☰) -->
-                <button class="mobile-hamburger-btn" onclick="toggleDealsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <!-- 2. رصيد المحفظة -->
+                <div class="wallet-pill" id="wallet-pill-btn" onclick="if(typeof waseetAlert==='function') waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك من الصفحة الرئيسية.');" title="رصيد المحفظة">
+                    <i class="fas fa-wallet wallet-icon"></i>
+                    <div class="wallet-details">
+                        <span class="wallet-label">محفظة النقاط</span>
+                        <span class="wallet-amount" id="deals-wallet-pts">0 نقطة (0$)</span>
+                    </div>
+                </div>
 
+                <!-- 3. أدوات أقصى اليسار: زر الحساب الشخصي + أيقونة القائمة (☰) -->
                 <div class="nav-actions">
-                    <a href="chat.html" class="btn-3d btn-outline">
-                        <i class="fas fa-comments text-orange"></i>
-                        <span>غرفة المحادثات</span>
-                    </a>
-                    <a href="index.html" class="btn-3d btn-gold">
-                        <i class="fas fa-store"></i>
-                        <span>سوق الحسابات</span>
-                    </a>
                     <div id="deals-nav-user-container"></div>
+                    <button class="mobile-hamburger-btn" onclick="toggleDealsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -255,9 +255,25 @@
                     <i class="fas fa-shield-alt text-gold"></i>
                     <span>قائمة الصفقات</span>
                 </a>
+                <a href="my-accounts.html" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-boxes text-gold"></i>
+                    <span>حساباتي</span>
+                </a>
+                <button class="drawer-shortcut-card" onclick="closeDealsDrawer(); if(window.waseetOpenSupportChat) window.waseetOpenSupportChat();">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
+                </button>
+                <a href="admin-chats.html" class="drawer-shortcut-card" id="deals-drawer-admin-chats" onclick="closeDealsDrawer()">
+                    <i class="fas fa-inbox text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
                 <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
                     <i class="fas fa-calculator text-silver"></i>
                     <span>حاسبة العمولات</span>
+                </a>
+                <a href="index.html#open-sell" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    <span>بيع حساب</span>
                 </a>
             </div>
         </div>
