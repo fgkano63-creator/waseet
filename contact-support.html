@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | المحادثة المباشرة مع الوسيط المعتمد</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261017_contactsupport">
+
+    <style>
+        /* أنماط مخصصة لصفحة المحادثة المستقلة */
+        .support-fullpage-card {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px);
+            min-height: 580px;
+            max-height: 860px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 35px rgba(197, 160, 89, 0.2);
+        }
+
+        .support-fullpage-header {
+            background: rgba(14, 18, 28, 0.95);
+            border-bottom: 1px solid var(--border-metal);
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .support-login-banner {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(197, 160, 89, 0.15));
+            border: 1px dashed var(--gold-primary);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 868px) {
+            .support-fullpage-card {
+                height: calc(100vh - 160px);
+                min-height: 500px;
+                border-radius: 14px;
+            }
+            .support-fullpage-header {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient 3D Background Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <!-- المجموعة 1 (أقصى اليمين): شعار الموقع فقط -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • المحادثة المباشرة</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- المجموعة 2 (الوسطى): أهم 3 أزرار للمستخدم -->
+                <nav class="nav-middle-group">
+                    <a href="index.html#marketplace" class="btn-nav-middle">
+                        <i class="fas fa-store"></i> المتجر
+                    </a>
+                    <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.location.href='index.html#open-sell'">
+                        <i class="fas fa-plus-circle"></i> بيع حساب
+                    </button>
+                    <a href="deals.html" class="btn-nav-middle">
+                        <i class="fas fa-shield-alt"></i> قائمة الصفقات
+                    </a>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ مع gap: 15px -->
+                <div class="nav-left-group">
+                    <!-- 1. رصيد المحفظة -->
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="openWalletQuickAlert()" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. زر الحساب الشخصي -->
+                    <div id="nav-user-container"></div>
+
+                    <!-- 3. أيقونة القائمة (☰) في أقصى اليسار -->
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleSupportDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Main Chat Page ================= -->
+        <main class="support-page-container">
+
+            <!-- تنبيه اختياري لتسجيل الدخول لحفظ المحادثة -->
+            <div class="support-login-banner" id="support-login-banner" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <i class="fas fa-shield-alt text-gold" style="font-size: 1.3rem;"></i>
+                    <span style="font-size: 0.88rem; color: #fff;">
+                        أنت تتواصل الآن كـ <strong>زائر مؤقت</strong>. سجل دخولك لحفظ سجل رسائلك والردود بشكل دائم.
+                    </span>
+                </div>
+                <button type="button" class="btn-3d btn-gold" onclick="loginWithGoogle()" style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
+                    <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
+                </button>
+            </div>
+
+            <!-- بطاقة المحادثة المستقلة الكاملة -->
+            <div class="support-fullpage-card card-3d">
+
+                <!-- 1. ترويسة المحادثة (الوسيط المعتمد) -->
+                <div class="support-fullpage-header">
+                    <div class="support-mediator-info">
+                        <div class="support-mediator-avatar-wrap">
+                            <img src="assets/logo.png" alt="الوسيط المعتمد" class="support-mediator-avatar">
+                            <span class="support-status-dot" title="متصل الآن"></span>
+                        </div>
+                        <div class="support-mediator-meta">
+                            <div class="support-mediator-name">
+                                <span>الوسيط المعتمد • إدارة WASEET</span>
+                                <span class="badge-mediator-crown"><i class="fas fa-crown"></i> إدارة رسمية</span>
+                            </div>
+                            <div class="support-mediator-status">
+                                <i class="fas fa-circle text-emerald" style="font-size: 0.55rem; color: #10b981;"></i> متاح للرد المباشر والمساعدة الفورية • متصل الآن
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.6rem; align-items: center;">
+                        <a href="admin-chats.html" id="btn-mediator-inbox" class="btn-3d btn-gold" style="display: none; padding: 0.45rem 0.85rem; font-size: 0.82rem; text-decoration: none;">
+                            <i class="fas fa-inbox"></i> صندوق الإدارة
+                        </a>
+                        <a href="index.html#marketplace" class="btn-3d btn-outline" style="padding: 0.45rem 0.85rem; font-size: 0.82rem; text-decoration: none;">
+                            <i class="fas fa-store text-gold"></i> المتجر
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. شريط الأسئلة والاستفسارات السريعة المساعدة -->
+                <div class="support-quick-chips" id="support-quick-chips">
+                    <button type="button" class="support-chip" data-text="مرحباً، لدي استفسار بخصوص فحص حسابي المعروض.">⏳ استفسار عن حسابي</button>
+                    <button type="button" class="support-chip" data-text="أرغب بالمساعدة في شحن رصيد المحفظة.">💳 شحن الرصيد</button>
+                    <button type="button" class="support-chip" data-text="كيف تتم إجراءات وساطة نقل الحساب؟">🛡️ ضمان الوساطة</button>
+                    <button type="button" class="support-chip" data-text="أحتاج للتحدث مباشرة مع الوسيط بخصوص صفقة.">💬 محادثة خاصة</button>
+                </div>
+
+                <!-- 3. مساحة عرض الرسائل (Scrollable Messages Area) -->
+                <div class="support-chat-messages" id="support-chat-messages">
+                    <div class="support-welcome-bubble">
+                        <div class="support-welcome-icon"><i class="fas fa-shield-alt text-gold"></i></div>
+                        <h4 style="margin: 0 0 0.35rem; color: #fff; font-size: 1rem;">مرحباً بك في المحادثة المباشرة مع الوسيط المعتمد</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--silver-muted); line-height: 1.5; max-width: 580px; margin: 0 auto;">
+                            يمكنك مراسلتنا هنا مباشرة بخصوص فحص الحسابات، طلبات الشحن، أو أي استفسار حول منصة وسيط. رسائلك مشفرة ومحمية وتصل للوسيط مباشرة بشكل لحظي.
+                        </p>
+                    </div>
+                    <!-- الرسائل السابقة والحالية تُحقن هنا ديناميكياً -->
+                </div>
+
+                <!-- 4. صندوق الإدخال والإرسال -->
+                <form class="support-chat-input-bar" id="support-chat-form" style="padding: 0.9rem 1.2rem; background: rgba(14, 18, 28, 0.95); border-top: 1px solid var(--border-metal); display: flex; gap: 0.75rem; align-items: center;">
+                    <input type="text" id="support-chat-input" class="support-chat-input" placeholder="اكتب رسالتك للوسيط المعتمد..." autocomplete="off" maxlength="1500" required style="flex: 1; background: rgba(22, 28, 44, 0.85); border: 1px solid var(--border-metal); border-radius: 12px; padding: 0.8rem 1.1rem; color: #fff; font-family: var(--font-ar); outline: none;">
+                    <button type="submit" class="btn-send-support" id="btn-send-support" title="إرسال" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--orange-bright), #c2410c); border: 1px solid var(--orange-bright); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; transition: all 0.2s ease;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+
+            </div>
+        </main>
+
+        <!-- ================= Sliding Drawer ================= -->
+        <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleSupportDrawer()"></div>
+        <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <img src="assets/logo.png" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                    <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+                </div>
+                <button class="drawer-close-btn" onclick="toggleSupportDrawer()">&times;</button>
+            </div>
+
+            <div class="drawer-user-card" id="drawer-user-card"></div>
+
+            <div class="drawer-section">
+                <h4 class="drawer-section-title">التنقل السريع</h4>
+                <div class="drawer-shortcuts-grid">
+                    <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-store text-gold"></i>
+                        <span>سوق الحسابات</span>
+                    </a>
+                    <a href="deals.html" class="drawer-shortcut-card" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-shield-alt text-gold"></i>
+                        <span>قائمة الصفقات</span>
+                    </a>
+                    <a href="contact-support.html" class="drawer-shortcut-card active" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-headset text-orange"></i>
+                        <span>تواصل مع الوسيط</span>
+                    </a>
+                    <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-link" style="display: none;" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-clipboard-check text-orange"></i>
+                        <span>قيد الفحص</span>
+                    </a>
+                    <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-inbox text-gold"></i>
+                        <span>محادثات الإدارة</span>
+                    </a>
+                    <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleSupportDrawer()">
+                        <i class="fas fa-boxes text-gold"></i>
+                        <span>حساباتي</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <h4 class="drawer-section-title">الحساب وتسجيل الدخول</h4>
+                <div class="drawer-auth-actions" id="drawer-auth-actions"></div>
+            </div>
+        </aside>
+
+        <!-- ================= Mobile App Bottom Navigation Bar ================= -->
+        <nav class="mobile-bottom-nav">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="index.html#marketplace" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>المتجر</span>
+            </a>
+            <a href="contact-support.html" class="mobile-nav-item mobile-nav-center-action active" title="المحادثة المباشرة">
+                <div class="center-action-circle" style="background: linear-gradient(135deg, var(--orange-bright), var(--gold-primary));">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <span>الوسيط</span>
+            </a>
+            <a href="deals.html" class="mobile-nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>الصفقات</span>
+            </a>
+            <button class="mobile-nav-item" onclick="toggleSupportDrawer()">
+                <i class="fas fa-user"></i>
+                <span>حسابي</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/particles.js"></script>
+
+    <script>
+        let supportRealtimeChannel = null;
+        let currentUser = null;
+
+        // صوت التنبيه اللحظي
+        function playSupportChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.25);
+            } catch (e) {}
+        }
+
+        // جلب المستخدم الحالي
+        function getActiveUser() {
+            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+                return WASEET_STATE.user;
+            }
+            try {
+                const saved = localStorage.getItem('WASEET_SAVED_USER_PERMANENT');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+
+            // توليد معرف فريد دائم للزائر
+            let guestId = localStorage.getItem('WASEET_GUEST_ID');
+            if (!guestId) {
+                guestId = 'guest_' + Math.random().toString(36).substring(2, 10);
+                localStorage.setItem('WASEET_GUEST_ID', guestId);
+            }
+            return {
+                id: guestId,
+                name: 'زائر المنصة',
+                isGuest: true,
+                wallet: { available: 0, locked: 0, total: 0 }
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = getActiveUser();
+
+            // التحقق من جلسة Supabase الحقيقية إن وجدت
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (client && client.auth) {
+                try {
+                    const { data: { session } } = await client.auth.getSession();
+                    if (session && session.user) {
+                        const u = session.user;
+                        currentUser = {
+                            id: u.id,
+                            email: u.email,
+                            name: (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || u.email.split('@')[0],
+                            avatar: (u.user_metadata && (u.user_metadata.avatar_url || u.user_metadata.picture)) || 'assets/logo.png',
+                            role: (u.email === 'fgkano63@gmail.com') ? 'admin' : 'buyer',
+                            wallet: (currentUser && currentUser.wallet) || { available: 0, locked: 0, total: 0 }
+                        };
+                        localStorage.setItem('WASEET_SAVED_USER_PERMANENT', JSON.stringify(currentUser));
+                    }
+                } catch (e) {
+                    console.warn('[Session Check]', e);
+                }
+            }
+
+            // إظهار بانر تسجيل الدخول إذا كان زائراً
+            const loginBanner = document.getElementById('support-login-banner');
+            if (loginBanner && currentUser.isGuest) {
+                loginBanner.style.display = 'flex';
+            }
+
+            // التحقق من صلاحيات المدير
+            const isMediator = currentUser && (
+                currentUser.role === 'admin' ||
+                currentUser.role === 'mediator' ||
+                currentUser.email === 'fgkano63@gmail.com'
+            );
+            if (isMediator) {
+                const inboxBtn = document.getElementById('btn-mediator-inbox');
+                if (inboxBtn) inboxBtn.style.display = 'inline-flex';
+                const drawerInbox = document.getElementById('drawer-admin-chats-link');
+                if (drawerInbox) drawerInbox.style.display = 'flex';
+                const drawerPending = document.getElementById('drawer-pending-link');
+                if (drawerPending) drawerPending.style.display = 'flex';
+            }
+
+            renderNavbarUser();
+            setupQuickChips();
+            setupChatForm();
+
+            // تحميل الرسائل وبدء Realtime
+            await loadMessages(currentUser.id);
+            setupRealtimeSubscription(currentUser.id);
+        });
+
+        function renderNavbarUser() {
+            const container = document.getElementById('nav-user-container');
+            const drawerCard = document.getElementById('drawer-user-card');
+            const drawerAuth = document.getElementById('drawer-auth-actions');
+            const walletPtsEl = document.getElementById('wallet-total-pts');
+
+            const pts = currentUser && currentUser.wallet ? currentUser.wallet.available : 0;
+            if (walletPtsEl) {
+                walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            }
+
+            if (container) {
+                if (currentUser && !currentUser.isGuest) {
+                    const avatar = currentUser.avatar || 'assets/logo.png';
+                    container.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleSupportDrawer()">
+                            <img src="${avatar}" alt="${currentUser.name}" style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold-primary); object-fit: cover;" onerror="this.src='assets/logo.png'">
+                            <span style="font-weight: 700; color: #fff; font-size: 0.85rem; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${currentUser.name}</span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <button class="btn-3d btn-outline" onclick="loginWithGoogle()" style="padding: 0.4rem 0.85rem; font-size: 0.82rem; border-radius: 999px;">
+                            <i class="fab fa-google text-gold"></i> دخول
+                        </button>
+                    `;
+                }
+            }
+
+            if (drawerCard) {
+                const avatar = (currentUser && currentUser.avatar) || 'assets/logo.png';
+                const name = (currentUser && currentUser.name) || 'زائر';
+                const roleLabel = (currentUser && currentUser.role === 'admin') ? '👑 الوسيط المعتمد' : 'مستخدم موثق';
+                drawerCard.innerHTML = `
+                    <img src="${avatar}" class="drawer-avatar" alt="${name}" onerror="this.src='assets/logo.png'" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--gold-primary); object-fit: cover;">
+                    <div class="drawer-user-meta">
+                        <span class="drawer-user-name" style="color: #fff; font-weight: 800;">${name}</span>
+                        <span class="drawer-user-role" style="color: var(--gold-light); font-size: 0.78rem;">${roleLabel}</span>
+                    </div>
+                `;
+            }
+
+            if (drawerAuth) {
+                if (currentUser && !currentUser.isGuest) {
+                    drawerAuth.innerHTML = `
+                        <button class="btn-3d btn-outline" onclick="logoutSupportUser()" style="width: 100%; border-color: #ef4444; color: #ef4444;">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                        </button>
+                    `;
+                } else {
+                    drawerAuth.innerHTML = `
+                        <button class="btn-social-login btn-social-google" onclick="loginWithGoogle()">
+                            <i class="fab fa-google" style="color: #ea4335;"></i> المتابعة باستخدام Google
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        async function loginWithGoogle() {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (client && client.auth) {
+                try {
+                    await client.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: { redirectTo: window.location.href }
+                    });
+                    return;
+                } catch (e) {
+                    console.warn('[Google Login Error]', e);
+                }
+            }
+            if (typeof waseetSignInWithGoogle === 'function') {
+                await waseetSignInWithGoogle();
+            }
+        }
+
+        function logoutSupportUser() {
+            localStorage.removeItem('WASEET_SAVED_USER_PERMANENT');
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (client && client.auth) {
+                client.auth.signOut();
+            }
+            window.location.reload();
+        }
+
+        function setupQuickChips() {
+            const chips = document.querySelectorAll('.support-chip');
+            const input = document.getElementById('support-chat-input');
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const text = chip.getAttribute('data-text');
+                    if (input && text) {
+                        input.value = text;
+                        input.focus();
+                    }
+                });
+            });
+        }
+
+        function setupChatForm() {
+            const form = document.getElementById('support-chat-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    sendMessage();
+                });
+            }
+        }
+
+        // جلب الرسائل
+        async function loadMessages(userId) {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            let messages = [];
+
+            if (client) {
+                try {
+                    const { data, error } = await client
+                        .from('support_messages')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .order('created_at', { ascending: true });
+
+                    if (!error && Array.isArray(data)) {
+                        messages = data;
+                    }
+                } catch (err) {
+                    console.warn('[Support Messages Query]', err);
+                }
+            }
+
+            // قراءة من التخزين المحلي كاحتياط
+            if (messages.length === 0) {
+                try {
+                    const local = JSON.parse(localStorage.getItem(`WASEET_SUPPORT_MSGS_${userId}`) || '[]');
+                    if (Array.isArray(local) && local.length > 0) messages = local;
+                } catch (e) {}
+            }
+
+            renderMessages(messages);
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('support-chat-messages');
+            if (!container) return;
+
+            const welcomeHtml = `
+                <div class="support-welcome-bubble">
+                    <div class="support-welcome-icon"><i class="fas fa-shield-alt text-gold"></i></div>
+                    <h4 style="margin: 0 0 0.35rem; color: #fff; font-size: 1rem;">مرحباً بك في المحادثة المباشرة مع الوسيط المعتمد</h4>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--silver-muted); line-height: 1.5; max-width: 580px; margin: 0 auto;">
+                        يمكنك مراسلتنا هنا مباشرة بخصوص فحص الحسابات، طلبات الشحن، أو أي استفسار حول منصة وسيط. رسائلك مشفرة ومحمية وتصل للوسيط مباشرة بشكل لحظي.
+                    </p>
+                </div>
+            `;
+
+            if (!messages || messages.length === 0) {
+                container.innerHTML = welcomeHtml;
+                return;
+            }
+
+            let html = welcomeHtml;
+            messages.forEach(msg => {
+                html += generateMessageBubble(msg);
+            });
+
+            container.innerHTML = html;
+            scrollToBottom();
+        }
+
+        function generateMessageBubble(msg) {
+            const isUser = msg.sender_role === 'user';
+            const timeStr = formatTime(msg.created_at);
+
+            if (isUser) {
+                return `
+                    <div class="support-msg-row user-row" data-msg-id="${msg.id || ''}">
+                        <div class="support-msg-bubble user-bubble">
+                            <div class="support-msg-text">${escapeHtml(msg.message)}</div>
+                            <div class="support-msg-time" style="font-size: 0.7rem; opacity: 0.8; margin-top: 0.3rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem;">
+                                ${timeStr} <i class="fas fa-check-double text-gold" style="font-size: 0.65rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="support-msg-row admin-row" data-msg-id="${msg.id || ''}">
+                        <div class="support-admin-avatar-tiny" title="الوسيط المعتمد">
+                            <img src="assets/logo.png" alt="الوسيط">
+                        </div>
+                        <div class="support-msg-bubble admin-bubble">
+                            <div class="support-admin-sender-tag" style="font-size: 0.72rem; font-weight: 800; color: var(--gold-light); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
+                                <i class="fas fa-crown text-gold"></i> الوسيط المعتمد (الإدارة)
+                            </div>
+                            <div class="support-msg-text">${escapeHtml(msg.message)}</div>
+                            <div class="support-msg-time" style="font-size: 0.7rem; opacity: 0.8; margin-top: 0.3rem;">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('support-chat-input');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            input.focus();
+
+            const newMsg = {
+                id: 'temp_' + Date.now(),
+                user_id: currentUser.id,
+                sender_role: 'user',
+                message: text,
+                created_at: new Date().toISOString()
+            };
+
+            // إضافة متفائلة فورية للواجهة
+            appendMessage(newMsg);
+
+            // حفظ محلي
+            try {
+                const key = `WASEET_SUPPORT_MSGS_${currentUser.id}`;
+                const local = JSON.parse(localStorage.getItem(key) || '[]');
+                local.push(newMsg);
+                localStorage.setItem(key, JSON.stringify(local));
+            } catch (e) {}
+
+            // إرسال لـ Supabase
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (client) {
+                try {
+                    const { data, error } = await client
+                        .from('support_messages')
+                        .insert([{
+                            user_id: currentUser.id,
+                            sender_role: 'user',
+                            message: text
+                        }])
+                        .select();
+
+                    if (!error && data && data[0]) {
+                        newMsg.id = data[0].id;
+                    }
+                } catch (err) {
+                    console.warn('[Send Message Error]', err);
+                }
+            }
+        }
+
+        function appendMessage(msg) {
+            const container = document.getElementById('support-chat-messages');
+            if (!container) return;
+
+            // التحقق من عدم التكرار
+            if (msg.id && !msg.id.startsWith('temp_')) {
+                const existing = container.querySelector(`[data-msg-id="${msg.id}"]`);
+                if (existing) return;
+            }
+
+            const div = document.createElement('div');
+            div.innerHTML = generateMessageBubble(msg);
+            const child = div.firstElementChild;
+            if (child && msg.id) {
+                child.setAttribute('data-msg-id', msg.id);
+            }
+            container.appendChild(child);
+            scrollToBottom();
+        }
+
+        function setupRealtimeSubscription(userId) {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            if (supportRealtimeChannel) {
+                try { client.removeChannel(supportRealtimeChannel); } catch (e) {}
+            }
+
+            try {
+                supportRealtimeChannel = client
+                    .channel(`support-chat-${userId}`)
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'support_messages',
+                        filter: `user_id=eq.${userId}`
+                    }, (payload) => {
+                        const newMsg = payload.new;
+                        if (!newMsg) return;
+
+                        if (newMsg.sender_role === 'admin') {
+                            playSupportChime();
+                        }
+                        appendMessage(newMsg);
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.warn('[Support Realtime Error]', err);
+            }
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('support-chat-messages');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            try {
+                const d = new Date(isoString);
+                return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function toggleSupportDrawer() {
+            const overlay = document.getElementById('drawer-overlay');
+            const drawer = document.getElementById('mobile-drawer');
+            if (overlay && drawer) {
+                const isActive = drawer.classList.contains('active');
+                if (isActive) {
+                    overlay.classList.remove('active');
+                    drawer.classList.remove('active');
+                } else {
+                    overlay.classList.add('active');
+                    drawer.classList.add('active');
+                }
+            }
+        }
+
+        function openWalletQuickAlert() {
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك بكل سهولة من الصفحة الرئيسية.');
+            } else {
+                alert('يمكنك شحن رصيدك من الصفحة الرئيسية للمنصة.');
+            }
+        }
+    </script>
+</body>
+</html>

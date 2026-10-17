@@ -5341,3 +5341,86 @@ input[type=number] {
     padding: 1.3rem;
     margin-top: 1.4rem;
 }
+
+/* ===================================================
+   1. إخفاء شعار Netlify العائم إجبارياً
+=================================================== */
+div[id*="netlify"],
+div[class*="netlify"],
+a[href*="netlify.com"],
+[data-netlify-deploy-id],
+#netlify-badge,
+.netlify-badge {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ===================================================
+   2. إصلاح تمرير نموذج بيع الحساب ومنع انقطاعه خلف شريط التنقل السفلي
+=================================================== */
+#modal-sell {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1.5rem 0.8rem 4rem !important;
+}
+
+#modal-sell .modal-box-3d {
+    max-height: none !important;
+    overflow-y: visible !important;
+    margin: auto !important;
+}
+
+#sell-account-form {
+    padding-bottom: 140px !important; /* مساحة كافية تضمن ظهور زر النشر فوق شريط التنقل السفلي */
+}
+
+@media (max-width: 868px) {
+    #modal-sell {
+        align-items: flex-start !important;
+        padding-top: 1rem !important;
+        padding-bottom: 3rem !important;
+    }
+    #sell-account-form {
+        padding-bottom: 160px !important;
+    }
+}
+
+/* ===================================================
+   3. تصميم صفحة المحادثة المستقلة مع الوسيط (contact-support.html)
+=================================================== */
+.support-page-container {
+    max-width: 960px;
+    margin: 1.2rem auto 3rem;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.support-fullpage-card {
+    background: linear-gradient(145deg, rgba(20, 26, 40, 0.98), rgba(10, 13, 22, 0.99));
+    border: 1px solid var(--gold-primary);
+    border-radius: 20px;
+    width: 100%;
+    height: calc(100vh - 140px);
+    min-height: 600px;
+    max-height: 860px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 35px rgba(197, 160, 89, 0.18);
+    overflow: hidden;
+}
+
+@media (max-width: 868px) {
+    .support-page-container {
+        margin: 0.5rem auto 5.5rem;
+        padding: 0 0.5rem;
+    }
+    .support-fullpage-card {
+        height: calc(100vh - 165px);
+        min-height: 520px;
+        border-radius: 16px;
+    }
+}
+

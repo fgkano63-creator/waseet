@@ -31,70 +31,20 @@
     }
 
     /**
-     * إنشاء وحقن النافذة المنبثقة والزر العائم للمحادثة المباشرة
+     * حقن الزر العائم للتواصل الفوري في أسفل الشاشة
      */
     function initSupportUI() {
-        if (document.getElementById('modal-support-chat')) return;
+        if (window.location.pathname.includes('contact-support.html') || window.location.pathname.includes('admin-chats.html')) {
+            return;
+        }
+        if (document.getElementById('support-floating-btn')) return;
 
-        // 1. حقن النافذة المنبثقة للمحادثة المباشرة
-        const modalHtml = `
-        <div class="modal-overlay" id="modal-support-chat" style="display: none; z-index: 10005;">
-            <div class="support-chat-card card-3d">
-                <div class="support-chat-header">
-                    <div class="support-mediator-info">
-                        <div class="support-mediator-avatar-wrap">
-                            <img src="assets/logo.png" alt="الوسيط المعتمد" class="support-mediator-avatar">
-                            <span class="support-status-dot" title="متصل الآن"></span>
-                        </div>
-                        <div class="support-mediator-meta">
-                            <div class="support-mediator-name">
-                                <span>الوسيط المعتمد • إدارة WASEET</span>
-                                <span class="badge-mediator-crown"><i class="fas fa-crown"></i> إدارة</span>
-                            </div>
-                            <div class="support-mediator-status">
-                                <i class="fas fa-circle text-emerald" style="font-size: 0.55rem;"></i> متاح للرد المباشر والمساعدة الفورية
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close-modal" id="btn-close-support-chat" aria-label="إغلاق">&times;</button>
-                </div>
-
-                <!-- شريط الأسئلة السريعة المساعدة -->
-                <div class="support-quick-chips" id="support-quick-chips">
-                    <button type="button" class="support-chip" data-text="مرحباً، لدي استفسار بخصوص فحص حسابي المعروض.">⏳ استفسار عن حسابي</button>
-                    <button type="button" class="support-chip" data-text="أرغب بالمساعدة في شحن رصيد المحفظة.">💳 شحن الرصيد</button>
-                    <button type="button" class="support-chip" data-text="كيف تتم إجراءات وساطة نقل الحساب؟">🛡️ ضمان الوساطة</button>
-                    <button type="button" class="support-chip" data-text="أحتاج للتحدث مباشرة مع الوسيط بخصوص صفقة.">💬 محادثة خاصة</button>
-                </div>
-
-                <!-- حاوية الرسائل -->
-                <div class="support-chat-messages" id="support-chat-messages">
-                    <div class="support-welcome-bubble">
-                        <div class="support-welcome-icon"><i class="fas fa-shield-alt text-gold"></i></div>
-                        <h4 style="margin: 0 0 0.35rem; color: #fff; font-size: 0.95rem;">مرحباً بك في المحادثة المباشرة مع الوسيط</h4>
-                        <p style="margin: 0; font-size: 0.8rem; color: var(--silver-muted); line-height: 1.4;">
-                            يمكنك مراسلتنا هنا مباشرة بخصوص فحص الحسابات، طلبات الشحن، أو أي استفسار حول منصة وسيط. رسائلك مشفرة ومحمية وتصل للإدارة فوراً.
-                        </p>
-                    </div>
-                    <!-- الرسائل تُحقن هنا ديناميكياً -->
-                </div>
-
-                <!-- صندوق الإدخال والإرسال -->
-                <form class="support-chat-input-bar" id="support-chat-form">
-                    <input type="text" id="support-chat-input" class="support-chat-input" placeholder="اكتب رسالتك للوسيط المعتمد..." autocomplete="off" maxlength="1500" required>
-                    <button type="submit" class="btn-send-support" id="btn-send-support" title="إرسال">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-        `;
-
-        // 2. حقن الزر العائم للتواصل الفوري في أسفل الشاشة
+        // حقن الزر العائم للتواصل الفوري في أسفل الشاشة يوجه للصفحة المستقلة
         const currentUser = getCurrentAuthUser();
         const isAdminViewer = currentUser && (typeof isMediatorUser === 'function'
             ? isMediatorUser(currentUser)
-            : currentUser.role === 'admin');
+            : (currentUser.role === 'admin' || currentUser.email === 'fgkano63@gmail.com'));
+
         const floatingBtnHtml = isAdminViewer ? `
         <a href="admin-chats.html" class="support-floating-pill" id="support-floating-btn" title="صندوق محادثات الدعم (الإدارة)" style="text-decoration: none;">
             <div class="support-floating-icon">
@@ -103,55 +53,16 @@
             <span class="support-floating-label">محادثات الإدارة</span>
         </a>
         ` : `
-        <button type="button" class="support-floating-pill" id="support-floating-btn" title="محادثة مباشرة مع الوسيط المعتمد" onclick="window.waseetOpenSupportChat()">
+        <a href="contact-support.html" class="support-floating-pill" id="support-floating-btn" title="محادثة مباشرة مع الوسيط المعتمد" style="text-decoration: none;">
             <div class="support-floating-icon">
                 <i class="fas fa-headset"></i>
                 <span class="support-badge-pulse" id="support-unread-dot" style="display: none;"></span>
             </div>
             <span class="support-floating-label">تواصل مع الوسيط</span>
-        </button>
+        </a>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
         document.body.insertAdjacentHTML('beforeend', floatingBtnHtml);
-
-        // ربط أحداث الإغلاق
-        const modal = document.getElementById('modal-support-chat');
-        const btnClose = document.getElementById('btn-close-support-chat');
-        if (btnClose && modal) {
-            btnClose.onclick = () => {
-                modal.style.display = 'none';
-                modal.classList.remove('active');
-            };
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    modal.classList.remove('active');
-                }
-            });
-        }
-
-        // ربط الشيبس السريعة
-        const chips = document.querySelectorAll('.support-chip');
-        const input = document.getElementById('support-chat-input');
-        chips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                const text = chip.getAttribute('data-text');
-                if (input && text) {
-                    input.value = text;
-                    input.focus();
-                }
-            });
-        });
-
-        // ربط نموذج الإرسال
-        const form = document.getElementById('support-chat-form');
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleSendSupportMessage();
-            });
-        }
     }
 
     /**
@@ -169,41 +80,10 @@
     }
 
     /**
-     * فتح نافذة المحادثة المباشرة مع الوسيط
+     * توجيه المستخدم مباشرة لصفحة المحادثة المستقلة مع الوسيط
      */
-    window.waseetOpenSupportChat = async function() {
-        initSupportUI();
-
-        const user = getCurrentAuthUser();
-        if (!user) {
-            if (typeof waseetAlert === 'function') {
-                await waseetAlert(
-                    'تسجيل الدخول مطلوب',
-                    'يرجى تسجيل الدخول أولاً لتتمكن من التحدث مع الوسيط المعتمد ومتابعة رسائلك بشكل آمن.',
-                    'warning'
-                );
-            }
-            if (window.waseetApp && typeof window.waseetApp.openLoginModal === 'function') {
-                window.waseetApp.openLoginModal();
-            }
-            return;
-        }
-
-        // إخفاء نقطة التنبيه
-        const unreadDot = document.getElementById('support-unread-dot');
-        if (unreadDot) unreadDot.style.display = 'none';
-
-        const modal = document.getElementById('modal-support-chat');
-        if (modal) {
-            modal.style.display = 'flex';
-            modal.classList.add('active');
-            const input = document.getElementById('support-chat-input');
-            if (input) input.focus();
-        }
-
-        // تحميل الرسائل وتهيئة البث المباشر
-        await loadUserSupportMessages(user.id);
-        setupSupportRealtime(user.id);
+    window.waseetOpenSupportChat = function() {
+        window.location.href = 'contact-support.html';
     };
 
     /**
@@ -419,26 +299,24 @@
                     const newMsg = payload.new;
                     if (!newMsg) return;
 
-                    // إذا كانت الرسالة من المدير ولم تكن النافذة مفتوحة، إظهار نقطة الإشعار
-                    const modal = document.getElementById('modal-support-chat');
-                    const isOpen = modal && modal.style.display !== 'none';
+                    const isChatPage = window.location.pathname.includes('contact-support.html');
 
                     if (newMsg.sender_role === 'admin') {
                         playSupportChime();
-                        if (!isOpen) {
+                        if (!isChatPage) {
                             const unreadDot = document.getElementById('support-unread-dot');
                             if (unreadDot) unreadDot.style.display = 'block';
                             if (typeof waseetAlert === 'function') {
                                 waseetAlert(
                                     '👑 رد جديد من الوسيط المعتمد',
-                                    `أرسل لك الوسيط رسالة جديدة:\n"${newMsg.message.substring(0, 80)}..."\nانقر على زر "تواصل مع الوسيط" لقراءتها.`,
+                                    `أرسل لك الوسيط رسالة جديدة:\n"${newMsg.message.substring(0, 80)}..."\nانقر على زر "تواصل مع الوسيط" لقراءتها والرد.`,
                                     'info'
                                 );
                             }
                         }
                     }
 
-                    if (isOpen) {
+                    if (isChatPage) {
                         appendSingleMessageToUI(newMsg);
                     }
                 })
