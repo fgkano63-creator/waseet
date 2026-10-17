@@ -1289,6 +1289,34 @@ class WaseetApp {
                 }
 
                 try {
+                    // 1. جلب بيانات البائع المسجل والتأكد من وجود seller_id صريح ليطابق سياسة RLS
+                    const client = window.waseetSupabaseClient || (typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null);
+                    let authUser = null;
+                    if (client) {
+                        const { data: sessionData } = await client.auth.getSession();
+                        authUser = sessionData?.session?.user || null;
+                        if (!authUser) {
+                            const { data: userData } = await client.auth.getUser();
+                            authUser = userData?.user || null;
+                        }
+                    }
+
+                    const currentUser = (window.WASEET_STATE && window.WASEET_STATE.user) || null;
+                    const sellerId = authUser?.id || currentUser?.id || null;
+
+                    if (!sellerId || sellerId === 'local_seller') {
+                        const authError = { message: 'يرجى تسجيل الدخول بحسابك أولاً لتتمكن من نشر الحساب.' };
+                        console.error('Insert Error:', authError);
+                        alert('فشل النشر: ' + authError.message);
+                        return;
+                    }
+
+                    const sellerName = currentUser?.name
+                        || authUser?.user_metadata?.full_name
+                        || authUser?.user_metadata?.name
+                        || (authUser?.email ? authUser.email.split('@')[0] : 'بائع معتمد');
+                    const sellerEmail = currentUser?.email || authUser?.email || '';
+
                     const game = selectedGameInput ? selectedGameInput.value : 'free_fire';
                     const title = (document.getElementById('form-title')?.value || '').trim() || 'حساب مميز';
                     const level = parseInt(document.getElementById('form-level')?.value) || 50;
@@ -1317,7 +1345,6 @@ class WaseetApp {
                         ];
                     }
 
-                    const currentUser = (window.WASEET_STATE && window.WASEET_STATE.user) || { id: 'local_seller', name: 'بائع معتمد' };
                     const newAccount = {
                         id: 'acc_' + Date.now(),
                         accountNumber: 1001 + (WASEET_STATE.accounts ? WASEET_STATE.accounts.length : 0),
@@ -1328,9 +1355,10 @@ class WaseetApp {
                         loginType: loginType,
                         bindStatus: bindStatus,
                         server: 'mena',
-                        sellerName: currentUser.name || 'بائع معتمد',
-                        sellerId: currentUser.id || 'local_seller',
-                        sellerEmail: currentUser.email || '',
+                        seller_id: sellerId,
+                        sellerId: sellerId,
+                        sellerName: sellerName,
+                        sellerEmail: sellerEmail,
                         sellerRating: 5.0,
                         sellerDeals: 1,
                         sellerPrice: sellerPrice,
@@ -1353,17 +1381,70 @@ class WaseetApp {
                         reviewMessage: 'الحساب قيد الفحص والتدقيق من قبل الوسيط المعتمد. المراجعة تكون في أقل من 24 ساعة.'
                     };
 
-                    // Save to Supabase marketplace_accounts so Admin sees it immediately in pending-accounts.html
+                    // 2. إدخال الحساب في جدول marketplace_accounts والتحقق الصريح من الأخطاء
+                    let savedRemote = null;
+                    let error = null;
+
                     if (typeof window.waseetSaveAccountToSupabase === 'function') {
-                        const savedRemote = await window.waseetSaveAccountToSupabase(newAccount);
-                        if (savedRemote && savedRemote.id) {
-                            newAccount.id = savedRemote.id;
-                            newAccount._syncedToSupabase = true;
-                        }
+                        const res = await window.waseetSaveAccountToSupabase(newAccount, { returnFullResult: true, showAlert: false });
+                        savedRemote = res?.data || null;
+                        error = res?.error || null;
+                    } else if (client) {
+                        const allowedGames = ['free_fire', 'pubg', 'other'];
+                        const dbGame = allowedGames.includes(game) ? game : 'other';
+                        const payload = {
+                            seller_id: sellerId,
+                            game: dbGame,
+                            title: title,
+                            level: level,
+                            prime_level: primeLevel,
+                            login_type: loginType,
+                            bind_status: bindStatus,
+                            server: 'mena',
+                            seller_price: sellerPrice,
+                            images: finalImages,
+                            details: {
+                                originalGame: game,
+                                sellerName: sellerName,
+                                sellerEmail: sellerEmail,
+                                evoGunsCount: evoCount,
+                                evoGuns: newAccount.evoGuns,
+                                rareSkins: rareSkins,
+                                iconicPants: iconicPants,
+                                accountNotes: newAccount.accountNotes,
+                                notes: newAccount.accountNotes,
+                                badge: newAccount.badge,
+                                reviewStatus: 'pending'
+                            },
+                            credentials: newAccount.credentials,
+                            status: 'pending_verification'
+                        };
+                        const { data: insertedData, error: insertErr } = await client
+                            .from('marketplace_accounts')
+                            .insert(payload)
+                            .select('*')
+                            .maybeSingle();
+                        savedRemote = insertedData;
+                        error = insertErr;
+                    } else {
+                        error = { message: 'تعذر الاتصال بقاعدة البيانات (Supabase Client غير مهيأ).' };
                     }
 
+                    if (error) {
+                        console.error('Insert Error:', error);
+                        alert('فشل النشر: ' + error.message);
+                        return;
+                    }
+
+                    if (savedRemote && savedRemote.id) {
+                        newAccount.id = savedRemote.id;
+                        newAccount.accountNumber = savedRemote.account_number || newAccount.accountNumber;
+                        newAccount.syncedToSupabase = true;
+                        newAccount._syncedToSupabase = true;
+                    }
+
+                    // 3. لا يتم الحفظ المحلي ولا إغلاق النافذة ولا إظهار رسالة النجاح إلا بعد نجاح الإدخال بدون أي أخطاء
                     WASEET_STATE.accounts.unshift(newAccount);
-                    // Save new account to localStorage so it persists on reload
                     try {
                         const savedAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
                         savedAccounts.unshift(newAccount);
@@ -1375,7 +1456,7 @@ class WaseetApp {
                     this.updateSellerListingsCounter();
                     this.updatePendingAccountsCounter();
 
-                    // Reset form and close Sell Modal immediately
+                    // Reset form and close Sell Modal only on success
                     this.uploadedImages = [];
                     this.renderImagePreviews();
                     this.closeSellModal();

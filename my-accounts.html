@@ -330,6 +330,9 @@
         }
 
         async function initMyAccountsPage() {
+            if (typeof window.waseetSyncAuthState === 'function') {
+                await window.waseetSyncAuthState();
+            }
             renderMyAccountsNavbarUser();
 
             // Setup edit modal close listeners

@@ -246,15 +246,49 @@ function waseetIsValidUuid(val) {
 /**
  * حفظ أو تحديث حساب معروض للبيع في جدول marketplace_accounts على Supabase
  */
-async function waseetSaveAccountToSupabase(account) {
+async function waseetSaveAccountToSupabase(account, options = {}) {
     const client = initWaseetSupabase();
-    if (!client || !account || !account.title) return null;
+    if (!client || !account || !account.title) {
+        const errObj = { message: 'تعذر الاتصال بقاعدة البيانات أو بيانات الحساب غير مكتملة.' };
+        if (options.showAlert) {
+            console.error('Insert Error:', errObj);
+            alert('فشل النشر: ' + errObj.message);
+        }
+        return options.returnFullResult ? { data: null, error: errObj } : null;
+    }
 
     try {
         const { data: { session } } = await client.auth.getSession();
-        const sessionUserId = session?.user?.id || null;
-        const sellerUuid = waseetIsValidUuid(account.sellerId) ? account.sellerId : sessionUserId;
-        if (!sellerUuid) return null;
+        const sessionUser = session?.user || null;
+        const sessionUserId = sessionUser?.id || null;
+        const candidateId = account.seller_id || account.sellerId || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        const sellerUuid = sessionUserId || (waseetIsValidUuid(candidateId) ? candidateId : null);
+
+        if (!sellerUuid) {
+            const authErr = { message: 'يرجى تسجيل الدخول بحسابك أولاً لتتمكن من نشر الحساب.' };
+            if (options.showAlert) {
+                console.error('Insert Error:', authErr);
+                alert('فشل النشر: ' + authErr.message);
+            }
+            return options.returnFullResult ? { data: null, error: authErr } : null;
+        }
+
+        // التأكد من وجود صف البائع في جدول profiles لمنع فشل المفتاح الأجنبي (Foreign Key seller_id)
+        try {
+            const sellerName = account.sellerName
+                || sessionUser?.user_metadata?.full_name
+                || sessionUser?.user_metadata?.name
+                || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.name : null)
+                || (sessionUser?.email ? sessionUser.email.split('@')[0] : 'بائع معتمد');
+            await client.from('profiles').upsert({
+                id: sellerUuid,
+                email: sessionUser?.email || account.sellerEmail || '',
+                name: sellerName,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'id', ignoreDuplicates: true });
+        } catch (profErr) {
+            console.warn('[Supabase Accounts] ملاحظة مزامنة ملف البائع:', profErr);
+        }
 
         // توحيد حالة الفحص للحسابات المعلقة
         let dbStatus = 'pending_verification';
@@ -277,6 +311,7 @@ async function waseetSaveAccountToSupabase(account) {
             localId: String(account.id || ''),
             originalGame: account.game || 'free_fire',
             sellerName: account.sellerName || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.name : 'بائع موثق'),
+            sellerEmail: account.sellerEmail || sessionUser?.email || '',
             evoGunsCount: Number(account.evoGunsCount || 0),
             evoGuns: account.evoGuns || [],
             rareSkins: account.rareSkins || [],
@@ -293,6 +328,7 @@ async function waseetSaveAccountToSupabase(account) {
             password: ''
         };
 
+        // 1. إرفاق معرف البائع إجبارياً في الـ Payload ليطابق سياسة الإدخال (RLS)
         const payload = {
             seller_id: sellerUuid,
             game: dbGame,
@@ -306,12 +342,12 @@ async function waseetSaveAccountToSupabase(account) {
             images: imagesArr,
             details: detailsObj,
             credentials: credsObj,
-            encrypted_credentials: JSON.stringify(credsObj),
-            status: dbStatus,
-            updated_at: new Date().toISOString()
+            status: dbStatus
         };
 
         let resultRow = null;
+        let finalError = null;
+
         if (waseetIsValidUuid(account.id)) {
             payload.id = account.id;
             const { data, error } = await client
@@ -320,8 +356,11 @@ async function waseetSaveAccountToSupabase(account) {
                 .select('*')
                 .maybeSingle();
             if (error) {
-                console.warn('[Supabase Accounts] تعذر تحديث الحساب:', error.message);
-                return null;
+                console.error('Insert Error:', error);
+                if (options.showAlert) {
+                    alert('فشل النشر: ' + error.message);
+                }
+                return options.returnFullResult ? { data: null, error } : null;
             }
             resultRow = data;
         } else {
@@ -330,9 +369,14 @@ async function waseetSaveAccountToSupabase(account) {
                 .insert(payload)
                 .select('*')
                 .maybeSingle();
+
             if (error) {
-                console.warn('[Supabase Accounts] تعذر إدراج الحساب:', error.message);
-                return null;
+                console.error('Insert Error:', error);
+                finalError = error;
+                if (options.showAlert) {
+                    alert('فشل النشر: ' + error.message);
+                }
+                return options.returnFullResult ? { data: null, error } : null;
             }
             resultRow = data;
         }
@@ -340,6 +384,8 @@ async function waseetSaveAccountToSupabase(account) {
         if (resultRow) {
             const oldId = account.id;
             account.id = resultRow.id;
+            account.seller_id = sellerUuid;
+            account.sellerId = sellerUuid;
             account.accountNumber = resultRow.account_number || account.accountNumber;
             account.syncedToSupabase = true;
 
@@ -349,6 +395,8 @@ async function waseetSaveAccountToSupabase(account) {
                 const idx = saved.findIndex(a => String(a.id) === String(oldId) || String(a.id) === String(resultRow.id) || a.title === account.title);
                 if (idx !== -1) {
                     saved[idx].id = resultRow.id;
+                    saved[idx].seller_id = sellerUuid;
+                    saved[idx].sellerId = sellerUuid;
                     saved[idx].accountNumber = account.accountNumber;
                     saved[idx].syncedToSupabase = true;
                     localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(saved));
@@ -356,10 +404,13 @@ async function waseetSaveAccountToSupabase(account) {
             } catch (e) {}
         }
 
-        return resultRow;
+        return options.returnFullResult ? { data: resultRow, error: finalError } : resultRow;
     } catch (err) {
-        console.warn('[Supabase Accounts] استثناء حفظ الحساب:', err);
-        return null;
+        console.error('Insert Error:', err);
+        if (options.showAlert) {
+            alert('فشل النشر: ' + (err.message || String(err)));
+        }
+        return options.returnFullResult ? { data: null, error: err } : null;
     }
 }
 
