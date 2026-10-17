@@ -76,7 +76,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
                         </div>
                     </div>
                 </nav>
@@ -88,7 +88,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0$</span>
                         </div>
                     </div>
 
@@ -357,7 +357,7 @@
             const user = WASEET_STATE.user;
             const pts = user && user.wallet ? user.wallet.available : 0;
             if (typeof waseetAlert === 'function') {
-                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts} نقطة (${pts}$). يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
+                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts}$. يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
             }
         }
 
@@ -368,7 +368,7 @@
             const walletPtsEl = document.getElementById('wallet-total-pts');
 
             const pts = user && user.wallet ? user.wallet.available : 0;
-            if (walletPtsEl) walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (walletPtsEl) walletPtsEl.innerText = `${pts}$`;
 
             // Sync Admin Mode & Desktop Nav Groups
             const isAdmin = !!(user && isMediatorUser(user));
@@ -396,11 +396,11 @@
             }
 
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (adminTotalEl) adminTotalEl.innerText = `${pts}$`;
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge && WASEET_STATE.deals) {
-                const dCount = WASEET_STATE.deals.length;
+                const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
                 adminDealsBadge.innerText = dCount;
                 adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
             }
@@ -644,7 +644,7 @@
                                     <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong></span>
                                     <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></span>
                                     <span style="background: rgba(234, 88, 12, 0.15); border: 1px solid var(--orange-bright); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800;">
-                                        سعر الظهور للمشتري: ${feeCalc.buyerPrice} نقطة ($${feeCalc.buyerPrice})
+                                        سعر الظهور للمشتري: ${feeCalc.buyerPrice}$
                                     </span>
                                 </div>
 

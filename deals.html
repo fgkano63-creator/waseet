@@ -218,7 +218,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
                         </div>
                     </div>
                 </nav>
@@ -230,7 +230,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="deals-wallet-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="deals-wallet-pts">0$</span>
                         </div>
                     </div>
 
@@ -385,9 +385,27 @@
     <script src="js/dialog.js"></script>
     <script src="js/support.js?v=20261017"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             renderDealsView();
             updateDrawerProfile();
+            if (typeof window.waseetFetchDealsFromSupabase === 'function') {
+                await window.waseetFetchDealsFromSupabase();
+                renderDealsView();
+                updateDrawerProfile();
+            }
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (!e.key || e.key.startsWith('WASEET_')) {
+                try {
+                    const savedActive = JSON.parse(localStorage.getItem('WASEET_DEALS_ACTIVE') || 'null');
+                    if (Array.isArray(savedActive)) WASEET_STATE.deals = savedActive;
+                    const savedCompleted = JSON.parse(localStorage.getItem('WASEET_DEALS_COMPLETED') || 'null');
+                    if (Array.isArray(savedCompleted)) WASEET_STATE.completedDeals = savedCompleted;
+                } catch (err) {}
+                renderDealsView(document.getElementById('deals-search-input')?.value || '');
+                updateDrawerProfile();
+            }
         });
 
         function toggleDealsDrawer() {
@@ -496,13 +514,13 @@
 
             const pts = (user && user.wallet && user.wallet.available) || 0;
             const walletPtsEl = document.getElementById('deals-wallet-pts');
-            if (walletPtsEl) walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (walletPtsEl) walletPtsEl.innerText = `${pts}$`;
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (adminTotalEl) adminTotalEl.innerText = `${pts}$`;
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge && WASEET_STATE.deals) {
-                const dCount = WASEET_STATE.deals.length;
+                const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
                 adminDealsBadge.innerText = dCount;
                 adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
             }
@@ -776,9 +794,19 @@
 
             // 3. Mediator Logged In -> Full Platform Deals Administration!
 
-            // Active and Completed deals
-            const activeDeals = (WASEET_STATE.deals || []).filter(d => d.status === 'active' || !d.status || d.status === 'pending');
-            const completedDeals = WASEET_STATE.completedDeals || [];
+            // Merge and deduplicate all deals so Admin sees EVERY deal across all statuses without exception
+            const allDealsMap = new Map();
+            (WASEET_STATE.deals || []).forEach(d => {
+                if (d && d.id) allDealsMap.set(String(d.id), d);
+            });
+            (WASEET_STATE.completedDeals || []).forEach(d => {
+                if (d && d.id && !allDealsMap.has(String(d.id))) allDealsMap.set(String(d.id), d);
+            });
+            const allPlatformDeals = Array.from(allDealsMap.values());
+
+            // Active/Pending/In-Progress Deals (all non-completed, non-cancelled statuses: waiting_credentials, mediator_inspecting, buyer_inspecting, pending_middleman, active, pending, created, disputed, etc.)
+            const activeDeals = allPlatformDeals.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
+            const completedDeals = allPlatformDeals.filter(d => d.status === 'completed' || d.status === 'cancelled');
 
             // Filter by search query (Requirement 6)
             const q = searchQuery.trim().toLowerCase();
@@ -812,7 +840,7 @@
             `;
 
             // Pending Review Accounts Section for Mediator (Requirement 1 & 2)
-            const pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_review');
+            const pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_review' || a.status === 'pending_verification');
             if (pendingAccounts.length > 0) {
                 html += `
                     <div style="margin-bottom: 2.5rem; background: rgba(245, 158, 11, 0.07); border: 2px solid rgba(245, 158, 11, 0.4); border-radius: 20px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
@@ -838,7 +866,7 @@
                                                 <span style="color: #fff;">${acc.title}</span>
                                             </div>
                                             <div class="deal-amount-tag">
-                                                $${acc.sellerPrice} <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice} نقطة)</span>
+                                                $${acc.sellerPrice} <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice}$)</span>
                                             </div>
                                         </div>
                                         <div class="deal-parties-grid">
@@ -924,10 +952,10 @@
         }
 
         function buildDealCardHtml(deal, idx, isCompleted) {
-            const stepText = deal.stageText || `المرحلة ${deal.currentStep}: نقل الملكية للمشتري وتأمين الحساب`;
+            const stepText = deal.stageText || `المرحلة ${deal.currentStep || 1}: نقل الملكية للمشتري وتأمين الحساب`;
             const isCancelled = deal.status === 'cancelled';
             const statusColor = isCancelled ? '#ef4444' : (isCompleted ? '#10b981' : 'var(--gold-light)');
-            const statusText = isCancelled ? 'ملغاة • تم استرجاع النقاط للمشتري' : (isCompleted ? 'مكتملة بنجاح 100% • تم تحرير الأرباح ✅' : stepText);
+            const statusText = isCancelled ? 'ملغاة • تم استرجاع الرصيد للمشتري' : (isCompleted ? 'مكتملة بنجاح 100% • تم تحرير الأرباح ✅' : stepText);
             const cardBorder = isCompleted ? 'border-color: rgba(16,185,129,0.3); opacity: 0.9;' : (isCancelled ? 'border-color: rgba(239,68,68,0.3);' : '');
 
             // Account number (Requirement 2 & 6)
@@ -949,7 +977,7 @@
                             <span>${deal.accountTitle}</span>
                         </div>
                         <div class="deal-amount-tag">
-                            ${deal.totalPoints}$ <span style="font-size: 0.95rem; color: #fff;">(${deal.totalPoints} نقطة)</span>
+                            ${deal.totalPoints}$
                         </div>
                     </div>
 

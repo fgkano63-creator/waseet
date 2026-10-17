@@ -226,7 +226,7 @@ class WaseetEscrowRoom {
         if (metaTitle) metaTitle.innerText = 'غرفة الوساطة المباشرة';
         if (metaDesc) metaDesc.innerText = 'لا توجد صفقة نشطة حالياً في النظام';
         if (topPill) {
-            topPill.innerHTML = `<span>المبلغ المحجوز:</span> <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0 نقطة</strong>`;
+            topPill.innerHTML = `<span>المبلغ المحجوز:</span> <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0$</strong>`;
             topPill.style.borderColor = 'var(--gold-primary)';
             topPill.style.boxShadow = 'none';
         }
@@ -239,7 +239,7 @@ class WaseetEscrowRoom {
                     <i class="fas fa-shield-alt text-gold" style="font-size: 3.5rem; margin-bottom: 1.2rem; display: block; opacity: 0.85;"></i>
                     <h2 style="color: #fff; font-size: 1.45rem; margin-bottom: 0.6rem;">لا توجد جلسة وساطة نشطة حالياً</h2>
                     <p style="font-size: 0.95rem; line-height: 1.8; color: var(--silver-muted); margin-bottom: 2rem;">
-                        لبدء صفقة شراء آمنة، تصفح سوق الحسابات واختر الحساب المناسب ثم اضغط على "طلب وساطة" لحجز النقاط وبدء المحادثة المشفرة فوراً مع الوسيط المعتمد.
+                        لبدء صفقة شراء آمنة، تصفح سوق الحسابات واختر الحساب المناسب ثم اضغط على "طلب وساطة" لحجز الرصيد وبدء المحادثة المشفرة فوراً مع الوسيط المعتمد.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                         <a href="index.html#marketplace" class="btn-3d btn-orange" style="text-decoration: none; padding: 0.75rem 1.4rem;">
@@ -305,7 +305,7 @@ class WaseetEscrowRoom {
         } else {
             topPill.innerHTML = `
                 <span>المبلغ المحجوز:</span>
-                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">${this.deal.totalPoints} نقطة (${this.deal.totalPoints}$)</strong>
+                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">${this.deal.totalPoints}$</strong>
             `;
             topPill.style.borderColor = 'var(--gold-primary)';
             topPill.style.boxShadow = 'none';
@@ -340,7 +340,7 @@ class WaseetEscrowRoom {
             `;
         } else if (this.viewerRole === 'buyer') {
             let note = 'أنت تتواصل في شات خاص ومباشر مع الوسيط المعتمد فقط. أموالك مؤمنة بالكامل.';
-            if (isCancelled) note = `💰 تم إلغاء الصفقة واسترجاع ${pts} نقطة بالكامل إلى محفظتك المتاحة بنجاح دون أي خصم.`;
+            if (isCancelled) note = `💰 تم إلغاء الصفقة واسترجاع ${pts}$ بالكامل إلى محفظتك المتاحة بنجاح دون أي خصم.`;
             if (isCompleted) note = '🎉 تهانينا! اكتملت صفقة الشراء بنجاح والحساب أصبح ملكك رسمياً مع ضمان WASEET الذهبي.';
 
             banner.innerHTML = `
@@ -354,7 +354,7 @@ class WaseetEscrowRoom {
             `;
         } else {
             let note = 'أنت تتواصل في شات خاص ومباشر مع الوسيط المعتمد فقط لمتابعة تسليم الحساب ومستحقاتك.';
-            if (isCancelled) note = '⚠️ تم إلغاء الصفقة لعدم مطابقة بيانات الحساب للشروط، وتم استرجاع النقاط للمشتري.';
+            if (isCancelled) note = '⚠️ تم إلغاء الصفقة لعدم مطابقة بيانات الحساب للشروط، وتم استرجاع الرصيد للمشتري.';
             if (isCompleted) note = `💰 مبروك! تم إيداع ${sellerPayout}$ في رصيدك المتاح للسحب كاش فوراً.`;
 
             banner.innerHTML = `
@@ -376,7 +376,7 @@ class WaseetEscrowRoom {
         if (this.deal.status === 'cancelled') {
             pipelineContainer.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 0.5rem; color: #ef4444; font-weight: 700;">
-                    <i class="fas fa-times-circle"></i> تم إيقاف وإلغاء مراحل الصفقة • تم إرجاع النقاط للمشتري
+                    <i class="fas fa-times-circle"></i> تم إيقاف وإلغاء مراحل الصفقة • تم إرجاع الرصيد للمشتري
                 </div>
             `;
             return;
@@ -384,7 +384,7 @@ class WaseetEscrowRoom {
 
         const pts = this.deal.totalPoints || 0;
         const steps = [
-            { num: 1, title: 'حجز النقاط', desc: `تم حجز ${pts} نقطة بالخزينة` },
+            { num: 1, title: 'حجز الرصيد', desc: `تم حجز ${pts}$ بالخزينة` },
             { num: 2, title: 'نقل الملكية', desc: 'تغيير الربط وتأمين المشتري' },
             { num: 3, title: 'تحرير الرصيد', desc: 'إرسال الأرباح وإنهاء الصفقة' }
         ];
@@ -658,13 +658,13 @@ class WaseetEscrowRoom {
             const pts = this.deal.totalPoints || 0;
             return `
                 <div class="creds-header">
-                    <div class="creds-title"><i class="fas fa-undo-alt" style="color: #ef4444;"></i> <span>إلغاء الصفقة واسترجاع النقاط</span></div>
+                    <div class="creds-title"><i class="fas fa-undo-alt" style="color: #ef4444;"></i> <span>إلغاء الصفقة واسترجاع الرصيد</span></div>
                     <span class="badge-secure" style="border-color: #ef4444; color: #ef4444;">تم الاسترجاع</span>
                 </div>
                 <div class="safe-panel-body">
                     <div class="cancelled-card-highlight">
                         <i class="fas fa-wallet text-gold" style="font-size: 2.2rem; margin-bottom: 0.5rem;"></i>
-                        <h4 style="color: #fff; margin-bottom: 0.4rem;">تم استرجاع ${pts} نقطة لمحافظتك بالكامل</h4>
+                        <h4 style="color: #fff; margin-bottom: 0.4rem;">تم استرجاع ${pts}$ لمحفظتك بالكامل</h4>
                         <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.6;">
                             قام الوسيط المعتمد برفض بيانات الحساب لعدم مطابقتها أو لحمايتك من أي خلل. تمت إعادة كامل المبلغ إلى رصيدك المتاح دون خصم أي عمولة.
                         </p>
@@ -700,7 +700,7 @@ class WaseetEscrowRoom {
         return `
             <div class="creds-header">
                 <div class="creds-title"><i class="fas fa-user-shield text-gold"></i> <span>حماية المشتري وضمان الاستلام</span></div>
-                <span class="badge-secure">نقاطك مؤمنة 100%</span>
+                <span class="badge-secure">رصيدك مؤمن 100%</span>
             </div>
             <div class="safe-panel-body">
                 <div class="shield-lock-notice">
@@ -712,7 +712,7 @@ class WaseetEscrowRoom {
                 </div>
                 <div class="deal-receipt-summary">
                     <div class="receipt-row"><span style="color: var(--silver-muted);">الحساب المطلوب:</span><span class="text-white" style="font-weight: 700;">${this.deal.accountTitle}</span></div>
-                    <div class="receipt-row"><span style="color: var(--silver-muted);">المبلغ المحجوز من محفظتك:</span><span class="text-gold font-mono" style="font-weight: 800;">${this.deal.totalPoints} نقطة (${this.deal.totalPoints}$)</span></div>
+                    <div class="receipt-row"><span style="color: var(--silver-muted);">المبلغ المحجوز من محفظتك:</span><span class="text-gold font-mono" style="font-weight: 800;">${this.deal.totalPoints}$</span></div>
                     <div class="receipt-row"><span style="color: var(--silver-muted);">حالة الضمان:</span><span style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> مؤمن بالكامل في خزينة الوساطة</span></div>
                 </div>
             </div>
@@ -734,7 +734,7 @@ class WaseetEscrowRoom {
                         <i class="fas fa-ban" style="font-size: 2.2rem; margin-bottom: 0.5rem; color: #ef4444;"></i>
                         <h4 style="color: #fff; margin-bottom: 0.4rem;">تم إلغاء الصفقة بواسطة الوسيط</h4>
                         <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.6;">
-                            تم إلغاء الصفقة وإرجاع النقاط للمشتري. يرجى مراجعة الوسيط عبر الشات لمعرفة سبب الرفض وإعادة نشر الحساب بالشروط الصحيحة.
+                            تم إلغاء الصفقة وإرجاع الرصيد للمشتري. يرجى مراجعة الوسيط عبر الشات لمعرفة سبب الرفض وإعادة نشر الحساب بالشروط الصحيحة.
                         </p>
                     </div>
                 </div>
@@ -754,7 +754,7 @@ class WaseetEscrowRoom {
                     <div class="payout-card-highlight">
                         <i class="fas fa-wallet text-gold" style="font-size: 2.4rem; margin-bottom: 0.5rem;"></i>
                         <span style="font-size: 0.85rem; color: var(--silver-muted);">تم إيداع أرباحك في محفظتك المتاحة:</span>
-                        <div style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-en); color: #10b981; margin: 0.3rem 0;">+$${sellerPayout} <span style="font-size: 1rem; color: #fff;">(${sellerPayout} نقطة)</span></div>
+                        <div style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-en); color: #10b981; margin: 0.3rem 0;">+${sellerPayout}$</div>
                         <span style="font-size: 0.75rem; color: var(--silver-muted);">رصيدك متاح الآن للسحب الفوري كاش</span>
                     </div>
                 </div>
@@ -769,11 +769,11 @@ class WaseetEscrowRoom {
             <div class="safe-panel-body">
                 <div class="payout-card-highlight">
                     <span style="font-size: 0.8rem; color: var(--silver-muted);">صافي ربحك من هذه الصفقة:</span>
-                    <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-en); color: var(--gold-light); margin: 0.3rem 0;">$${sellerPayout} <span style="font-size: 0.95rem; color: #fff;">(${sellerPayout} نقطة)</span></div>
+                    <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-en); color: var(--gold-light); margin: 0.3rem 0;">${sellerPayout}$</div>
                     <span style="font-size: 0.75rem; color: var(--silver-muted);">+ ${fee}$ عمولة المنصة يدفعها المشتري تلقائياً</span>
                 </div>
                 <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.7; margin-top: 1rem;">
-                    تم استلام بيانات الحساب التي رفعتها ويقوم الوسيط بفحصها الآن. بمجرد أن ينهي الوسيط تسليم الحساب للمشتري وتأكيد الربط، سيقوم الوسيط فوراً بضغط زر <strong>تحرير الرصيد</strong> لتصلك الـ ${sellerPayout} نقطة في محفظتك المتاحة للسحب كاش.
+                    تم استلام بيانات الحساب التي رفعتها ويقوم الوسيط بفحصها الآن. بمجرد أن ينهي الوسيط تسليم الحساب للمشتري وتأكيد الربط، سيقوم الوسيط فوراً بضغط زر <strong>تحرير الرصيد</strong> ليصلك مبلغ ${sellerPayout}$ في محفظتك المتاحة للسحب كاش.
                 </p>
             </div>
         `;
@@ -971,6 +971,9 @@ class WaseetEscrowRoom {
 
         this.renderAll();
         saveWaseetData();
+        if (typeof window.waseetSaveDealToSupabase === 'function') {
+            window.waseetSaveDealToSupabase(this.deal);
+        }
         this.broadcastUpdate();
     }
 
@@ -1011,6 +1014,9 @@ class WaseetEscrowRoom {
         }
 
         saveWaseetData();
+        if (typeof window.waseetSaveDealToSupabase === 'function') {
+            await window.waseetSaveDealToSupabase(this.deal);
+        }
         this.broadcastUpdate();
         this.renderAll();
         if (typeof waseetAlert === 'function') {
@@ -1027,8 +1033,8 @@ class WaseetEscrowRoom {
         if (typeof waseetConfirm === 'function') {
             confirmCancel = await waseetConfirm(
                 'تأكيد رفض الحساب وإلغاء الصفقة',
-                `هل أنت متأكد من رفض الحساب وإلغاء صفقة الوساطة؟\n\nسيتم فك الحجز وإرجاع كامل المبلغ (${this.deal.totalPoints} نقطة / ${this.deal.totalPoints}$) إلى محفظة المشتري المتاحة فوراً دون خصم أي عمولة.`,
-                'نعم، رفض الحساب وإرجاع النقاط',
+                `هل أنت متأكد من رفض الحساب وإلغاء صفقة الوساطة؟\n\nسيتم فك الحجز وإرجاع كامل المبلغ (${this.deal.totalPoints}$) إلى محفظة المشتري المتاحة فوراً دون خصم أي عمولة.`,
+                'نعم، رفض الحساب وإرجاع الرصيد',
                 'تراجع',
                 'danger'
             );
@@ -1054,13 +1060,13 @@ class WaseetEscrowRoom {
 
         this.deal.buyerMessages.push({
             sender: 'system',
-            text: `⚠️ قام الوسيط المعتمد برفض الحساب وإلغاء الصفقة. تم استرجاع كامل المبلغ (${this.deal.totalPoints} نقطة / ${this.deal.totalPoints}$) إلى محفظتك المتاحة.`,
+            text: `⚠️ قام الوسيط المعتمد برفض الحساب وإلغاء الصفقة. تم استرجاع كامل المبلغ (${this.deal.totalPoints}$) إلى محفظتك المتاحة.`,
             time: timeStr
         });
 
         this.deal.sellerMessages.push({
             sender: 'system',
-            text: `⚠️ قام الوسيط المعتمد بإلغاء الصفقة لعدم صحة/مطابقة بيانات الحساب للشروط، وتم استرجاع النقاط للمشتري.`,
+            text: `⚠️ قام الوسيط المعتمد بإلغاء الصفقة لعدم صحة/مطابقة بيانات الحساب للشروط، وتم استرجاع الرصيد للمشتري.`,
             time: timeStr
         });
 
@@ -1074,6 +1080,9 @@ class WaseetEscrowRoom {
         }
 
         saveWaseetData();
+        if (typeof window.waseetSaveDealToSupabase === 'function') {
+            await window.waseetSaveDealToSupabase(this.deal);
+        }
         this.broadcastUpdate();
         this.renderAll();
 

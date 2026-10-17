@@ -80,7 +80,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
                         </div>
                     </div>
                 </nav>
@@ -92,7 +92,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0$</span>
                         </div>
                     </div>
 
@@ -325,7 +325,7 @@
             const user = WASEET_STATE.user;
             const pts = user && user.wallet ? user.wallet.available : 0;
             if (typeof waseetAlert === 'function') {
-                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts} نقطة (${pts}$). يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
+                waseetAlert('محفظة النقاط', `رصيدك الحالي: ${pts}$. يمكنك الشحن أو السحب من الصفحة الرئيسية.`);
             }
         }
 
@@ -355,7 +355,7 @@
                         editFeePreview.innerHTML = `
                             <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
                                 <div>صافي البائع: <strong class="text-gold">$${feeCalc.sellerPrice}</strong> | عمولة المنصة: <strong class="text-orange">+$${feeCalc.fee}</strong></div>
-                                <div style="color: #fff; font-weight: 700; margin-top: 2px;">سعر الظهور للمشتري: ${feeCalc.buyerPrice} نقطة (${feeCalc.buyerPrice}$)</div>
+                                <div style="color: #fff; font-weight: 700; margin-top: 2px;">سعر الظهور للمشتري: ${feeCalc.buyerPrice}$</div>
                             </div>
                         `;
                     }
@@ -382,7 +382,7 @@
 
             const pts = user && user.wallet ? user.wallet.available : 0;
             if (walletPtsEl) {
-                walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+                walletPtsEl.innerText = `${pts}$`;
             }
 
             const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
@@ -410,11 +410,11 @@
             }
 
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (adminTotalEl) adminTotalEl.innerText = `${pts}$`;
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge && WASEET_STATE.deals) {
-                const dCount = WASEET_STATE.deals.length;
+                const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
                 adminDealsBadge.innerText = dCount;
                 adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
             }
@@ -457,7 +457,7 @@
                         <div class="drawer-user-meta" style="flex: 1;">
                             <span class="drawer-user-name">${user.name}</span>
                             <span class="drawer-user-role">${roleBadge}</span>
-                            <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة (${pts}$) متاحة</span>
+                            <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts}$ متاحة</span>
                         </div>
                     `;
                 } else {
@@ -632,8 +632,8 @@
                                     </div>
                                     <div class="card-footer" style="padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto;">
                                         <div class="price-col" style="margin-bottom: 0.4rem;">
-                                            <span class="price-sub">صافي ربحك: $${pricing.sellerPrice} (يظهر للمشتري: ${pricing.buyerPrice} نقطة)</span>
-                                            <span class="price-main">$${pricing.sellerPrice} <span style="font-size: 0.85rem; color: var(--gold-light);">دولار</span></span>
+                                            <span class="price-sub">صافي ربحك: $${pricing.sellerPrice} (يظهر للمشتري: ${pricing.buyerPrice}$)</span>
+                                            <span class="price-main">${pricing.sellerPrice}$</span>
                                         </div>
                                         <div class="my-account-card-actions">
                                             <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">

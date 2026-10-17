@@ -250,16 +250,16 @@ grant execute on function public.get_account_credentials(uuid) to authenticated;
 -- 4. جدول صفقات الوساطة (deals)
 -- ==============================================================================
 create table if not exists public.deals (
-    id text primary key, -- مثل DEAL-1001 أو UUID
+    id text primary key, -- مثل DEAL-1001 أو DEAL-2
     account_id uuid references public.marketplace_accounts(id) on delete set null,
     account_number integer,
     buyer_id uuid not null references public.profiles(id),
-    seller_id uuid not null references public.profiles(id),
+    seller_id uuid references public.profiles(id),
     seller_price numeric not null check (seller_price >= 0),
     fee numeric not null check (fee >= 0),
     total_points numeric not null check (total_points >= 0),
     status text not null default 'waiting_credentials' 
-        check (status in ('waiting_credentials', 'mediator_inspecting', 'buyer_inspecting', 'completed', 'cancelled', 'disputed')),
+        check (status in ('waiting_credentials', 'mediator_inspecting', 'buyer_inspecting', 'pending_middleman', 'active', 'pending', 'created', 'completed', 'cancelled', 'disputed')),
     current_step integer not null default 1 check (current_step between 1 and 4),
     -- بيانات الدخول المشفرة (لا تُخزن بنص عادي ولا تُعرض مباشرة في الواجهة)
     encrypted_credentials text,
@@ -270,14 +270,20 @@ create table if not exists public.deals (
 
 -- ضبط أذونات deals
 revoke all on table public.deals from anon;
-grant select on table public.deals to authenticated;
+grant select, insert, update on table public.deals to authenticated;
 grant all on table public.deals to service_role;
 
 -- تفعيل RLS
 alter table public.deals enable row level security;
 
 -- سياسات RLS لجدول الصفقات:
--- القراءة: المشتري والبائع الخاصان بالصفقة فقط أو المدير العام
+-- 1. القراءة الشاملة للمدير (يرى جميع الصفقات بجميع حالاتها دون استثناء)
+drop policy if exists "deals_admin_select_all" on public.deals;
+create policy "deals_admin_select_all"
+on public.deals for select to authenticated
+using ( public.is_admin() );
+
+-- 2. القراءة للمشتري أو البائع المشارك في الصفقة
 drop policy if exists "deals_select_participants_or_admin" on public.deals;
 create policy "deals_select_participants_or_admin"
 on public.deals for select to authenticated
@@ -285,12 +291,25 @@ using (
   buyer_id = auth.uid() or seller_id = auth.uid() or public.is_admin()
 );
 
--- التعديل والإضافة للصفقات: محصورة بالخادم (service_role عبر Netlify Function) أو المدير لحماية الحسابات المالية والأسعار والعمولة من التلاعب
+-- 3. إنشاء صفقة وساطة جديدة (من قِبل المشتري أو البائع أو المدير)
+drop policy if exists "deals_insert_policy" on public.deals;
+create policy "deals_insert_policy"
+on public.deals for insert to authenticated
+with check (
+  buyer_id = auth.uid() or seller_id = auth.uid() or public.is_admin()
+);
+
+-- 4. تحديث حالة الصفقة وخطواتها (لأطراف الصفقة أو المدير)
 drop policy if exists "deals_admin_update" on public.deals;
-create policy "deals_admin_update"
+drop policy if exists "deals_update_policy" on public.deals;
+create policy "deals_update_policy"
 on public.deals for update to authenticated
-using ( public.is_admin() )
-with check ( public.is_admin() );
+using (
+  buyer_id = auth.uid() or seller_id = auth.uid() or public.is_admin()
+)
+with check (
+  buyer_id = auth.uid() or seller_id = auth.uid() or public.is_admin()
+);
 
 
 -- ==============================================================================

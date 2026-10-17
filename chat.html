@@ -80,7 +80,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
                         </div>
                     </div>
                 </nav>
@@ -92,7 +92,7 @@
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="chat-wallet-pts">0 نقطة (0$)</span>
+                            <span class="wallet-amount" id="chat-wallet-pts">0$</span>
                         </div>
                     </div>
 
@@ -137,7 +137,7 @@
 
                             <div class="locked-amount-pill">
                                 <span>المبلغ المحجوز:</span>
-                                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0 نقطة</strong>
+                                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0$</strong>
                             </div>
                         </div>
                     </div>
@@ -372,13 +372,13 @@
 
             const pts = (user && user.wallet && user.wallet.available) || 0;
             const walletPtsEl = document.getElementById('chat-wallet-pts');
-            if (walletPtsEl) walletPtsEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (walletPtsEl) walletPtsEl.innerText = `${pts}$`;
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة (${pts}$)`;
+            if (adminTotalEl) adminTotalEl.innerText = `${pts}$`;
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge && WASEET_STATE.deals) {
-                const dCount = WASEET_STATE.deals.length;
+                const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
                 adminDealsBadge.innerText = dCount;
                 adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
             }

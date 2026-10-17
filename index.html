@@ -77,8 +77,8 @@
                     <div class="wallet-pill" id="admin-wallet-pill" onclick="window.waseetApp && window.waseetApp.openWalletModal && window.waseetApp.openWalletModal()" title="انقر لإدارة وشحن المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
-                            <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-label">الرصيد</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
                         </div>
                     </div>
                 </nav>
@@ -89,10 +89,10 @@
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.waseetApp && window.waseetApp.openWalletModal && window.waseetApp.openWalletModal()" title="انقر لإدارة وشحن المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
-                            <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة (0$)</span>
+                            <span class="wallet-label">الرصيد</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0$</span>
                         </div>
-                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 محجوز</span>
+                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0$ محجوز</span>
                     </div>
 
                     <!-- 2. زر الحساب الشخصي -->
@@ -315,7 +315,7 @@
                             </div>
                             <div class="res-row">
                                 <span class="res-label" style="font-weight: 800; color: #fff;">السعر النهائي الذي يدفعه المشتري:</span>
-                                <span class="res-val text-gold big" id="calc-res-buyer">33 نقطة ($33)</span>
+                                <span class="res-val text-gold big" id="calc-res-buyer">33$</span>
                             </div>
                         </div>
                     </div>
@@ -707,35 +707,35 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المتاح للشراء والسحب:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0 نقطة (0$)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0$</div>
                 </div>
                 <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid var(--orange-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المحجوز في صفقات الوساطة:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0 نقطة (0$)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0$</div>
                 </div>
             </div>
 
             <div style="background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-metal); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem;">
                 <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--gold-light);">
-                    <i class="fas fa-money-bill-wave"></i> شحن نقاط جديدة (1 نقطة = 1 دولار)
+                    <i class="fas fa-money-bill-wave"></i> شحن رصيد المحفظة ($)
                 </h4>
                 
                 <!-- Luxury 3D Number Stepper (Requirement 2 & 3 - Image 3) -->
                 <div class="input-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> عدد النقاط المراد شحنها:</label>
-                        <span class="stepper-live-val" id="topup-live-preview">50 نقطة (50$)</span>
+                        <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> المبلغ المراد شحنه:</label>
+                        <span class="stepper-live-val" id="topup-live-preview">50$</span>
                     </div>
                     
                     <div class="luxury-stepper-container">
-                        <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustTopup(-10)" title="إنقاص 10 نقاط">
+                        <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustTopup(-10)" title="إنقاص 10$">
                             <i class="fas fa-minus"></i>
                         </button>
                         <div class="stepper-input-wrap">
                             <input type="number" id="topup-amount" class="stepper-number-input" value="50" min="10" max="10000" step="5" oninput="window.waseetSyncTopupInput()">
-                            <span class="stepper-unit-label">نقطة</span>
+                            <span class="stepper-unit-label">$</span>
                         </div>
-                        <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10 نقاط">
+                        <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10$">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>

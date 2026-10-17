@@ -217,7 +217,7 @@ class WaseetApp {
                     <div class="drawer-user-meta" style="flex: 1;">
                         <span class="drawer-user-name">${user.name}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
-                        <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة (${pts}$) متاحة</span>
+                        <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts}$ متاحة</span>
                     </div>
                     <i class="fas fa-user-cog text-gold" style="font-size: 1.05rem; opacity: 0.85;" title="إدارة الحساب"></i>
                 `;
@@ -425,39 +425,60 @@ class WaseetApp {
        MEDIATOR DEALS LIST MODAL (قائمة صفقات الوساطة)
        ========================================================================== */
 
-    openMediatorDealsModal() {
+    async openMediatorDealsModal() {
         const container = document.getElementById('mediator-deals-list-container');
         const modal = document.getElementById('modal-mediator-deals');
         if (!modal || !container) return;
 
-        const deals = WASEET_STATE.deals || [WASEET_STATE.activeDeal];
+        modal.classList.add('active');
+
+        if (typeof window.waseetFetchDealsFromSupabase === 'function') {
+            await window.waseetFetchDealsFromSupabase();
+        }
+
+        const dealsMap = new Map();
+        (WASEET_STATE.deals || []).forEach(d => { if (d && d.id) dealsMap.set(String(d.id), d); });
+        (WASEET_STATE.completedDeals || []).forEach(d => { if (d && d.id && !dealsMap.has(String(d.id))) dealsMap.set(String(d.id), d); });
+        const deals = Array.from(dealsMap.values());
+
+        if (deals.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--silver-muted);">
+                    <i class="fas fa-shield-alt text-gold" style="font-size: 2.2rem; margin-bottom: 0.8rem; display: block;"></i>
+                    لا توجد صفقات مسجلة حالياً.
+                </div>
+            `;
+            return;
+        }
 
         container.innerHTML = deals.map((deal, idx) => {
             const stepTitles = [
                 'المرحلة 0: ملغاة',
-                'المرحلة 1: حجز النقاط وتأكيد الطلب',
+                'المرحلة 1: حجز الرصيد وتأكيد الطلب',
                 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب',
                 'المرحلة 3: تحرير الرصيد وإرسال الأرباح',
                 'المرحلة 4: مكتملة بنجاح 100%'
             ];
-            const currentTitle = stepTitles[deal.currentStep] || deal.stageText;
+            const currentTitle = deal.stageText || stepTitles[deal.currentStep] || 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب';
+            const buyerName = (deal.buyer && deal.buyer.name) ? deal.buyer.name : 'المشتري';
+            const sellerName = (deal.seller && deal.seller.name) ? deal.seller.name : 'البائع';
 
             return `
                 <div class="deal-card-item">
                     <div class="deal-card-header">
                         <div style="display: flex; align-items: center; gap: 0.6rem;">
                             <span class="deal-num-tag">#DEAL-${deal.dealNumber || (idx + 1)}</span>
-                            <strong style="color: #fff; font-size: 1rem;">${deal.accountTitle}</strong>
+                            <strong style="color: #fff; font-size: 1rem;">${deal.accountTitle || deal.title || 'حساب وساطة'}</strong>
                         </div>
                         <span style="font-family: var(--font-en); font-weight: 800; color: var(--gold-light); font-size: 1.15rem;">
-                            ${deal.totalPoints}$ (${deal.totalPoints} نقطة)
+                            ${deal.totalPoints || 0}$
                         </span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; margin: 0.8rem 0; font-size: 0.85rem; color: var(--silver-muted);">
-                        <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color:#fff;">${deal.buyer.name}</strong></div>
-                        <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color:#fff;">${deal.seller.name}</strong></div>
-                        <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+$${deal.fee}</strong></div>
+                        <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color:#fff;">${buyerName}</strong></div>
+                        <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color:#fff;">${sellerName}</strong></div>
+                        <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+$${deal.fee || 0}</strong></div>
                     </div>
 
                     <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.6rem 0.8rem; margin-bottom: 0.9rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
@@ -473,8 +494,6 @@ class WaseetApp {
                 </div>
             `;
         }).join('');
-
-        modal.classList.add('active');
     }
 
     updateWalletDisplay() {
@@ -486,18 +505,18 @@ class WaseetApp {
         const chatsBadge = document.getElementById('nav-chats-badge');
 
         const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-        if (totalEl) totalEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
-        if (adminTotalEl) adminTotalEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
+        if (totalEl) totalEl.innerText = `${wallet.available}$`;
+        if (adminTotalEl) adminTotalEl.innerText = `${wallet.available}$`;
         if (lockedEl) {
             if (wallet.locked > 0) {
-                lockedEl.innerText = `${wallet.locked} محجوز (${wallet.locked}$)`;
+                lockedEl.innerText = `${wallet.locked}$ محجوز`;
                 lockedEl.style.display = 'inline-block';
             } else {
                 lockedEl.style.display = 'none';
             }
         }
-        if (modalAvailEl) modalAvailEl.innerText = `${wallet.available} نقطة (${wallet.available}$)`;
-        if (modalLockEl) modalLockEl.innerText = `${wallet.locked} نقطة (${wallet.locked}$)`;
+        if (modalAvailEl) modalAvailEl.innerText = `${wallet.available}$`;
+        if (modalLockEl) modalLockEl.innerText = `${wallet.locked}$`;
 
         if (chatsBadge) {
             let userChatsCount = 0;
@@ -505,12 +524,13 @@ class WaseetApp {
             
             if (currentUser) {
                 if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
-                    // Mediator sees all active deals requiring mediation
-                    userChatsCount = (WASEET_STATE.deals || []).filter(d => d.status === 'active' || !d.status).length;
+                    // Mediator sees all non-completed deals requiring mediation across all statuses
+                    userChatsCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
                 } else {
                     // Regular Buyer / Seller only sees active deals where they are the buyer or seller
                     userChatsCount = (WASEET_STATE.deals || []).filter(d => {
-                        const isActive = d.status === 'active' || !d.status;
+                        if (!d) return false;
+                        const isActive = d.status !== 'completed' && d.status !== 'cancelled';
                         const isBuyer = d.buyer && (d.buyer.id === currentUser.id || d.buyer.name === currentUser.name);
                         const isSeller = d.seller && (d.seller.id === currentUser.id || d.seller.name === currentUser.name);
                         return isActive && (isBuyer || isSeller);
@@ -721,7 +741,7 @@ class WaseetApp {
                         <div class="card-footer">
                             <div class="price-col">
                                 <span class="price-sub">صافي البائع: $${pricing.sellerPrice} + عمولة $${pricing.fee}</span>
-                                <span class="price-main">${pricing.buyerPrice} <span style="font-size: 0.9rem; color: var(--gold-light);">نقطة</span></span>
+                                <span class="price-main">${pricing.buyerPrice}$</span>
                             </div>
                             ${isMediator ? `
                                 <div class="mediator-actions-wrap" style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
@@ -935,7 +955,7 @@ class WaseetApp {
             <div class="deck-actions-bar">
                 <div class="price-col">
                     <span class="price-sub">صافي البائع: $${pricing.sellerPrice} + عمولة الوساطة: $${pricing.fee}</span>
-                    <span class="price-main" style="font-size: 1.6rem;">${pricing.buyerPrice} <span style="font-size: 1rem; color: var(--gold-light);">نقطة ($${pricing.buyerPrice})</span></span>
+                    <span class="price-main" style="font-size: 1.6rem;">${pricing.buyerPrice}$</span>
                 </div>
                 <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
                     <a href="${WASEET_STATE.activeDeal ? 'chat.html?dealId=' + WASEET_STATE.activeDeal.id : 'chat.html'}" class="btn-3d btn-outline" style="text-decoration: none;">
@@ -1113,7 +1133,7 @@ class WaseetApp {
 
             document.getElementById('calc-res-seller').innerText = `$${res.sellerPrice}`;
             document.getElementById('calc-res-fee').innerText = `+$${res.fee}`;
-            document.getElementById('calc-res-buyer').innerText = `${res.buyerPrice} نقطة ($${res.buyerPrice})`;
+            document.getElementById('calc-res-buyer').innerText = `${res.buyerPrice}$`;
             document.getElementById('calc-res-tier').innerText = res.tierText;
         };
 
@@ -1219,7 +1239,7 @@ class WaseetApp {
                     <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 0.75rem; border-radius: 10px; font-size: 0.85rem;">
                         <div>صافي ربحك: <strong class="text-gold">$${calc.sellerPrice}</strong></div>
                         <div>عمولة الوساطة المضافة: <strong class="text-orange">+$${calc.fee}</strong></div>
-                        <div style="margin-top: 0.3rem; font-weight: 700; color: #fff;">السعر الذي سيظهر للمشتري: ${calc.buyerPrice} نقطة ($${calc.buyerPrice})</div>
+                        <div style="margin-top: 0.3rem; font-weight: 700; color: #fff;">السعر الذي سيظهر للمشتري: ${calc.buyerPrice}$</div>
                     </div>
                 `;
             };
@@ -1419,8 +1439,8 @@ class WaseetApp {
         const pricing = calculateWaseetFee(acc.sellerPrice);
         const confirmBuy = await waseetConfirm(
             'طلب وساطة وشراء الحساب',
-            `هل تود حجز نقاط لشراء هذا الحساب؟\n\nالسعر الإجمالي: ${pricing.buyerPrice} نقطة ($${pricing.buyerPrice})\n(سيتم حجز النقاط في محفظة الوساطة حتى تفحص الحساب وتؤكد استلامه وتغيير كلمة السر بإشراف الوسيط).`,
-            'نعم، حجز النقاط والمتابعة',
+            `هل تود حجز الرصيد لشراء هذا الحساب؟\n\nالسعر الإجمالي: ${pricing.buyerPrice}$\n(سيتم حجز المبلغ في محفظة الوساطة حتى تفحص الحساب وتؤكد استلامه وتغيير كلمة السر بإشراف الوسيط).`,
+            'نعم، حجز الرصيد والمتابعة',
             'إلغاء الطلب',
             'escrow'
         );
@@ -1434,8 +1454,8 @@ class WaseetApp {
             // Check available points
             if (WASEET_STATE.user.wallet.available < pricing.buyerPrice) {
                 const addPts = await waseetConfirm(
-                    'رصيد النقاط غير كافٍ',
-                    `رصيدك المتاح (${WASEET_STATE.user.wallet.available} نقطة (${WASEET_STATE.user.wallet.available}$)) لا يكفي لشراء الحساب (${pricing.buyerPrice} نقطة (${pricing.buyerPrice}$)).\nهل تود شحن نقاط المحفظة الآن؟`,
+                    'الرصيد غير كافٍ',
+                    `رصيدك المتاح (${WASEET_STATE.user.wallet.available}$) لا يكفي لشراء الحساب (${pricing.buyerPrice}$).\nهل تود شحن المحفظة الآن؟`,
                     'فتح نافذة الشحن',
                     'إلغاء',
                     'warning'
@@ -1453,6 +1473,14 @@ class WaseetApp {
             // Dynamically create a real deal record (Requirement 2 & 4)
             // Use localStorage to get a globally persistent deal counter
             let dealCounter = parseInt(localStorage.getItem('WASEET_DEAL_COUNTER') || '0') + 1;
+            const maxExistingNum = Math.max(
+                1,
+                ...(WASEET_STATE.deals || []).map(d => Number(d.dealNumber) || 0),
+                ...(WASEET_STATE.completedDeals || []).map(d => Number(d.dealNumber) || 0)
+            );
+            if (dealCounter <= maxExistingNum) {
+                dealCounter = maxExistingNum + 1;
+            }
             localStorage.setItem('WASEET_DEAL_COUNTER', String(dealCounter));
 
             const newDeal = {
@@ -1462,29 +1490,30 @@ class WaseetApp {
                 accountId: acc.id,
                 accountTitle: acc.title,
                 buyer: { id: WASEET_STATE.user.id, name: WASEET_STATE.user.name, phone: '+212 60 *** ***' },
-                seller: { id: 'seller_' + acc.id, name: acc.sellerName, phone: '+213 55 *** ***' },
+                seller: { id: acc.sellerId || ('seller_' + acc.id), name: acc.sellerName, phone: '+213 55 *** ***' },
                 mediator: { id: 'admin_waseet', name: 'الوسيط المعتمد' },
                 sellerPrice: acc.sellerPrice,
                 fee: pricing.fee,
                 totalPoints: pricing.buyerPrice,
                 currentStep: 2,
                 status: 'active',
+                createdAt: new Date().toISOString(),
                 stageText: 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب (الحساب مفحوص ومعتمد)',
                 credentials: {
-                    email: 'seller_' + acc.id + '@gmail.com',
+                    email: (acc.credentials && acc.credentials.email_or_phone) || ('seller_' + acc.id + '@gmail.com'),
                     password: '•••••••••••• (محمية ومطابقة)',
-                    rawPassword: 'FF_Secure_Pass_2026!',
+                    rawPassword: (acc.credentials && acc.credentials.password) || 'FF_Secure_Pass_2026!',
                     loginType: acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك',
                     backupCodes: '8912-4410, 6721-9981'
                 },
                 sellerMessages: [
-                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice} نقطة لشراء الحساب المفحوص والمعتمد.`, time: '12:00' },
+                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice}$ لشراء الحساب المفحوص والمعتمد.`, time: '12:00' },
                     { sender: 'seller', name: acc.sellerName + ' (البائع)', text: 'مرحباً بالوسيط، الحساب مفحوص وجاهز لنقل الربط وتسليم الإيميل للمشتري.', time: '12:02' },
                     { sender: 'mediator', name: 'أنت (الوسيط)', text: 'أهلاً بك، الحساب تم التحقق منه مسبقاً، سأقوم الآن بنقل الربط وتأمينه للمشتري.', time: '12:04' }
                 ],
                 buyerMessages: [
-                    { sender: 'system', text: `تم حجز ${pricing.buyerPrice} نقطة بنجاح في خزينة الوساطة الآمنة.`, time: '12:00' },
-                    { sender: 'buyer', name: WASEET_STATE.user.name + ' (المشتري)', text: 'مرحباً بالوسيط، تم حجز النقاط. بانتظار نقل الربط واستلام بيانات الحساب المفحوص.', time: '12:03' },
+                    { sender: 'system', text: `تم حجز ${pricing.buyerPrice}$ بنجاح في خزينة الوساطة الآمنة.`, time: '12:00' },
+                    { sender: 'buyer', name: WASEET_STATE.user.name + ' (المشتري)', text: 'مرحباً بالوسيط، تم حجز المبلغ. بانتظار نقل الربط واستلام بيانات الحساب المفحوص.', time: '12:03' },
                     { sender: 'mediator', name: 'الوسيط المعتمد', text: 'أهلاً بك، أموالك مؤمنة بالكامل في الخزينة، الحساب مفحوص مسبقاً وجاري تأمين نقله إليك.', time: '12:05' }
                 ]
             };
@@ -1497,10 +1526,18 @@ class WaseetApp {
             saveWaseetData();
             this.renderUserProfile();
 
+            if (typeof window.waseetSaveDealToSupabase === 'function') {
+                try {
+                    await window.waseetSaveDealToSupabase(newDeal);
+                } catch (err) {
+                    console.warn('Supabase deal sync warning:', err);
+                }
+            }
+
             // Requirement 2: Notification 2 does NOT stay; disappears automatically and redirects
             this.showAutoDismissToast(
-                'تم تأكيد طلب الوساطة وحجز النقاط بنجاح!',
-                `تم حجز ${pricing.buyerPrice} نقطة بأمان في خزينة الوساطة وأُدرجت الصفقة في جدول الوسيط!\nجاري نقلك تلقائياً إلى غرفة الوساطة...`,
+                'تم تأكيد طلب الوساطة وحجز الرصيد بنجاح!',
+                `تم حجز ${pricing.buyerPrice}$ بأمان في خزينة الوساطة وأُدرجت الصفقة في جدول الوسيط!\nجاري نقلك تلقائياً إلى غرفة الوساطة...`,
                 2200,
                 () => {
                     window.location.href = 'chat.html?dealId=' + newDeal.id;
@@ -1553,7 +1590,7 @@ class WaseetApp {
             document.getElementById('modal-wallet').classList.remove('active');
             await waseetAlert(
                 'تسجيل الدخول مطلوب',
-                'يرجى تسجيل الدخول أولاً لتتمكن من شحن وإدارة محفظة النقاط الخاصة بك.',
+                'يرجى تسجيل الدخول أولاً لتتمكن من شحن وإدارة محفظتك الخاصة.',
                 'warning'
             );
             this.openLoginModal();
@@ -1573,8 +1610,8 @@ class WaseetApp {
 
         document.getElementById('modal-wallet').classList.remove('active');
         await waseetAlert(
-            'تم شحن النقاط بنجاح',
-            `تم شحن ${amount} نقطة بنجاح إلى محفظتك الآمنة عبر [${paymentMethod}]!\nالرصيد المتاح الآن: ${WASEET_STATE.user.wallet.available} نقطة (${WASEET_STATE.user.wallet.available}$).`,
+            'تم شحن الرصيد بنجاح',
+            `تم شحن ${amount}$ بنجاح إلى محفظتك الآمنة عبر [${paymentMethod}]!\nالرصيد المتاح الآن: ${WASEET_STATE.user.wallet.available}$.`,
             'success'
         );
     }
@@ -1727,7 +1764,7 @@ class WaseetApp {
                     البائع: <strong style="color: #fff;">${acc.sellerName}</strong> • اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong> • الرتبة: <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong> • السيرفر: ${acc.server || 'الشرق الأوسط'}
                 </div>
                 <div style="font-size: 0.88rem; color: var(--silver-muted); margin-top: 0.3rem;">
-                    صافي البائع: <strong style="color: #fff;">$${pricing.sellerPrice}</strong> | عمولة المنصة: <strong style="color: var(--gold-light);">$${pricing.fee}</strong> | سعر المشتري: <strong style="color: var(--orange-bright);">${pricing.buyerPrice} نقطة ($${pricing.buyerPrice})</strong>
+                    صافي البائع: <strong style="color: #fff;">$${pricing.sellerPrice}</strong> | عمولة المنصة: <strong style="color: var(--gold-light);">$${pricing.fee}</strong> | سعر المشتري: <strong style="color: var(--orange-bright);">${pricing.buyerPrice}$</strong>
                 </div>
             </div>
 
@@ -2083,7 +2120,7 @@ window.waseetSyncTopupInput = function() {
     if (!input) return;
     const val = parseFloat(input.value) || 0;
     if (preview) {
-        preview.textContent = `${val} نقطة (${val}$)`;
+        preview.textContent = `${val}$`;
     }
     // Update active preset pill
     const pills = document.querySelectorAll('#topup-presets-container .preset-pill');

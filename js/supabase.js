@@ -197,6 +197,9 @@ async function waseetSyncAuthState() {
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
 
+        // جلب ومزامنة جميع الصفقات من قاعدة بيانات Supabase (بما في ذلك كافة الحالات للمدير)
+        await waseetFetchDealsFromSupabase();
+
         // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
         if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
@@ -222,6 +225,186 @@ async function waseetSyncAuthState() {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);
     }
 }
+
+/**
+ * التحقق مما إذا كان المعرف بصيغة UUID صحيحة
+ */
+function waseetIsValidUuid(val) {
+    if (!val || typeof val !== 'string') return false;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val.trim());
+}
+
+/**
+ * حفظ أو تحديث صفقة وساطة في جدول deals على Supabase
+ */
+async function waseetSaveDealToSupabase(deal) {
+    const client = initWaseetSupabase();
+    if (!client || !deal || !deal.id) return false;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const sessionUserId = session?.user?.id || null;
+
+        const buyerUuid = waseetIsValidUuid(deal.buyer?.id) ? deal.buyer.id : sessionUserId;
+        const sellerUuid = waseetIsValidUuid(deal.seller?.id) ? deal.seller.id : buyerUuid;
+        if (!buyerUuid) return false;
+
+        // مطابقة حقل الحالة مع قيود جدول deals مع حفظ الحالة الدقيقة الكاملة في notes JSON
+        let dbStatus = 'mediator_inspecting';
+        if (deal.status === 'completed') dbStatus = 'completed';
+        else if (deal.status === 'cancelled') dbStatus = 'cancelled';
+        else if (deal.status === 'disputed') dbStatus = 'disputed';
+        else if (deal.status === 'waiting_credentials') dbStatus = 'waiting_credentials';
+        else if (deal.status === 'buyer_inspecting') dbStatus = 'buyer_inspecting';
+
+        const accNum = Number(deal.accountNumber || (deal.accountId ? String(deal.accountId).replace(/\D/g, '') : 0)) || null;
+        const stepVal = Math.min(4, Math.max(1, Number(deal.currentStep) || 2));
+
+        const payload = {
+            id: String(deal.id),
+            account_id: waseetIsValidUuid(deal.accountId) ? deal.accountId : null,
+            account_number: accNum,
+            buyer_id: buyerUuid,
+            seller_id: sellerUuid,
+            seller_price: Number(deal.sellerPrice || 0),
+            fee: Number(deal.fee || 0),
+            total_points: Number(deal.totalPoints || 0),
+            status: dbStatus,
+            current_step: stepVal,
+            notes: JSON.stringify(deal),
+            updated_at: new Date().toISOString()
+        };
+
+        const { error } = await client
+            .from('deals')
+            .upsert(payload, { onConflict: 'id' });
+
+        if (error) {
+            console.warn('[Supabase Deals] تعذر حفظ الصفقة في السحابة:', error.message);
+            return false;
+        }
+        return true;
+    } catch (err) {
+        console.warn('[Supabase Deals] استثناء أثناء حفظ الصفقة:', err);
+        return false;
+    }
+}
+
+/**
+ * جلب جميع الصفقات من جدول deals في Supabase (دون تصفية أو استثناء لأي حالة)
+ * لضمان رؤية المدير (is_admin()) لكافة الصفقات في جميع المراحل والحالات
+ */
+async function waseetFetchDealsFromSupabase() {
+    const client = initWaseetSupabase();
+    if (!client || typeof WASEET_STATE === 'undefined') return [];
+
+    try {
+        // استعلام شامل بدون أي فلتر على status لكي يجلب للمدير جميع الصفقات (بانتظار الوسيط، قيد الفحص، نشطة، معلقة، مكتملة، ملغاة)
+        const { data, error } = await client
+            .from('deals')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error || !Array.isArray(data)) {
+            if (error) console.warn('[Supabase Deals] تعذر جلب الصفقات:', error.message);
+            return WASEET_STATE.deals || [];
+        }
+
+        const remoteDeals = data.map((row, index) => {
+            let parsed = null;
+            if (row.notes && typeof row.notes === 'string' && row.notes.trim().startsWith('{')) {
+                try {
+                    parsed = JSON.parse(row.notes);
+                } catch (e) {
+                    parsed = null;
+                }
+            }
+
+            const dealNumber = (parsed && parsed.dealNumber) || (data.length - index);
+            const rawStatus = (parsed && parsed.status) || row.status || 'active';
+            // توحيد الحالة بحيث تعتبر أي صفقة غير مكتملة وغير ملغاة صفقة نشطة/جارية تظهر في القائمة الرئيسية
+            const normalizedStatus = (row.status === 'completed' || rawStatus === 'completed')
+                ? 'completed'
+                : ((row.status === 'cancelled' || rawStatus === 'cancelled') ? 'cancelled' : rawStatus);
+
+            return {
+                ...(parsed || {}),
+                id: row.id || (parsed && parsed.id),
+                dealNumber: dealNumber,
+                title: (parsed && parsed.title) || `صفقة رقم ${dealNumber} • حساب #${row.account_number || ''}`,
+                accountId: (parsed && parsed.accountId) || row.account_id || `acc_${row.account_number || 1001}`,
+                accountNumber: row.account_number || (parsed && parsed.accountNumber) || null,
+                accountTitle: (parsed && parsed.accountTitle) || `حساب وساطة #${row.account_number || dealNumber}`,
+                buyer: (parsed && parsed.buyer) || { id: row.buyer_id, name: 'مشتري موثق', phone: '' },
+                seller: (parsed && parsed.seller) || { id: row.seller_id, name: 'بائع موثق', phone: '' },
+                mediator: (parsed && parsed.mediator) || { id: 'admin_waseet', name: 'الوسيط المعتمد' },
+                sellerPrice: Number(row.seller_price ?? (parsed && parsed.sellerPrice) ?? 0),
+                fee: Number(row.fee ?? (parsed && parsed.fee) ?? 0),
+                totalPoints: Number(row.total_points ?? (parsed && parsed.totalPoints) ?? 0),
+                currentStep: Number(row.current_step ?? (parsed && parsed.currentStep) ?? 2),
+                status: normalizedStatus,
+                stageText: (parsed && parsed.stageText) || 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب',
+                credentials: (parsed && parsed.credentials) || {
+                    email: 'محفوظ لدى الوسيط',
+                    password: '••••••••••••',
+                    rawPassword: '••••••••••••',
+                    loginType: 'Google / Facebook',
+                    backupCodes: '—'
+                },
+                sellerMessages: (parsed && Array.isArray(parsed.sellerMessages)) ? parsed.sellerMessages : [],
+                buyerMessages: (parsed && Array.isArray(parsed.buyerMessages)) ? parsed.buyerMessages : [],
+                createdAt: row.created_at || (parsed && parsed.createdAt) || new Date().toISOString()
+            };
+        });
+
+        // دمج الصفقات السحابية مع الصفقات المحلية دون فقدان أي صفقة
+        const mergedMap = new Map();
+        remoteDeals.forEach(d => {
+            if (d && d.id) mergedMap.set(String(d.id), d);
+        });
+        (WASEET_STATE.deals || []).forEach(d => {
+            if (d && d.id && !mergedMap.has(String(d.id))) {
+                mergedMap.set(String(d.id), d);
+                // رفع أي صفقة محلية لم تُحفظ بعد إلى السحابة
+                waseetSaveDealToSupabase(d);
+            }
+        });
+        (WASEET_STATE.completedDeals || []).forEach(d => {
+            if (d && d.id && !mergedMap.has(String(d.id))) {
+                mergedMap.set(String(d.id), d);
+            }
+        });
+
+        const allMerged = Array.from(mergedMap.values());
+        // ترتيب تنازلي حسب رقم الصفقة أو التاريخ
+        allMerged.sort((a, b) => (Number(b.dealNumber) || 0) - (Number(a.dealNumber) || 0));
+
+        // ضمان ترقيم متسلسل نظيف إذا كان هناك صفقات بدون dealNumber
+        let maxDealNum = 0;
+        allMerged.forEach(d => {
+            if (Number(d.dealNumber) > maxDealNum) maxDealNum = Number(d.dealNumber);
+        });
+        const currentCounter = parseInt(localStorage.getItem('WASEET_DEAL_COUNTER') || '0');
+        if (maxDealNum > currentCounter) {
+            localStorage.setItem('WASEET_DEAL_COUNTER', String(maxDealNum));
+        }
+
+        WASEET_STATE.deals = allMerged.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
+        WASEET_STATE.completedDeals = allMerged.filter(d => d.status === 'completed' || d.status === 'cancelled');
+        if (!WASEET_STATE.activeDeal && WASEET_STATE.deals.length > 0) {
+            WASEET_STATE.activeDeal = WASEET_STATE.deals[0];
+        }
+
+        if (typeof saveWaseetData === 'function') saveWaseetData();
+        return allMerged;
+    } catch (err) {
+        console.warn('[Supabase Deals] استثناء جلب الصفقات:', err);
+        return WASEET_STATE.deals || [];
+    }
+}
+
+window.waseetSaveDealToSupabase = waseetSaveDealToSupabase;
+window.waseetFetchDealsFromSupabase = waseetFetchDealsFromSupabase;
 
 /**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
@@ -253,5 +436,6 @@ if (typeof window !== 'undefined') {
         initWaseetSupabase();
         initWaseetAuthListener();
         waseetSyncAuthState();
+        waseetFetchDealsFromSupabase();
     });
 }
