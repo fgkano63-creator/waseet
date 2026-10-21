@@ -1,13 +1,13 @@
 /**
- * WASEET (وسيط) - Service Worker (v3)
- * استراتيجية Network-First فائقة السرعة للملفات الحيوية (HTML, CSS, JS) لمنع التخزين العنيف.
- * دعم PWA كامل واجتياز اختبارات PWABuilder ومتجر Google Play.
+ * WASEET (وسيط) - Service Worker (v5)
+ * استراتيجية Network-First هادئة ومستقرة للملفات الحيوية (HTML, CSS, JS)
+ * دعم كامل لـ PWA ومتجر Google Play بدون أي إعادة تحميل قسرية للمتصفح.
  * استثناء تام للاتصالات اللحظية وواجهات Supabase لضمان دقة وسرعة العمليات المالية.
  */
 
-const CACHE_NAME = 'waseet-pwa-v4';
+const CACHE_NAME = 'waseet-pwa-v5';
 
-// الملفات الأساسية للتخزين المؤقت الأولي
+// الملفات الأساسية للتخزين المؤقت
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -31,7 +31,7 @@ const STATIC_ASSETS = [
   './assets/screenshots/screenshot-desktop.png'
 ];
 
-// 1. التثبيت والتخزين الأولي مع التفعيل الفوري
+// 1. التثبيت الهادئ والتخزين الأولي
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -47,7 +47,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. التفعيل وحذف كافة نسخ الكاش القديمة فوراً
+// 2. التفعيل وتنظيف الكاش القديم بهدوء
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -59,27 +59,11 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => {
-      return self.clients.claim();
-    }).then(() => {
-      // إرسال إشعار لكافة الصفحات بأن الإصدار الجديد أصبح نشطاً
-      return self.clients.matchAll({ type: 'window' }).then((clients) => {
-        clients.forEach((client) => {
-          client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME });
-        });
-      });
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// 3. الاستجابة للرسائل المباشرة
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
-
-// 4. استراتيجية الجلب (Fetch Strategy): Network First للملفات الحيوية
+// 3. استراتيجية الجلب (Fetch Strategy): Network First للملفات الحيوية دون إزعاج المستخدم
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
@@ -116,7 +100,7 @@ self.addEventListener('fetch', (event) => {
           return networkRes;
         })
         .catch(async () => {
-          // في حال عدم توفر اتصال بالإنترنت، الرجوع لنسخة الكاش
+          // عند انقطاع الإنترنت: الرجوع للكاش
           const cached = await caches.match(req);
           if (cached) return cached;
           if (isHtml) {
