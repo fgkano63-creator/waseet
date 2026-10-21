@@ -1,10 +1,11 @@
 /**
- * WASEET (وسيط) - Service Worker
- * يوفر دعم PWA وتثبيت التطبيق على الهواتف ومتجر Google Play
- * مع استثناء كامل للاتصالات اللحظية وواجهات Supabase لضمان سرعة وموثوقية الصفقات.
+ * WASEET (وسيط) - Service Worker (v3)
+ * استراتيجية Network-First فائقة السرعة للملفات الحيوية (HTML, CSS, JS) لمنع التخزين العنيف.
+ * دعم PWA كامل واجتياز اختبارات PWABuilder ومتجر Google Play.
+ * استثناء تام للاتصالات اللحظية وواجهات Supabase لضمان دقة وسرعة العمليات المالية.
  */
 
-const CACHE_NAME = 'waseet-pwa-v2';
+const CACHE_NAME = 'waseet-pwa-v3';
 
 // الملفات الأساسية للتخزين المؤقت الأولي
 const STATIC_ASSETS = [
@@ -20,54 +21,75 @@ const STATIC_ASSETS = [
   './admin-deposits.html',
   './manifest.json',
   './css/style.css',
+  './js/pwa-register.js',
+  './js/supabase.js',
+  './js/app.js',
   './assets/favicon-192.png',
   './assets/favicon-512.png',
-  './assets/logo.png'
+  './assets/logo.png',
+  './assets/screenshots/screenshot-mobile.png',
+  './assets/screenshots/screenshot-desktop.png'
 ];
 
-// تثبيت الـ Service Worker
+// 1. التثبيت والتخزين الأولي مع التفعيل الفوري
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // محاولة تخزين الملفات الأساسية مع تجاهل أي فشل لملفات ثانوية
       return Promise.allSettled(
         STATIC_ASSETS.map((url) =>
           cache.add(url).catch((err) => {
-            console.warn('[SW] فشل تخزين ملف مبدئي:', url, err);
+            console.warn('[SW] فشل تخزين ملف أثناء التثبيت:', url, err);
           })
         )
       );
     })
   );
-  self.skipWaiting();
 });
 
-// تفعيل وحذف الكاش القديم
+// 2. التفعيل وحذف كافة نسخ الكاش القديمة فوراً
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] تنظيف كاش قديم:', key);
             return caches.delete(key);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      return self.clients.claim();
+    }).then(() => {
+      // إرسال إشعار لكافة الصفحات بأن الإصدار الجديد أصبح نشطاً
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME });
+        });
+      });
+    })
   );
 });
 
-// التعامل مع الطلبات (Fetch Handler)
+// 3. الاستجابة للرسائل المباشرة
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// 4. استراتيجية الجلب (Fetch Strategy): Network First للملفات الحيوية
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // 1. استثناء كل الطلبات غير GET (مثل POST و PUT و DELETE)
+  // استثناء كافة الطلبات غير GET
   if (req.method !== 'GET') {
     return;
   }
 
-  // 2. استثناء كامل لاتصالات Supabase، الـ Realtime، والـ WebSockets لحماية وسرعة الصفقات
+  // استثناء تام لاتصالات Supabase وقواعد البيانات والـ Realtime
   if (
     url.hostname.includes('supabase.co') ||
     url.pathname.includes('/rest/v1') ||
@@ -76,13 +98,14 @@ self.addEventListener('fetch', (event) => {
     url.protocol === 'ws:' ||
     url.protocol === 'wss:'
   ) {
-    // تمرير الطلب للشبكة مباشرة دون لمس الكاش
     return;
   }
 
-  // 3. لصفحات HTML (Navigation requests): استراتيجية Network-First
-  // محاولة جلب أحدث نسخة من الشبكة، وإذا تعذر الاتصال يتم استخدام الكاش
-  if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
+  // استراتيجية Network-First للصفحات (HTML) والملفات البرمجية (JS, CSS, JSON)
+  const isHtml = req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html');
+  const isScriptOrStyle = url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.json');
+
+  if (isHtml || isScriptOrStyle) {
     event.respondWith(
       fetch(req)
         .then((networkRes) => {
@@ -93,31 +116,31 @@ self.addEventListener('fetch', (event) => {
           return networkRes;
         })
         .catch(async () => {
+          // في حال عدم توفر اتصال بالإنترنت، الرجوع لنسخة الكاش
           const cached = await caches.match(req);
           if (cached) return cached;
-          return caches.match('./index.html');
+          if (isHtml) {
+            return (await caches.match('./index.html')) || (await caches.match('./'));
+          }
+          return new Response('Network offline and asset not in cache', { status: 503, statusText: 'Offline' });
         })
     );
     return;
   }
 
-  // 4. للملفات الثابتة (CSS, JS, Images, Fonts): استراتيجية Stale-While-Revalidate
-  // إرجاع النسخة المخزنة فوراً مع تحديثها في الخلفية من الشبكة
+  // لباقي الملفات الثابتة (الصور والأيقونات): Cache First مع تحديث بالخلفية
   event.respondWith(
     caches.match(req).then((cachedRes) => {
-      const fetchPromise = fetch(req)
-        .then((networkRes) => {
-          if (networkRes && networkRes.status === 200 && networkRes.type === 'basic') {
-            const resClone = networkRes.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-          }
-          return networkRes;
-        })
-        .catch(() => {
-          // في حال عدم توفر اتصال بالإنترنت، يعتمد على الكاش فقط
-        });
-
-      return cachedRes || fetchPromise;
+      if (cachedRes) {
+        return cachedRes;
+      }
+      return fetch(req).then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const resClone = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+        }
+        return networkRes;
+      });
     })
   );
 });
