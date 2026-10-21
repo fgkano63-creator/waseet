@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة طلبات شحن النقاط | WASEET - لوحة المدير</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=3">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0d14">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Waseet">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261021_admindeposits">
+
+    <style>
+        .admin-deposits-container {
+            max-width: 1220px;
+            margin: 1.5rem auto 5.5rem;
+            padding: 0 1rem;
+        }
+
+        .admin-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-stat-box {
+            background: linear-gradient(145deg, rgba(20, 26, 42, 0.96), rgba(10, 14, 24, 0.98));
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 1.15rem 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+        }
+
+        .admin-stat-box.highlight-pending {
+            border-color: rgba(245, 158, 11, 0.6);
+        }
+
+        .admin-filter-bar {
+            background: rgba(14, 19, 30, 0.92);
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-pills-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-metal);
+            color: var(--silver-muted);
+            padding: 0.48rem 0.95rem;
+            border-radius: 10px;
+            font-family: var(--font-ar);
+            font-size: 0.84rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.25), rgba(234, 88, 12, 0.2));
+            border-color: var(--gold-primary);
+            color: #fff;
+        }
+
+        .deposits-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 500px) {
+            .deposits-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .deposit-admin-card {
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.97), rgba(10, 13, 22, 0.99));
+            border: 1px solid var(--border-metal);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .deposit-admin-card.is-pending {
+            border-color: var(--gold-primary);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.8), 0 0 22px rgba(197, 160, 89, 0.16);
+        }
+
+        .deposit-card-header {
+            padding: 1rem 1.2rem;
+            background: rgba(12, 16, 26, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .deposit-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            min-width: 0;
+        }
+
+        .deposit-user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid var(--gold-primary);
+            flex-shrink: 0;
+        }
+
+        .deposit-receipt-banner {
+            position: relative;
+            height: 210px;
+            background: #070a10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: zoom-in;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .deposit-receipt-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.25s ease;
+        }
+
+        .deposit-receipt-banner:hover img {
+            transform: scale(1.04);
+        }
+
+        .zoom-hint-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.78);
+            color: var(--gold-light);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 8px;
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            pointer-events: none;
+        }
+
+        .deposit-card-body {
+            padding: 1.1rem 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .deposit-amount-banner {
+            background: rgba(197, 160, 89, 0.1);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .deposit-actions-row {
+            display: flex;
+            gap: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-approve-deposit {
+            flex: 1.3;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: 1px solid #34d399;
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            font-family: var(--font-ar);
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-approve-deposit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-reject-deposit {
+            flex: 0.85;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #f87171;
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            font-family: var(--font-ar);
+            font-size: 0.86rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reject-deposit:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="is-admin-mode">
+
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">لوحة الإدارة • طلبات شحن النقاط</span>
+                        </div>
+                    </a>
+                </div>
+
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin active" title="طلبات الشحن">
+                        <i class="fas fa-coins text-gold"></i> طلبات الشحن
+                        <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                        <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قائمة الصفقات">
+                        <i class="fas fa-crown text-gold"></i> قائمة الصفقات
+                    </a>
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الإدارة">
+                        <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                    </a>
+                    <a href="wallet.html" class="wallet-pill" style="text-decoration: none;" title="محفظة النقاط">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </a>
+                </nav>
+
+                <div class="nav-left-group">
+                    <a href="index.html" class="btn-3d btn-outline" style="padding: 0.45rem 0.9rem; font-size: 0.82rem; text-decoration: none;">
+                        <i class="fas fa-store text-gold"></i> المتجر
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- رسالة رفض الوصول لغير المدير -->
+        <div id="admin-access-denied" style="display: none; max-width: 560px; margin: 4rem auto; text-align: center; padding: 2.5rem 1.5rem; background: rgba(14,18,28,0.92); border: 2px dashed rgba(239,68,68,0.5); border-radius: 20px;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
+            <h2 style="color: #fff; margin: 0 0 0.6rem;">صلاحية الوسيط المعتمد مطلوبة</h2>
+            <p style="color: var(--silver-muted); margin: 0 0 1.4rem; line-height: 1.6;">
+                هذه الصفحة مخصصة لمدير المنصة فقط لمراجعة إيصالات التحويل واعتماد شحن النقاط للمستخدمين.
+            </p>
+            <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> العودة للمتجر</a>
+        </div>
+
+        <!-- ================= Main Admin Content ================= -->
+        <main class="admin-deposits-container" id="admin-deposits-main" style="display: none;">
+
+            <!-- 1. شريط الإحصائيات -->
+            <section class="admin-stats-bar">
+                <div class="admin-stat-box highlight-pending">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">طلبات بانتظار الموافقة</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: #fbbf24;" id="stat-pending-count">0</div>
+                    </div>
+                    <i class="fas fa-hourglass-half" style="font-size: 1.8rem; color: #fbbf24; opacity: 0.8;"></i>
+                </div>
+
+                <div class="admin-stat-box">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">طلبات تمت الموافقة عليها</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: #34d399;" id="stat-approved-count">0</div>
+                    </div>
+                    <i class="fas fa-check-double" style="font-size: 1.8rem; color: #34d399; opacity: 0.8;"></i>
+                </div>
+
+                <div class="admin-stat-box">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">إجمالي النقاط المشحونة</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: var(--gold-light);">
+                            <span id="stat-total-pts">0</span> <small style="font-size: 0.9rem;">نقطة</small>
+                        </div>
+                    </div>
+                    <i class="fas fa-coins" style="font-size: 1.8rem; color: var(--gold-primary); opacity: 0.85;"></i>
+                </div>
+            </section>
+
+            <!-- 2. شريط الفلترة والبحث -->
+            <section class="admin-filter-bar">
+                <div class="filter-pills-group">
+                    <button type="button" class="filter-pill-btn active" data-filter="pending" onclick="setAdminDepositFilter('pending', this)">
+                        ⏳ قيد المراجعة (<span id="pill-count-pending">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="all" onclick="setAdminDepositFilter('all', this)">
+                        📋 جميع الطلبات (<span id="pill-count-all">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="approved" onclick="setAdminDepositFilter('approved', this)">
+                        ✅ المقبولة (<span id="pill-count-approved">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="rejected" onclick="setAdminDepositFilter('rejected', this)">
+                        ❌ المرفوضة (<span id="pill-count-rejected">0</span>)
+                    </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; max-width: 360px;">
+                    <input type="text" id="admin-deposit-search" placeholder="ابحث باسم المستخدم أو البريد..." oninput="renderAdminDepositCards()" style="flex: 1; padding: 0.55rem 0.9rem; border-radius: 10px; background: rgba(22, 28, 44, 0.9); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; outline: none;">
+                    <button type="button" class="btn-3d btn-outline" onclick="loadAdminDeposits()" title="تحديث القائمة" style="padding: 0.55rem 0.85rem;">
+                        <i class="fas fa-sync-alt" id="admin-deposits-refresh-icon"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 3. شبكة بطاقات طلبات الشحن -->
+            <section class="deposits-cards-grid" id="admin-deposits-grid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--silver-muted);">
+                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.7rem;"></i>
+                    <div>جاري جلب طلبات الشحن من قاعدة البيانات...</div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- عارض صورة الإيصال بالحجم الكامل -->
+    <div id="admin-receipt-lightbox" onclick="this.style.display='none'" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;">
+        <img id="admin-receipt-lightbox-img" src="" alt="إيصال التحويل" style="max-width: 95%; max-height: 92vh; border-radius: 14px; border: 2px solid var(--gold-primary); box-shadow: 0 25px 70px rgba(0,0,0,0.95);">
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js?v=20261021"></script>
+    <script src="js/data.js?v=20261021"></script>
+    <script src="js/calculator.js?v=20261021"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/pwa-register.js"></script>
+
+    <script>
+        let allAdminDeposits = [];
+        let activeDepositFilter = 'pending';
+        let adminDepositsRealtime = null;
+
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function openAdminReceiptZoom(url) {
+            if (!url) return;
+            const lb = document.getElementById('admin-receipt-lightbox');
+            const img = document.getElementById('admin-receipt-lightbox-img');
+            if (lb && img) {
+                img.src = url;
+                lb.style.display = 'flex';
+            }
+        }
+
+        function setAdminDepositFilter(filterVal, btnEl) {
+            activeDepositFilter = filterVal;
+            document.querySelectorAll('.filter-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            renderAdminDepositCards();
+        }
+
+        async function loadAdminDeposits() {
+            const icon = document.getElementById('admin-deposits-refresh-icon');
+            if (icon) icon.classList.add('fa-spin');
+            try {
+                if (typeof waseetAdminFetchDepositRequests === 'function') {
+                    allAdminDeposits = await waseetAdminFetchDepositRequests();
+                }
+                updateAdminStatsAndCounts();
+                renderAdminDepositCards();
+                if (typeof waseetUpdateAdminPendingDepositsBadge === 'function') {
+                    waseetUpdateAdminPendingDepositsBadge();
+                }
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
+        }
+
+        function updateAdminStatsAndCounts() {
+            const pendingList = allAdminDeposits.filter(r => r.status === 'pending');
+            const approvedList = allAdminDeposits.filter(r => r.status === 'approved');
+            const rejectedList = allAdminDeposits.filter(r => r.status === 'rejected');
+            const totalApprovedPts = approvedList.reduce((sum, r) => sum + Number(r.amount_requested || 0), 0);
+
+            document.getElementById('stat-pending-count').innerText = pendingList.length;
+            document.getElementById('stat-approved-count').innerText = approvedList.length;
+            document.getElementById('stat-total-pts').innerText = totalApprovedPts;
+
+            document.getElementById('pill-count-pending').innerText = pendingList.length;
+            document.getElementById('pill-count-all').innerText = allAdminDeposits.length;
+            document.getElementById('pill-count-approved').innerText = approvedList.length;
+            document.getElementById('pill-count-rejected').innerText = rejectedList.length;
+        }
+
+        function renderAdminDepositCards() {
+            const grid = document.getElementById('admin-deposits-grid');
+            if (!grid) return;
+
+            const query = (document.getElementById('admin-deposit-search')?.value || '').trim().toLowerCase();
+
+            let filtered = allAdminDeposits.filter(r => {
+                if (activeDepositFilter !== 'all' && r.status !== activeDepositFilter) return false;
+                if (query) {
+                    const uName = (r.userProfile?.name || '').toLowerCase();
+                    const uEmail = (r.userProfile?.email || '').toLowerCase();
+                    const method = (r.payment_method || '').toLowerCase();
+                    return uName.includes(query) || uEmail.includes(query) || method.includes(query);
+                }
+                return true;
+            });
+
+            if (!filtered.length) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; background: rgba(14,19,30,0.6); border: 1px dashed var(--border-metal); border-radius: 18px; color: var(--silver-muted);">
+                        <i class="fas fa-inbox" style="font-size: 2.6rem; color: var(--gold-primary); opacity: 0.65; margin-bottom: 0.7rem;"></i>
+                        <h3 style="color: #fff; margin: 0 0 0.3rem;">لا توجد طلبات شحن في هذا القسم</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">ستظهر هنا طلبات شحن المستخدمين وإيصالاتهم فور إرسالها.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(req => {
+                const prof = req.userProfile || {};
+                const userName = prof.name || (prof.email ? prof.email.split('@')[0] : 'مستخدم المنصة');
+                const userEmail = prof.email || '';
+                const userAvatar = prof.avatar_url || 'assets/logo.png';
+                const currentPts = Number(prof.points_balance ?? prof.wallet_balance ?? 0);
+                const dt = new Date(req.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+
+                let statusBadge = `<span class="status-pill pending" style="background: rgba(245,158,11,0.18); color:#fbbf24; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.74rem; font-weight:800;">⏳ قيد المراجعة</span>`;
+                if (req.status === 'approved') {
+                    statusBadge = `<span class="status-pill approved" style="background: rgba(16,185,129,0.18); color:#34d399; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.74rem; font-weight:800;">✅ تمت الموافقة</span>`;
+                } else if (req.status === 'rejected') {
+                    statusBadge = `<span class="status-pill rejected" style="background: rgba(239,68,68,0.18); color:#f87171; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.74rem; font-weight:800;">❌ مرفوض</span>`;
+                }
+
+                const actionsHtml = req.status === 'pending' ? `
+                    <div class="deposit-actions-row">
+                        <button type="button" class="btn-approve-deposit" onclick="handleApproveDeposit('${escHtml(req.id)}', ${Number(req.amount_requested)}, '${escHtml(userName)}')">
+                            <i class="fas fa-check-circle"></i> موافقة وشحن (${Number(req.amount_requested)} نقطة)
+                        </button>
+                        <button type="button" class="btn-reject-deposit" onclick="handleRejectDeposit('${escHtml(req.id)}', '${escHtml(userName)}')">
+                            <i class="fas fa-times-circle"></i> رفض
+                        </button>
+                    </div>
+                ` : `
+                    <div style="font-size: 0.78rem; color: var(--silver-muted); padding-top: 0.4rem; border-top: 1px dashed rgba(255,255,255,0.08);">
+                        <i class="fas fa-check-double text-gold"></i> ${escHtml(req.admin_note || 'تمت معالجة الطلب')}
+                    </div>
+                `;
+
+                return `
+                    <article class="deposit-admin-card ${req.status === 'pending' ? 'is-pending' : ''}">
+                        <div class="deposit-card-header">
+                            <div class="deposit-user-info">
+                                <img src="${escHtml(userAvatar)}" alt="" class="deposit-user-avatar" onerror="this.src='assets/logo.png'">
+                                <div style="min-width: 0;">
+                                    <div style="color: #fff; font-weight: 800; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escHtml(userName)}</div>
+                                    <div style="color: var(--silver-muted); font-size: 0.73rem; direction: ltr; text-align: right;">${escHtml(userEmail)}</div>
+                                    <div style="color: var(--gold-light); font-size: 0.72rem;">رصيده الحالي: <strong>${currentPts} نقطة</strong></div>
+                                </div>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <div class="deposit-receipt-banner" onclick="openAdminReceiptZoom('${escHtml(req.receipt_image_url)}')" title="اضغط لتكبير صورة الإيصال">
+                            <img src="${escHtml(req.receipt_image_url)}" alt="إيصال التحويل">
+                            <span class="zoom-hint-badge"><i class="fas fa-search-plus"></i> تكبير الإيصال</span>
+                        </div>
+
+                        <div class="deposit-card-body">
+                            <div class="deposit-amount-banner">
+                                <span style="color: var(--silver-light); font-size: 0.84rem; font-weight: 700;">النقاط المطلوبة:</span>
+                                <span style="color: var(--gold-light); font-size: 1.25rem; font-weight: 900;">${Number(req.amount_requested)} نقطة (Pts)</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--silver-muted);">
+                                <span><i class="fas fa-credit-card text-gold"></i> ${escHtml(req.payment_method || 'تحويل محلي')}</span>
+                                <span><i class="far fa-clock"></i> ${dt}</span>
+                            </div>
+
+                            ${req.notes ? `<div style="background: rgba(255,255,255,0.03); padding: 0.45rem 0.7rem; border-radius: 8px; font-size: 0.78rem; color: #e2e8f0;"><strong>ملاحظة المستخدم:</strong> ${escHtml(req.notes)}</div>` : ''}
+
+                            ${actionsHtml}
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        async function handleApproveDeposit(requestId, amount, userName) {
+            let confirmed = true;
+            if (typeof waseetConfirm === 'function') {
+                confirmed = await waseetConfirm(
+                    'تأكيد الموافقة وشحن النقاط',
+                    `هل تحققت من صورة الإيصال وتود إضافة (${amount} نقطة) فوراً إلى محفظة المستخدم [${userName}]؟`,
+                    'نعم، موافقة وشحن الرصيد',
+                    'تراجع',
+                    'success'
+                );
+            } else {
+                confirmed = confirm(`هل تود الموافقة وشحن ${amount} نقطة للمستخدم ${userName}؟`);
+            }
+
+            if (!confirmed) return;
+
+            const { data, error } = await waseetAdminApproveDepositRequest(requestId, 'تم التحقق من الإيصال وإضافة النقاط بنجاح');
+            if (error) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تعذر اعتماد الطلب', error.message || 'تأكد من تشغيل كود SQL الخاص بنظام المحفظة في Supabase.', 'danger');
+                } else {
+                    alert(error.message);
+                }
+                return;
+            }
+
+            await loadAdminDeposits();
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert(
+                    '✅ تم شحن النقاط بنجاح!',
+                    `تمت الموافقة على الطلب وإيداع ${amount} نقطة في حساب [${userName}] وتسجيل العملية في سجل المحفظة.`,
+                    'success'
+                );
+            }
+        }
+
+        async function handleRejectDeposit(requestId, userName) {
+            let reason = 'لم يتم التحقق من صحة إيصال التحويل المرفق، يرجى مراجعة البيانات والمحاولة مجدداً.';
+            if (typeof waseetPrompt === 'function') {
+                const inputReason = await waseetPrompt(
+                    'رفض طلب الشحن',
+                    `أدخل سبب رفض طلب الشحن الخاص بالمستخدم [${userName}]:`,
+                    reason
+                );
+                if (inputReason === null) return;
+                if (inputReason.trim()) reason = inputReason.trim();
+            } else {
+                const inputReason = prompt(`سبب رفض طلب الشحن للمستخدم ${userName}:`, reason);
+                if (inputReason === null) return;
+                if (inputReason.trim()) reason = inputReason.trim();
+            }
+
+            const { error } = await waseetAdminRejectDepositRequest(requestId, reason);
+            if (error) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تعذر رفض الطلب', error.message, 'danger');
+                }
+                return;
+            }
+
+            await loadAdminDeposits();
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('تم رفض الطلب', `تم تحديث حالة الطلب إلى مرفوض وإشعار المستخدم بالسبب.`, 'warning');
+            }
+        }
+
+        function setupAdminDepositsRealtime() {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            if (adminDepositsRealtime) {
+                try { client.removeChannel(adminDepositsRealtime); } catch (e) {}
+            }
+
+            try {
+                adminDepositsRealtime = client
+                    .channel('admin-deposits-live')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'deposit_requests'
+                    }, () => {
+                        loadAdminDeposits();
+                    })
+                    .subscribe();
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(async () => {
+                const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+                const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
+
+                if (!isAdmin) {
+                    document.getElementById('admin-access-denied').style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('admin-deposits-main').style.display = 'block';
+                await loadAdminDeposits();
+                setupAdminDepositsRealtime();
+            }, 450);
+        });
+    </script>
+</body>
+</html>

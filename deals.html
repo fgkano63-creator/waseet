@@ -206,8 +206,12 @@
                     </a>
                 </nav>
 
-                <!-- المجموعة 2 المخصصة للمدير (الـ 5 أزرار الأساسية فقط في المنتصف بتناسق) -->
+                <!-- المجموعة 2 المخصصة للمدير (أزرار التحكم الأساسية) -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                        <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                    </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
                     </a>
@@ -222,11 +226,11 @@
                     <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
                         <i class="fas fa-comments text-orange"></i> المحادثات
                     </a>
-                    <div class="wallet-pill" id="admin-wallet-pill" onclick="if(typeof waseetAlert==='function') waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك من الصفحة الرئيسية.');" title="محفظة النقاط">
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
                         </div>
                     </div>
                 </nav>
@@ -234,11 +238,11 @@
                 <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ مع gap: 15px -->
                 <div class="nav-left-group">
                     <!-- 1. رصيد المحفظة -->
-                    <div class="wallet-pill" id="wallet-pill-btn" onclick="if(typeof waseetAlert==='function') waseetAlert('محفظة النقاط', 'يمكنك إدارة وشحن رصيدك من الصفحة الرئيسية.');" title="رصيد المحفظة">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
-                            <span class="wallet-amount" id="deals-wallet-pts">0$</span>
+                            <span class="wallet-amount" id="deals-wallet-pts">0 نقطة</span>
                         </div>
                     </div>
 
@@ -523,9 +527,13 @@
 
             const pts = (user && user.wallet && user.wallet.available) || 0;
             const walletPtsEl = document.getElementById('deals-wallet-pts');
-            if (walletPtsEl) walletPtsEl.innerText = `${pts}$`;
+            if (walletPtsEl) walletPtsEl.innerText = `${pts} نقطة`;
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
-            if (adminTotalEl) adminTotalEl.innerText = `${pts}$`;
+            if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة`;
+
+            if (isAdmin && typeof window.waseetUpdateAdminPendingDepositsBadge === 'function') {
+                window.waseetUpdateAdminPendingDepositsBadge();
+            }
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge && WASEET_STATE.deals) {
@@ -772,7 +780,7 @@
                                                 </div>
                                             </div>
                                             <div style="font-family: var(--font-en); font-weight: 900; color: var(--gold-light); font-size: 1.25rem;">
-                                                $${acc.sellerPrice} <span style="font-size: 0.8rem; color: var(--silver-muted);">(صافي ربحك)</span>
+                                                ${acc.sellerPrice} نقطة <span style="font-size: 0.8rem; color: var(--silver-muted);">(صافي ربحك)</span>
                                             </div>
                                         </div>
                                         ${badgeHtml}
@@ -875,7 +883,7 @@
                                                 <span style="color: #fff;">${acc.title}</span>
                                             </div>
                                             <div class="deal-amount-tag">
-                                                $${acc.sellerPrice} <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice}$)</span>
+                                                ${acc.sellerPrice} نقطة <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice} نقطة)</span>
                                             </div>
                                         </div>
                                         <div class="deal-parties-grid">
@@ -986,14 +994,14 @@
                             <span>${deal.accountTitle}</span>
                         </div>
                         <div class="deal-amount-tag">
-                            ${deal.totalPoints}$
+                            ${deal.totalPoints} نقطة
                         </div>
                     </div>
 
                     <div class="deal-parties-grid">
                         <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color: #fff;">${deal.buyer ? deal.buyer.name : 'أحمد'}</strong></div>
                         <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color: #fff;">${deal.seller ? deal.seller.name : 'سامي'}</strong></div>
-                        <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+$${deal.fee || 3}</strong></div>
+                        <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+${deal.fee || 3} نقطة</strong></div>
                     </div>
 
                     <div class="deal-stage-bar">

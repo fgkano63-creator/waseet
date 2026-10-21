@@ -66,8 +66,12 @@
                     </a>
                 </nav>
 
-                <!-- المجموعة 2 المخصصة للمدير (الـ 5 أزرار الأساسية فقط في المنتصف بتناسق) -->
+                <!-- المجموعة 2 المخصصة للمدير (أزرار التحكم الأساسية في المنتصف بتناسق) -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                        <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                    </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
                     </a>
@@ -82,11 +86,11 @@
                     <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
                         <i class="fas fa-comments text-orange"></i> المحادثات
                     </a>
-                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.waseetApp && window.waseetApp.openWalletModal && window.waseetApp.openWalletModal()" title="انقر لإدارة وشحن المحفظة">
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="انقر لإدارة وشحن المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">الرصيد</span>
-                            <span class="wallet-amount" id="admin-wallet-total-pts">0$</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
                         </div>
                     </div>
                 </nav>
@@ -94,13 +98,13 @@
                 <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ مع gap: 15px -->
                 <div class="nav-left-group">
                     <!-- 1. رصيد المحفظة -->
-                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.waseetApp && window.waseetApp.openWalletModal && window.waseetApp.openWalletModal()" title="انقر لإدارة وشحن المحفظة">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="انقر لإدارة وشحن المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">الرصيد</span>
-                            <span class="wallet-amount" id="wallet-total-pts">0$</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
                         </div>
-                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0$ محجوز</span>
+                        <span class="wallet-locked-tag" id="wallet-locked-pts" style="display: none;">0 نقطة محجوزة</span>
                     </div>
 
                     <!-- 2. زر الحساب الشخصي -->
@@ -159,8 +163,8 @@
                         <div class="stat-label">ضمان استرجاع النقاط عند الخلل</div>
                     </div>
                     <div class="stat-card-3d card-3d">
-                        <div class="stat-num text-orange">3$ - 5$</div>
-                        <div class="stat-label">عمولة ثابتة متدرجة تبدأ من 3$</div>
+                        <div class="stat-num text-orange">3 - 5 نقاط</div>
+                        <div class="stat-label">عمولة ثابتة متدرجة تبدأ من 3 نقاط</div>
                     </div>
                     <div class="stat-card-3d card-3d">
                         <div class="stat-num text-gold">برايم 1-8</div>
@@ -289,41 +293,41 @@
                             </p>
 
                             <div class="input-group">
-                                <label class="input-label"><i class="fas fa-hand-holding-usd text-gold"></i> المبلغ الصافي الذي ترغب في استلامه كبائع ($):</label>
+                                <label class="input-label"><i class="fas fa-hand-holding-usd text-gold"></i> المبلغ الصافي الذي ترغب في استلامه كبائع (بالنقاط):</label>
                                 <div class="luxury-stepper-container">
-                                    <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustCalc(-10)" title="إنقاص 10$">
+                                    <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustCalc(-10)" title="إنقاص 10 نقاط">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                     <div class="stepper-input-wrap">
                                         <input type="number" id="calc-seller-input" class="stepper-number-input" value="30" min="5" max="10000" step="5">
-                                        <span class="stepper-unit-label">$</span>
+                                        <span class="stepper-unit-label">نقطة</span>
                                     </div>
-                                    <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustCalc(10)" title="زيادة 10$">
+                                    <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustCalc(10)" title="زيادة 10 نقاط">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
                             </div>
                             <small style="color: var(--silver-muted); line-height: 1.6; display: block; margin-top: 0.5rem;">
-                                * نظام العمولات المحدث: أقل من 100$ (3$-5$) • من 100$-250$ (10$) • من 250$-500$ (15$) • من 500$-750$ (20$) • من 750$-850$ (25$) • من 850$-1000$ (30$) • من 1000$-1500$ (35$) • من 1500$-2000$ (40$) • من 2000$-3000$ (45$) • من 3000$ فما فوق (50$ كحد أقصى).
+                                * نظام العمولات المحدث: أقل من 100 نقطة (3-5 نقاط) • من 100-250 نقطة (10 نقاط) • من 250-500 نقطة (15 نقطة) • من 500-750 نقطة (20 نقطة) • من 750-850 نقطة (25 نقطة) • من 850-1000 نقطة (30 نقطة) • من 1000-1500 نقطة (35 نقطة) • من 1500-2000 نقطة (40 نقطة) • من 2000-3000 نقطة (45 نقطة) • من 3000 نقطة فما فوق (50 نقطة كحد أقصى).
                             </small>
                         </div>
 
                         <div class="calc-results-panel">
                             <div class="res-row">
                                 <span class="res-label"><i class="fas fa-hand-holding-usd text-gold"></i> صافي ربح البائع:</span>
-                                <span class="res-val" id="calc-res-seller">$30</span>
+                                <span class="res-val" id="calc-res-seller">30 نقطة</span>
                             </div>
                             <div class="res-row">
                                 <span class="res-label"><i class="fas fa-shield-alt text-orange"></i> عمولة خدمة ووساطة الموقع:</span>
-                                <span class="res-val text-orange" id="calc-res-fee">+$3</span>
+                                <span class="res-val text-orange" id="calc-res-fee">+3 نقاط</span>
                             </div>
                             <div class="res-row">
                                 <span class="res-label"><i class="fas fa-info-circle text-gold"></i> الشريحة المطبقة:</span>
-                                <span class="res-val" style="font-size: 0.85rem;" id="calc-res-tier">أقل من 50$ (عمولة 3$)</span>
+                                <span class="res-val" style="font-size: 0.85rem;" id="calc-res-tier">أقل من 50 نقطة (عمولة 3 نقاط)</span>
                             </div>
                             <div class="res-row">
                                 <span class="res-label" style="font-weight: 800; color: #fff;">السعر النهائي الذي يدفعه المشتري:</span>
-                                <span class="res-val text-gold big" id="calc-res-buyer">33$</span>
+                                <span class="res-val text-gold big" id="calc-res-buyer">33 نقطة</span>
                             </div>
                         </div>
                     </div>
@@ -641,7 +645,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">المبلغ الصافي الذي ترغب باستلامه كبائع ($):</label>
+                    <label class="input-label">المبلغ الصافي الذي ترغب باستلامه كبائع (بالنقاط):</label>
                     <input type="number" id="form-seller-price" class="input-3d" value="45" min="5" required>
                 </div>
 
@@ -715,46 +719,51 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid var(--gold-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المتاح للشراء والسحب:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0$</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: #fff;" id="modal-wallet-avail">0 نقطة</div>
                 </div>
                 <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid var(--orange-primary); padding: 1rem; border-radius: 12px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--silver-muted);">الرصيد المحجوز في صفقات الوساطة:</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0$</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-en); color: var(--orange-bright);" id="modal-wallet-lock">0 نقطة</div>
                 </div>
             </div>
 
             <div style="background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-metal); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--gold-light);">
-                    <i class="fas fa-money-bill-wave"></i> شحن رصيد المحفظة ($)
-                </h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--gold-light); margin: 0;">
+                        <i class="fas fa-coins text-gold"></i> شحن رصيد النقاط (Manual Points Deposit)
+                    </h4>
+                    <a href="wallet.html" class="btn-3d btn-gold" style="font-size: 0.8rem; padding: 0.35rem 0.8rem; text-decoration: none;">
+                        <i class="fas fa-wallet"></i> صفحة المحفظة الكاملة
+                    </a>
+                </div>
                 
-                <!-- Luxury 3D Number Stepper (Requirement 2 & 3 - Image 3) -->
+                <!-- Luxury 3D Number Stepper -->
                 <div class="input-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> المبلغ المراد شحنه:</label>
-                        <span class="stepper-live-val" id="topup-live-preview">50$</span>
+                        <label class="input-label" style="margin-bottom: 0;"><i class="fas fa-coins text-gold"></i> عدد النقاط المراد شحنها:</label>
+                        <span class="stepper-live-val" id="topup-live-preview">50 نقطة</span>
                     </div>
                     
                     <div class="luxury-stepper-container">
-                        <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustTopup(-10)" title="إنقاص 10$">
+                        <button type="button" class="stepper-btn stepper-btn-minus" onclick="window.waseetAdjustTopup(-10)" title="إنقاص 10 نقاط">
                             <i class="fas fa-minus"></i>
                         </button>
                         <div class="stepper-input-wrap">
                             <input type="number" id="topup-amount" class="stepper-number-input" value="50" min="10" max="10000" step="5" oninput="window.waseetSyncTopupInput()">
-                            <span class="stepper-unit-label">$</span>
+                            <span class="stepper-unit-label">نقطة</span>
                         </div>
-                        <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10$">
+                        <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10 نقاط">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
 
                     <!-- Quick Preset Selection Pills -->
                     <div class="stepper-quick-presets" id="topup-presets-container">
-                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(25)">25$</button>
-                        <button type="button" class="preset-pill active" onclick="window.waseetSetTopup(50)">50$</button>
-                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(100)">100$</button>
-                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(250)">250$</button>
-                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(500)">500$</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(25)">25 نقطة</button>
+                        <button type="button" class="preset-pill active" onclick="window.waseetSetTopup(50)">50 نقطة</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(100)">100 نقطة</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(250)">250 نقطة</button>
+                        <button type="button" class="preset-pill" onclick="window.waseetSetTopup(500)">500 نقطة</button>
                     </div>
                 </div>
 
@@ -1009,14 +1018,18 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
                 <a href="#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-calculator text-silver"></i>
                     <span>حاسبة العمولات</span>
                 </a>
-                <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); document.getElementById('modal-wallet') && document.getElementById('modal-wallet').classList.add('active')">
+                <a href="wallet.html" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-wallet text-gold"></i>
-                    <span>شحن المحفظة</span>
-                </button>
+                    <span>محفظتي والنقاط</span>
+                </a>
             </div>
         </div>
 

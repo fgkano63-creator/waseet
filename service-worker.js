@@ -4,7 +4,7 @@
  * مع استثناء كامل للاتصالات اللحظية وواجهات Supabase لضمان سرعة وموثوقية الصفقات.
  */
 
-const CACHE_NAME = 'waseet-pwa-v1';
+const CACHE_NAME = 'waseet-pwa-v2';
 
 // الملفات الأساسية للتخزين المؤقت الأولي
 const STATIC_ASSETS = [
@@ -16,6 +16,8 @@ const STATIC_ASSETS = [
   './admin-chats.html',
   './my-accounts.html',
   './pending-accounts.html',
+  './wallet.html',
+  './admin-deposits.html',
   './manifest.json',
   './css/style.css',
   './assets/favicon-192.png',

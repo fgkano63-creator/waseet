@@ -31,40 +31,40 @@ function calculateWaseetFee(sellerPrice) {
 
     if (price < 50) {
         fee = 3;
-        tierText = 'أقل من 50$ (عمولة ثابتة 3$)';
+        tierText = 'أقل من 50 نقطة (عمولة ثابتة 3 نقطة)';
     } else if (price < 100) {
         fee = 5;
-        tierText = 'من 50$ إلى 99$ (عمولة ثابتة 5$)';
+        tierText = 'من 50 إلى 99 نقطة (عمولة ثابتة 5 نقطة)';
     } else if (price >= 100 && price < 250) {
         fee = 10;
-        tierText = 'من 100$ إلى 250$ (عمولة 10$)';
+        tierText = 'من 100 إلى 250 نقطة (عمولة 10 نقطة)';
     } else if (price >= 250 && price < 500) {
         fee = 15;
-        tierText = 'من 250$ إلى 500$ (عمولة 15$)';
+        tierText = 'من 250 إلى 500 نقطة (عمولة 15 نقطة)';
     } else if (price >= 500 && price < 750) {
         fee = 20;
-        tierText = 'من 500$ إلى 750$ (عمولة 20$)';
+        tierText = 'من 500 إلى 750 نقطة (عمولة 20 نقطة)';
     } else if (price >= 750 && price < 850) {
         fee = 25;
-        tierText = 'من 750$ إلى 850$ (عمولة 25$)';
+        tierText = 'من 750 إلى 850 نقطة (عمولة 25 نقطة)';
     } else if (price >= 850 && price < 1000) {
         fee = 30;
-        tierText = 'من 850$ إلى 1000$ (عمولة 30$)';
+        tierText = 'من 850 إلى 1000 نقطة (عمولة 30 نقطة)';
     } else if (price >= 1000 && price < 1500) {
         fee = 35;
-        tierText = 'من 1000$ إلى 1500$ (عمولة 35$)';
+        tierText = 'من 1000 إلى 1500 نقطة (عمولة 35 نقطة)';
     } else if (price >= 1500 && price < 2000) {
         fee = 40;
-        tierText = 'من 1500$ إلى 2000$ (عمولة 40$)';
+        tierText = 'من 1500 إلى 2000 نقطة (عمولة 40 نقطة)';
     } else if (price >= 2000 && price < 2500) {
         fee = 45;
-        tierText = 'من 2000$ إلى 2500$ (عمولة 45$)';
+        tierText = 'من 2000 إلى 2500 نقطة (عمولة 45 نقطة)';
     } else if (price >= 2500 && price < 3000) {
         fee = 45;
-        tierText = 'من 2500$ إلى 3000$ (عمولة 45$)';
+        tierText = 'من 2500 إلى 3000 نقطة (عمولة 45 نقطة)';
     } else {
         fee = 50;
-        tierText = 'من 3000$ فما فوق (عمولة ثابتة 50$)';
+        tierText = 'من 3000 نقطة فما فوق (عمولة ثابتة 50 نقطة)';
     }
 
     const buyerPrice = price + fee;

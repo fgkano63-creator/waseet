@@ -633,7 +633,7 @@ class WaseetEscrowRoom {
         if (metaTitle) metaTitle.innerText = 'غرفة الوساطة المباشرة';
         if (metaDesc) metaDesc.innerText = 'لا توجد صفقة نشطة حالياً في النظام';
         if (topPill) {
-            topPill.innerHTML = `<span>المبلغ المحجوز:</span> <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0$</strong>`;
+            topPill.innerHTML = `<span>المبلغ المحجوز:</span> <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">0 نقطة</strong>`;
             topPill.style.borderColor = 'var(--gold-primary)';
             topPill.style.boxShadow = 'none';
         }
@@ -674,7 +674,7 @@ class WaseetEscrowRoom {
             }
             dealSelect.innerHTML = allDeals.map((d, idx) => `
                 <option value="${d.id}" ${d.id === this.deal.id ? 'selected' : ''}>
-                    #DEAL-${d.dealNumber || (idx + 1)} (${d.totalPoints}$)
+                    #DEAL-${d.dealNumber || (idx + 1)} (${d.totalPoints} نقطة)
                 </option>
             `).join('');
             dealSelect.value = this.deal.id;
@@ -698,7 +698,7 @@ class WaseetEscrowRoom {
         if (this.deal.status === 'cancelled') {
             topPill.innerHTML = `
                 <span style="color: #ef4444; font-weight: 700;"><i class="fas fa-undo-alt"></i> حالة الصفقة:</span>
-                <strong style="color: #ef4444; font-family: var(--font-ar); font-size: 1.05rem;">ملغاة • تم استرجاع ${this.deal.totalPoints}$ للمشتري</strong>
+                <strong style="color: #ef4444; font-family: var(--font-ar); font-size: 1.05rem;">ملغاة • تم استرجاع ${this.deal.totalPoints} نقطة للمشتري</strong>
             `;
             topPill.style.borderColor = '#ef4444';
             topPill.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.3)';
@@ -712,7 +712,7 @@ class WaseetEscrowRoom {
         } else {
             topPill.innerHTML = `
                 <span>المبلغ المحجوز:</span>
-                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">${this.deal.totalPoints}$</strong>
+                <strong style="color: var(--gold-light); font-family: var(--font-en); font-size: 1.2rem;">${this.deal.totalPoints} نقطة</strong>
             `;
             topPill.style.borderColor = 'var(--gold-primary)';
             topPill.style.boxShadow = 'none';
@@ -733,8 +733,8 @@ class WaseetEscrowRoom {
 
         if (this.viewerRole === 'mediator') {
             let note = 'لديك شاشات مستقلة للتواصل مع البائع والمشتري بشكل منفصل، مع صلاحية حصرية لفحص بيانات الدخول وإلغاء/تحرير الصفقة.';
-            if (isCancelled) note = `⚠️ تم إلغاء الصفقة ورفض الحساب وتمت إعادة كامل المبلغ (${pts}$) إلى محفظة المشتري.`;
-            if (isCompleted) note = `✅ اكتملت صفقة الوساطة بنجاح! تم تحويل ${sellerPayout}$ للبائع وإيداع عمولتك ${fee}$ في أرباح المنصة.`;
+            if (isCancelled) note = `⚠️ تم إلغاء الصفقة ورفض الحساب وتمت إعادة كامل المبلغ (${pts} نقطة) إلى محفظة المشتري.`;
+            if (isCompleted) note = `✅ اكتملت صفقة الوساطة بنجاح! تم تحويل ${sellerPayout} نقطة للبائع وإيداع عمولتك ${fee} نقطة في أرباح المنصة.`;
 
             banner.innerHTML = `
                 <div class="banner-mediator">
@@ -747,7 +747,7 @@ class WaseetEscrowRoom {
             `;
         } else if (this.viewerRole === 'buyer') {
             let note = 'أنت تتواصل في شات خاص ومباشر مع الوسيط المعتمد فقط. أموالك مؤمنة بالكامل.';
-            if (isCancelled) note = `💰 تم إلغاء الصفقة واسترجاع ${pts}$ بالكامل إلى محفظتك المتاحة بنجاح دون أي خصم.`;
+            if (isCancelled) note = `💰 تم إلغاء الصفقة واسترجاع ${pts} نقطة بالكامل إلى محفظتك المتاحة بنجاح دون أي خصم.`;
             if (isCompleted) note = '🎉 تهانينا! اكتملت صفقة الشراء بنجاح والحساب أصبح ملكك رسمياً مع ضمان WASEET الذهبي.';
 
             banner.innerHTML = `
@@ -762,7 +762,7 @@ class WaseetEscrowRoom {
         } else {
             let note = 'أنت تتواصل في شات خاص ومباشر مع الوسيط المعتمد فقط لمتابعة تسليم الحساب ومستحقاتك.';
             if (isCancelled) note = '⚠️ تم إلغاء الصفقة لعدم مطابقة بيانات الحساب للشروط، وتم استرجاع الرصيد للمشتري.';
-            if (isCompleted) note = `💰 مبروك! تم إيداع ${sellerPayout}$ في رصيدك المتاح للسحب كاش فوراً.`;
+            if (isCompleted) note = `💰 مبروك! تم إيداع ${sellerPayout} نقطة في رصيدك المتاح.`;
 
             banner.innerHTML = `
                 <div class="banner-seller">
@@ -791,7 +791,7 @@ class WaseetEscrowRoom {
 
         const pts = this.deal.totalPoints || 0;
         const steps = [
-            { num: 1, title: 'حجز الرصيد', desc: `تم حجز ${pts}$ بالخزينة` },
+            { num: 1, title: 'حجز الرصيد', desc: `تم حجز ${pts} نقطة بالخزينة` },
             { num: 2, title: 'نقل الملكية', desc: 'تغيير الربط وتأمين المشتري' },
             { num: 3, title: 'تحرير الرصيد', desc: 'إرسال الأرباح وإنهاء الصفقة' }
         ];
@@ -984,7 +984,7 @@ class WaseetEscrowRoom {
                     <i class="fas fa-times-circle text-orange" style="font-size: 2rem; margin-bottom: 0.5rem; color: #ef4444;"></i>
                     <h4 style="color: #fff; margin-bottom: 0.3rem;">تم إلغاء الصفقة ورفض الحساب</h4>
                     <p style="color: var(--silver-muted); font-size: 0.8rem; line-height: 1.6;">
-                        تم استرجاع ${pts}$ بالكامل إلى محفظة المشتري وإلغاء تجميد الرصيد.
+                        تم استرجاع ${pts} نقطة بالكامل إلى محفظة المشتري وإلغاء تجميد الرصيد.
                     </p>
                 </div>
             `;
@@ -1005,7 +1005,7 @@ class WaseetEscrowRoom {
             } else if (this.deal.currentStep === 3) {
                 nextBtn = `
                     <button class="btn-3d btn-gold glow-gold" style="width: 100%;" onclick="window.escrowRoom.completeDeal()">
-                        <i class="fas fa-coins"></i> تحرير الرصيد (${sellerPayout}$ للبائع + ${fee}$ عمولة المنصة)
+                        <i class="fas fa-coins"></i> تحرير الرصيد (${sellerPayout} نقطة للبائع + ${fee} نقطة عمولة المنصة)
                     </button>
                 `;
             }
@@ -1013,7 +1013,7 @@ class WaseetEscrowRoom {
             actionButtonsHtml = `
                 ${nextBtn}
                 <button class="btn-3d btn-danger-cancel" onclick="window.escrowRoom.cancelAndRefundDeal()">
-                    <i class="fas fa-undo-alt"></i> إلغاء الصفقة واسترجاع ${pts}$ للمشتري
+                    <i class="fas fa-undo-alt"></i> إلغاء الصفقة واسترجاع ${pts} نقطة للمشتري
                 </button>
             `;
         }
@@ -1074,7 +1074,7 @@ class WaseetEscrowRoom {
                 <div class="safe-panel-body">
                     <div class="cancelled-card-highlight">
                         <i class="fas fa-wallet text-gold" style="font-size: 2.2rem; margin-bottom: 0.5rem;"></i>
-                        <h4 style="color: #fff; margin-bottom: 0.4rem;">تم استرجاع ${pts}$ لمحفظتك بالكامل</h4>
+                        <h4 style="color: #fff; margin-bottom: 0.4rem;">تم استرجاع ${pts} نقطة لمحفظتك بالكامل</h4>
                         <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.6;">
                             قام الوسيط المعتمد برفض بيانات الحساب لعدم مطابقتها أو لحمايتك من أي خلل. تمت إعادة كامل المبلغ إلى رصيدك المتاح دون خصم أي عمولة.
                         </p>
@@ -1122,7 +1122,7 @@ class WaseetEscrowRoom {
                 </div>
                 <div class="deal-receipt-summary">
                     <div class="receipt-row"><span style="color: var(--silver-muted);">الحساب المطلوب:</span><span class="text-white" style="font-weight: 700;">${this.deal.accountTitle}</span></div>
-                    <div class="receipt-row"><span style="color: var(--silver-muted);">المبلغ المحجوز من محفظتك:</span><span class="text-gold font-mono" style="font-weight: 800;">${this.deal.totalPoints}$</span></div>
+                    <div class="receipt-row"><span style="color: var(--silver-muted);">المبلغ المحجوز من محفظتك:</span><span class="text-gold font-mono" style="font-weight: 800;">${this.deal.totalPoints} نقطة</span></div>
                     <div class="receipt-row"><span style="color: var(--silver-muted);">حالة الضمان:</span><span style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> مؤمن بالكامل في خزينة الوساطة</span></div>
                 </div>
             </div>
@@ -1164,7 +1164,7 @@ class WaseetEscrowRoom {
                     <div class="payout-card-highlight">
                         <i class="fas fa-wallet text-gold" style="font-size: 2.4rem; margin-bottom: 0.5rem;"></i>
                         <span style="font-size: 0.85rem; color: var(--silver-muted);">تم إيداع أرباحك في محفظتك المتاحة:</span>
-                        <div style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-en); color: #10b981; margin: 0.3rem 0;">+${sellerPayout}$</div>
+                        <div style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-en); color: #10b981; margin: 0.3rem 0;">+${sellerPayout} نقطة</div>
                         <span style="font-size: 0.75rem; color: var(--silver-muted);">رصيدك متاح الآن للسحب الفوري كاش</span>
                     </div>
                 </div>
@@ -1179,11 +1179,11 @@ class WaseetEscrowRoom {
             <div class="safe-panel-body">
                 <div class="payout-card-highlight">
                     <span style="font-size: 0.8rem; color: var(--silver-muted);">صافي ربحك من هذه الصفقة:</span>
-                    <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-en); color: var(--gold-light); margin: 0.3rem 0;">${sellerPayout}$</div>
-                    <span style="font-size: 0.75rem; color: var(--silver-muted);">+ ${fee}$ عمولة المنصة يدفعها المشتري تلقائياً</span>
+                    <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-en); color: var(--gold-light); margin: 0.3rem 0;">${sellerPayout} نقطة</div>
+                    <span style="font-size: 0.75rem; color: var(--silver-muted);">+ ${fee} نقطة عمولة المنصة يدفعها المشتري تلقائياً</span>
                 </div>
                 <p style="color: var(--silver-muted); font-size: 0.85rem; line-height: 1.7; margin-top: 1rem;">
-                    تم استلام بيانات الحساب التي رفعتها ويقوم الوسيط بفحصها الآن. بمجرد أن ينهي الوسيط تسليم الحساب للمشتري وتأكيد الربط، سيقوم الوسيط فوراً بضغط زر <strong>تحرير الرصيد</strong> ليصلك مبلغ ${sellerPayout}$ في محفظتك المتاحة للسحب كاش.
+                    تم استلام بيانات الحساب التي رفعتها ويقوم الوسيط بفحصها الآن. بمجرد أن ينهي الوسيط تسليم الحساب للمشتري وتأكيد الربط، سيقوم الوسيط فوراً بضغط زر <strong>تحرير الرصيد</strong> ليصلك مبلغ ${sellerPayout} نقطة في محفظتك المتاحة للسحب كاش.
                 </p>
             </div>
         `;
@@ -1485,7 +1485,7 @@ class WaseetEscrowRoom {
 
         this.deal.sellerMessages.push({
             sender: 'system',
-            text: `🎉 تم تحرير الرصيد بنجاح! تم إيداع ${this.deal.sellerPrice}$ في محفظتك المتاحة للسحب كاش.`,
+            text: `🎉 تم تحرير الرصيد بنجاح! تم إيداع ${this.deal.sellerPrice} نقطة في محفظتك المتاحة.`,
             time: timeStr
         });
 
@@ -1495,12 +1495,27 @@ class WaseetEscrowRoom {
             time: timeStr
         });
 
-        // Deduct from locked points
+        // Release points in Supabase DB via atomic RPC
+        if (typeof window.waseetReleaseEscrowPointsInDb === 'function') {
+            try {
+                await window.waseetReleaseEscrowPointsInDb(this.deal.id);
+            } catch (e) {
+                console.warn('Could not release escrow points in DB:', e);
+            }
+        }
+
+        // Deduct from locked points in local state
         if (WASEET_STATE.user && WASEET_STATE.user.wallet) {
             if (WASEET_STATE.user.wallet.locked >= this.deal.totalPoints) {
                 WASEET_STATE.user.wallet.locked -= this.deal.totalPoints;
                 WASEET_STATE.user.wallet.total -= this.deal.totalPoints;
             }
+        }
+
+        if (typeof window.waseetRefreshMyWalletBalance === 'function') {
+            try {
+                await window.waseetRefreshMyWalletBalance();
+            } catch (e) {}
         }
 
         // Move deal from active to completed deals archive (Requirement 5)
@@ -1521,7 +1536,7 @@ class WaseetEscrowRoom {
         if (typeof waseetAlert === 'function') {
             await waseetAlert(
                 'مبروك! اكتملت الصفقة بنجاح 100%',
-                `تم إنهاء صفقة الوساطة بنجاح! تم تحويل ${this.deal.sellerPrice}$ للبائع وإيداع عمولتك ${this.deal.fee}$ في أرباح المنصة.`,
+                `تم إنهاء صفقة الوساطة بنجاح! تم تحويل ${this.deal.sellerPrice} نقطة للبائع وإيداع عمولتك ${this.deal.fee} نقطة في أرباح المنصة.`,
                 'success'
             );
         }
@@ -1532,7 +1547,7 @@ class WaseetEscrowRoom {
         if (typeof waseetConfirm === 'function') {
             confirmCancel = await waseetConfirm(
                 'تأكيد رفض الحساب وإلغاء الصفقة',
-                `هل أنت متأكد من رفض الحساب وإلغاء صفقة الوساطة؟\n\nسيتم فك الحجز وإرجاع كامل المبلغ (${this.deal.totalPoints}$) إلى محفظة المشتري المتاحة فوراً دون خصم أي عمولة.`,
+                `هل أنت متأكد من رفض الحساب وإلغاء صفقة الوساطة؟\n\nسيتم فك الحجز وإرجاع كامل المبلغ (${this.deal.totalPoints} نقطة) إلى محفظة المشتري المتاحة فوراً دون خصم أي عمولة.`,
                 'نعم، رفض الحساب وإرجاع الرصيد',
                 'تراجع',
                 'danger'
@@ -1546,7 +1561,16 @@ class WaseetEscrowRoom {
         this.deal.status = 'cancelled';
         this.deal.currentStep = 0;
 
-        // Refund points back to buyer's available wallet
+        // Refund points in Supabase DB via atomic RPC
+        if (typeof window.waseetRefundEscrowPointsInDb === 'function') {
+            try {
+                await window.waseetRefundEscrowPointsInDb(this.deal.id);
+            } catch (e) {
+                console.warn('Could not refund escrow points in DB:', e);
+            }
+        }
+
+        // Refund points back to buyer's available wallet in local state
         if (WASEET_STATE.user && WASEET_STATE.user.wallet) {
             WASEET_STATE.user.wallet.available += this.deal.totalPoints;
             if (WASEET_STATE.user.wallet.locked >= this.deal.totalPoints) {
@@ -1554,12 +1578,18 @@ class WaseetEscrowRoom {
             }
         }
 
+        if (typeof window.waseetRefreshMyWalletBalance === 'function') {
+            try {
+                await window.waseetRefreshMyWalletBalance();
+            } catch (e) {}
+        }
+
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
         this.deal.buyerMessages.push({
             sender: 'system',
-            text: `⚠️ قام الوسيط المعتمد برفض الحساب وإلغاء الصفقة. تم استرجاع كامل المبلغ (${this.deal.totalPoints}$) إلى محفظتك المتاحة.`,
+            text: `⚠️ قام الوسيط المعتمد برفض الحساب وإلغاء الصفقة. تم استرجاع كامل المبلغ (${this.deal.totalPoints} نقطة) إلى محفظتك المتاحة.`,
             time: timeStr
         });
 
@@ -1588,7 +1618,7 @@ class WaseetEscrowRoom {
         if (typeof waseetAlert === 'function') {
             await waseetAlert(
                 'تم إلغاء الصفقة واسترجاع الرصيد',
-                `تم إلغاء الصفقة بنجاح! تم استرجاع كامل المبلغ (${this.deal.totalPoints}$) إلى محفظة المشتري المتاحة دون خصم أي عمولة.`,
+                `تم إلغاء الصفقة بنجاح! تم استرجاع كامل المبلغ (${this.deal.totalPoints} نقطة) إلى محفظة المشتري المتاحة دون خصم أي عمولة.`,
                 'info'
             );
         }

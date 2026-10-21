@@ -368,9 +368,9 @@ async function waseetSyncAuthState() {
             isAdmin: isAdmin,
             provider: 'supabase_google',
             wallet: {
-                available: profile ? Number(profile.wallet_balance || 0) : 0,
-                locked: 0,
-                total: profile ? Number(profile.wallet_balance || 0) : 0
+                available: profile ? Number(profile.points_balance ?? profile.wallet_balance ?? 0) : 0,
+                locked: profile ? Number(profile.locked_points ?? 0) : 0,
+                total: profile ? (Number(profile.points_balance ?? profile.wallet_balance ?? 0) + Number(profile.locked_points ?? 0)) : 0
             }
         };
 
@@ -1319,6 +1319,393 @@ window.waseetFetchDealMessagesFromSupabase = waseetFetchDealMessagesFromSupabase
 window.waseetFetchDealsFromSupabase = waseetFetchDealsFromSupabase;
 
 /**
+ * ==============================================================================
+ * نظام المحفظة الداخلية والشحن اليدوي بالنقاط (Manual Wallet & Points System)
+ * ==============================================================================
+ */
+
+/**
+ * تحديث رصيد النقاط للمستخدم الحالي من جدول profiles في Supabase وتحديث عناصر الواجهة
+ */
+async function waseetRefreshMyWalletBalance() {
+    const client = initWaseetSupabase();
+    if (!client) return null;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const userId = session?.user?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        if (!userId || !waseetIsValidUuid(userId)) return null;
+
+        const profile = await waseetFetchUserProfile(userId);
+        if (!profile) return null;
+
+        const available = Number(profile.points_balance ?? profile.wallet_balance ?? 0);
+        const locked = Number(profile.locked_points ?? 0);
+        const total = available + locked;
+
+        if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+            WASEET_STATE.user.wallet = { available, locked, total };
+            if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+
+        const totalPtsEl = document.getElementById('wallet-total-pts');
+        if (totalPtsEl) totalPtsEl.innerText = `${available} نقطة`;
+
+        const adminTotalPtsEl = document.getElementById('admin-wallet-total-pts');
+        if (adminTotalPtsEl) adminTotalPtsEl.innerText = `${available} نقطة`;
+
+        if (window.waseetApp && typeof window.waseetApp.updateWalletDisplay === 'function') {
+            window.waseetApp.updateWalletDisplay();
+        }
+
+        return { available, locked, total };
+    } catch (err) {
+        console.warn('[Wallet] استثناء تحديث رصيد النقاط:', err);
+        return null;
+    }
+}
+
+/**
+ * إرسال طلب شحن رصيد يدوي مرفق بصورة الإيصال إلى جدول deposit_requests
+ */
+async function waseetSubmitDepositRequest({ amount, paymentMethod, receiptImageUrl, notes }) {
+    const client = initWaseetSupabase();
+    if (!client) {
+        return { data: null, error: { message: 'تعذر الاتصال بقاعدة بيانات Supabase' } };
+    }
+
+    try {
+        const ensuredProfile = await waseetEnsureUserProfileInDb();
+        if (!ensuredProfile || !ensuredProfile.id) {
+            return { data: null, error: { message: 'يرجى تسجيل الدخول بحسابك أولاً لإرسال طلب الشحن' } };
+        }
+
+        const numAmount = Number(amount);
+        if (!numAmount || numAmount <= 0) {
+            return { data: null, error: { message: 'يرجى إدخال عدد نقاط صحيح أكبر من الصفر' } };
+        }
+
+        if (!receiptImageUrl) {
+            return { data: null, error: { message: 'يرجى إرفاق صورة إيصال التحويل المالي' } };
+        }
+
+        const payload = {
+            user_id: ensuredProfile.id,
+            amount_requested: numAmount,
+            payment_method: paymentMethod || 'تحويل محلي',
+            receipt_image_url: receiptImageUrl,
+            notes: notes || '',
+            status: 'pending'
+        };
+
+        const { data, error } = await client
+            .from('deposit_requests')
+            .insert([payload])
+            .select('*')
+            .single();
+
+        if (error) {
+            console.error('[Deposit Request] خطأ إدراج طلب الشحن:', error.message);
+            return { data: null, error };
+        }
+
+        return { data, error: null };
+    } catch (err) {
+        console.error('[Deposit Request] استثناء إرسال طلب الشحن:', err);
+        return { data: null, error: { message: err.message || 'حدث خطأ غير متوقع' } };
+    }
+}
+
+/**
+ * جلب طلبات الشحن الخاصة بالمستخدم الحالي
+ */
+async function waseetFetchMyDepositRequests() {
+    const client = initWaseetSupabase();
+    if (!client) return [];
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const userId = session?.user?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        if (!userId || !waseetIsValidUuid(userId)) return [];
+
+        const { data, error } = await client
+            .from('deposit_requests')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (error) {
+            console.warn('[Deposit Request] خطأ جلب طلباتي:', error.message);
+            return [];
+        }
+        return Array.isArray(data) ? data : [];
+    } catch (err) {
+        console.warn('[Deposit Request] استثناء جلب طلباتي:', err);
+        return [];
+    }
+}
+
+/**
+ * جلب سجل الحركات المالية (wallet_transactions) للمستخدم الحالي
+ */
+async function waseetFetchMyWalletTransactions() {
+    const client = initWaseetSupabase();
+    if (!client) return [];
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const userId = session?.user?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        if (!userId || !waseetIsValidUuid(userId)) return [];
+
+        const { data, error } = await client
+            .from('wallet_transactions')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(150);
+
+        if (error) {
+            console.warn('[Wallet Transactions] خطأ جلب السجل:', error.message);
+            return [];
+        }
+        return Array.isArray(data) ? data : [];
+    } catch (err) {
+        console.warn('[Wallet Transactions] استثناء جلب السجل:', err);
+        return [];
+    }
+}
+
+/**
+ * [للمدير] جلب كافة طلبات الشحن مع بيانات المستخدمين
+ */
+async function waseetAdminFetchDepositRequests() {
+    const client = initWaseetSupabase();
+    if (!client) return [];
+
+    try {
+        const { data: requests, error } = await client
+            .from('deposit_requests')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(300);
+
+        if (error) {
+            console.error('[Admin Deposits] خطأ جلب طلبات الشحن:', error.message);
+            return [];
+        }
+
+        if (!Array.isArray(requests) || requests.length === 0) return [];
+
+        const userIds = Array.from(new Set(requests.map(r => r.user_id).filter(id => waseetIsValidUuid(id))));
+        const profilesMap = {};
+
+        if (userIds.length > 0) {
+            const { data: profiles } = await client
+                .from('profiles')
+                .select('id, name, email, avatar_url, points_balance, wallet_balance')
+                .in('id', userIds);
+
+            if (Array.isArray(profiles)) {
+                profiles.forEach(p => {
+                    if (p && p.id) profilesMap[p.id] = p;
+                });
+            }
+        }
+
+        return requests.map(r => ({
+            ...r,
+            userProfile: profilesMap[r.user_id] || null
+        }));
+    } catch (err) {
+        console.error('[Admin Deposits] استثناء جلب طلبات الشحن:', err);
+        return [];
+    }
+}
+
+/**
+ * [للمدير] الموافقة على طلب شحن وإضافة النقاط آلياً للمستخدم عبر RPC
+ */
+async function waseetAdminApproveDepositRequest(requestId, adminNote = '') {
+    const client = initWaseetSupabase();
+    if (!client) return { data: null, error: { message: 'تعذر الاتصال بـ Supabase' } };
+
+    try {
+        const { data, error } = await client.rpc('approve_deposit_request', {
+            p_request_id: requestId,
+            p_admin_note: adminNote || 'تم التحقق من الإيصال وشحن النقاط بنجاح'
+        });
+
+        if (error) {
+            console.error('[Admin Approve Deposit] خطأ RPC:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        return { data, error: null };
+    } catch (err) {
+        console.error('[Admin Approve Deposit] استثناء:', err);
+        return { data: null, error: { message: err.message || 'فشل اعتماد الطلب' } };
+    }
+}
+
+/**
+ * [للمدير] رفض طلب شحن عبر RPC
+ */
+async function waseetAdminRejectDepositRequest(requestId, adminNote = '') {
+    const client = initWaseetSupabase();
+    if (!client) return { data: null, error: { message: 'تعذر الاتصال بـ Supabase' } };
+
+    try {
+        const { data, error } = await client.rpc('reject_deposit_request', {
+            p_request_id: requestId,
+            p_admin_note: adminNote || 'لم يتم قبول الإيصال المرفق، يرجى مراجعة البيانات'
+        });
+
+        if (error) {
+            console.error('[Admin Reject Deposit] خطأ RPC:', error.message);
+            return { data: null, error };
+        }
+
+        return { data, error: null };
+    } catch (err) {
+        console.error('[Admin Reject Deposit] استثناء:', err);
+        return { data: null, error: { message: err.message || 'فشل رفض الطلب' } };
+    }
+}
+
+/**
+ * حجز النقاط في قاعدة البيانات عند طلب شراء حساب (Escrow Lock)
+ */
+async function waseetLockEscrowPointsInDb(dealObj) {
+    const client = initWaseetSupabase();
+    if (!client || !dealObj) return { data: null, error: { message: 'بيانات الصفقة غير مكتملة' } };
+
+    try {
+        const accountUuid = (dealObj.accountId && waseetIsValidUuid(dealObj.accountId)) ? dealObj.accountId : null;
+        let sellerUuid = (dealObj.seller && waseetIsValidUuid(dealObj.seller.id)) ? dealObj.seller.id : null;
+
+        if (!sellerUuid && accountUuid) {
+            const { data: accRow } = await client
+                .from('marketplace_accounts')
+                .select('seller_id')
+                .eq('id', accountUuid)
+                .maybeSingle();
+            if (accRow && accRow.seller_id) sellerUuid = accRow.seller_id;
+        }
+
+        const { data, error } = await client.rpc('lock_escrow_points_for_deal', {
+            p_deal_id: String(dealObj.id),
+            p_account_id: accountUuid,
+            p_seller_id: sellerUuid,
+            p_seller_price: Number(dealObj.sellerPrice || 0),
+            p_fee: Number(dealObj.fee || 0),
+            p_total_points: Number(dealObj.totalPoints || 0)
+        });
+
+        if (error) {
+            console.warn('[Escrow Lock RPC] تنبيه:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        return { data, error: null };
+    } catch (err) {
+        console.warn('[Escrow Lock RPC] استثناء:', err);
+        return { data: null, error: { message: err.message } };
+    }
+}
+
+/**
+ * تحرير نقاط الصفقة للبائع وخصم عمولة المنصة تلقائياً عند إتمام الصفقة
+ */
+async function waseetReleaseEscrowPointsInDb(dealId) {
+    const client = initWaseetSupabase();
+    if (!client || !dealId) return { data: null, error: { message: 'معرف الصفقة غير صالح' } };
+
+    try {
+        const { data, error } = await client.rpc('release_escrow_deal_points', {
+            p_deal_id: String(dealId)
+        });
+
+        if (error) {
+            console.warn('[Escrow Release RPC] تنبيه:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        return { data, error: null };
+    } catch (err) {
+        console.warn('[Escrow Release RPC] استثناء:', err);
+        return { data: null, error: { message: err.message } };
+    }
+}
+
+/**
+ * استرداد النقاط المحجوزة إلى المشتري عند إلغاء الصفقة
+ */
+async function waseetRefundEscrowPointsInDb(dealId) {
+    const client = initWaseetSupabase();
+    if (!client || !dealId) return { data: null, error: { message: 'معرف الصفقة غير صالح' } };
+
+    try {
+        const { data, error } = await client.rpc('refund_escrow_deal_points', {
+            p_deal_id: String(dealId)
+        });
+
+        if (error) {
+            console.warn('[Escrow Refund RPC] تنبيه:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        return { data, error: null };
+    } catch (err) {
+        console.warn('[Escrow Refund RPC] استثناء:', err);
+        return { data: null, error: { message: err.message } };
+    }
+}
+
+/**
+ * تحديث شارة عدد طلبات الشحن المعلقة في شريط تنقل المدير
+ */
+async function waseetUpdateAdminPendingDepositsBadge() {
+    const client = initWaseetSupabase();
+    if (!client) return;
+
+    try {
+        const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+        const isAdmin = user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)));
+        if (!isAdmin) return;
+
+        const { count, error } = await client
+            .from('deposit_requests')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending');
+
+        if (!error && typeof count === 'number') {
+            const badges = document.querySelectorAll('#admin-nav-deposits-badge, .admin-deposits-badge-count');
+            badges.forEach(el => {
+                el.innerText = String(count);
+                el.style.display = count > 0 ? 'inline-block' : 'none';
+            });
+        }
+    } catch (e) {}
+}
+
+window.waseetRefreshMyWalletBalance = waseetRefreshMyWalletBalance;
+window.waseetSubmitDepositRequest = waseetSubmitDepositRequest;
+window.waseetFetchMyDepositRequests = waseetFetchMyDepositRequests;
+window.waseetFetchMyWalletTransactions = waseetFetchMyWalletTransactions;
+window.waseetAdminFetchDepositRequests = waseetAdminFetchDepositRequests;
+window.waseetAdminApproveDepositRequest = waseetAdminApproveDepositRequest;
+window.waseetAdminRejectDepositRequest = waseetAdminRejectDepositRequest;
+window.waseetLockEscrowPointsInDb = waseetLockEscrowPointsInDb;
+window.waseetReleaseEscrowPointsInDb = waseetReleaseEscrowPointsInDb;
+window.waseetRefundEscrowPointsInDb = waseetRefundEscrowPointsInDb;
+window.waseetUpdateAdminPendingDepositsBadge = waseetUpdateAdminPendingDepositsBadge;
+
+/**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
  */
 function initWaseetAuthListener() {
@@ -1328,6 +1715,7 @@ function initWaseetAuthListener() {
     client.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
             await waseetSyncAuthState();
+            await waseetUpdateAdminPendingDepositsBadge();
         } else if (event === 'SIGNED_OUT') {
             if (typeof WASEET_STATE !== 'undefined') {
                 WASEET_STATE.user = null;
@@ -1350,5 +1738,6 @@ if (typeof window !== 'undefined') {
         waseetSyncAuthState();
         waseetFetchAccountsFromSupabase();
         waseetFetchDealsFromSupabase();
+        setTimeout(waseetUpdateAdminPendingDepositsBadge, 1200);
     });
 }
