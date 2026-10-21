@@ -251,51 +251,83 @@ function generateAccountsList() {
             badge: 'ماستر 50k',
             featured: false,
             status: 'available'
-        }
-    ];
-
-    // Generate additional realistic Free Fire accounts to exceed 30 accounts for pagination
-    const primeLevels = [8, 7, 6, 5, 4, 3];
-    const sellerNames = ['Sami_Pro', 'Hunter_DZ', 'Morocco_Lion', 'Cairo_Tiger', 'Raptor_TN', 'Zaid_KSA', 'Omar_FF', 'Kratos_DZ', 'Falcon_Eye', 'Matrix_Gamer', 'Shadow_Blade', 'Titan_mena', 'Desert_Fox', 'Anubis_Pro', 'Scar_King', 'Akm_Sniper', 'Night_Wolf', 'Alpha_Dog', 'Viper_Green', 'Ghost_Rider', 'Spectre_FF', 'Zero_Hero', 'Crown_King', 'Blaze_Lord', 'Frost_Bite', 'Thunder_Bolt', 'Storm_Ruler'];
-    
-    for (let i = 10; i <= 36; i++) {
-        const prime = primeLevels[i % primeLevels.length];
-        const lvl = 55 + (i % 26);
-        const evoCount = (i % 6);
-        const price = 25 + ((i % 12) * 15);
-        const login = i % 2 === 0 ? 'google' : 'facebook';
-        const sName = sellerNames[(i - 10) % sellerNames.length];
-        
-        list.push({
-            id: `acc_${100 + i}`,
-            accountNumber: 1000 + i,
-            game: i === 25 ? 'pubg' : (i === 32 ? 'brawl_stars' : 'free_fire'),
-            title: i === 25 ? `حساب ببجي موبايل ليفل ${lvl} - أسلحة مطورة وسكنات رويال باس` : (i === 32 ? `حساب براول ستارز كؤوس عالية ليفل ${lvl}` : `حساب فري فاير برايم ${prime} ليفل ${lvl} - ${evoCount > 0 ? evoCount + ' أسلحة إيفو' : 'نظيف ومميز'}`),
-            level: lvl,
-            primeLevel: prime,
-            loginType: login,
+        },
+        {
+            id: 'acc_110',
+            accountNumber: 1010,
+            game: 'steam',
+            title: 'حساب ستيم تركي نخبوي - مكتبة 65 لعبة AAA كبرى + رصيد محفظة',
+            level: 45,
+            primeLevel: 7,
+            loginType: 'google',
+            bindStatus: 'single',
+            server: 'global',
+            sellerName: 'SteamMaster_Pro',
+            sellerRating: 5.0,
+            sellerDeals: 14,
+            sellerPrice: 120,
+            evoGunsCount: 0,
+            evoGuns: [],
+            rareSkins: ['CS2 Prime + سكين Karambit Fade', 'Dota 2 Arcana'],
+            iconicPants: [],
+            accountNotes: 'حساب ستيم بدون أي حظر VAC، تسليم الإيميل الأساسي الأصلي مع فواتير الشراء الأولى كاملة.',
+            images: [SAMPLE_IMAGES[4], SAMPLE_IMAGES[0], SAMPLE_IMAGES[1]],
+            image: SAMPLE_IMAGES[4],
+            badge: 'ستيم تركي مميز',
+            featured: true,
+            status: 'available'
+        },
+        {
+            id: 'acc_111',
+            accountNumber: 1011,
+            game: 'pubg',
+            title: 'حساب ببجي موبايل - إم فور السحلية ليفل 7 + سلاح AWM إيفو',
+            level: 75,
+            primeLevel: 7,
+            loginType: 'facebook',
             bindStatus: 'single',
             server: 'mena',
-            sellerName: sName,
-            sellerRating: (4.7 + ((i % 4) * 0.1)).toFixed(1),
-            sellerDeals: 5 + (i % 25),
-            sellerPrice: price,
-            evoGunsCount: evoCount,
-            evoGuns: evoCount > 2 ? ['AK تنين ليفل 5', 'MP40 كوبرا ليفل 4', 'M1014 أخضر ليفل 4'] : (evoCount > 0 ? ['MP40 كوبرا ليفل 4'] : []),
-            rareSkins: prime >= 7 ? ['حزمة الهيب هوب', 'سكن الجوكر'] : ['سكن المحارب الناري', 'أجنحة الظل'],
-            iconicPants: prime >= 6 ? ['بنطلون الجاز الكلاسيكي الشهير'] : ['بنطلون الكاوبوي'],
-            accountNotes: `حساب موثق لدى وسيط WASEET، مالك أصلي مع بيانات دخول كاملة وسجل نظيف بدون أي حظر.`,
-            images: [
-                SAMPLE_IMAGES[(i) % SAMPLE_IMAGES.length],
-                SAMPLE_IMAGES[(i + 1) % SAMPLE_IMAGES.length],
-                SAMPLE_IMAGES[(i + 2) % SAMPLE_IMAGES.length]
-            ],
-            image: SAMPLE_IMAGES[(i) % SAMPLE_IMAGES.length],
-            badge: `برايم ${prime}`,
-            featured: i % 7 === 0,
+            sellerName: 'Sniper_Alpha',
+            sellerRating: 4.9,
+            sellerDeals: 19,
+            sellerPrice: 95,
+            evoGunsCount: 3,
+            evoGuns: ['M416 السحلية Lv.7 ماكس', 'AWM قوس قزح Lv.4', 'AKM حفرية Lv.4'],
+            rareSkins: ['بدلة المحارب الذهبي', 'حقيبة الأجنحة'],
+            iconicPants: [],
+            accountNotes: 'حساب موثق من السيزون 5 مع ربط فيسبوك نظيف ونقل رسمي فوري.',
+            images: [SAMPLE_IMAGES[2], SAMPLE_IMAGES[5], SAMPLE_IMAGES[3]],
+            image: SAMPLE_IMAGES[2],
+            badge: 'سحلية ماكس',
+            featured: false,
             status: 'available'
-        });
-    }
+        },
+        {
+            id: 'acc_112',
+            accountNumber: 1012,
+            game: 'free_fire',
+            title: 'حساب فري فاير برايم 6 - سكن الكريمنال الأزرق النادر وسكار القرش',
+            level: 70,
+            primeLevel: 6,
+            loginType: 'google',
+            bindStatus: 'single',
+            server: 'mena',
+            sellerName: 'Morocco_Lion',
+            sellerRating: 4.85,
+            sellerDeals: 11,
+            sellerPrice: 40,
+            evoGunsCount: 3,
+            evoGuns: ['سكار القرش المطور Lv.5', 'MP40 الكوبرا Lv.4', 'M1014 التنين Lv.4'],
+            rareSkins: ['الكريمنال الأزرق الأصلي', 'حزمة المقاتل الشبح'],
+            iconicPants: ['بنطلون الجاز الكلاسيكي الشهير'],
+            accountNotes: 'حساب سريع النقل بإيميل مستقل جاهز للتسليم الفوري مع الوسيط.',
+            images: [SAMPLE_IMAGES[1], SAMPLE_IMAGES[3], SAMPLE_IMAGES[0]],
+            image: SAMPLE_IMAGES[1],
+            badge: 'كريمنال أزرق',
+            featured: false,
+            status: 'available'
+        }
+    ];
 
     // Ensure strict, organized, sequential numbering for all accounts (Requirement 7)
     list.forEach((acc, idx) => {

@@ -774,7 +774,7 @@ class WaseetApp {
             return `
                 <div class="account-card-3d card-3d">
                     <div class="card-media" onclick="window.waseetApp.openCardDeck('${acc.id}')" style="cursor: pointer;" title="انقر لعرض صور الحساب مع كامل التفاصيل">
-                        <img src="${imagesList[0]}" alt="${acc.title}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        <img src="${imagesList[0] || 'assets/favicon-512.png'}" alt="${acc.title}" class="card-img" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain'; this.style.padding='24px'; this.style.background='#0d121c';">
                         ${statusTagHtml}
                         ${primeBadgeHtml}
                         ${accountNumBadgeHtml}
@@ -1056,7 +1056,7 @@ class WaseetApp {
         if (thumbsContainer) {
             thumbsContainer.innerHTML = images.map((src, idx) => `
                 <div class="deck-thumb-item ${idx === this.currentDeckIndex ? 'active' : ''}" onclick="window.waseetApp.selectDeckImage(${idx})">
-                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                 </div>
             `).join('');
         }
@@ -1977,7 +1977,7 @@ class WaseetApp {
 
                         return `
                             <div style="background: rgba(16, 20, 32, 0.85); border: 1px solid var(--border-metal); border-radius: 12px; padding: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                                <img src="${img}" alt="${acc.title}" style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary);" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                                <img src="${img}" alt="${acc.title}" style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary);" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                                 <div style="flex: 1; min-width: 240px;">
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
                                         <h4 style="color: #fff; font-size: 0.98rem; margin: 0;">${acc.title} <span style="color: var(--gold-primary); font-size: 0.85rem;">#${accNum}</span></h4>
@@ -2060,7 +2060,7 @@ class WaseetApp {
                             <i class="fas fa-chevron-right"></i>
                         </button>
                         <div class="deck-main-img-box" onclick="window.waseetApp.zoomInspectImage()" title="انقر لتكبير الصورة ملء الشاشة">
-                            <img id="inspect-main-display-img" src="${this.currentInspectImages[0]}" alt="Account Image" class="deck-display-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                            <img id="inspect-main-display-img" src="${this.currentInspectImages[0]}" alt="Account Image" class="deck-display-img" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                             <div class="deck-zoom-hint-badge">
                                 <i class="fas fa-search-plus"></i> انقر للتكبير ملء الشاشة
                             </div>
@@ -2074,7 +2074,7 @@ class WaseetApp {
                     <div class="deck-thumbs-strip" id="inspect-thumbs-strip">
                         ${this.currentInspectImages.map((src, idx) => `
                             <div class="deck-thumb-item ${idx === 0 ? 'active' : ''}" onclick="window.waseetApp.selectInspectImage(${idx})">
-                                <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                                <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                             </div>
                         `).join('')}
                     </div>
@@ -2179,7 +2179,7 @@ class WaseetApp {
         if (thumbsContainer) {
             thumbsContainer.innerHTML = images.map((src, idx) => `
                 <div class="deck-thumb-item ${idx === this.currentInspectIndex ? 'active' : ''}" onclick="window.waseetApp.selectInspectImage(${idx})">
-                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                 </div>
             `).join('');
         }

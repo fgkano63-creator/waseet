@@ -5,7 +5,7 @@
  * استثناء تام للاتصالات اللحظية وواجهات Supabase لضمان دقة وسرعة العمليات المالية.
  */
 
-const CACHE_NAME = 'waseet-pwa-v3';
+const CACHE_NAME = 'waseet-pwa-v4';
 
 // الملفات الأساسية للتخزين المؤقت الأولي
 const STATIC_ASSETS = [
