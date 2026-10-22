@@ -252,7 +252,7 @@
         <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 10005;" onclick="this.classList.remove('active')">
             <div class="lightbox-box" onclick="event.stopPropagation()">
                 <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
-                <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.onerror=null; this.src='assets/logo.png';">
                 <div class="lightbox-caption" id="lightbox-caption"></div>
             </div>
         </div>
@@ -592,7 +592,7 @@
                                 const details = safeParsePendingJson(acc.details, {});
                                 const prof = (acc.profiles && !Array.isArray(acc.profiles)) ? acc.profiles : (Array.isArray(acc.profiles) ? acc.profiles[0] : profilesMap[acc.seller_id]);
                                 const parsedImgs = Array.isArray(acc.images) ? acc.images : safeParsePendingJson(acc.images, []);
-                                const imgs = (Array.isArray(parsedImgs) && parsedImgs.length) ? parsedImgs : (acc.image_url ? [acc.image_url] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']);
+                                const imgs = (Array.isArray(parsedImgs) && parsedImgs.length) ? parsedImgs : (acc.image_url ? [acc.image_url] : ['assets/logo.png']);
                                 return {
                                     id: acc.id,
                                     localId: details.localId || null,
@@ -613,7 +613,7 @@
                                     evoGunsCount: details.evoGunsCount || acc.evo_guns_count || 0,
                                     iconicPants: Array.isArray(details.iconicPants) ? details.iconicPants.join('، ') : String(details.iconicPants || acc.iconic_pants || ''),
                                     rareSkins: Array.isArray(details.rareSkins) ? details.rareSkins.join('، ') : String(details.rareSkins || acc.rare_skins || ''),
-                                    image: imgs[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+                                    image: imgs[0] || 'assets/logo.png',
                                     images: imgs,
                                     details: details,
                                     credentials: safeExtractPendingCreds(acc, details)
@@ -747,7 +747,7 @@
                 try {
                     const sellerPriceNum = Number(acc.sellerPrice) || 0;
                     const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(sellerPriceNum) : { sellerPrice: sellerPriceNum, fee: 0, buyerPrice: sellerPriceNum };
-                    const imagesArr = Array.isArray(acc.images) && acc.images.length ? acc.images : [acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
+                    const imagesArr = Array.isArray(acc.images) && acc.images.length ? acc.images : [acc.image || 'assets/logo.png'];
                     const imgCount = imagesArr.length;
                     let dateStr = 'اليوم';
                     if (acc.createdAt) {
@@ -756,7 +756,7 @@
                             dateStr = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                         }
                     }
-                    const mainImg = imagesArr[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+                    const mainImg = imagesArr[0] || 'assets/logo.png';
                     const safeId = String(acc.id || '').replace(/'/g, "\\'");
 
                     return `
@@ -778,7 +778,7 @@
                             <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: start;">
                                 <!-- Thumbnail -->
                                 <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal); cursor: pointer;" onclick="openInspectionModal('${safeId}')">
-                                    <img src="${mainImg}" alt="${acc.title || ''}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400'">
+                                    <img src="${mainImg}" alt="${acc.title || ''}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='assets/logo.png';">
                                     <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">
                                         <i class="fas fa-camera"></i> ${imgCount} صور
                                     </span>
@@ -837,7 +837,7 @@
             if (!acc) return;
 
             currentInspectingAccount = acc;
-            inspectActiveImages = (Array.isArray(acc.images) && acc.images.length) ? acc.images : [acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
+            inspectActiveImages = (Array.isArray(acc.images) && acc.images.length) ? acc.images : [acc.image || 'assets/logo.png'];
             inspectActiveImgIdx = 0;
 
             const modal = document.getElementById('modal-inspect-account-detail');
@@ -865,7 +865,7 @@
                     </div>
 
                     <div class="inspect-gallery-large" onclick="zoomInspectImage()" title="انقر لتكبير الصورة ملء الشاشة">
-                        <img id="inspect-large-display-img" class="inspect-gallery-img" src="${inspectActiveImages[0]}" alt="Account Large Photo" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        <img id="inspect-large-display-img" class="inspect-gallery-img" src="${inspectActiveImages[0]}" alt="Account Large Photo" onerror="this.onerror=null; this.src='assets/logo.png';">
                         <button type="button" class="deck-nav-btn deck-nav-prev" onclick="event.stopPropagation(); prevInspectSlide();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem;" title="الصورة السابقة">
                             <i class="fas fa-chevron-right"></i>
                         </button>

@@ -506,7 +506,7 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
 
         const imagesArr = Array.isArray(account.images) && account.images.length > 0
             ? account.images
-            : (account.image ? [account.image] : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800']);
+            : (account.image ? [account.image] : ['assets/logo.png']);
 
         const credsObj = account.credentials || {
             email_or_phone: '',
@@ -728,7 +728,7 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         ? parsedImagesField
         : (Array.isArray(parsedGalleryField) && parsedGalleryField.length > 0
             ? parsedGalleryField
-            : (acc.image_url ? [acc.image_url] : (Array.isArray(details.images) && details.images.length > 0 ? details.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'])));
+            : (acc.image_url ? [acc.image_url] : (Array.isArray(details.images) && details.images.length > 0 ? details.images : ['assets/logo.png'])));
 
     const rareSkinsVal = details.rareSkins || acc.rare_skins || ['سكنات نادرة'];
     const iconicPantsVal = details.iconicPants || acc.iconic_pants || ['بنطلون مميز'];
@@ -757,7 +757,7 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         rareSkins: Array.isArray(rareSkinsVal) ? rareSkinsVal : String(rareSkinsVal).split('،').map(s => s.trim()),
         iconicPants: Array.isArray(iconicPantsVal) ? iconicPantsVal : String(iconicPantsVal).split('،').map(s => s.trim()),
         accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
-        image: imgs[0] || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+        image: imgs[0] || 'assets/logo.png',
         images: imgs,
         badge: details.badge || ((details.originalGame || acc.game) === 'free_fire' ? `برايم ${acc.prime_level || 1}` : 'مميز'),
         featured: false,

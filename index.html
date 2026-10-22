@@ -447,7 +447,7 @@
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <div class="deck-main-img-box" onclick="window.waseetApp.zoomCurrentImage()" title="انقر لتكبير الصورة ملء الشاشة">
-                        <img id="deck-main-display-img" src="" alt="Account Image" class="deck-display-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+                        <img id="deck-main-display-img" src="" alt="Account Image" class="deck-display-img" onerror="this.onerror=null; this.src='assets/logo.png';">
                         <div class="deck-zoom-hint-badge">
                             <i class="fas fa-search-plus"></i> انقر للتكبير
                         </div>
@@ -531,7 +531,7 @@
     <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 9999;" onclick="this.classList.remove('active')">
         <div class="lightbox-box" onclick="event.stopPropagation()">
             <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
-            <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'">
+            <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.onerror=null; this.src='assets/logo.png';">
             <div class="lightbox-caption" id="lightbox-caption"></div>
         </div>
     </div>

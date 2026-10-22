@@ -566,7 +566,7 @@
                                 mapped = window.waseetMapRemoteAccountRow(acc);
                             } else {
                                 const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
-                                const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800'];
+                                const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : ['assets/logo.png'];
                                 mapped = {
                                     id: acc.id,
                                     accountNumber: acc.account_number,
@@ -680,7 +680,7 @@
                             statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد فحص الوسيط</span>`;
                         }
 
-                        const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800';
+                        const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'assets/logo.png';
 
                         return `
                             <div class="account-card-3d card-3d" id="card-${acc.id}">

@@ -85,7 +85,7 @@ create table if not exists public.deposit_requests (
     notes text default '',
     status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
     admin_note text default '',
-    reviewed_by uuid references public.profiles(id) on delete set null,
+    reviewed_by uuid, -- معرف المدير المشرف على الطلب (بدون قيد مفتاح أجنبي صارم لتجنب توقف لوحة المدير)
     reviewed_at timestamp with time zone,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
@@ -187,6 +187,7 @@ as $$
 declare
     v_req public.deposit_requests%rowtype;
     v_new_balance numeric;
+    v_reviewer_id uuid;
 begin
     if not public.is_admin() then
         raise exception 'أمني: هذه الصلاحية مخصصة لمدير المنصة فقط';
@@ -205,6 +206,20 @@ begin
         raise exception 'تمت معالجة طلب الشحن هذا مسبقاً (الحالة الحالية: %)', v_req.status;
     end if;
 
+    -- تحديد معرف المراجع بأمان لتجنب تعارض المفتاح الأجنبي deposit_requests_reviewed_by_fkey
+    if exists (select 1 from public.profiles where id = auth.uid()) then
+        v_reviewer_id := auth.uid();
+    else
+        if exists (
+            select 1 from pg_constraint 
+            where conname = 'deposit_requests_reviewed_by_fkey'
+        ) then
+            v_reviewer_id := null;
+        else
+            v_reviewer_id := auth.uid();
+        end if;
+    end if;
+
     -- تفعيل راية العملية الداخلية الآمنة
     perform set_config('app.internal_wallet_op', 'true', true);
 
@@ -220,7 +235,7 @@ begin
     update public.deposit_requests
     set status = 'approved',
         admin_note = coalesce(nullif(trim(p_admin_note), ''), 'تم التحقق من الإيصال وشحن النقاط بنجاح'),
-        reviewed_by = auth.uid(),
+        reviewed_by = v_reviewer_id,
         reviewed_at = timezone('utc'::text, now()),
         updated_at = timezone('utc'::text, now())
     where id = p_request_id;
@@ -269,6 +284,7 @@ set search_path = public
 as $$
 declare
     v_req public.deposit_requests%rowtype;
+    v_reviewer_id uuid;
 begin
     if not public.is_admin() then
         raise exception 'أمني: هذه الصلاحية مخصصة لمدير المنصة فقط';
@@ -287,10 +303,24 @@ begin
         raise exception 'تمت معالجة طلب الشحن هذا مسبقاً';
     end if;
 
+    -- تحديد معرف المراجع بأمان لتجنب تعارض المفتاح الأجنبي deposit_requests_reviewed_by_fkey
+    if exists (select 1 from public.profiles where id = auth.uid()) then
+        v_reviewer_id := auth.uid();
+    else
+        if exists (
+            select 1 from pg_constraint 
+            where conname = 'deposit_requests_reviewed_by_fkey'
+        ) then
+            v_reviewer_id := null;
+        else
+            v_reviewer_id := auth.uid();
+        end if;
+    end if;
+
     update public.deposit_requests
     set status = 'rejected',
         admin_note = coalesce(nullif(trim(p_admin_note), ''), 'لم يتم قبول الإيصال المرفق'),
-        reviewed_by = auth.uid(),
+        reviewed_by = v_reviewer_id,
         reviewed_at = timezone('utc'::text, now()),
         updated_at = timezone('utc'::text, now())
     where id = p_request_id;

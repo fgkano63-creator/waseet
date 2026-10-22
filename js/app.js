@@ -1381,9 +1381,9 @@ class WaseetApp {
                         finalImages = [...this.uploadedImages];
                     } else {
                         finalImages = [
-                            'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000',
-                            'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000',
-                            'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1000'
+                            'assets/logo.png',
+                            'assets/fav_test_shield.png',
+                            'assets/fav_badge_v2.png'
                         ];
                     }
 
@@ -1972,7 +1972,7 @@ class WaseetApp {
                             statusNote = '<div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: #a7f3d0; margin-top: 0.6rem;"><i class="fas fa-store"></i> تم فحص الحساب واعتماده وهو معروض للبيع الآن.</div>';
                         }
 
-                        const img = (acc.images && acc.images[0]) || acc.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400';
+                        const img = (acc.images && acc.images[0]) || acc.image || 'assets/logo.png';
                         const accNum = acc.accountNumber || acc.id;
 
                         return `

@@ -5,12 +5,12 @@
  */
 
 const SAMPLE_IMAGES = [
-    'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1000&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1563089145-599997674d42?w=1000&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1000&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1000&auto=format&fit=crop&q=80'
+    'assets/logo.png',
+    'assets/fav_test_shield.png',
+    'assets/fav_badge_v2.png',
+    'assets/favicon-512.png',
+    'assets/fav_test_badge.png',
+    'assets/logo.jpg'
 ];
 
 function generateAccountsList() {
@@ -425,6 +425,16 @@ function loadWaseetData() {
         if (savedAccounts) {
             const userAccounts = JSON.parse(savedAccounts);
             if (Array.isArray(userAccounts) && userAccounts.length > 0) {
+                userAccounts.forEach(a => {
+                    if (!a.image || a.image === '' || (typeof a.image === 'string' && a.image.includes('undefined'))) {
+                        a.image = 'assets/logo.png';
+                    }
+                    if (!Array.isArray(a.images) || a.images.length === 0) {
+                        a.images = [a.image || 'assets/logo.png'];
+                    } else {
+                        a.images = a.images.map(img => (img && typeof img === 'string' && !img.includes('undefined')) ? img : 'assets/logo.png');
+                    }
+                });
                 // Add user accounts to front (newest first), avoiding duplicates
                 const existingIds = new Set(WASEET_STATE.accounts.map(a => a.id));
                 const newOnes = userAccounts.filter(a => a && a.id && !existingIds.has(a.id));
