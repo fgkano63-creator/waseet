@@ -158,7 +158,8 @@
 
             <!-- Stats Bar -->
             <div class="pending-stats-grid">
-                <div class="pending-stat-card">
+                <!-- 1. قيد الفحص والمراجعة -->
+                <div class="pending-stat-card stat-card-pending">
                     <div class="pending-stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
                         <i class="fas fa-clock"></i>
                     </div>
@@ -167,7 +168,18 @@
                         <div style="font-size: 0.78rem; color: var(--silver-muted);">قيد الفحص والمراجعة</div>
                     </div>
                 </div>
-                <div class="pending-stat-card">
+                <!-- 2. معتمدة في المتجر (بجانب قيد الفحص في الصف الأول على الموبايل) -->
+                <div class="pending-stat-card stat-card-approved">
+                    <div class="pending-stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #10b981;" id="stat-approved-total">0</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted);">معتمدة في المتجر</div>
+                    </div>
+                </div>
+                <!-- 3. حسابات فري فاير -->
+                <div class="pending-stat-card stat-card-ff">
                     <div class="pending-stat-icon" style="background: rgba(234, 88, 12, 0.15); color: var(--orange-bright);">
                         <i class="fas fa-fire-alt"></i>
                     </div>
@@ -176,22 +188,14 @@
                         <div style="font-size: 0.78rem; color: var(--silver-muted);">حسابات فري فاير</div>
                     </div>
                 </div>
-                <div class="pending-stat-card">
+                <!-- 4. حسابات ببجي موبايل -->
+                <div class="pending-stat-card stat-card-pubg">
                     <div class="pending-stat-icon" style="background: rgba(197, 160, 89, 0.15); color: var(--gold-light);">
                         <i class="fas fa-crosshairs"></i>
                     </div>
                     <div>
                         <div style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="stat-pending-pubg">0</div>
                         <div style="font-size: 0.78rem; color: var(--silver-muted);">حسابات ببجي موبايل</div>
-                    </div>
-                </div>
-                <div class="pending-stat-card">
-                    <div class="pending-stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                        <i class="fas fa-check-double"></i>
-                    </div>
-                    <div>
-                        <div style="font-size: 1.5rem; font-weight: 900; color: #10b981;" id="stat-approved-total">0</div>
-                        <div style="font-size: 0.78rem; color: var(--silver-muted);">معتمدة في المتجر</div>
                     </div>
                 </div>
             </div>
@@ -762,46 +766,46 @@
                     return `
                         <div class="pending-account-card">
                             <!-- Top Header -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <div class="pending-card-header">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
                                     <span style="background: rgba(197, 160, 89, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.85rem; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--gold-primary);">
                                         #${acc.accountNumber || String(acc.id || '').slice(0, 6)}
                                     </span>
-                                    <h3 style="color: #fff; margin: 0; font-size: 1.15rem; font-weight: 800;">${acc.title || 'حساب قيد الفحص'}</h3>
+                                    <h3 class="pending-card-title">${acc.title || 'حساب قيد الفحص'}</h3>
                                 </div>
-                                <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                <span class="pending-status-pill">
                                     <i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)
                                 </span>
                             </div>
 
                             <!-- Card Body Grid -->
-                            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: start;">
+                            <div class="pending-card-body-grid">
                                 <!-- Thumbnail -->
-                                <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal); cursor: pointer;" onclick="openInspectionModal('${safeId}')">
-                                    <img src="${mainImg}" alt="${acc.title || ''}" style="width: 100%; height: 110px; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='assets/logo.png';">
-                                    <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">
+                                <div class="pending-card-thumb" onclick="openInspectionModal('${safeId}')" title="انقر لتكبير وفحص صور الحساب">
+                                    <img src="${mainImg}" alt="${acc.title || ''}" onerror="this.onerror=null; this.src='assets/favicon-512.png';">
+                                    <span class="pending-thumb-badge">
                                         <i class="fas fa-camera"></i> ${imgCount} صور
                                     </span>
                                 </div>
 
                                 <!-- Meta & Pricing -->
-                                <div>
-                                    <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--silver-muted);">
+                                <div class="pending-card-details">
+                                    <div class="pending-meta-row">
                                         <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName || 'بائع موثق'}</strong></span>
                                         <span><i class="fas fa-gamepad text-orange"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></span>
                                         <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${dateStr}</span>
                                     </div>
 
-                                    <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; font-size: 0.85rem;">
-                                        <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">صافي البائع: <strong class="text-gold">${feeCalc.sellerPrice} نقطة</strong></span>
-                                        <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px;">عمولة المنصة: <strong class="text-orange">+${feeCalc.fee} نقطة</strong></span>
-                                        <span style="background: rgba(234, 88, 12, 0.15); border: 1px solid var(--orange-bright); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800;">
+                                    <div class="pending-prices-row">
+                                        <span class="price-chip-seller">صافي البائع: <strong class="text-gold">${feeCalc.sellerPrice} نقطة</strong></span>
+                                        <span class="price-chip-fee">عمولة المنصة: <strong class="text-orange">+${feeCalc.fee} نقطة</strong></span>
+                                        <span class="price-chip-buyer">
                                             سعر الظهور للمشتري: ${feeCalc.buyerPrice} نقطة
                                         </span>
                                     </div>
 
                                     <!-- Specs Chips -->
-                                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                    <div class="pending-specs-row">
                                         <span class="evo-chip"><i class="fas fa-shield-alt text-gold"></i> ليفيل ${acc.level || 50}</span>
                                         <span class="evo-chip"><i class="fas fa-crown text-gold"></i> برايم ${acc.primeLevel || 1}</span>
                                         ${acc.evoGunsCount ? `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${acc.evoGunsCount} أسلحة إيفو</span>` : ''}
@@ -812,7 +816,7 @@
                             </div>
 
                             <!-- Action Decision Buttons -->
-                            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center; margin-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; flex-wrap: wrap;">
+                            <div class="pending-card-actions">
                                 <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${safeId}')" title="رفض الحساب وحذفه">
                                     <i class="fas fa-trash-alt"></i> رفض الحساب (تحايل/خطأ)
                                 </button>
