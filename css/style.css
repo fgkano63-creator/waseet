@@ -2687,14 +2687,24 @@ html, body {
 }
 
 @media (max-width: 768px) {
+    /* 1. Global Scale Down for Mobile to reduce long scrolling */
+    html {
+        font-size: 14.5px !important;
+    }
+
     /* Safe space for mobile bottom navigation */
     body {
-        padding-bottom: 74px !important;
+        padding-bottom: 70px !important;
     }
 
     /* Container Spacing */
     .container {
-        padding: 0 1rem;
+        padding: 0 0.75rem !important;
+    }
+
+    /* Reduce default spacing on headings and paragraphs across mobile */
+    h1, h2, h3, h4 {
+        margin-top: 0;
     }
 }
 
@@ -2930,78 +2940,80 @@ html, body {
    MOBILE LAYOUT & HERO, MARKETPLACE, CARDS (max-width: 768px)
    ========================================================================== */
 @media (max-width: 768px) {
-    /* Hero Section on Mobile */
+    /* Hero Section on Mobile - Compact to reduce scrolling */
     .hero-section {
-        padding: 2rem 0 1.5rem;
+        padding: 1.1rem 0 0.8rem !important;
     }
     .hero-badge {
-        font-size: 0.78rem;
-        padding: 0.35rem 0.8rem;
-        margin-bottom: 1rem;
+        font-size: 0.72rem !important;
+        padding: 0.25rem 0.65rem !important;
+        margin-bottom: 0.5rem !important;
     }
     .hero-title {
-        font-size: clamp(1.6rem, 7vw, 2.3rem);
-        line-height: 1.3;
-        margin-bottom: 0.8rem;
+        font-size: clamp(1.35rem, 5.5vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.5rem !important;
     }
     .hero-description {
-        font-size: 0.92rem;
-        padding: 0 0.4rem;
-        margin-bottom: 1.4rem;
-        line-height: 1.6;
+        font-size: 0.82rem !important;
+        padding: 0 0.2rem !important;
+        margin-bottom: 0.8rem !important;
+        line-height: 1.45 !important;
     }
     .hero-cta-group {
-        gap: 0.7rem;
+        gap: 0.5rem !important;
     }
     .hero-cta-group .btn-3d {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
+        width: 100% !important;
+        max-width: 280px !important;
+        justify-content: center !important;
+        padding: 0.55rem 1rem !important;
     }
     .hero-stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.8rem;
-        margin-top: 1.5rem;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.45rem !important;
+        margin-top: 0.9rem !important;
     }
     .hero-stats-grid .stat-card-3d:last-child {
-        grid-column: 1 / -1;
+        grid-column: 1 / -1 !important;
     }
     .stat-card-3d {
-        padding: 1rem 0.8rem;
+        padding: 0.65rem 0.5rem !important;
+        border-radius: 10px !important;
     }
     .stat-num {
-        font-size: 1.5rem;
+        font-size: 1.25rem !important;
     }
     .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.68rem !important;
     }
 
     /* Marketplace & Filters on Mobile */
     .marketplace-section {
-        padding: 2rem 0 2.5rem;
+        padding: 1.2rem 0 1.5rem !important;
     }
     .section-head {
-        flex-direction: column;
+        flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 0.4rem !important;
-        margin-bottom: 1.2rem;
+        gap: 0.35rem !important;
+        margin-bottom: 0.8rem !important;
     }
     .section-title {
-        font-size: 1.35rem;
+        font-size: 1.18rem !important;
     }
     .filter-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.7rem;
-        margin-bottom: 1.5rem;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.45rem !important;
+        margin-bottom: 1rem !important;
     }
     .filter-item {
-        min-width: unset;
+        min-width: unset !important;
         max-width: 100% !important;
     }
     .filter-select {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.6rem;
+        font-size: 0.78rem !important;
+        padding: 0.42rem 0.5rem !important;
     }
     /* ==========================================================================
        Accounts Grid on Mobile (Requirement: 2 accounts per row strictly)
@@ -5525,7 +5537,9 @@ input[type=number] {
 
 /* Mobile Responsiveness for Verification Desk */
 @media (max-width: 768px) {
+    /* استثناء صارم لشبكة الإحصائيات (2x2) وبطاقة مراجعة الحسابات لتبقى بأبعادها الكاملة كما هي */
     .pending-page-container {
+        font-size: 16px !important;
         padding: 0 0.5rem !important;
         margin: 1rem auto 4.5rem !important;
         max-width: 100% !important;
