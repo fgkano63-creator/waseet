@@ -8,10 +8,10 @@
    ========================================================================== */
 
 :root {
-    --bg-void: #000000;
-    --bg-surface: #050508;
-    --bg-card: rgba(12, 14, 20, 0.86);
-    --bg-card-hover: rgba(18, 22, 32, 0.96);
+    --bg-void: #07080c;
+    --bg-surface: #0e111a;
+    --bg-card: rgba(18, 22, 34, 0.82);
+    --bg-card-hover: rgba(26, 31, 48, 0.95);
     
     --orange-primary: #ea580c;
     --orange-bright: #ff6a00;
@@ -38,9 +38,8 @@
     -webkit-font-smoothing: antialiased;
 }
 
-html,
 body {
-    background-color: #000000 !important;
+    background-color: var(--bg-void);
     color: var(--silver-white);
     font-family: var(--font-ar);
     direction: rtl;
@@ -48,21 +47,6 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-}
-
-/* خلفية شعار وسيط الكاملة على خلفية سوداء خالصة مع إزاحة للأسفل لتوفير مساحة مريحة للنصوص في الأعلى */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-color: #000000;
-    background-image: url("../assets/splash.png");
-    background-repeat: no-repeat;
-    background-position: center 58%;
-    background-size: contain;
-    opacity: 0.22;
-    pointer-events: none;
-    z-index: 0;
 }
 
 /* Ambient Canvas */
@@ -89,7 +73,7 @@ body::before {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #000000;
+    background: #090a10;
 }
 ::-webkit-scrollbar-thumb {
     background: #252a3d;
@@ -148,16 +132,15 @@ body::before {
 }
 
 .brand-logo-img {
-    width: 66px;
-    height: 66px;
-    min-width: 66px;
+    height: 60px !important;
+    width: auto !important;
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
+    background-color: transparent !important;
     object-fit: contain !important;
     overflow: visible !important;
-    margin-top: 5px;
     transform-origin: center center;
     will-change: transform, filter;
     animation: shield3DFloat 4.5s ease-in-out infinite alternate;
@@ -2893,10 +2876,12 @@ html, body {
         gap: 8px !important;
     }
     .brand-logo-img {
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 50px !important;
-        margin-top: 4px !important;
+        height: 55px !important;
+        width: auto !important;
+        min-width: unset !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
         object-fit: contain !important;
     }
     .brand-title {
@@ -6247,21 +6232,32 @@ body.chat-page-body .chat-input-bar {
     transform: translateY(-1px) scale(1.02) !important;
 }
 
-/* الحفاظ على حجم الشعار كاملاً وظهور الأجنحة والتفاصيل الجانبية بالكامل دون أي اقتطاع أو قص */
+/* شعار الموقع في شريط التنقل العلوي (Navbar) والقائمة الجانبية بدون خلفية سوداء وبحجم واضح ومتناسق */
 .brand-logo-img,
-.drawer-logo,
-img[src*="logo.png"] {
-    border-radius: 12% !important;
+img.brand-logo-img[src*="logo.png"] {
+    height: 60px !important;
+    width: auto !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     object-fit: contain !important;
-    background-color: #000000 !important;
     overflow: visible !important;
 }
 
-.brand-logo-img,
-.drawer-logo {
+@media (max-width: 900px) {
+    .brand-logo-img,
+    img.brand-logo-img[src*="logo.png"] {
+        height: 55px !important;
+        width: auto !important;
+    }
+}
+
+.drawer-logo,
+img.drawer-logo[src*="logo.png"] {
     border-radius: 0 !important;
+    background: transparent !important;
     background-color: transparent !important;
-    padding-top: 3px !important;
+    object-fit: contain !important;
 }
 
 /* أزرار التنقل السريع (الأسهم Back & Forward Arrows) في أعلى لوحة التحكم والترويسة */
