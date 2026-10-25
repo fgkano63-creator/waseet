@@ -116,6 +116,63 @@
             }
         }
 
+        /* تصغير بطاقات الرصيد وخصائص المحفظة للتناسق مع الهواتف */
+        @media (max-width: 768px) {
+            .wallet-page-container {
+                margin: 0.75rem auto 4.5rem !important;
+                padding: 0 0.65rem !important;
+            }
+            .wallet-hero-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+                margin-bottom: 0.85rem !important;
+            }
+            .wallet-hero-grid .wallet-stat-card:last-child {
+                grid-column: 1 / -1 !important;
+            }
+            .wallet-stat-card {
+                padding: 0.65rem 0.75rem !important;
+                border-radius: 12px !important;
+            }
+            .wallet-stat-top {
+                margin-bottom: 0.3rem !important;
+                gap: 0.35rem !important;
+            }
+            .wallet-stat-label {
+                font-size: 0.72rem !important;
+                line-height: 1.25 !important;
+            }
+            .wallet-stat-icon {
+                width: 28px !important;
+                height: 28px !important;
+                border-radius: 8px !important;
+                font-size: 0.85rem !important;
+                flex-shrink: 0 !important;
+            }
+            .wallet-stat-value {
+                font-size: 1.25rem !important;
+                gap: 0.25rem !important;
+            }
+            .wallet-stat-unit {
+                font-size: 0.72rem !important;
+            }
+            .wallet-stat-card > div:last-child {
+                margin-top: 0.25rem !important;
+                font-size: 0.66rem !important;
+            }
+            .wallet-panel-card {
+                padding: 0.95rem 0.85rem !important;
+                border-radius: 14px !important;
+            }
+            .wallet-panel-title {
+                margin-bottom: 0.75rem !important;
+                padding-bottom: 0.55rem !important;
+            }
+            .wallet-panel-title h3 {
+                font-size: 0.95rem !important;
+            }
+        }
+
         .wallet-panel-card {
             background: linear-gradient(145deg, rgba(18, 24, 38, 0.96), rgba(10, 13, 22, 0.99));
             border: 1px solid var(--border-metal);

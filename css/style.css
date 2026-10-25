@@ -39,7 +39,7 @@
 }
 
 body {
-    background-color: var(--bg-void);
+    background-color: #000000;
     color: var(--silver-white);
     font-family: var(--font-ar);
     direction: rtl;
@@ -47,6 +47,20 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+}
+
+/* الشعار في خلفية الموقع بكامل أبعاده وأجنحته دون اقتطاع */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("../assets/splash.png");
+    background-repeat: no-repeat;
+    background-position: center 58%;
+    background-size: contain;
+    opacity: 0.32;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Ambient Canvas */
