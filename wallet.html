@@ -344,6 +344,349 @@
 
         .tx-amount.positive { color: #34d399; }
         .tx-amount.negative { color: #fb923c; }
+
+        /* ================= Dynamic Regional Payment Gateway UI ================= */
+        .gateway-step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--orange-bright));
+            color: #090d16;
+            font-weight: 900;
+            font-size: 0.76rem;
+            margin-left: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .gateway-category-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.55rem;
+            background: rgba(8, 12, 20, 0.85);
+            padding: 0.38rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 0.85rem;
+        }
+
+        .gateway-cat-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--silver-muted);
+            border-radius: 10px;
+            padding: 0.6rem 0.75rem;
+            font-family: var(--font-ar);
+            font-size: 0.84rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            transition: all 0.22s ease;
+        }
+
+        .gateway-cat-tab i {
+            font-size: 0.95rem;
+        }
+
+        .gateway-cat-tab.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.24), rgba(234, 88, 12, 0.18));
+            border-color: var(--gold-primary);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.18);
+        }
+
+        .gateway-select-wrap {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        .gateway-dropdown-select {
+            width: 100%;
+            padding: 0.72rem 1rem 0.72rem 2.4rem;
+            border-radius: 12px;
+            background: rgba(12, 17, 28, 0.95);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: #fff;
+            font-family: var(--font-ar);
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .gateway-dropdown-select:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+        }
+
+        .gateway-dropdown-select option,
+        .gateway-dropdown-select optgroup {
+            background: #0d121d;
+            color: #fff;
+            font-family: var(--font-ar);
+            padding: 0.4rem;
+        }
+
+        .gateway-select-arrow {
+            position: absolute;
+            left: 0.95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-primary);
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        .gateway-pills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.48rem;
+            margin-bottom: 1rem;
+        }
+
+        .gateway-pill-btn {
+            background: rgba(14, 19, 30, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 11px;
+            padding: 0.52rem 0.45rem;
+            color: var(--silver-light);
+            font-family: var(--font-ar);
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.38rem;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gateway-pill-btn:hover {
+            border-color: rgba(197, 160, 89, 0.5);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .gateway-pill-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.22), rgba(234, 88, 12, 0.15));
+            border-color: var(--gold-primary);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(197, 160, 89, 0.22);
+        }
+
+        .gateway-pill-flag {
+            font-size: 1.05rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .gateway-pill-icon-img {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* بطاقة تفاصيل وسيلة الدفع المختارة */
+        .gateway-details-card {
+            background: linear-gradient(155deg, rgba(18, 25, 40, 0.96), rgba(10, 14, 24, 0.98));
+            border: 1.5px solid rgba(197, 160, 89, 0.48);
+            border-radius: 16px;
+            padding: 1.1rem;
+            margin-bottom: 1.15rem;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .gateway-details-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gateway-details-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            min-width: 0;
+        }
+
+        .gateway-details-badge-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(197, 160, 89, 0.14);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .gateway-details-badge-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gateway-country-tag {
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.22rem 0.6rem;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .gateway-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            background: rgba(8, 12, 20, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 11px;
+            padding: 0.55rem 0.8rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .gateway-account-box {
+            background: rgba(197, 160, 89, 0.09);
+            border: 1px solid rgba(197, 160, 89, 0.42);
+            border-radius: 12px;
+            padding: 0.7rem 0.85rem;
+            margin-bottom: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .gateway-account-number {
+            font-family: 'Courier New', monospace, var(--font-ar);
+            font-size: 0.98rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            letter-spacing: 0.4px;
+            word-break: break-all;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .btn-copy-gateway {
+            background: linear-gradient(135deg, var(--gold-primary), #b08d45);
+            color: #090d16;
+            border: none;
+            border-radius: 9px;
+            padding: 0.42rem 0.8rem;
+            font-family: var(--font-ar);
+            font-size: 0.78rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
+        }
+
+        .btn-copy-gateway:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+
+        .btn-copy-gateway.copied {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-copy-mini {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--silver-light);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 7px;
+            padding: 0.25rem 0.55rem;
+            font-family: var(--font-ar);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-mini:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-light);
+        }
+
+        .btn-copy-mini.copied {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #34d399;
+        }
+
+        .gateway-instructions-box {
+            background: rgba(234, 88, 12, 0.08);
+            border-right: 3px solid var(--orange-bright);
+            border-radius: 8px;
+            padding: 0.55rem 0.75rem;
+            font-size: 0.77rem;
+            color: var(--silver-light);
+            line-height: 1.55;
+        }
+
+        @media (max-width: 640px) {
+            .wallet-panel-card {
+                padding: 1.1rem 0.95rem;
+            }
+            .gateway-pills-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .gateway-cat-tab {
+                font-size: 0.78rem;
+                padding: 0.55rem 0.45rem;
+            }
+            .gateway-account-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-copy-gateway {
+                width: 100%;
+                justify-content: center;
+                padding: 0.52rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -485,27 +828,21 @@
             <!-- 2. الشبكة الرئيسية: نموذج طلب شحن الرصيد + سجل العمليات -->
             <section class="wallet-main-layout">
 
-                <!-- العمود الأيمن: نموذج طلب شحن رصيد يدوي -->
+                <!-- العمود الأيمن: بوابة الدفع الإقليمية الذكية وشحن النقاط -->
                 <div class="wallet-panel-card">
                     <div class="wallet-panel-title">
-                        <h3><i class="fas fa-plus-circle text-gold"></i> طلب شحن رصيد نقاط</h3>
-                        <span class="status-pill approved" style="font-size: 0.72rem;"><i class="fas fa-bolt"></i> شحن آمن وموثق</span>
-                    </div>
-
-                    <div style="background: rgba(197, 160, 89, 0.08); border: 1px solid rgba(197, 160, 89, 0.28); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1.2rem; font-size: 0.82rem; color: var(--silver-light); line-height: 1.6;">
-                        <strong style="color: var(--gold-light); display: block; margin-bottom: 0.25rem;"><i class="fas fa-info-circle"></i> كيف تشحن نقاطك؟</strong>
-                        1. قم بتحويل المبلغ عبر البنك أو المحفظة المحلية للوسيط المعتمد (يمكنك طلب رقم الحساب من <a href="contact-support.html" style="color: var(--gold-light); text-decoration: underline;">محادثة الوسيط</a>).<br>
-                        2. أدخل عدد النقاط المطلوبة بالأسفل وأرفق <strong>صورة إيصال التحويل المالي</strong>.<br>
-                        3. بمجرد ضغط المدير على "موافقة" ينزل الرصيد في محفظتك فوراً!
+                        <h3><i class="fas fa-globe-africa text-gold"></i> بوابة شحن النقاط الإقليمية</h3>
+                        <span class="status-pill approved" style="font-size: 0.72rem;"><i class="fas fa-shield-alt"></i> كافة الدول العربية + Crypto</span>
                     </div>
 
                     <form id="deposit-request-form">
-                        <!-- عدد النقاط المطلوبة -->
-                        <div class="form-group" style="margin-bottom: 1.1rem;">
-                            <label style="display: block; color: #fff; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.45rem;">
-                                عدد النقاط المطلوبة (Pts) <span style="color: #ef4444;">*</span>
+                        <!-- الخطوة 1: عدد النقاط المطلوبة -->
+                        <div class="form-group" style="margin-bottom: 1.15rem;">
+                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.45rem;">
+                                <span class="gateway-step-badge">1</span>
+                                حدد عدد النقاط المطلوبة (Pts) <span style="color: #ef4444; margin-right: 4px;">*</span>
                             </label>
-                            <input type="number" id="deposit-amount-input" class="form-control" min="1" max="100000" step="1" placeholder="مثلاً: 100" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; background: rgba(12, 16, 26, 0.9); border: 1px solid var(--border-metal); color: #fff; font-size: 1rem; font-weight: 800; font-family: var(--font-ar); box-sizing: border-box;">
+                            <input type="number" id="deposit-amount-input" class="form-control" min="1" max="100000" step="1" placeholder="أدخل عدد النقاط (مثلاً: 100)" required style="width: 100%; padding: 0.72rem 1rem; border-radius: 12px; background: rgba(12, 16, 26, 0.92); border: 1px solid var(--border-metal); color: #fff; font-size: 0.98rem; font-weight: 800; font-family: var(--font-ar); box-sizing: border-box;">
                             <div class="quick-pts-pills">
                                 <button type="button" class="quick-pts-btn" onclick="setQuickPoints(50, this)">50 نقطة</button>
                                 <button type="button" class="quick-pts-btn" onclick="setQuickPoints(100, this)">100 نقطة</button>
@@ -515,42 +852,70 @@
                             </div>
                         </div>
 
-                        <!-- وسيلة التحويل المالي -->
-                        <div class="form-group" style="margin-bottom: 1.1rem;">
-                            <label style="display: block; color: #fff; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.45rem;">
-                                وسيلة التحويل المستخدمة <span style="color: #ef4444;">*</span>
+                        <!-- الخطوة 2: تبويبات التصنيف واختيار الدولة / المحفظة -->
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.5rem;">
+                                <span class="gateway-step-badge">2</span>
+                                اختر دولتك أو وسيلة الدفع <span style="color: #ef4444; margin-right: 4px;">*</span>
                             </label>
-                            <input type="hidden" id="deposit-method-input" value="تحويل بنكي / محلي">
-                            <div class="payment-methods-grid" id="payment-methods-grid">
-                                <div class="method-option-card active" data-method="تحويل بنكي / محلي" onclick="selectDepositMethod(this)">
-                                    <i class="fas fa-university"></i>
-                                    <span>تحويل بنكي / محلي</span>
-                                </div>
-                                <div class="method-option-card" data-method="بريدي موب / CCP" onclick="selectDepositMethod(this)">
-                                    <i class="fas fa-money-check-alt"></i>
-                                    <span>بريدي موب / CCP</span>
-                                </div>
-                                <div class="method-option-card" data-method="فودافون / محفظة إلكترونية" onclick="selectDepositMethod(this)">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    <span>محفظة موبايل</span>
-                                </div>
-                                <div class="method-option-card" data-method="USDT / Binance Pay" onclick="selectDepositMethod(this)">
-                                    <i class="fas fa-coins"></i>
-                                    <span>USDT / Binance</span>
-                                </div>
+
+                            <input type="hidden" id="deposit-method-input" value="">
+
+                            <!-- تبويبات الفئة: المحافظ العربية المحلية مقابل العملات الرقمية -->
+                            <div class="gateway-category-tabs" role="tablist">
+                                <button type="button" class="gateway-cat-tab active" id="gw-tab-local" onclick="switchGatewayCategory('local')">
+                                    <i class="fas fa-map-marker-alt text-gold"></i>
+                                    <span>المحافظ العربية (9 دول)</span>
+                                </button>
+                                <button type="button" class="gateway-cat-tab" id="gw-tab-crypto" onclick="switchGatewayCategory('crypto')">
+                                    <i class="fas fa-coins text-orange"></i>
+                                    <span>العملات الرقمية (USDT / Binance)</span>
+                                </button>
+                            </div>
+
+                            <!-- القائمة المنسدلة السريعة لاختيار الدولة أو المحفظة مباشرة -->
+                            <div class="gateway-select-wrap">
+                                <select id="gateway-dropdown-select" class="gateway-dropdown-select" onchange="selectGatewayById(this.value)" aria-label="اختر وسيلة الدفع">
+                                    <!-- يتم تعبئتها ديناميكياً من WASEET_PAYMENT_GATEWAYS -->
+                                </select>
+                                <i class="fas fa-chevron-down gateway-select-arrow"></i>
+                            </div>
+
+                            <!-- أزرار الاختيار السريع حسب التبويب المفتوح -->
+                            <div class="gateway-pills-grid" id="gateway-pills-grid">
+                                <!-- يتم توليدها ديناميكياً -->
+                            </div>
+
+                            <!-- بطاقة تفاصيل الدفع الديناميكية (اسم المستفيد + رقم الحساب + زر النسخ) -->
+                            <div class="gateway-details-card" id="gateway-details-card">
+                                <!-- يتم توليدها ديناميكياً فور اختيار الوسيلة -->
                             </div>
                         </div>
 
-                        <!-- إرفاق صورة الإيصال -->
-                        <div class="form-group" style="margin-bottom: 1.1rem;">
-                            <label style="display: block; color: #fff; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.45rem;">
-                                صورة إيصال التحويل المالي <span style="color: #ef4444;">*</span>
+                        <!-- الخطوة 3: نموذج إثبات التحويل (رقم العملية/المحول + صورة الإيصال) -->
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.45rem;">
+                                <span class="gateway-step-badge">3</span>
+                                بيانات إثبات التحويل المالي <span style="color: #ef4444; margin-right: 4px;">*</span>
+                            </label>
+
+                            <!-- حقل رقم العملية أو اسم المحول -->
+                            <div style="margin-bottom: 0.85rem;">
+                                <label for="deposit-sender-ref-input" style="display: block; color: var(--silver-light); font-weight: 700; font-size: 0.8rem; margin-bottom: 0.35rem;">
+                                    <i class="fas fa-hashtag text-gold"></i> رقم العملية (Transaction ID) أو اسم/رقم المحوّل <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="text" id="deposit-sender-ref-input" required placeholder="أدخل رقم العملية أو اسم صاحب الحساب/الرقم الذي حوّلت منه..." maxlength="180" style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; background: rgba(12, 16, 26, 0.92); border: 1px solid var(--border-metal); color: #fff; font-size: 0.86rem; font-weight: 700; font-family: var(--font-ar); box-sizing: border-box;">
+                            </div>
+
+                            <!-- منطقة رفع صورة الإيصال -->
+                            <label style="display: block; color: var(--silver-light); font-weight: 700; font-size: 0.8rem; margin-bottom: 0.35rem;">
+                                <i class="fas fa-camera text-gold"></i> إرفاق صورة إيصال التحويل (Screenshot) <span style="color: #ef4444;">*</span>
                             </label>
                             <input type="file" id="receipt-file-input" accept="image/*" style="display: none;">
                             <div class="receipt-dropzone" id="receipt-dropzone" onclick="document.getElementById('receipt-file-input').click()">
-                                <i class="fas fa-cloud-upload-alt text-gold" style="font-size: 2rem; margin-bottom: 0.4rem;"></i>
-                                <div style="color: #fff; font-weight: 700; font-size: 0.9rem;">اضغط هنا لاختيار أو تصوير إيصال التحويل</div>
-                                <div style="color: var(--silver-muted); font-size: 0.76rem; margin-top: 0.2rem;">يدعم صور PNG, JPG, WEBP بوضوح عالي</div>
+                                <i class="fas fa-cloud-upload-alt text-gold" style="font-size: 1.85rem; margin-bottom: 0.35rem;"></i>
+                                <div style="color: #fff; font-weight: 800; font-size: 0.88rem;">اضغط هنا لرفع صورة الإيصال أو لقطة الشاشة</div>
+                                <div style="color: var(--silver-muted); font-size: 0.74rem; margin-top: 0.2rem;">يدعم صور PNG, JPG, WEBP بوضوح عالي</div>
                             </div>
                             <div class="receipt-preview-box" id="receipt-preview-box">
                                 <img id="receipt-preview-img" src="" alt="معاينة الإيصال">
@@ -560,16 +925,16 @@
                             </div>
                         </div>
 
-                        <!-- ملاحظات اختيارية -->
-                        <div class="form-group" style="margin-bottom: 1.25rem;">
-                            <label style="display: block; color: #fff; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.4rem;">
-                                رقم العملية أو ملاحظة للوسيط (اختياري)
+                        <!-- ملاحظة إضافية اختيارية -->
+                        <div class="form-group" style="margin-bottom: 1.15rem;">
+                            <label for="deposit-notes-input" style="display: block; color: var(--silver-muted); font-weight: 700; font-size: 0.78rem; margin-bottom: 0.35rem;">
+                                ملاحظة إضافية للوسيط (اختياري)
                             </label>
-                            <input type="text" id="deposit-notes-input" placeholder="مثال: اسم المحول أو آخر 4 أرقام من الإيصال..." maxlength="250" style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; background: rgba(12, 16, 26, 0.9); border: 1px solid var(--border-metal); color: #fff; font-size: 0.88rem; font-family: var(--font-ar); box-sizing: border-box;">
+                            <input type="text" id="deposit-notes-input" placeholder="أي توضيح إضافي ترغب بإرساله للإدارة..." maxlength="200" style="width: 100%; padding: 0.62rem 0.9rem; border-radius: 11px; background: rgba(12, 16, 26, 0.85); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 0.82rem; font-family: var(--font-ar); box-sizing: border-box;">
                         </div>
 
-                        <button type="submit" id="btn-submit-deposit" class="btn-3d btn-gold" style="width: 100%; padding: 0.85rem 1.2rem; font-size: 0.98rem; justify-content: center;">
-                            <i class="fas fa-paper-plane"></i> إرسال طلب شحن النقاط للمراجعة
+                        <button type="submit" id="btn-submit-deposit" class="btn-3d btn-gold" style="width: 100%; padding: 0.85rem 1.2rem; font-size: 0.96rem; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i> إرسال الإيصال وطلب شحن النقاط
                         </button>
                     </form>
                 </div>
@@ -682,9 +1047,9 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js?v=20261021"></script>
-    <script src="js/data.js?v=20261021"></script>
-    <script src="js/calculator.js?v=20261021"></script>
+    <script src="js/supabase.js?v=20261025_gw"></script>
+    <script src="js/data.js?v=20261025_gw"></script>
+    <script src="js/calculator.js?v=20261025_gw"></script>
     <script src="js/dialog.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/pwa-register.js"></script>
@@ -692,6 +1057,226 @@
     <script>
         let currentReceiptDataUrl = '';
         let walletRealtimeChannel = null;
+        let activeGatewayCategory = 'local';
+        let selectedGatewayId = 'syria_shamcash';
+
+        // قائمة احتياطية في حال لم يتم تحديث الكاش لملف js/data.js بعد
+        const FALLBACK_PAYMENT_GATEWAYS = [
+            {
+                id: 'crypto_binance',
+                category: 'crypto',
+                countryName: 'عالمي (العملات الرقمية)',
+                countryFlag: '🌐',
+                iconSvg: 'assets/payments/binance.svg',
+                iconClass: 'fas fa-coins',
+                methodName: 'Binance Pay (بينانس باي)',
+                shortLabel: 'Binance Pay',
+                beneficiaryLabel: 'اسم حساب بينانس (Nickname)',
+                beneficiaryName: 'WASEET_OFFICIAL_PAY',
+                accountLabel: 'معرّف الدفع (Binance Pay ID)',
+                accountNumber: '849201948',
+                secondaryLabel: 'البريد المربوط (اختياري للتحويل)',
+                secondaryValue: 'pay@waseet-gaming.com',
+                currencyHint: '1 نقطة = 1 USDT (تحويل فوري بدون عمولة شبكة)',
+                instructions: 'افتح تطبيق Binance > اختر Binance Pay > إرسال (Send) > الصق معرّف الـ Pay ID أعلاه وتأكد من اسم المستفيد ثم التقط صورة شاشة للإيصال.'
+            },
+            {
+                id: 'crypto_usdt_trc20',
+                category: 'crypto',
+                countryName: 'عالمي (شبكة العملات الرقمية)',
+                countryFlag: '💎',
+                iconSvg: 'assets/payments/binance.svg',
+                iconClass: 'fas fa-wallet',
+                methodName: 'USDT (شبكة TRC20 / BEP20)',
+                shortLabel: 'USDT (TRC20)',
+                beneficiaryLabel: 'الشبكة المعتمدة (Network)',
+                beneficiaryName: 'Tron (TRC20) — أو BNB Smart Chain (BEP20)',
+                accountLabel: 'عنوان محفظة الإيداع (USDT Address)',
+                accountNumber: 'TX8k9P2mN7qR4vL6wZ1yC3bV5nM8jK2hG4',
+                secondaryLabel: 'عنوان شبكة BEP20 البديل',
+                secondaryValue: '0x71C95911E9a5D330f4D621842EC243EE1343292e',
+                currencyHint: '1 نقطة = 1 USDT صافي بعد عمولة الشبكة',
+                instructions: 'يرجى التأكد من اختيار شبكة TRC20 المطابقة للعنوان عند السحب من أي منصة، ثم إرفاق رقم الـ TXID أو لقطة شاشة لتفاصيل التحويل.'
+            },
+            {
+                id: 'syria_shamcash',
+                category: 'local',
+                countryCode: 'SY',
+                countryName: 'سوريا',
+                countryFlag: '🇸🇾',
+                iconSvg: 'assets/payments/syria.svg',
+                iconClass: 'fas fa-mobile-alt',
+                methodName: 'شام كاش (Sham Cash) / سيريتل كاش',
+                shortLabel: 'سوريا • شام كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'محمد الأحمد - خزينة وسيط سوريا',
+                accountLabel: 'رقم حساب شام كاش / رمز سيريتل كاش',
+                accountNumber: 'SC-90482910',
+                secondaryLabel: 'رقم سيريتل كاش (تحويل يدوي)',
+                secondaryValue: '0933123456',
+                currencyHint: 'يتم احتساب الصرف حسب السعر اليومي المعتمد في السوق السوري',
+                instructions: 'قم بالتحويل إلى رقم حساب شام كاش أو رمز سيريتل كاش الموضح أعلاه، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة الإشعار.'
+            },
+            {
+                id: 'egypt_vodafone',
+                category: 'local',
+                countryCode: 'EG',
+                countryName: 'مصر',
+                countryFlag: '🇪🇬',
+                iconSvg: 'assets/payments/egypt.svg',
+                iconClass: 'fas fa-mobile-alt',
+                methodName: 'فودافون كاش (Vodafone Cash) / إنستا باي',
+                shortLabel: 'مصر • فودافون كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'أحمد محمود حسن (وكيل وسيط مصر)',
+                accountLabel: 'رقم محفظة فودافون كاش',
+                accountNumber: '01012345678',
+                secondaryLabel: 'عنوان الدفع الفوري (InstaPay IPA)',
+                secondaryValue: 'waseet.egypt@instapay',
+                currencyHint: 'يدعم التحويل الفوري من جميع المحافظ المصرية وتطبيق InstaPay',
+                instructions: 'حوّل المبلغ بالجنيه المصري إلى رقم محفظة فودافون كاش أو عنوان إنستا باي أعلاه، ثم اكتب الرقم المحوّل منه وأرفق سكرين شوت رسالة التأكيد.'
+            },
+            {
+                id: 'iraq_zaincash',
+                category: 'local',
+                countryCode: 'IQ',
+                countryName: 'العراق',
+                countryFlag: '🇮🇶',
+                iconSvg: 'assets/payments/iraq.svg',
+                iconClass: 'fas fa-wallet',
+                methodName: 'زين كاش العراق (Zain Cash) / كي كارد',
+                shortLabel: 'العراق • زين كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'علي حسين العراقي - وسيط العراق',
+                accountLabel: 'رقم محفظة زين كاش (Zain Cash)',
+                accountNumber: '07801234567',
+                secondaryLabel: 'رقم بطاقة ماستر الرافدين (Qi Card)',
+                secondaryValue: '7102938475',
+                currencyHint: 'يدعم التحويل المباشر عبر تطبيق زين كاش أو ماستر كارد الرافدين',
+                instructions: 'قم بتحويل الرصيد عبر تطبيق Zain Cash إلى الرقم أعلاه، ثم أدخل رقم العملية الموجود في الإشعار وأرفق لقطة الشاشة.'
+            },
+            {
+                id: 'morocco_cih',
+                category: 'local',
+                countryCode: 'MA',
+                countryName: 'المغرب',
+                countryFlag: '🇲🇦',
+                iconSvg: 'assets/payments/morocco.svg',
+                iconClass: 'fas fa-university',
+                methodName: 'سياش بنك (CIH Bank) / البريد بنك',
+                shortLabel: 'المغرب • سياش CIH',
+                beneficiaryLabel: 'اسم المستفيد (Nom du bénéficiaire)',
+                beneficiaryName: 'YOUSSEF EL AMRANI - WASEET MA',
+                accountLabel: 'رقم حساب سياش (RIB / Numéro de compte)',
+                accountNumber: '230780123456789012345678',
+                secondaryLabel: 'حساب البريد بنك (Barid Bank)',
+                secondaryValue: '00987654321000',
+                currencyHint: 'تحويل فوري مجاني من تطبيق CIH Mobile أو Barid Bank Mobile',
+                instructions: 'قم بإجراء تحويل بنكي من تطبيق CIH Mobile إلى رقم الحساب أعلاه، ثم اكتب اسم صاحب الحساب المرسل وأرفق وصل التحويل (Reçu).'
+            },
+            {
+                id: 'algeria_baridimob',
+                category: 'local',
+                countryCode: 'DZ',
+                countryName: 'الجزائر',
+                countryFlag: '🇩🇿',
+                iconSvg: 'assets/payments/algeria.svg',
+                iconClass: 'fas fa-money-check-alt',
+                methodName: 'بريد الجزائر (BaridiMob / CCP)',
+                shortLabel: 'الجزائر • بريدي موب',
+                beneficiaryLabel: 'اسم المستفيد (Nom & Prénom)',
+                beneficiaryName: 'KARIM BENALI - WASEET DZ',
+                accountLabel: 'رقم الـ RIP (لتطبيق BaridiMob)',
+                accountNumber: '00799999001234567890',
+                secondaryLabel: 'رقم حساب CCP (للتحويل البريدي)',
+                secondaryValue: '0012345678 Clé 90',
+                currencyHint: 'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر',
+                instructions: 'انسخ رقم الـ RIP أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
+            },
+            {
+                id: 'saudi_stcpay',
+                category: 'local',
+                countryCode: 'SA',
+                countryName: 'السعودية',
+                countryFlag: '🇸🇦',
+                iconSvg: 'assets/payments/saudi.svg',
+                iconClass: 'fas fa-university',
+                methodName: 'STC Pay / مصرف الراجحي / برق',
+                shortLabel: 'السعودية • STC / الراجحي',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'مؤسسة وسيط للخدمات الرقمية',
+                accountLabel: 'رقم الآيبان (IBAN الراجحي) أو جوال STC Pay',
+                accountNumber: 'SA0380000000608010167519',
+                secondaryLabel: 'رقم محفظة STC Pay / برق (Barq)',
+                secondaryValue: '0501234567',
+                currencyHint: 'يدعم التحويل السريع (سريع) من جميع البنوك السعودية ومحفظة STC Pay',
+                instructions: 'قم بالتحويل إلى رقم الآيبان أو رقم جوال STC Pay أعلاه، ثم أدخل اسم المحوّل وأرفق إيصال التحويل البنكي.'
+            },
+            {
+                id: 'libya_madar',
+                category: 'local',
+                countryCode: 'LY',
+                countryName: 'ليبيا',
+                countryFlag: '🇱🇾',
+                iconSvg: 'assets/payments/libya.svg',
+                iconClass: 'fas fa-mobile-alt',
+                methodName: 'تداول / سداد / رصيد المدار وليبيانا',
+                shortLabel: 'ليبيا • المدار / تداول',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'عمر السنوسي - وكيل وسيط ليبيا',
+                accountLabel: 'رقم المحفظة / رقم استقبال الرصيد (المدار)',
+                accountNumber: '0911234567',
+                secondaryLabel: 'رقم ليبيانا / خدمة سداد',
+                secondaryValue: '0921234567',
+                currencyHint: 'متاح الشحن عبر محافظ تداول وسداد أو تحويل رصيد المدار وليبيانا',
+                instructions: 'قم بتحويل القيمة إلى الرقم الموضح أعلاه، ثم اكتب الرقم المحوّل منه أو رقم الإيصال وأرفق لقطة شاشة لإتمام العملية.'
+            },
+            {
+                id: 'tunisia_d17',
+                category: 'local',
+                countryCode: 'TN',
+                countryName: 'تونس',
+                countryFlag: '🇹🇳',
+                iconSvg: '',
+                iconClass: 'fas fa-credit-card',
+                methodName: 'تطبيق D17 / البريد التونسي (e-Dinar)',
+                shortLabel: 'تونس • تطبيق D17',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'أمين التونسي - WASEET TN',
+                accountLabel: 'رقم الهاتف المربوط بتطبيق D17',
+                accountNumber: '20123456',
+                secondaryLabel: 'رقم بطاقة e-Dinar Smart (البريد التونسي)',
+                secondaryValue: '5359820012345678',
+                currencyHint: 'تحويل فوري عبر تطبيق D17 التابع للبريد التونسي',
+                instructions: 'افتح تطبيق D17 واختر إرسال أموال (Transfert d\'argent) إلى الرقم أعلاه، ثم أدخل رقم التفويض/العملية وأرفق صورة الإيصال.'
+            },
+            {
+                id: 'jordan_cliq',
+                category: 'local',
+                countryCode: 'JO',
+                countryName: 'الأردن',
+                countryFlag: '🇯🇴',
+                iconSvg: '',
+                iconClass: 'fas fa-bolt',
+                methodName: 'نظام كليك (CliQ) / زين كاش الأردن',
+                shortLabel: 'الأردن • كليك / زين كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: 'زيد عبدالله الأردني - وسيط الأردن',
+                accountLabel: 'الاسم المستعار في كليك (CliQ Alias)',
+                accountNumber: 'WASEETJO',
+                secondaryLabel: 'رقم محفظة زين كاش الأردن / UWallet',
+                secondaryValue: '0791234567',
+                currencyHint: 'يدعم الدفع الفوري من جميع البنوك والمحافظ الأردنية عبر CliQ',
+                instructions: 'أرسل المبلغ بالدينار الأردني عبر نظام CliQ إلى الاسم المستعار (WASEETJO) أو رقم زين كاش، ثم أدخل اسم المرسل وأرفق صورة الإشعار.'
+            }
+        ];
+
+        function getGatewaysList() {
+            if (typeof window.WASEET_PAYMENT_GATEWAYS !== 'undefined' && Array.isArray(window.WASEET_PAYMENT_GATEWAYS) && window.WASEET_PAYMENT_GATEWAYS.length > 0) {
+                return window.WASEET_PAYMENT_GATEWAYS;
+            }
+            return FALLBACK_PAYMENT_GATEWAYS;
+        }
 
         function setQuickPoints(pts, btnEl) {
             const input = document.getElementById('deposit-amount-input');
@@ -700,13 +1285,211 @@
             if (btnEl) btnEl.classList.add('active');
         }
 
-        function selectDepositMethod(cardEl) {
-            if (!cardEl) return;
-            document.querySelectorAll('.method-option-card').forEach(c => c.classList.remove('active'));
-            cardEl.classList.add('active');
-            const val = cardEl.getAttribute('data-method') || 'تحويل محلي';
-            const input = document.getElementById('deposit-method-input');
-            if (input) input.value = val;
+        function initPaymentGatewaysUI() {
+            const list = getGatewaysList();
+            const selectEl = document.getElementById('gateway-dropdown-select');
+            if (selectEl) {
+                const localItems = list.filter(g => g.category === 'local');
+                const cryptoItems = list.filter(g => g.category === 'crypto');
+
+                const localOptionsHtml = localItems.map(g =>
+                    `<option value="${escapeSafe(g.id)}">${g.countryFlag || '🌍'} ${escapeSafe(g.countryName)} — ${escapeSafe(g.methodName)}</option>`
+                ).join('');
+
+                const cryptoOptionsHtml = cryptoItems.map(g =>
+                    `<option value="${escapeSafe(g.id)}">${g.countryFlag || '💎'} ${escapeSafe(g.methodName)}</option>`
+                ).join('');
+
+                selectEl.innerHTML = `
+                    <optgroup label="🌍 المحافظ والبنوك في الدول العربية">
+                        ${localOptionsHtml}
+                    </optgroup>
+                    <optgroup label="💎 العملات الرقمية العالمية (Crypto)">
+                        ${cryptoOptionsHtml}
+                    </optgroup>
+                `;
+            }
+
+            switchGatewayCategory('local', 'syria_shamcash');
+        }
+
+        function switchGatewayCategory(category, preferredId) {
+            activeGatewayCategory = category === 'crypto' ? 'crypto' : 'local';
+            const tabLocal = document.getElementById('gw-tab-local');
+            const tabCrypto = document.getElementById('gw-tab-crypto');
+            if (tabLocal && tabCrypto) {
+                tabLocal.classList.toggle('active', activeGatewayCategory === 'local');
+                tabCrypto.classList.toggle('active', activeGatewayCategory === 'crypto');
+            }
+
+            const list = getGatewaysList();
+            const filtered = list.filter(g => g.category === activeGatewayCategory);
+            const targetId = preferredId || (filtered[0] ? filtered[0].id : list[0].id);
+
+            renderGatewayPills(filtered, targetId);
+            selectGatewayById(targetId, true);
+        }
+
+        function renderGatewayPills(items, currentId) {
+            const grid = document.getElementById('gateway-pills-grid');
+            if (!grid) return;
+
+            grid.style.gridTemplateColumns = activeGatewayCategory === 'crypto' ? 'repeat(2, 1fr)' : '';
+
+            grid.innerHTML = items.map(g => {
+                const isActive = g.id === currentId;
+                const badgeVisual = g.iconSvg
+                    ? `<img src="${escapeSafe(g.iconSvg)}" alt="" class="gateway-pill-icon-img" onerror="this.style.display='none'">`
+                    : `<span class="gateway-pill-flag">${g.countryFlag || '🌍'}</span>`;
+
+                return `
+                    <button type="button" class="gateway-pill-btn ${isActive ? 'active' : ''}" data-gw-id="${escapeSafe(g.id)}" onclick="selectGatewayById('${escapeSafe(g.id)}')">
+                        ${badgeVisual}
+                        <span>${escapeSafe(g.shortLabel || g.countryName)}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectGatewayById(gwId, skipCategorySync) {
+            const list = getGatewaysList();
+            const gw = list.find(item => item.id === gwId) || list[0];
+            if (!gw) return;
+
+            selectedGatewayId = gw.id;
+
+            // إذا اختار المستخدم من القائمة المنسدلة وسيلة تنتمي لتبويب آخر، نحدث التبويب والأزرار تلقائياً
+            if (!skipCategorySync && gw.category !== activeGatewayCategory) {
+                activeGatewayCategory = gw.category;
+                const tabLocal = document.getElementById('gw-tab-local');
+                const tabCrypto = document.getElementById('gw-tab-crypto');
+                if (tabLocal && tabCrypto) {
+                    tabLocal.classList.toggle('active', activeGatewayCategory === 'local');
+                    tabCrypto.classList.toggle('active', activeGatewayCategory === 'crypto');
+                }
+                const filtered = list.filter(item => item.category === activeGatewayCategory);
+                renderGatewayPills(filtered, gw.id);
+            } else {
+                document.querySelectorAll('.gateway-pill-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-gw-id') === gw.id);
+                });
+            }
+
+            // مزامنة القائمة المنسدلة وحقل الإدخال المخفي
+            const selectEl = document.getElementById('gateway-dropdown-select');
+            if (selectEl && selectEl.value !== gw.id) {
+                selectEl.value = gw.id;
+            }
+
+            const hiddenInput = document.getElementById('deposit-method-input');
+            if (hiddenInput) {
+                hiddenInput.value = gw.category === 'crypto'
+                    ? gw.methodName
+                    : `${gw.countryName} — ${gw.methodName}`;
+            }
+
+            renderGatewayDetailsCard(gw);
+        }
+
+        function renderGatewayDetailsCard(gw) {
+            const card = document.getElementById('gateway-details-card');
+            if (!card || !gw) return;
+
+            const iconHtml = gw.iconSvg
+                ? `<img src="${escapeSafe(gw.iconSvg)}" alt="${escapeSafe(gw.countryName)}" onerror="this.outerHTML='<span>${gw.countryFlag || '💳'}</span>'">`
+                : `<span>${gw.countryFlag || '💳'}</span>`;
+
+            const secondaryRowHtml = gw.secondaryValue
+                ? `
+                    <div class="gateway-info-row" style="margin-bottom: 0.65rem;">
+                        <div style="min-width: 0;">
+                            <div style="font-size: 0.72rem; color: var(--silver-muted);">${escapeSafe(gw.secondaryLabel || 'حساب بديل / إضافي')}</div>
+                            <div style="font-size: 0.84rem; color: #fff; font-weight: 800; direction: ltr; text-align: right; word-break: break-all;">${escapeSafe(gw.secondaryValue)}</div>
+                        </div>
+                        <button type="button" class="btn-copy-mini" data-copy="${escapeSafe(gw.secondaryValue)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">
+                            <i class="far fa-copy"></i> نسخ
+                        </button>
+                    </div>
+                `
+                : '';
+
+            card.innerHTML = `
+                <div class="gateway-details-header">
+                    <div class="gateway-details-title-wrap">
+                        <div class="gateway-details-badge-icon">${iconHtml}</div>
+                        <div style="min-width: 0;">
+                            <div style="color: #fff; font-weight: 900; font-size: 0.92rem; line-height: 1.3;">${escapeSafe(gw.methodName)}</div>
+                            <div style="color: var(--gold-light); font-size: 0.74rem; font-weight: 700; margin-top: 2px;">
+                                ${escapeSafe(gw.currencyHint || 'شحن آمن ومباشر لرصيد النقاط')}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="gateway-country-tag">${gw.countryFlag || ''} ${escapeSafe(gw.countryName)}</span>
+                </div>
+
+                <!-- اسم المستفيد -->
+                <div class="gateway-info-row">
+                    <div style="min-width: 0;">
+                        <div style="font-size: 0.73rem; color: var(--silver-muted);"><i class="fas fa-user-check text-gold"></i> ${escapeSafe(gw.beneficiaryLabel || 'اسم المستفيد المعتمد')}</div>
+                        <div style="font-size: 0.88rem; color: #fff; font-weight: 800; margin-top: 2px;">${escapeSafe(gw.beneficiaryName)}</div>
+                    </div>
+                    <button type="button" class="btn-copy-mini" data-copy="${escapeSafe(gw.beneficiaryName)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">
+                        <i class="far fa-copy"></i> نسخ الاسم
+                    </button>
+                </div>
+
+                <!-- رقم الحساب / المحفظة / Pay ID مع زر النسخ السريع -->
+                <div class="gateway-account-box">
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="font-size: 0.74rem; color: var(--silver-light); font-weight: 700; margin-bottom: 3px;">
+                            <i class="fas fa-key text-gold"></i> ${escapeSafe(gw.accountLabel || 'رقم الحساب / المحفظة')}
+                        </div>
+                        <div class="gateway-account-number" id="active-gw-account-num">${escapeSafe(gw.accountNumber)}</div>
+                    </div>
+                    <button type="button" class="btn-copy-gateway" data-copy="${escapeSafe(gw.accountNumber)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">
+                        <i class="fas fa-copy"></i>
+                        <span>نسخ الرقم</span>
+                    </button>
+                </div>
+
+                ${secondaryRowHtml}
+
+                <!-- تعليمات سريعة -->
+                <div class="gateway-instructions-box">
+                    <i class="fas fa-info-circle" style="color: var(--orange-bright); margin-left: 4px;"></i>
+                    ${escapeSafe(gw.instructions || 'قم بالتحويل للرقم الموضح أعلاه ثم أدخل رقم العملية وأرفق صورة الإيصال بالأسفل.')}
+                </div>
+            `;
+        }
+
+        async function copyGatewayText(textToCopy, btnEl) {
+            if (!textToCopy) return;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                } else {
+                    const temp = document.createElement('textarea');
+                    temp.value = textToCopy;
+                    temp.style.position = 'fixed';
+                    temp.style.opacity = '0';
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(temp);
+                }
+
+                if (btnEl) {
+                    const origHtml = btnEl.innerHTML;
+                    btnEl.classList.add('copied');
+                    btnEl.innerHTML = '<i class="fas fa-check"></i> <span>تم النسخ!</span>';
+                    setTimeout(() => {
+                        btnEl.classList.remove('copied');
+                        btnEl.innerHTML = origHtml;
+                    }, 1800);
+                }
+            } catch (e) {
+                console.warn('Copy failed', e);
+            }
         }
 
         function clearReceiptImage() {
@@ -887,6 +1670,12 @@
                            </div>`
                         : '';
 
+                    const userRefHtml = req.notes
+                        ? `<div style="color: var(--silver-light); font-size: 0.74rem; margin-top: 2px;">
+                            <i class="fas fa-hashtag text-gold"></i> ${escapeSafe(req.notes)}
+                           </div>`
+                        : '';
+
                     return `
                         <div class="history-item-card">
                             <div style="display: flex; align-items: center; gap: 0.8rem;">
@@ -898,6 +1687,7 @@
                                     <div style="color: var(--silver-muted); font-size: 0.76rem;">
                                         ${escapeSafe(req.payment_method || 'تحويل محلي')} • ${dt}
                                     </div>
+                                    ${userRefHtml}
                                 </div>
                             </div>
                             <div>${statusBadge}</div>
@@ -1008,6 +1798,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // تهيئة بوابة الدفع الإقليمية الذكية
+            initPaymentGatewaysUI();
+
             // معالجة اختيار صورة الإيصال
             const fileInput = document.getElementById('receipt-file-input');
             if (fileInput) {
@@ -1033,13 +1826,23 @@
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const amount = parseFloat(document.getElementById('deposit-amount-input').value);
-                    const method = document.getElementById('deposit-method-input').value;
-                    const notes = document.getElementById('deposit-notes-input').value.trim();
+                    const method = document.getElementById('deposit-method-input').value || 'تحويل محلي';
+                    const senderRefEl = document.getElementById('deposit-sender-ref-input');
+                    const senderRef = senderRefEl ? senderRefEl.value.trim() : '';
+                    const extraNotes = document.getElementById('deposit-notes-input').value.trim();
 
                     if (!amount || amount <= 0) {
                         if (typeof waseetAlert === 'function') {
                             waseetAlert('تنبيه', 'يرجى تحديد عدد النقاط المطلوبة بشكل صحيح.', 'warning');
                         }
+                        return;
+                    }
+
+                    if (!senderRef) {
+                        if (typeof waseetAlert === 'function') {
+                            waseetAlert('بيانات التحويل مطلوبة', 'يرجى إدخال رقم العملية (Transaction ID) أو اسم/رقم الحساب المحوّل منه.', 'warning');
+                        }
+                        if (senderRefEl) senderRefEl.focus();
                         return;
                     }
 
@@ -1049,6 +1852,10 @@
                         }
                         return;
                     }
+
+                    const combinedNotes = extraNotes
+                        ? `المحوّل/رقم العملية: ${senderRef} | ملاحظة: ${extraNotes}`
+                        : `المحوّل/رقم العملية: ${senderRef}`;
 
                     const btn = document.getElementById('btn-submit-deposit');
                     const origHtml = btn.innerHTML;
@@ -1060,7 +1867,7 @@
                             amount,
                             paymentMethod: method,
                             receiptImageUrl: currentReceiptDataUrl,
-                            notes
+                            notes: combinedNotes
                         });
 
                         if (error) {
@@ -1073,13 +1880,15 @@
                         }
 
                         form.reset();
+                        selectGatewayById(selectedGatewayId, true);
+                        document.querySelectorAll('.quick-pts-btn').forEach(b => b.classList.remove('active'));
                         clearReceiptImage();
                         await refreshAllWalletData();
 
                         if (typeof waseetAlert === 'function') {
                             await waseetAlert(
                                 'تم إرسال طلب الشحن بنجاح!',
-                                `تم استلام طلب شحن (${amount} نقطة) مرفقاً بصورة الإيصال.\nسيقوم الوسيط المعتمد بمراجعته والموافقة عليه ليضاف الرصيد إلى محفظتك فوراً.`,
+                                `تم استلام طلب شحن (${amount} نقطة) عبر (${method}) مرفقاً بصورة الإيصال.\nسيقوم الوسيط المعتمد بمراجعته والموافقة عليه ليضاف الرصيد إلى محفظتك فوراً.`,
                                 'success'
                             );
                         }
