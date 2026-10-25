@@ -745,7 +745,7 @@ window.waseetSafeParseCredentials = waseetSafeParseCredentials;
 
 /**
  * جلب الحسابات المعتمدة للمتجر العام من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
- * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو مرفوض أو وهمي.
+ * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو محجوز (in_deal) أو مباع (sold) أو مرفوض.
  */
 async function waseetFetchAccountsFromSupabase(options = {}) {
     const client = initWaseetSupabase();
@@ -754,6 +754,9 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
     const includeAllStatuses = !!(options && options.includeAllStatuses);
 
     try {
+        // فحص تلقائي لإلغاء الحجوزات التي مر عليها أكثر من 48 ساعة وإرجاع الحسابات للسوق
+        await waseetExpireStaleEscrowDeals();
+
         // جلب الحسابات الفعلية فقط من Supabase (دون إعادة رفع أي بيانات محلية قديمة)
         let rows = null;
         let joinQuery = client
@@ -798,7 +801,7 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
 
         const remoteAccounts = rows
             .map(r => waseetMapRemoteAccountRow(r, profilesMap))
-            .filter(Boolean);
+            .filter(acc => acc && (includeAllStatuses || (acc.status === 'available' || acc.status === 'approved')));
 
         // اعتماد الحسابات الفعلية من قاعدة البيانات فقط كمصدر وحيد للحقيقة
         WASEET_STATE.accounts = remoteAccounts;
@@ -1502,11 +1505,11 @@ async function waseetAdminRejectDepositRequest(requestId, adminNote = '') {
 }
 
 /**
- * حجز النقاط في قاعدة البيانات عند طلب شراء حساب (Escrow Lock)
+ * حجز النقاط في قاعدة البيانات عند طلب شراء حساب (Escrow Lock) وتغيير حالة الحساب إلى in_deal ليختفي من السوق العام
  */
 async function waseetLockEscrowPointsInDb(dealObj) {
     const client = initWaseetSupabase();
-    if (!client || !dealObj) return { data: null, error: { message: 'بيانات الصفقة غير مكتملة' } };
+    if (!client || !dealObj) return { ok: false, data: null, error: { message: 'بيانات الصفقة غير مكتملة' } };
 
     try {
         const accountUuid = (dealObj.accountId && waseetIsValidUuid(dealObj.accountId)) ? dealObj.accountId : null;
@@ -1532,23 +1535,36 @@ async function waseetLockEscrowPointsInDb(dealObj) {
 
         if (error) {
             console.warn('[Escrow Lock RPC] تنبيه:', error.message);
-            return { data: null, error };
+            return { ok: false, data: null, error };
+        }
+
+        // تأكيد تحويل حالة الحساب إلى in_deal لإخفائه تماماً من السوق العام
+        if (accountUuid) {
+            try {
+                await client
+                    .from('marketplace_accounts')
+                    .update({
+                        status: 'in_deal',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', accountUuid);
+            } catch (e) {}
         }
 
         await waseetRefreshMyWalletBalance();
-        return { data, error: null };
+        return { ok: true, data, error: null };
     } catch (err) {
         console.warn('[Escrow Lock RPC] استثناء:', err);
-        return { data: null, error: { message: err.message } };
+        return { ok: false, data: null, error: { message: err.message } };
     }
 }
 
 /**
- * تحرير نقاط الصفقة للبائع وخصم عمولة المنصة تلقائياً عند إتمام الصفقة
+ * تحرير نقاط الصفقة للبائع وخصم عمولة المنصة تلقائياً عند إتمام الصفقة وتحويل حالة الحساب إلى مباع (sold)
  */
-async function waseetReleaseEscrowPointsInDb(dealId) {
+async function waseetReleaseEscrowPointsInDb(dealId, accountIdHint = null) {
     const client = initWaseetSupabase();
-    if (!client || !dealId) return { data: null, error: { message: 'معرف الصفقة غير صالح' } };
+    if (!client || !dealId) return { ok: false, data: null, error: { message: 'معرف الصفقة غير صالح' } };
 
     try {
         const { data, error } = await client.rpc('release_escrow_deal_points', {
@@ -1557,23 +1573,35 @@ async function waseetReleaseEscrowPointsInDb(dealId) {
 
         if (error) {
             console.warn('[Escrow Release RPC] تنبيه:', error.message);
-            return { data: null, error };
+            return { ok: false, data: null, error };
+        }
+
+        if (accountIdHint && waseetIsValidUuid(accountIdHint)) {
+            try {
+                await client
+                    .from('marketplace_accounts')
+                    .update({
+                        status: 'sold',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', accountIdHint);
+            } catch (e) {}
         }
 
         await waseetRefreshMyWalletBalance();
-        return { data, error: null };
+        return { ok: true, data, error: null };
     } catch (err) {
         console.warn('[Escrow Release RPC] استثناء:', err);
-        return { data: null, error: { message: err.message } };
+        return { ok: false, data: null, error: { message: err.message } };
     }
 }
 
 /**
- * استرداد النقاط المحجوزة إلى المشتري عند إلغاء الصفقة
+ * استرداد النقاط المحجوزة إلى المشتري عند إلغاء الصفقة وإعادة الحساب للظهور في السوق تلقائياً (available)
  */
-async function waseetRefundEscrowPointsInDb(dealId) {
+async function waseetRefundEscrowPointsInDb(dealId, accountIdHint = null) {
     const client = initWaseetSupabase();
-    if (!client || !dealId) return { data: null, error: { message: 'معرف الصفقة غير صالح' } };
+    if (!client || !dealId) return { ok: false, data: null, error: { message: 'معرف الصفقة غير صالح' } };
 
     try {
         const { data, error } = await client.rpc('refund_escrow_deal_points', {
@@ -1582,16 +1610,127 @@ async function waseetRefundEscrowPointsInDb(dealId) {
 
         if (error) {
             console.warn('[Escrow Refund RPC] تنبيه:', error.message);
-            return { data: null, error };
+            return { ok: false, data: null, error };
+        }
+
+        if (accountIdHint && waseetIsValidUuid(accountIdHint)) {
+            try {
+                await client
+                    .from('marketplace_accounts')
+                    .update({
+                        status: 'available',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', accountIdHint);
+            } catch (e) {}
         }
 
         await waseetRefreshMyWalletBalance();
-        return { data, error: null };
+        return { ok: true, data, error: null };
     } catch (err) {
         console.warn('[Escrow Refund RPC] استثناء:', err);
-        return { data: null, error: { message: err.message } };
+        return { ok: false, data: null, error: { message: err.message } };
     }
 }
+
+/**
+ * المؤقت الزمني التلقائي (48 ساعة):
+ * يفحص الصفقات والحجوزات التي مر عليها أكثر من 48 ساعة دون اكتمال، فيلغي الحجز تلقائياً،
+ * ويسترجع النقاط لمحفظة المشتري، ويعيد الحساب إلى قسم "الحسابات المفحوصة" في السوق العام.
+ */
+async function waseetExpireStaleEscrowDeals(force = false) {
+    const client = initWaseetSupabase();
+    if (!client) return null;
+
+    const now = Date.now();
+    if (!force && window._waseetLastExpireCheckAt && (now - window._waseetLastExpireCheckAt < 60000)) {
+        return null;
+    }
+    window._waseetLastExpireCheckAt = now;
+
+    try {
+        const { data, error } = await client.rpc('expire_stale_escrow_deals');
+        if (!error && data && data.expired_count > 0) {
+            await waseetRefreshMyWalletBalance();
+        }
+        return data || null;
+    } catch (e) {
+        return null;
+    }
+}
+window.waseetExpireStaleEscrowDeals = waseetExpireStaleEscrowDeals;
+
+/**
+ * دوال التنقل السريع (Back & Forward Arrows) بين الصفحة الحالية والسابقة
+ */
+function waseetHistoryBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+function waseetHistoryForward() {
+    window.history.forward();
+}
+
+window.waseetHistoryBack = waseetHistoryBack;
+window.waseetHistoryForward = waseetHistoryForward;
+
+/**
+ * تهيئة تحسينات التنقل وروابط الدعم المباشر وأزرار الأسهم في جميع صفحات المنصة
+ */
+function waseetInitNavigationEnhancements() {
+    try {
+        const DIRECT_SUPPORT_URL = 'https://wa.me/qr/KN2ECHUNFKEPP1';
+
+        // 1. تحديث كافة روابط الدعم المباشر / واتساب لتوجه إلى الرابط الرسمي المعتمد
+        document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+            link.setAttribute('href', DIRECT_SUPPORT_URL);
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+        });
+
+        // 2. التأكد من وجود زري (حساباتي) و (محادثة الوسيط) في شريط تنقل البائع والمشتري (#nav-user-middle-group)
+        const userNav = document.getElementById('nav-user-middle-group');
+        if (userNav) {
+            const path = (window.location.pathname || '').toLowerCase();
+            if (!userNav.querySelector('a[href="my-accounts.html"]')) {
+                const myAccLink = document.createElement('a');
+                myAccLink.href = 'my-accounts.html';
+                myAccLink.className = 'btn-nav-middle' + (path.includes('my-accounts.html') ? ' active' : '');
+                myAccLink.innerHTML = '<i class="fas fa-boxes text-gold"></i> حساباتي';
+                userNav.appendChild(myAccLink);
+            }
+            if (!userNav.querySelector('a[href="contact-support.html"]')) {
+                const supportChatLink = document.createElement('a');
+                supportChatLink.href = 'contact-support.html';
+                supportChatLink.className = 'btn-nav-middle' + (path.includes('contact-support.html') ? ' active' : '');
+                supportChatLink.innerHTML = '<i class="fas fa-headset text-orange"></i> محادثة الوسيط <span class="deals-badge-count chats-unread-badge" style="display: none;"></span>';
+                userNav.appendChild(supportChatLink);
+            }
+        }
+
+        // 3. إضافة أزرار الأسهم (Back & Forward Arrows) في الترويسة العلوية لتسهيل التنقل بين الصفحات
+        const brandGroups = document.querySelectorAll('.nav-brand-group, .wa-topbar');
+        brandGroups.forEach(group => {
+            if (group.querySelector('.waseet-history-nav-arrows')) return;
+            const arrowsWrap = document.createElement('div');
+            arrowsWrap.className = 'waseet-history-nav-arrows';
+            arrowsWrap.innerHTML = `
+                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            `;
+            group.insertBefore(arrowsWrap, group.firstChild);
+        });
+    } catch (e) {}
+}
+window.waseetInitNavigationEnhancements = waseetInitNavigationEnhancements;
 
 /**
  * تحديث شارة عدد طلبات الشحن المعلقة في شريط تنقل المدير
@@ -1866,6 +2005,7 @@ function initWaseetAuthListener() {
 // تشغيل المستمع بمجرد اكتمال تحميل DOM
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
+        waseetInitNavigationEnhancements();
         initWaseetSupabase();
         initWaseetAuthListener();
         waseetSyncAllNavBadges();

@@ -92,13 +92,23 @@
 
     <!-- Top Bar -->
     <div class="wa-topbar">
-        <a href="index.html" class="brand-wrap">
-            <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
-            <div class="brand-text-col">
-                <span class="brand-title">WASEET</span>
-                <span class="brand-subtitle">وسيط • محادثات الإدارة والدعم المباشر</span>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div class="waseet-history-nav-arrows">
+                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
             </div>
-        </a>
+            <a href="index.html" class="brand-wrap">
+                <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
+                <div class="brand-text-col">
+                    <span class="brand-title">WASEET</span>
+                    <span class="brand-subtitle">وسيط • محادثات الإدارة والدعم المباشر</span>
+                </div>
+            </a>
+        </div>
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <a href="index.html" class="wa-back-btn"><i class="fas fa-store text-gold"></i> العودة للمتجر</a>
             <a href="admin-deposits.html" class="wa-back-btn" style="border-color: #10b981; color: #34d399;" title="إدارة طلبات شحن النقاط"><i class="fas fa-money-check-alt"></i> شحن النقاط</a>

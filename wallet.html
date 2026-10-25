@@ -700,6 +700,14 @@
         <header class="header-navbar">
             <div class="container nav-container">
                 <div class="nav-brand-group">
+                    <div class="waseet-history-nav-arrows">
+                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
                     <a href="index.html" class="brand-wrap">
                         <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
@@ -719,6 +727,13 @@
                     </a>
                     <a href="deals.html" class="btn-nav-middle">
                         <i class="fas fa-shield-alt text-gold"></i> قيد الشراء
+                    </a>
+                    <a href="my-accounts.html" class="btn-nav-middle">
+                        <i class="fas fa-boxes text-gold"></i> حساباتي
+                    </a>
+                    <a href="contact-support.html" class="btn-nav-middle">
+                        <i class="fas fa-headset text-orange"></i> محادثة الوسيط
+                        <span class="deals-badge-count chats-unread-badge" style="display: none;"></span>
                     </a>
                 </nav>
 

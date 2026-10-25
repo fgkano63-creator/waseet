@@ -1646,13 +1646,18 @@ class WaseetEscrowRoom {
             time: timeStr
         });
 
-        // Release points in Supabase DB via atomic RPC
+        // Release points in Supabase DB via atomic RPC & mark account as sold
         if (typeof window.waseetReleaseEscrowPointsInDb === 'function') {
             try {
-                await window.waseetReleaseEscrowPointsInDb(this.deal.id);
+                await window.waseetReleaseEscrowPointsInDb(this.deal.id, this.deal.accountId);
             } catch (e) {
                 console.warn('Could not release escrow points in DB:', e);
             }
+        }
+        if (typeof window.waseetFetchAccountsFromSupabase === 'function') {
+            try {
+                await window.waseetFetchAccountsFromSupabase();
+            } catch (e) {}
         }
 
         // Deduct from locked points in local state
@@ -1712,13 +1717,18 @@ class WaseetEscrowRoom {
         this.deal.status = 'cancelled';
         this.deal.currentStep = 0;
 
-        // Refund points in Supabase DB via atomic RPC
+        // Refund points in Supabase DB via atomic RPC & return account to available in marketplace
         if (typeof window.waseetRefundEscrowPointsInDb === 'function') {
             try {
-                await window.waseetRefundEscrowPointsInDb(this.deal.id);
+                await window.waseetRefundEscrowPointsInDb(this.deal.id, this.deal.accountId);
             } catch (e) {
                 console.warn('Could not refund escrow points in DB:', e);
             }
+        }
+        if (typeof window.waseetFetchAccountsFromSupabase === 'function') {
+            try {
+                await window.waseetFetchAccountsFromSupabase();
+            } catch (e) {}
         }
 
         // Refund points back to buyer's available wallet in local state

@@ -298,6 +298,14 @@
             <div class="container nav-container">
                 <!-- المجموعة 1 (أقصى اليمين): شعار الموقع فقط -->
                 <div class="nav-brand-group">
+                    <div class="waseet-history-nav-arrows">
+                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
                     <a href="index.html" class="brand-wrap">
                         <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
@@ -307,10 +315,10 @@
                     </a>
                 </div>
 
-                <!-- المجموعة 2 (الوسطى للمستخدم العادي): أهم 3 أزرار -->
+                <!-- المجموعة 2 (الوسطى للمستخدم العادي) -->
                 <nav class="nav-middle-group" id="nav-user-middle-group">
                     <a href="index.html" class="btn-nav-middle">
-                        <i class="fas fa-store text-gold"></i> العودة للمتجر
+                        <i class="fas fa-store text-gold"></i> المتجر
                     </a>
                     <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.location.href='index.html#open-sell'">
                         <i class="fas fa-plus-circle text-orange"></i> بيع حساب
@@ -318,6 +326,13 @@
                     <a href="deals.html" class="btn-nav-middle">
                         <i class="fas fa-shield-alt text-gold"></i> قيد الشراء
                         <span class="deals-badge-count" id="deals-badge-count" style="display: none;"></span>
+                    </a>
+                    <a href="my-accounts.html" class="btn-nav-middle">
+                        <i class="fas fa-boxes text-gold"></i> حساباتي
+                    </a>
+                    <a href="contact-support.html" class="btn-nav-middle active">
+                        <i class="fas fa-headset text-orange"></i> محادثة الوسيط
+                        <span class="deals-badge-count chats-unread-badge" style="display: none;"></span>
                     </a>
                 </nav>
 

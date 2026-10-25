@@ -6233,6 +6233,57 @@ img[src*="logo.png"] {
     object-fit: cover !important;
 }
 
+/* أزرار التنقل السريع (الأسهم Back & Forward Arrows) في أعلى لوحة التحكم والترويسة */
+.waseet-history-nav-arrows {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.45rem;
+    flex-shrink: 0;
+}
+
+.btn-history-arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(197, 160, 89, 0.38);
+    background: rgba(18, 24, 38, 0.85);
+    color: var(--gold-light);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.btn-history-arrow:hover {
+    background: rgba(197, 160, 89, 0.22);
+    border-color: var(--gold-primary);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(197, 160, 89, 0.25);
+}
+
+.btn-history-arrow:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .btn-history-arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        font-size: 0.76rem;
+    }
+    .waseet-history-nav-arrows {
+        gap: 0.25rem;
+        margin-left: 0.25rem;
+    }
+}
+
+
 
 
 

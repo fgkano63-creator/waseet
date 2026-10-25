@@ -1751,6 +1751,16 @@ class WaseetApp {
             WASEET_STATE.deals.unshift(newDeal);
             WASEET_STATE.activeDeal = newDeal;
 
+            // تحويل حالة الحساب إلى محجوز (in_deal) ليختفي فوراً من السوق العام
+            acc.status = 'in_deal';
+            acc.lockedAt = new Date().toISOString();
+            if (Array.isArray(WASEET_STATE.accounts)) {
+                WASEET_STATE.accounts = WASEET_STATE.accounts.filter(a => String(a.id) !== String(acc.id));
+            }
+            const deckModal = document.getElementById('modal-card-deck');
+            if (deckModal) deckModal.classList.remove('active');
+            this.renderMarketplace();
+
             this.updateWalletDisplay();
             saveWaseetData();
             this.renderUserProfile();
