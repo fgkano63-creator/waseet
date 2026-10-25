@@ -13,13 +13,12 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Favicon / شعار التبويب البارز عالي الدقة متوافق مع كافة المتصفحات -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=3">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png?v=3">
-    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png?v=3">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=3">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=3">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
+    <!-- Favicon / أيقونة التطبيق والشعار المربع ذو الزوايا الدائرية -->
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+    <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
 
     <!-- PWA & Mobile Web App Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -234,7 +233,7 @@
                             </select>
                         </div>
 
-                        <div class="filter-item">
+                        <div class="filter-item" style="display: none !important;">
                             <label class="filter-label"><i class="fas fa-crosshairs text-orange"></i> أسلحة إيفو المطورة</label>
                             <select id="filter-evo" class="filter-select">
                                 <option value="all">الكل</option>
@@ -560,15 +559,15 @@
                         <i class="fas fa-fire-alt text-orange"></i>
                         <span>فري فاير (Free Fire)</span>
                     </button>
-                    <button type="button" class="game-tab-btn" data-game="pubg">
+                    <button type="button" class="game-tab-btn" data-game="pubg" onclick="event.preventDefault(); event.stopPropagation(); if(window.waseetShowGameUnavailable) window.waseetShowGameUnavailable(); else alert('غير متوفر الآن بسبب عدم وجود وسيط');">
                         <i class="fas fa-crosshairs text-gold"></i>
                         <span>ببجي موبايل (PUBG)</span>
                     </button>
-                    <button type="button" class="game-tab-btn" data-game="brawl_stars">
+                    <button type="button" class="game-tab-btn" data-game="brawl_stars" onclick="event.preventDefault(); event.stopPropagation(); if(window.waseetShowGameUnavailable) window.waseetShowGameUnavailable(); else alert('غير متوفر الآن بسبب عدم وجود وسيط');">
                         <i class="fas fa-skull text-silver"></i>
                         <span>براول ستارز</span>
                     </button>
-                    <button type="button" class="game-tab-btn" data-game="other">
+                    <button type="button" class="game-tab-btn" data-game="other" onclick="event.preventDefault(); event.stopPropagation(); if(window.waseetShowGameUnavailable) window.waseetShowGameUnavailable(); else alert('غير متوفر الآن بسبب عدم وجود وسيط');">
                         <i class="fas fa-gem text-orange"></i>
                         <span>لعبة أخرى</span>
                     </button>
@@ -584,7 +583,7 @@
                 <div class="form-grid-2">
                     <div class="input-group">
                         <label class="input-label">مستوى الحساب (Level):</label>
-                        <input type="number" id="form-level" class="input-3d" value="75" min="1" max="150" required>
+                        <input type="number" id="form-level" class="input-3d" value="" placeholder="مثال: 75" min="1" max="150" required>
                     </div>
 
                     <div class="input-group" id="group-form-prime">
@@ -607,18 +606,18 @@
                     <div class="form-grid-2">
                         <div class="input-group">
                             <label class="input-label"><i class="fas fa-crosshairs text-orange"></i> عدد أسلحة إيفو (المطورة):</label>
-                            <input type="number" id="form-evo-count" class="input-3d" value="4" min="0" max="15" placeholder="عدد أسلحة إيفو">
+                            <input type="number" id="form-evo-count" class="input-3d" value="" min="0" max="15" placeholder="مثال: 4">
                         </div>
 
                         <div class="input-group">
                             <label class="input-label"><i class="fas fa-tshirt text-gold"></i> السراويل المميزة:</label>
-                            <input type="text" id="form-iconic-pants" class="input-3d" value="بنطلون الجاز، بنطلون الملاك" placeholder="مثال: بنطلون الجاز، بنطلون الملاك، الدودة">
+                            <input type="text" id="form-iconic-pants" class="input-3d" value="" placeholder="مثال: بنطلون الجاز، بنطلون الملاك">
                         </div>
                     </div>
 
                     <div class="input-group">
                         <label class="input-label"><i class="fas fa-crown text-gold"></i> السكنات النادرة:</label>
-                        <input type="text" id="form-rare-skins" class="input-3d" value="سكن الساكورا، حزمة الهيب هوب، كريمنال" placeholder="مثال: ساكورا، هيب هوب، كريمنال، جوكر...">
+                        <input type="text" id="form-rare-skins" class="input-3d" value="" placeholder="مثال: سكن الساكورا، حزمة الهيب هوب، كريمنال">
                     </div>
 
                     <div class="input-group">
@@ -682,7 +681,7 @@
                     <div class="image-previews-grid" id="image-previews-grid"></div>
                 </div>
 
-                <!-- Private Escrow Credentials Box (Image 2) -->
+                <!-- Private Escrow Credentials Box (Image 3) -->
                 <div class="secret-escrow-box">
                     <div class="secret-header" style="display: flex; align-items: center; gap: 0.5rem; color: var(--orange-bright); font-weight: 800; font-size: 0.95rem; margin-bottom: 0.8rem;">
                         <i class="fas fa-lock"></i>
@@ -698,6 +697,30 @@
                             <label class="input-label" for="form-seller-password">كلمة المرور:</label>
                             <input type="password" id="form-seller-password" class="input-3d" style="font-size: 0.95rem;" placeholder="كلمة المرور السرية" required>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Account Credentials Box (حساب الاسترداد) -->
+                <div class="secret-escrow-box" style="margin-top: 0.85rem;">
+                    <div class="secret-header" style="display: flex; align-items: center; gap: 0.5rem; color: var(--orange-bright); font-weight: 800; font-size: 0.95rem; margin-bottom: 0.8rem;">
+                        <i class="fas fa-user-shield"></i>
+                        <span>أضف حساب الاسترداد:</span>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="input-group">
+                            <label class="input-label" for="form-recovery-email">البريد الإلكتروني / رقم حساب الاسترداد:</label>
+                            <input type="text" id="form-recovery-email" class="input-3d" style="font-size: 0.95rem;" placeholder="مثال: recovery@gmail.com أو رقم الهاتف">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="form-recovery-password">كلمة المرور لحساب الاسترداد:</label>
+                            <input type="password" id="form-recovery-password" class="input-3d" style="font-size: 0.95rem;" placeholder="كلمة المرور السرية لحساب الاسترداد">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 0.65rem; padding: 0.55rem 0.8rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; color: #34d399; font-size: 0.84rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-shield-alt" style="font-size: 1rem;"></i>
+                        <span>لا يمكن لأحد رؤية بيانات الحساب خلاف الوسيط المعتمد من الموقع</span>
                     </div>
                 </div>
 

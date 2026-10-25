@@ -718,7 +718,9 @@ function waseetSafeParseCredentials(acc, details = {}) {
 
     return {
         email_or_phone: String(parsedCreds.email_or_phone || parsedCreds.email || parsedCreds.login || (acc && acc.login_identifier) || details.email_or_phone || 'غير متوفر'),
-        password: String(parsedCreds.password || parsedCreds.pass || (acc && acc.raw_password) || details.password || '••••••••')
+        password: String(parsedCreds.password || parsedCreds.pass || (acc && acc.raw_password) || details.password || '••••••••'),
+        recovery_email: String(parsedCreds.recovery_email || details.recovery_email || ''),
+        recovery_password: String(parsedCreds.recovery_password || details.recovery_password || '')
     };
 }
 
@@ -754,8 +756,14 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
             ? parsedGalleryField
             : (acc.image_url ? [acc.image_url] : (Array.isArray(details.images) && details.images.length > 0 ? details.images : ['assets/logo.png'])));
 
-    const rareSkinsVal = details.rareSkins || acc.rare_skins || ['سكنات نادرة'];
-    const iconicPantsVal = details.iconicPants || acc.iconic_pants || ['بنطلون مميز'];
+    const rawSkins = details.rareSkins || acc.rare_skins || [];
+    const rawPants = details.iconicPants || acc.iconic_pants || [];
+    const cleanSkins = (Array.isArray(rawSkins) ? rawSkins : String(rawSkins).split('،'))
+        .map(s => String(s || '').trim())
+        .filter(s => s && s !== 'سكنات نادرة' && s !== 'غير محدد');
+    const cleanPants = (Array.isArray(rawPants) ? rawPants : String(rawPants).split('،'))
+        .map(s => String(s || '').trim())
+        .filter(s => s && s !== 'بنطلون مميز' && s !== 'غير محدد');
 
     return {
         id: acc.id,
@@ -776,10 +784,10 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         sellerRating: 5.0,
         sellerDeals: 1,
         sellerPrice: parseFloat(acc.seller_price) || 0,
-        evoGunsCount: Number(details.evoGunsCount ?? acc.evo_guns_count ?? 0),
-        evoGuns: Array.isArray(details.evoGuns) ? details.evoGuns : (Number(details.evoGunsCount || acc.evo_guns_count) > 0 ? [`${details.evoGunsCount || acc.evo_guns_count} أسلحة إيفو مطورة`] : []),
-        rareSkins: Array.isArray(rareSkinsVal) ? rareSkinsVal : String(rareSkinsVal).split('،').map(s => s.trim()),
-        iconicPants: Array.isArray(iconicPantsVal) ? iconicPantsVal : String(iconicPantsVal).split('،').map(s => s.trim()),
+        evoGunsCount: 0,
+        evoGuns: [],
+        rareSkins: cleanSkins,
+        iconicPants: cleanPants,
         accountNotes: details.accountNotes || details.notes || acc.account_notes || acc.notes || '',
         image: imgs[0] || 'assets/logo.png',
         images: imgs,
@@ -800,7 +808,7 @@ window.waseetSafeParseCredentials = waseetSafeParseCredentials;
 
 /**
  * جلب الحسابات المعتمدة للمتجر العام من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
- * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو مرفوض.
+ * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو مرفوض أو وهمي.
  */
 async function waseetFetchAccountsFromSupabase(options = {}) {
     const client = initWaseetSupabase();
@@ -809,18 +817,7 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
     const includeAllStatuses = !!(options && options.includeAllStatuses);
 
     try {
-        // أولاً: رفع أي حسابات محلية في WASEET_USER_ACCOUNTS لم يتم رفعها بعد إلى السحابة
-        try {
-            const localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-            for (const localAcc of localSaved) {
-                if (localAcc && !waseetIsValidUuid(localAcc.id) && !localAcc.syncedToSupabase) {
-                    await waseetSaveAccountToSupabase(localAcc);
-                }
-            }
-        } catch (e) {}
-
-        // ثانياً: جلب الحسابات من Supabase:
-        // في المتجر العام (الوضع الافتراضي) نجلب فقط الحسابات المعتمدة ('available' أو 'approved')
+        // جلب الحسابات الفعلية فقط من Supabase (دون إعادة رفع أي بيانات محلية قديمة)
         let rows = null;
         let joinQuery = client
             .from('marketplace_accounts')
@@ -866,31 +863,8 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
             .map(r => waseetMapRemoteAccountRow(r, profilesMap))
             .filter(Boolean);
 
-        // دمج الحسابات السحابية مع الحسابات المحلية المعتمدة فقط للمتجر العام
-        const existingAccounts = WASEET_STATE.accounts || [];
-        const mergedMap = new Map();
-
-        remoteAccounts.forEach(acc => {
-            mergedMap.set(String(acc.id), acc);
-        });
-
-        existingAccounts.forEach(localAcc => {
-            if (!localAcc) return;
-            // في المتجر العام، لا ندمج أي حساب معلق أو مرفوض
-            if (!includeAllStatuses && localAcc.status && localAcc.status !== 'available' && localAcc.status !== 'approved') {
-                return;
-            }
-            const alreadyInRemote = remoteAccounts.some(r =>
-                String(r.id) === String(localAcc.id) ||
-                (r.localId && String(r.localId) === String(localAcc.id)) ||
-                (r.title === localAcc.title && Number(r.sellerPrice) === Number(localAcc.sellerPrice))
-            );
-            if (!alreadyInRemote) {
-                mergedMap.set(String(localAcc.id), localAcc);
-            }
-        });
-
-        WASEET_STATE.accounts = Array.from(mergedMap.values());
+        // اعتماد الحسابات الفعلية من قاعدة البيانات فقط كمصدر وحيد للحقيقة
+        WASEET_STATE.accounts = remoteAccounts;
         if (window.waseetApp) {
             window.waseetApp.updatePendingAccountsCounter();
             window.waseetApp.updateSellerListingsCounter();
@@ -1751,15 +1725,17 @@ function waseetSyncAllNavBadges() {
             });
         });
 
-        // 2. حساب عدد الحسابات قيد الفحص (قيد الفحص)
-        const pendingCount = (WASEET_STATE.accounts || []).filter(a => a && a.status === 'pending_review').length;
+        // 2. حساب عدد الحسابات قيد الفحص الفعلي من قاعدة البيانات فقط
+        const pendingCount = isMed ? Number(window._waseetExactPendingCount || 0) : 0;
         const pendingBadgeSelectors = [
             '#admin-nav-pending-badge',
-            '#drawer-pending-badge-count'
+            '#drawer-pending-badge-count',
+            '#nav-pending-count',
+            '#drawer-pending-count'
         ];
         pendingBadgeSelectors.forEach(sel => {
             document.querySelectorAll(sel).forEach(el => {
-                if (pendingCount > 0) {
+                if (isMed && pendingCount > 0) {
                     el.innerText = String(pendingCount);
                     el.style.display = 'inline-flex';
                 } else {
@@ -1768,6 +1744,10 @@ function waseetSyncAllNavBadges() {
                 }
             });
         });
+
+        if (isMed) {
+            waseetFetchExactPendingAccountsCount();
+        }
 
         // 3. تحديث شارة المحادثات غير المقروءة
         const path = (window.location.pathname || '').toLowerCase();
@@ -1778,6 +1758,62 @@ function waseetSyncAllNavBadges() {
         waseetRenderChatsUnreadBadge(unreadChats);
     } catch (e) {}
 }
+
+async function waseetFetchExactPendingAccountsCount(force = false) {
+    const client = initWaseetSupabase();
+    if (!client) return 0;
+
+    const now = Date.now();
+    if (!force && window._waseetPendingCountPromise) {
+        return window._waseetPendingCountPromise;
+    }
+    if (!force && window._waseetLastPendingCountAt && (now - window._waseetLastPendingCountAt < 2500)) {
+        return Number(window._waseetExactPendingCount || 0);
+    }
+
+    window._waseetPendingCountPromise = (async () => {
+        try {
+            const { count, error } = await client
+                .from('marketplace_accounts')
+                .select('id', { count: 'exact', head: true })
+                .in('status', ['pending_verification', 'pending_review', 'pending']);
+
+            const exact = (!error && typeof count === 'number') ? Math.max(0, count) : 0;
+            window._waseetExactPendingCount = exact;
+            window._waseetLastPendingCountAt = Date.now();
+
+            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const isMed = typeof isMediatorUser === 'function' ? isMediatorUser(user) : !!(user && (user.isAdmin || user.role === 'admin' || user.role === 'mediator'));
+
+            ['#admin-nav-pending-badge', '#drawer-pending-badge-count', '#nav-pending-count', '#drawer-pending-count'].forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (isMed && exact > 0) {
+                        el.innerText = String(exact);
+                        el.style.display = 'inline-flex';
+                    } else {
+                        el.innerText = '';
+                        el.style.display = 'none';
+                    }
+                });
+            });
+
+            const modalBadge = document.getElementById('pending-modal-badge');
+            if (modalBadge) {
+                modalBadge.innerText = String(exact);
+                modalBadge.style.display = exact > 0 ? 'inline-flex' : 'none';
+            }
+
+            return exact;
+        } catch (e) {
+            return Number(window._waseetExactPendingCount || 0);
+        } finally {
+            window._waseetPendingCountPromise = null;
+        }
+    })();
+
+    return window._waseetPendingCountPromise;
+}
+window.waseetFetchExactPendingAccountsCount = waseetFetchExactPendingAccountsCount;
 
 function waseetRenderChatsUnreadBadge(count) {
     const num = Math.max(0, Number(count) || 0);

@@ -148,7 +148,7 @@ class WaseetApp {
         this.updateMobileDrawer();
     }
 
-    async updatePendingAccountsCounter() {
+    async updatePendingAccountsCounter(force = false) {
         const user = WASEET_STATE.user;
         const isMediator = user && isMediatorUser(user);
 
@@ -169,35 +169,10 @@ class WaseetApp {
             return;
         }
 
-        const isPendingStatus = (st) => st === 'pending' || st === 'pending_verification' || st === 'pending_review';
-        let localSaved = [];
-        try {
-            localSaved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-        } catch (e) {}
-
-        const pendingIds = new Set();
-        [...(WASEET_STATE.accounts || []), ...localSaved].forEach(a => {
-            if (a && a.id && isPendingStatus(a.status)) pendingIds.add(String(a.id));
-        });
-
-        const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
-        if (client) {
-            try {
-                const { data } = await client
-                    .from('marketplace_accounts')
-                    .select('id, status')
-                    .neq('status', 'available')
-                    .neq('status', 'approved')
-                    .neq('status', 'rejected')
-                    .neq('status', 'sold')
-                    .neq('status', 'in_deal');
-                if (Array.isArray(data)) {
-                    data.forEach(r => { if (r && r.id) pendingIds.add(String(r.id)); });
-                }
-            } catch (e) {}
+        let count = 0;
+        if (typeof window.waseetFetchExactPendingAccountsCount === 'function') {
+            count = await window.waseetFetchExactPendingAccountsCount(force);
         }
-
-        const count = pendingIds.size;
 
         if (navBadge) {
             navBadge.innerText = count > 0 ? String(count) : '';
@@ -212,7 +187,8 @@ class WaseetApp {
             drawerBadge.style.display = (isMediator && count > 0) ? 'inline-flex' : 'none';
         }
         if (modalBadge) {
-            modalBadge.innerText = count > 0 ? String(count) : '0';
+            modalBadge.innerText = count > 0 ? String(count) : '';
+            modalBadge.style.display = count > 0 ? 'inline-flex' : 'none';
         }
     }
 
@@ -745,11 +721,7 @@ class WaseetApp {
             const loginName = acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك';
             const imagesList = acc.images && acc.images.length > 0 ? acc.images : [acc.image];
 
-            const evoTag = (acc.evoGunsCount && acc.evoGunsCount > 0)
-                ? `<span class="spec-chip" style="background: rgba(234, 88, 12, 0.2); border-color: var(--orange-primary); color: var(--orange-bright);"><i class="fas fa-crosshairs"></i> ${acc.evoGunsCount} أسلحة إيفو</span>`
-                : '';
-
-            const pantsTag = (acc.iconicPants && acc.iconicPants.length > 0)
+            const pantsTag = (acc.iconicPants && acc.iconicPants.length > 0 && acc.iconicPants[0] !== 'بنطلون مميز')
                 ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${acc.iconicPants[0]}</span>`
                 : '';
 
@@ -790,7 +762,6 @@ class WaseetApp {
                         <div class="card-specs">
                             <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
                             <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
-                            ${evoTag}
                             ${pantsTag}
                         </div>
                         <div class="card-footer">
@@ -895,17 +866,16 @@ class WaseetApp {
         // Details Underneath the Image Gallery
         const pricing = calculateWaseetFee(acc.sellerPrice);
         const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
-        const evoListHtml = (acc.evoGuns && acc.evoGuns.length)
-            ? acc.evoGuns.map(g => `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${g}</span>`).join('')
-            : '<span style="color: var(--silver-muted); font-size: 0.85rem;">لا توجد أسلحة إيفو مسجلة</span>';
 
-        const pantsListHtml = (acc.iconicPants && acc.iconicPants.length)
-            ? acc.iconicPants.map(p => `<span class="pants-chip"><i class="fas fa-tshirt text-gold"></i> ${p}</span>`).join('')
-            : '<span style="color: var(--silver-muted); font-size: 0.85rem;">بنطلونات عادية</span>';
+        const validPants = (acc.iconicPants || []).filter(p => p && p !== 'بنطلون مميز' && p !== 'غير محدد');
+        const pantsListHtml = validPants.length
+            ? validPants.map(p => `<span class="pants-chip"><i class="fas fa-tshirt text-gold"></i> ${p}</span>`).join('')
+            : '<span style="color: var(--silver-muted); font-size: 0.84rem; opacity: 0.72;">مثال توضيحي: بنطلون الجاز، بنطلون الملاك</span>';
 
-        const skinsListHtml = (acc.rareSkins && acc.rareSkins.length)
-            ? acc.rareSkins.map(s => `<span class="spec-chip">${s}</span>`).join('')
-            : '';
+        const validSkins = (acc.rareSkins || []).filter(s => s && s !== 'سكنات نادرة' && s !== 'غير محدد');
+        const skinsListHtml = validSkins.length
+            ? validSkins.map(s => `<span class="spec-chip">${s}</span>`).join('')
+            : '<span style="color: var(--silver-muted); font-size: 0.84rem; opacity: 0.72;">مثال توضيحي: سكن الساكورا، حزمة الهيب هوب، كريمنال</span>';
 
         detailsPanel.innerHTML = `
             <div class="details-specs-grid">
@@ -962,19 +932,44 @@ class WaseetApp {
                             </div>
                         </div>
                     </div>
+
+                    <div style="margin-top: 0.9rem; padding-top: 0.85rem; border-top: 1px dashed rgba(249, 115, 22, 0.35);">
+                        <div style="display: flex; align-items: center; gap: 0.45rem; color: var(--orange-bright); font-weight: 800; font-size: 0.9rem; margin-bottom: 0.65rem;">
+                            <i class="fas fa-user-shield"></i>
+                            <span>أضف حساب الاسترداد:</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                            <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                    <code style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && acc.credentials.recovery_email) || 'غير مضاف'}</code>
+                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.recovery_email) || ''}', 'تم نسخ حساب الاسترداد')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">كلمة المرور لحساب الاسترداد:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                    <span id="deck-rec-pw-${acc.id}" style="color: var(--orange-bright); font-size: 0.92rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
+                                    <div style="display: flex; gap: 0.3rem;">
+                                        <button class="btn-3d btn-outline" onclick="const el=document.getElementById('deck-rec-pw-${acc.id}'); if(el.innerText==='••••••••••'){ el.innerText='${(acc.credentials && acc.credentials.recovery_password) || 'غير مضاف'}'; el.style.letterSpacing='normal'; this.innerHTML='<i class=\\'fas fa-eye-slash\\'></i>'; } else { el.innerText='••••••••••'; el.style.letterSpacing='2px'; this.innerHTML='<i class=\\'fas fa-eye\\'></i>'; }" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.recovery_password) || ''}', 'تم نسخ كلمة مرور الاسترداد')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.65rem; padding: 0.5rem 0.75rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; color: #34d399; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; gap: 0.45rem;">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>لا يمكن لأحد رؤية بيانات الحساب خلاف الوسيط المعتمد من الموقع</span>
+                        </div>
+                    </div>
                 </div>
             ` : ''}
-
-
-            <!-- Free Fire Evo Guns Section -->
-            <div style="margin-bottom: 1.2rem;">
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--orange-bright); margin-bottom: 0.4rem;">
-                    <i class="fas fa-crosshairs"></i> أسلحة إيفو المطورة (Evo Guns):
-                </h4>
-                <div class="chip-tag-group">
-                    ${evoListHtml}
-                </div>
-            </div>
 
             <!-- Free Fire Iconic Pants Section -->
             <div style="margin-bottom: 1.2rem;">
@@ -987,16 +982,14 @@ class WaseetApp {
             </div>
 
             <!-- Rare Skins -->
-            ${skinsListHtml ? `
-                <div style="margin-bottom: 1.2rem;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--silver-white); margin-bottom: 0.4rem;">
-                        <i class="fas fa-gem text-gold"></i> السكنات والحزم النادرة:
-                    </h4>
-                    <div class="chip-tag-group">
-                        ${skinsListHtml}
-                    </div>
+            <div style="margin-bottom: 1.2rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--silver-white); margin-bottom: 0.4rem;">
+                    <i class="fas fa-gem text-gold"></i> السكنات والحزم النادرة:
+                </h4>
+                <div class="chip-tag-group">
+                    ${skinsListHtml}
                 </div>
-            ` : ''}
+            </div>
 
             <!-- Account Notes -->
             <div class="account-notes-box">
@@ -1113,12 +1106,14 @@ class WaseetApp {
         if (gameSelect && dynamicContainer) {
             gameSelect.addEventListener('change', () => {
                 const g = gameSelect.value;
-                if (g === 'free_fire' || g === 'all') {
-                    dynamicContainer.style.display = 'contents';
-                } else {
-                    // For PUBG or Brawl Stars
-                    dynamicContainer.style.display = 'contents';
+                if (g !== 'free_fire' && g !== 'all') {
+                    gameSelect.value = 'free_fire';
+                    if (typeof window.waseetShowGameUnavailable === 'function') {
+                        window.waseetShowGameUnavailable();
+                    }
+                    return;
                 }
+                dynamicContainer.style.display = 'contents';
                 applyFilters();
             });
         }
@@ -1285,21 +1280,39 @@ class WaseetApp {
         const ffDetailedFields = document.getElementById('freefire-detailed-fields');
         const primeGroup = document.getElementById('group-form-prime');
 
+        window.waseetShowGameUnavailable = () => {
+            this.showAutoDismissToast(
+                'تنبيه توفر الخدمة',
+                'غير متوفر الآن بسبب عدم وجود وسيط',
+                2800
+            );
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('تنبيه', 'غير متوفر الآن بسبب عدم وجود وسيط', 'warning');
+            }
+        };
+
         // Game selector tabs
         gameTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', (e) => {
+                const g = tab.getAttribute('data-game');
+                if (g !== 'free_fire') {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    gameTabs.forEach(t => {
+                        if (t.getAttribute('data-game') === 'free_fire') t.classList.add('active');
+                        else t.classList.remove('active');
+                    });
+                    if (selectedGameInput) selectedGameInput.value = 'free_fire';
+                    window.waseetShowGameUnavailable();
+                    return;
+                }
                 gameTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                const g = tab.getAttribute('data-game');
-                if (selectedGameInput) selectedGameInput.value = g;
-
-                if (g === 'free_fire') {
-                    if (ffDetailedFields) ffDetailedFields.style.display = 'block';
-                    if (primeGroup) primeGroup.style.display = 'block';
-                } else {
-                    if (ffDetailedFields) ffDetailedFields.style.display = 'none';
-                    if (primeGroup) primeGroup.style.display = 'none';
-                }
+                if (selectedGameInput) selectedGameInput.value = 'free_fire';
+                if (ffDetailedFields) ffDetailedFields.style.display = 'block';
+                if (primeGroup) primeGroup.style.display = 'block';
             });
         });
 
@@ -1369,21 +1382,19 @@ class WaseetApp {
 
                     // Free fire detailed attributes
                     const evoCount = parseInt(document.getElementById('form-evo-count')?.value) || 0;
-                    const iconicPantsStr = document.getElementById('form-iconic-pants')?.value || '';
-                    const rareSkinsStr = document.getElementById('form-rare-skins')?.value || '';
-                    const notesStr = document.getElementById('form-account-notes')?.value || '';
+                    const iconicPantsStr = (document.getElementById('form-iconic-pants')?.value || '').trim();
+                    const rareSkinsStr = (document.getElementById('form-rare-skins')?.value || '').trim();
+                    const notesStr = (document.getElementById('form-account-notes')?.value || '').trim();
 
-                    const iconicPants = iconicPantsStr ? iconicPantsStr.split('،').map(s => s.trim()) : ['بنطلون مميز'];
-                    const rareSkins = rareSkinsStr ? rareSkinsStr.split('،').map(s => s.trim()) : ['سكنات نادرة'];
+                    const iconicPants = iconicPantsStr ? iconicPantsStr.split('،').map(s => s.trim()).filter(Boolean) : [];
+                    const rareSkins = rareSkinsStr ? rareSkinsStr.split('،').map(s => s.trim()).filter(Boolean) : [];
 
                     let finalImages = [];
                     if (this.uploadedImages.length > 0) {
                         finalImages = [...this.uploadedImages];
                     } else {
                         finalImages = [
-                            'assets/logo.png',
-                            'assets/fav_test_shield.png',
-                            'assets/fav_badge_v2.png'
+                            'assets/logo.png'
                         ];
                     }
 
@@ -1405,7 +1416,7 @@ class WaseetApp {
                         sellerDeals: 1,
                         sellerPrice: sellerPrice,
                         evoGunsCount: evoCount,
-                        evoGuns: evoCount > 0 ? [`${evoCount} أسلحة إيفو مطورة`] : [],
+                        evoGuns: [],
                         rareSkins: rareSkins,
                         iconicPants: iconicPants,
                         accountNotes: notesStr || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.',
@@ -1416,7 +1427,9 @@ class WaseetApp {
                         status: 'pending_verification',
                         credentials: {
                             email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
-                            password: document.getElementById('form-seller-password')?.value?.trim() || ''
+                            password: document.getElementById('form-seller-password')?.value?.trim() || '',
+                            recovery_email: document.getElementById('form-recovery-email')?.value?.trim() || '',
+                            recovery_password: document.getElementById('form-recovery-password')?.value?.trim() || ''
                         },
                         submittedAt: new Date().toISOString(),
                         reviewStatus: 'pending',
@@ -1496,7 +1509,7 @@ class WaseetApp {
                     saveWaseetData();
                     this.renderMarketplace();
                     this.updateSellerListingsCounter();
-                    this.updatePendingAccountsCounter();
+                    this.updatePendingAccountsCounter(true);
 
                     // Reset form and close Sell Modal only on success
                     this.uploadedImages = [];
@@ -2115,7 +2128,7 @@ class WaseetApp {
                 </div>
             </div>
 
-            <!-- Specs Grid -->
+            <!--Specs Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
                 <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
                     <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">طريقة الدخول:</span>
@@ -2128,10 +2141,6 @@ class WaseetApp {
                 <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
                     <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">ليفيل الحساب:</span>
                     <strong style="color: #fff; font-size: 0.9rem;">Lv. ${acc.level || 50}</strong>
-                </div>
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.7rem;">
-                    <span style="color: var(--silver-muted); font-size: 0.78rem; display: block;">أسلحة إيفو:</span>
-                    <strong style="color: var(--orange-bright); font-size: 0.9rem;">${acc.evoGunsCount || 0} أسلحة</strong>
                 </div>
             </div>
 

@@ -13,11 +13,12 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="assets/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="assets/logo.png">
+    <!-- Favicon / أيقونة التطبيق والشعار المربع ذو الزوايا الدائرية -->
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+    <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
 
     <!-- PWA & Mobile Web App Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -433,7 +434,7 @@
             }
             const adminPendingBadge = document.getElementById('admin-nav-pending-badge');
             if (adminPendingBadge) {
-                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review').length;
+                const pCount = Array.isArray(allPendingAccounts) ? allPendingAccounts.length : 0;
                 adminPendingBadge.innerText = pCount > 0 ? String(pCount) : '';
                 adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-flex' : 'none';
             }
@@ -646,41 +647,14 @@
                 }
             }
 
-            // 2. دمج الحسابات المعلقة من الحالة المحلية و localStorage دائماً
+            // 2. اعتماد الحسابات الفعلية من قاعدة البيانات فقط (دون دمج أي بيانات محلية وهمية)
             const mergedMap = new Map();
             remoteList.forEach(acc => {
                 if (acc && acc.id) mergedMap.set(String(acc.id), acc);
             });
 
-            const isPendingStatus = (st) => st && st !== 'available' && st !== 'approved' && st !== 'rejected' && st !== 'sold' && st !== 'in_deal' && st !== 'hidden';
-
-            let savedUserAccounts = [];
-            try {
-                savedUserAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
-            } catch (e) {}
-
-            const localCandidates = [
-                ...(WASEET_STATE.accounts || []),
-                ...savedUserAccounts
-            ].filter(a => a && isPendingStatus(a.status));
-
-            localCandidates.forEach(localAcc => {
-                const alreadyExists = Array.from(mergedMap.values()).some(r =>
-                    String(r.id) === String(localAcc.id) ||
-                    (r.localId && String(r.localId) === String(localAcc.id)) ||
-                    (r.title === localAcc.title && Number(r.sellerPrice) === Number(localAcc.sellerPrice))
-                );
-                if (!alreadyExists && localAcc.id) {
-                    mergedMap.set(String(localAcc.id), {
-                        ...localAcc,
-                        credentials: safeExtractPendingCreds(localAcc, localAcc.details || {}),
-                        iconicPants: Array.isArray(localAcc.iconicPants) ? localAcc.iconicPants.join('، ') : String(localAcc.iconicPants || ''),
-                        rareSkins: Array.isArray(localAcc.rareSkins) ? localAcc.rareSkins.join('، ') : String(localAcc.rareSkins || '')
-                    });
-                }
-            });
-
             allPendingAccounts = Array.from(mergedMap.values());
+            window._waseetExactPendingCount = allPendingAccounts.length;
             updatePendingStats();
             applyPendingFilters();
             renderNavbarUser();
@@ -712,6 +686,14 @@
         }
 
         function filterPendingGame(game, chipEl) {
+            if (game === 'pubg' || game === 'brawl_stars' || game === 'other') {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تنبيه', 'غير متوفر الآن بسبب عدم وجود وسيط', 'warning');
+                } else {
+                    alert('غير متوفر الآن بسبب عدم وجود وسيط');
+                }
+                return;
+            }
             currentGameFilter = game;
             document.querySelectorAll('.pending-controls-bar .support-chip').forEach(c => c.classList.remove('active'));
             if (chipEl) chipEl.classList.add('active');
@@ -821,7 +803,6 @@
                                     <div class="pending-specs-row">
                                         <span class="evo-chip"><i class="fas fa-shield-alt text-gold"></i> ليفيل ${acc.level || 50}</span>
                                         <span class="evo-chip"><i class="fas fa-crown text-gold"></i> برايم ${acc.primeLevel || 1}</span>
-                                        ${acc.evoGunsCount ? `<span class="evo-chip"><i class="fas fa-fire text-orange"></i> ${acc.evoGunsCount} أسلحة إيفو</span>` : ''}
                                         <span class="evo-chip"><i class="fas fa-link text-silver"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
                                         <span class="evo-chip"><i class="fas fa-key text-silver"></i> دخول ${acc.loginType || 'Google'}</span>
                                     </div>
@@ -915,9 +896,8 @@
                         <div><span style="color: var(--silver-muted);">مستوى البرايم:</span> <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong></div>
                         <div><span style="color: var(--silver-muted);">نوع الربط:</span> <strong style="color: #fff;">${acc.bindStatus === 'single' ? 'ربط أحادي آمن' : 'ربط ثنائي'}</strong></div>
                         <div><span style="color: var(--silver-muted);">نوع الحساب:</span> <strong style="color: #fff;">${acc.loginType === 'google' ? 'Google Gmail' : 'Facebook'}</strong></div>
-                        <div><span style="color: var(--silver-muted);">أسلحة إيفو المطورة:</span> <strong style="color: var(--orange-bright);">${acc.evoGunsCount || 0} أسلحة</strong></div>
-                        <div><span style="color: var(--silver-muted);">السراويل النادرة:</span> <strong style="color: #fff;">${acc.iconicPants || 'غير محدد'}</strong></div>
-                        <div><span style="color: var(--silver-muted);">السكنات المميزة:</span> <strong style="color: #fff;">${acc.rareSkins || 'غير محدد'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">السراويل النادرة:</span> <strong style="color: #fff;">${acc.iconicPants || 'مثال: بنطلون الجاز، بنطلون الملاك'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">السكنات المميزة:</span> <strong style="color: #fff;">${acc.rareSkins || 'مثال: سكن الساكورا، حزمة الهيب هوب'}</strong></div>
                     </div>
 
                     ${acc.accountNotes ? `
@@ -961,11 +941,43 @@
                                     <button type="button" class="btn-3d btn-outline" id="btn-toggle-pw" onclick="toggleInspectPwVisibility()" style="padding: 4px 10px; font-size: 0.8rem;" title="إظهار/إخفاء">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('password')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                     <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('password')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- حساب الاسترداد -->
+                    <div style="margin-top: 1rem; padding-top: 0.9rem; border-top: 1px dashed rgba(249, 115, 22, 0.35);">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--orange-bright); font-weight: 800; font-size: 0.95rem; margin-bottom: 0.7rem;">
+                            <i class="fas fa-user-shield"></i>
+                            <span>أضف حساب الاسترداد:</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                            <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
+                                <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                    <code style="color: #fff; font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.recovery_email || 'غير مضاف'}</code>
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${(creds.recovery_email || '').replace(/'/g, "\\'")}', 'تم نسخ بريد الاسترداد')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
+                                <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">كلمة المرور لحساب الاسترداد:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                                    <code style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.recovery_password || 'غير مضاف'}</code>
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${(creds.recovery_password || '').replace(/'/g, "\\'")}', 'تم نسخ كلمة مرور الاسترداد')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.7rem; padding: 0.55rem 0.8rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; color: #34d399; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>لا يمكن لأحد رؤية بيانات الحساب خلاف الوسيط المعتمد من الموقع</span>
                         </div>
                     </div>
                 </div>
