@@ -66,26 +66,8 @@ class WaseetBackground {
         this.mouse.x += (this.mouse.targetX - this.mouse.x) * 0.05;
         this.mouse.y += (this.mouse.targetY - this.mouse.y) * 0.05;
 
-        // Clear canvas
+        // Clear canvas (keep pure #000000 background untouched)
         this.ctx.clearRect(0, 0, this.width, this.height);
-
-        // Draw subtle radial glow from background
-        const bgGradient = this.ctx.createRadialGradient(
-            this.width / 2 + this.mouse.x * 0.5,
-            this.height / 3 + this.mouse.y * 0.5,
-            50,
-            this.width / 2,
-            this.height / 2,
-            Math.max(this.width, this.height) * 0.8
-        );
-        bgGradient.addColorStop(0, 'rgba(217, 83, 15, 0.08)');  // dark orange accent glow
-        bgGradient.addColorStop(0.5, 'rgba(197, 160, 89, 0.04)'); // antique gold glow
-        bgGradient.addColorStop(1, 'rgba(7, 8, 12, 0)');
-        this.ctx.fillStyle = bgGradient;
-        this.ctx.fillRect(0, 0, this.width, this.height);
-
-        // Draw subtle 3D perspective grid lines
-        this.drawSubtleGrid();
 
         // Draw and update particles
         for (let p of this.particles) {
