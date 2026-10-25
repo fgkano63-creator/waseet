@@ -64,7 +64,7 @@
                         <i class="fas fa-plus-circle text-orange"></i> بيع حساب
                     </a>
                     <a href="deals.html" class="btn-nav-middle">
-                        <i class="fas fa-shield-alt text-gold"></i> قائمة الصفقات
+                        <i class="fas fa-shield-alt text-gold"></i> قيد الشراء
                     </a>
                 </nav>
 
@@ -81,8 +81,8 @@
                         <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
                         <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;">0</span>
                     </a>
-                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قائمة الصفقات الحية">
-                        <i class="fas fa-crown text-gold"></i> قائمة الصفقات
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
                         <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;">0</span>
                     </a>
                     <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
@@ -97,8 +97,12 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ مع gap: 15px -->
+                <!-- المجموعة 3 (أقصى اليسار): العودة للمتجر + رصيد المحفظة + زر الحساب + القائمة ☰ -->
                 <div class="nav-left-group">
+                    <a href="index.html" class="btn-3d btn-outline btn-nav-back-store" style="padding: 0.38rem 0.75rem; font-size: 0.78rem; text-decoration: none; white-space: nowrap;" title="العودة للمتجر الرئيسي">
+                        <i class="fas fa-store text-gold"></i> <span>العودة للمتجر</span>
+                    </a>
+
                     <!-- 1. رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -279,7 +283,7 @@
             <ul class="drawer-links-list">
                 <li><a href="index.html"><i class="fas fa-store text-gold"></i> المتجر وسوق الحسابات</a></li>
                 <li><a href="my-accounts.html" class="active"><i class="fas fa-boxes text-orange"></i> حساباتي المعروضة للبيع</a></li>
-                <li><a href="deals.html"><i class="fas fa-handshake text-gold"></i> صفقات الوساطة</a></li>
+                <li><a href="deals.html"><i class="fas fa-handshake text-gold"></i> قيد الشراء</a></li>
                 <li><a href="chat.html"><i class="fas fa-comments text-orange"></i> غرفة الوساطة المباشرة</a></li>
                 <li><a href="contact-support.html"><i class="fas fa-headset text-gold"></i> تواصل مع الوسيط المعتمد</a></li>
                 <li id="drawer-pending-accounts-link" style="display: none;"><a href="pending-accounts.html"><i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص</a></li>
@@ -304,7 +308,7 @@
         </a>
         <a href="deals.html" class="mobile-nav-item">
             <i class="fas fa-handshake"></i>
-            <span>الصفقات</span>
+            <span>قيد الشراء</span>
         </a>
         <a href="chat.html" class="mobile-nav-item">
             <i class="fas fa-comments"></i>

@@ -99,10 +99,10 @@
             </div>
         </a>
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="index.html" class="wa-back-btn"><i class="fas fa-store text-gold"></i> العودة للمتجر</a>
             <a href="admin-deposits.html" class="wa-back-btn" style="border-color: #10b981; color: #34d399;" title="إدارة طلبات شحن النقاط"><i class="fas fa-money-check-alt"></i> شحن النقاط</a>
             <a href="pending-accounts.html" class="wa-back-btn"><i class="fas fa-clipboard-check text-orange"></i> قيد الفحص</a>
-            <a href="deals.html" class="wa-back-btn"><i class="fas fa-crown text-gold"></i> الصفقات</a>
-            <a href="index.html" class="wa-back-btn"><i class="fas fa-store"></i> المتجر</a>
+            <a href="deals.html" class="wa-back-btn"><i class="fas fa-crown text-gold"></i> قيد الشراء</a>
         </div>
     </div>
 
@@ -162,12 +162,12 @@
                                 <div id="wa-active-email" style="color: var(--silver-muted); font-size: 0.74rem; direction: ltr; text-align: right;"></div>
                             </div>
                         </div>
-                        <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> مزامنة لحظية</span>
+                        <span style="color: #10b981; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.12); padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(16,185,129,0.35);"><i class="fas fa-circle" style="font-size: 0.5rem; color: #10b981;"></i> متصل الآن</span>
                     </div>
 
                     <div class="whatsapp-chat-body" id="wa-chat-body"></div>
 
-                    <form class="whatsapp-chat-footer" id="wa-reply-form">
+                    <form class="whatsapp-chat-footer" id="wa-reply-form" onsubmit="return false;">
                         <textarea id="wa-reply-input" class="wa-chat-input" rows="1" maxlength="1500" placeholder="اكتب ردك كوسيط معتمد..." required></textarea>
                         <button type="submit" class="btn-send-support" title="إرسال الرد">
                             <i class="fas fa-paper-plane"></i>
@@ -338,12 +338,18 @@
                 const badge = unread[c.userId] ? `<span class="wa-unread-badge">${unread[c.userId]}</span>` : '';
                 return `
                     <div class="whatsapp-contact-item ${c.userId === activeUserId ? 'active' : ''}" data-user-id="${esc(c.userId)}">
-                        <div class="whatsapp-contact-avatar-wrap">
+                        <div class="whatsapp-contact-avatar-wrap" style="position: relative;">
                             <img class="whatsapp-contact-avatar" src="${esc(p.avatar)}" referrerpolicy="no-referrer" onerror="this.src='${DEFAULT_AVATAR}'" alt="">
+                            <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #0d121d;" title="متصل الآن"></span>
                         </div>
                         <div class="whatsapp-contact-meta">
-                            <div class="whatsapp-contact-top">
-                                <span class="whatsapp-contact-name">${esc(p.name)}</span>
+                            <div class="whatsapp-contact-top" style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; min-width: 0;">
+                                    <span class="whatsapp-contact-name">${esc(p.name)}</span>
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #10b981; font-weight: 800; background: rgba(16,185,129,0.12); padding: 1px 7px; border-radius: 999px; border: 1px solid rgba(16,185,129,0.32); flex-shrink: 0;">
+                                        <i class="fas fa-circle" style="font-size: 0.42rem; color: #10b981;"></i> متصل الآن
+                                    </span>
+                                </div>
                                 <span class="whatsapp-contact-time">${fmtTime(c.last.created_at)}</span>
                             </div>
                             <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
@@ -443,14 +449,30 @@
             document.getElementById('wa-chat-main').classList.add('mobile-hidden');
         }
 
-        /* ================= إرسال رد المدير ================= */
+        let adminReplyTimestamps = [];
+
+        /* ================= إرسال رد المدير مع حماية ضد السبام ================= */
         async function sendReply(e) {
-            e.preventDefault();
-            const input = document.getElementById('wa-reply-input');
-            const text = (input.value || '').trim();
-            if (!text || !activeUserId) return;
-            input.value = '';
-            input.focus({ preventScroll: true });
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            try {
+                const input = document.getElementById('wa-reply-input');
+                if (!input) return;
+                const text = (input.value || '').trim();
+                if (!text || !activeUserId) return;
+
+                const now = Date.now();
+                adminReplyTimestamps = adminReplyTimestamps.filter(ts => now - ts < 10000);
+                const lastTs = adminReplyTimestamps.length > 0 ? adminReplyTimestamps[adminReplyTimestamps.length - 1] : 0;
+                if (now - lastTs < 1200 || adminReplyTimestamps.length >= 5) {
+                    if (typeof waseetAlert === 'function') {
+                        await waseetAlert('تنبيه منع السبام', 'يرجى الانتظار قليلاً قبل إرسال رسالة أخرى.', 'warning');
+                    }
+                    return;
+                }
+                adminReplyTimestamps.push(now);
+
+                input.value = '';
+                input.focus({ preventScroll: true });
 
             const tempMsg = {
                 id: 'temp_' + Date.now(),
@@ -492,6 +514,9 @@
                 }
             } catch (err) {
                 console.warn('[Admin Chats] استثناء إرسال الرد:', err);
+            }
+            } catch (outerErr) {
+                console.warn('[Admin Chats] خطأ غير متوقع:', outerErr);
             }
         }
 

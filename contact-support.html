@@ -308,36 +308,42 @@
 
                 <!-- المجموعة 2 (الوسطى للمستخدم العادي): أهم 3 أزرار -->
                 <nav class="nav-middle-group" id="nav-user-middle-group">
-                    <a href="index.html#marketplace" class="btn-nav-middle">
-                        <i class="fas fa-store text-gold"></i> المتجر
+                    <a href="index.html" class="btn-nav-middle">
+                        <i class="fas fa-store text-gold"></i> العودة للمتجر
                     </a>
                     <button type="button" class="btn-nav-middle btn-nav-middle-sell" onclick="window.location.href='index.html#open-sell'">
                         <i class="fas fa-plus-circle text-orange"></i> بيع حساب
                     </button>
                     <a href="deals.html" class="btn-nav-middle">
-                        <i class="fas fa-shield-alt text-gold"></i> قائمة الصفقات
+                        <i class="fas fa-shield-alt text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="deals-badge-count" style="display: none;"></span>
                     </a>
                 </nav>
 
                 <!-- المجموعة 2 المخصصة للمدير (أزرار التحكم الأساسية) -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="index.html" class="btn-nav-middle btn-nav-admin" title="العودة للمتجر">
+                        <i class="fas fa-store text-gold"></i> العودة للمتجر
+                    </a>
                     <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
-                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
                     </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
                     </a>
                     <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
                         <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
-                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;">0</span>
+                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;"></span>
                     </a>
-                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قائمة الصفقات الحية">
-                        <i class="fas fa-crown text-gold"></i> قائمة الصفقات
-                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;">0</span>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;"></span>
                     </a>
                     <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
                         <i class="fas fa-comments text-orange"></i> المحادثات
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-chats-badge" style="display: none;"></span>
                     </a>
                     <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -348,8 +354,12 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ مع gap: 15px -->
+                <!-- المجموعة 3 (أقصى اليسار): العودة للمتجر + رصيد المحفظة + زر الحساب + أيقونة ☰ -->
                 <div class="nav-left-group">
+                    <a href="index.html" class="btn-nav-back-store" title="العودة للمتجر الرئيسي">
+                        <i class="fas fa-store text-gold"></i>
+                        <span>العودة للمتجر</span>
+                    </a>
                     <!-- 1. رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -438,7 +448,7 @@
                 </div>
 
                 <!-- 4. صندوق الإدخال والإرسال -->
-                <form class="support-chat-input-bar" id="support-chat-form">
+                <form class="support-chat-input-bar" id="support-chat-form" onsubmit="return false;">
                     <input type="text" id="support-chat-input" class="support-chat-input" placeholder="اكتب رسالتك للوسيط المعتمد..." autocomplete="off" maxlength="1500" required>
                     <button type="submit" class="btn-send-support" id="btn-send-support" title="إرسال">
                         <i class="fas fa-paper-plane"></i>
@@ -470,7 +480,7 @@
                     </a>
                     <a href="deals.html" class="drawer-shortcut-card" onclick="toggleSupportDrawer()">
                         <i class="fas fa-shield-alt text-gold"></i>
-                        <span>قائمة الصفقات</span>
+                        <span>قيد الشراء</span>
                     </a>
                     <a href="contact-support.html" class="drawer-shortcut-card active" onclick="toggleSupportDrawer()">
                         <i class="fas fa-headset text-orange"></i>
@@ -515,7 +525,7 @@
             </a>
             <a href="deals.html" class="mobile-nav-item">
                 <i class="fas fa-shield-alt"></i>
-                <span>الصفقات</span>
+                <span>قيد الشراء</span>
             </a>
             <button class="mobile-nav-item" onclick="toggleSupportDrawer()">
                 <i class="fas fa-user"></i>
@@ -678,16 +688,19 @@
             }
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
-            if (adminDealsBadge && typeof WASEET_STATE !== 'undefined' && WASEET_STATE.deals) {
+            if (adminDealsBadge && typeof WASEET_STATE !== 'undefined') {
                 const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
-                adminDealsBadge.innerText = dCount;
-                adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
+                adminDealsBadge.innerText = dCount > 0 ? String(dCount) : '';
+                adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-flex' : 'none';
             }
             const adminPendingBadge = document.getElementById('admin-nav-pending-badge');
             if (adminPendingBadge && typeof WASEET_STATE !== 'undefined') {
                 const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review').length;
-                adminPendingBadge.innerText = pCount;
-                adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-block' : 'none';
+                adminPendingBadge.innerText = pCount > 0 ? String(pCount) : '';
+                adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-flex' : 'none';
+            }
+            if (typeof window.waseetSyncAllNavBadges === 'function') {
+                window.waseetSyncAllNavBadges();
             }
 
             if (container) {
@@ -905,14 +918,28 @@
             scrollToBottom();
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('support-chat-input');
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text) return;
+        let supportPageMsgTimestamps = [];
 
-            input.value = '';
-            input.focus({ preventScroll: true });
+        async function sendMessage() {
+            try {
+                const input = document.getElementById('support-chat-input');
+                if (!input) return;
+                const text = input.value.trim();
+                if (!text) return;
+
+                const now = Date.now();
+                supportPageMsgTimestamps = supportPageMsgTimestamps.filter(ts => now - ts < 10000);
+                const lastTs = supportPageMsgTimestamps.length > 0 ? supportPageMsgTimestamps[supportPageMsgTimestamps.length - 1] : 0;
+                if (now - lastTs < 1200 || supportPageMsgTimestamps.length >= 5) {
+                    if (typeof waseetAlert === 'function') {
+                        await waseetAlert('تنبيه منع السبام', 'يرجى الانتظار قليلاً قبل إرسال رسالة أخرى.', 'warning');
+                    }
+                    return;
+                }
+                supportPageMsgTimestamps.push(now);
+
+                input.value = '';
+                input.focus({ preventScroll: true });
 
             const tempId = 'temp_' + Date.now();
             const newMsg = {
@@ -961,6 +988,9 @@
                 } catch (err) {
                     console.warn('[Send Message Error]', err);
                 }
+            }
+            } catch (outerErr) {
+                console.warn('[Send Message Unexpected Error]', outerErr);
             }
         }
 

@@ -213,23 +213,37 @@
         return row;
     }
 
+    let supportMsgTimestamps = [];
+
     /**
-     * إرسال رسالة جديدة
+     * إرسال رسالة جديدة مع حماية ضد السبام (Rate Limiting) ومعالجة الأخطاء (try/catch)
      */
     async function handleSendSupportMessage() {
-        const input = document.getElementById('support-chat-input');
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
+        try {
+            const input = document.getElementById('support-chat-input');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
 
-        const user = getCurrentAuthUser();
-        if (!user) {
-            window.waseetOpenSupportChat();
-            return;
-        }
+            const now = Date.now();
+            supportMsgTimestamps = supportMsgTimestamps.filter(ts => now - ts < 10000);
+            const lastTs = supportMsgTimestamps.length > 0 ? supportMsgTimestamps[supportMsgTimestamps.length - 1] : 0;
+            if (now - lastTs < 1200 || supportMsgTimestamps.length >= 5) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تنبيه منع السبام', 'يرجى الانتظار قليلاً قبل إرسال رسالة أخرى.', 'warning');
+                }
+                return;
+            }
+            supportMsgTimestamps.push(now);
 
-        input.value = '';
-        input.focus({ preventScroll: true });
+            const user = getCurrentAuthUser();
+            if (!user) {
+                window.waseetOpenSupportChat();
+                return;
+            }
+
+            input.value = '';
+            input.focus({ preventScroll: true });
 
         const tempId = 'temp_' + Date.now();
         const newMsg = {
@@ -280,6 +294,9 @@
             } catch (err) {
                 console.warn('[Support Chat] استثناء في إرسال الرسالة:', err);
             }
+        }
+        } catch (outerErr) {
+            console.warn('[Support Chat] خطأ غير متوقع:', outerErr);
         }
     }
 

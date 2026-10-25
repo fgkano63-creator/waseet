@@ -62,7 +62,8 @@
                         <i class="fas fa-plus-circle text-orange"></i> بيع حساب
                     </button>
                     <a href="deals.html" class="btn-nav-middle">
-                        <i class="fas fa-shield-alt text-gold"></i> قائمة الصفقات
+                        <i class="fas fa-shield-alt text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="deals-badge-count" style="display: none;"></span>
                     </a>
                 </nav>
 
@@ -70,21 +71,23 @@
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
                     <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
-                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
                     </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
                     </a>
                     <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
                         <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
-                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;">0</span>
+                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;"></span>
                     </a>
-                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قائمة الصفقات الحية">
-                        <i class="fas fa-crown text-gold"></i> قائمة الصفقات
-                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;">0</span>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;"></span>
                     </a>
                     <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
                         <i class="fas fa-comments text-orange"></i> المحادثات
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-chats-badge" style="display: none;"></span>
                     </a>
                     <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="انقر لإدارة وشحن المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -964,7 +967,7 @@
         </button>
         <a href="deals.html" class="mobile-nav-item" id="mobile-nav-deals-link">
             <i class="fas fa-shield-alt"></i>
-            <span>الصفقات</span>
+            <span>قيد الشراء</span>
         </a>
         <a href="my-accounts.html" class="mobile-nav-item">
             <i class="fas fa-user"></i>
@@ -995,12 +998,12 @@
                 </a>
                 <a href="deals.html" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-shield-alt text-gold"></i>
-                    <span>قائمة الصفقات</span>
+                    <span>قيد الشراء</span>
                 </a>
                 <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-btn-pending-verification" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer();" style="display: none;">
                     <i class="fas fa-clipboard-check text-orange"></i>
                     <span>حسابات قيد الفحص</span>
-                    <span class="deals-badge-count" id="drawer-pending-count" style="display: none;">0</span>
+                    <span class="deals-badge-count" id="drawer-pending-count" style="display: none;"></span>
                 </a>
                 <button class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer(); window.waseetApp && window.waseetApp.openSellModal()">
                     <i class="fas fa-plus-circle text-orange"></i>

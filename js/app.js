@@ -91,12 +91,16 @@ class WaseetApp {
             if (adminWalletPill) adminWalletPill.style.display = 'none';
         }
 
-        // شارات المدير في الشريط العلوي
+        // شارات المدير في الشريط العلوي (تختفي تماماً إذا كان العدد 0)
         const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
-        if (adminDealsBadge && WASEET_STATE.deals) {
-            const dCount = WASEET_STATE.deals.length;
-            adminDealsBadge.innerText = dCount;
-            adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-block' : 'none';
+        if (adminDealsBadge) {
+            const activeDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
+            const dCount = activeDeals.length;
+            adminDealsBadge.innerText = dCount > 0 ? String(dCount) : '';
+            adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-flex' : 'none';
+        }
+        if (typeof window.waseetSyncAllNavBadges === 'function') {
+            window.waseetSyncAllNavBadges();
         }
 
         // روابط القائمة الجانبية للمدير
@@ -196,19 +200,19 @@ class WaseetApp {
         const count = pendingIds.size;
 
         if (navBadge) {
-            navBadge.innerText = count;
-            navBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
+            navBadge.innerText = count > 0 ? String(count) : '';
+            navBadge.style.display = (isMediator && count > 0) ? 'inline-flex' : 'none';
         }
         if (adminNavBadge) {
-            adminNavBadge.innerText = count;
-            adminNavBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
+            adminNavBadge.innerText = count > 0 ? String(count) : '';
+            adminNavBadge.style.display = (isMediator && count > 0) ? 'inline-flex' : 'none';
         }
         if (drawerBadge) {
-            drawerBadge.innerText = count;
-            drawerBadge.style.display = (isMediator && count > 0) ? 'inline-block' : 'none';
+            drawerBadge.innerText = count > 0 ? String(count) : '';
+            drawerBadge.style.display = (isMediator && count > 0) ? 'inline-flex' : 'none';
         }
         if (modalBadge) {
-            modalBadge.innerText = count;
+            modalBadge.innerText = count > 0 ? String(count) : '0';
         }
     }
 
@@ -298,11 +302,6 @@ class WaseetApp {
                     <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetApp.closeMobileDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
                     </button>
-                    ${!isMediatorUser(user) ? `
-                        <button class="btn-3d btn-gold" onclick="window.waseetApp.loginAsMediator(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-top: 0.5rem;">
-                            <i class="fas fa-crown"></i> الدخول بصلاحية الوسيط المعتمد
-                        </button>
-                    ` : ''}
                 `;
             } else {
                 authActions.innerHTML = `
@@ -311,9 +310,6 @@ class WaseetApp {
                     </button>
                     <button class="btn-social-login btn-social-facebook" onclick="window.waseetApp.loginWithProvider('facebook'); window.waseetApp.closeMobileDrawer();">
                         <i class="fab fa-facebook-f" style="color: #1877f2;"></i> المتابعة باستخدام Facebook
-                    </button>
-                    <button class="btn-3d btn-gold" onclick="window.waseetApp.loginAsMediator(); window.waseetApp.closeMobileDrawer();" style="width: 100%;">
-                        <i class="fas fa-crown"></i> الدخول كـ الوسيط المعتمد
                     </button>
                 `;
             }
@@ -605,10 +601,14 @@ class WaseetApp {
 
             if (userChatsCount > 0) {
                 chatsBadge.style.display = 'inline-flex';
-                chatsBadge.innerText = userChatsCount;
+                chatsBadge.innerText = String(userChatsCount);
             } else {
+                chatsBadge.innerText = '';
                 chatsBadge.style.display = 'none';
             }
+        }
+        if (typeof window.waseetSyncAllNavBadges === 'function') {
+            window.waseetSyncAllNavBadges();
         }
     }
 
@@ -1696,14 +1696,12 @@ class WaseetApp {
                     backupCodes: '8912-4410, 6721-9981'
                 },
                 sellerMessages: [
-                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice} نقطة لشراء الحساب المفحوص والمعتمد.`, time: '12:00' },
-                    { sender: 'seller', name: acc.sellerName + ' (البائع)', text: 'مرحباً بالوسيط، الحساب مفحوص وجاهز لنقل الربط وتسليم الإيميل للمشتري.', time: '12:02' },
-                    { sender: 'mediator', name: 'أنت (الوسيط)', text: 'أهلاً بك، الحساب تم التحقق منه مسبقاً، سأقوم الآن بنقل الربط وتأمينه للمشتري.', time: '12:04' }
+                    { sender: 'system', text: `قام المشتري ${WASEET_STATE.user.name} بحجز ${pricing.buyerPrice} نقطة لشراء الحساب المفحوص والمعتمد.`, time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) },
+                    { sender: 'mediator', name: 'الوسيط المعتمد', text: 'مرحباً بك في غرفة الوساطة الآمنة. هل ترغب في البيع؟', quickReplyRole: 'seller', quickReplies: ['نعم', 'لا', 'غير متأكد'], time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) }
                 ],
                 buyerMessages: [
-                    { sender: 'system', text: `تم حجز ${pricing.buyerPrice} نقطة بنجاح في خزينة الوساطة الآمنة.`, time: '12:00' },
-                    { sender: 'buyer', name: WASEET_STATE.user.name + ' (المشتري)', text: 'مرحباً بالوسيط، تم حجز النقاط. بانتظار نقل الربط واستلام بيانات الحساب المفحوص.', time: '12:03' },
-                    { sender: 'mediator', name: 'الوسيط المعتمد', text: 'أهلاً بك، نقاطك مؤمنة بالكامل في الخزينة، الحساب مفحوص مسبقاً وجاري تأمين نقله إليك.', time: '12:05' }
+                    { sender: 'system', text: `تم حجز ${pricing.buyerPrice} نقطة بنجاح في خزينة الوساطة الآمنة.`, time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) },
+                    { sender: 'mediator', name: 'الوسيط المعتمد', text: 'مرحباً بك في غرفة الوساطة الآمنة. نقاطك مؤمنة بالكامل في الخزينة، هل تريد الشراء؟', quickReplyRole: 'buyer', quickReplies: ['نعم', 'لا', 'غير متأكد'], time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) }
                 ]
             };
 

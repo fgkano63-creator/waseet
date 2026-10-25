@@ -328,7 +328,9 @@ window.waseetEnsureUserProfileInDb = waseetEnsureUserProfileInDb;
 async function waseetSyncAuthState() {
     const client = initWaseetSupabase();
     if (!client) return;
+    if (window._waseetSyncAuthInFlight) return window._waseetSyncAuthInFlight;
 
+    window._waseetSyncAuthInFlight = (async () => {
     try {
         const { data: { session }, error } = await client.auth.getSession();
         if (error || !session || !session.user) return;
@@ -358,6 +360,15 @@ async function waseetSyncAuthState() {
 
         const userRole = isAdmin ? 'admin' : ((profile && profile.role) || 'user');
 
+        const rawAvail = profile
+            ? (profile.points_balance !== undefined && profile.points_balance !== null
+                ? Number(profile.points_balance)
+                : Number(profile.wallet_balance ?? 0))
+            : 0;
+        const rawLocked = profile && profile.locked_points !== undefined && profile.locked_points !== null
+            ? Number(profile.locked_points)
+            : 0;
+
         const mappedUser = {
             id: authUser.id,
             email: authUser.email || (profile ? profile.email : ''),
@@ -368,9 +379,9 @@ async function waseetSyncAuthState() {
             isAdmin: isAdmin,
             provider: 'supabase_google',
             wallet: {
-                available: profile ? Number(profile.points_balance ?? profile.wallet_balance ?? 0) : 0,
-                locked: profile ? Number(profile.locked_points ?? 0) : 0,
-                total: profile ? (Number(profile.points_balance ?? profile.wallet_balance ?? 0) + Number(profile.locked_points ?? 0)) : 0
+                available: rawAvail,
+                locked: rawLocked,
+                total: rawAvail + rawLocked
             }
         };
 
@@ -378,6 +389,12 @@ async function waseetSyncAuthState() {
             WASEET_STATE.user = mappedUser;
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
+
+        // تحديث جميع عناصر المحفظة في الترويسة فوراً
+        ['wallet-total-pts', 'admin-wallet-total-pts', 'deals-wallet-pts', 'chat-wallet-pts'].forEach(elId => {
+            const el = document.getElementById(elId);
+            if (el) el.innerText = `${rawAvail} نقطة`;
+        });
 
         // التأكد من إنشاء/تحديث حساب المستخدم أو المدير في جدول public.profiles بشكل سليم
         if (!profile || (isAdmin && profile.role !== 'admin')) {
@@ -390,15 +407,18 @@ async function waseetSyncAuthState() {
         if (typeof renderNavbarUser === 'function') renderNavbarUser();
         if (typeof renderMyAccountsNavbarUser === 'function') renderMyAccountsNavbarUser();
 
-        // جلب ومزامنة جميع الصفقات والحسابات من قاعدة بيانات Supabase
-        await waseetFetchAccountsFromSupabase();
-        await waseetFetchDealsFromSupabase();
+        // جلب ومزامنة جميع الصفقات والحسابات من قاعدة بيانات Supabase بالتوازي لتسريع التنقل
+        await Promise.allSettled([
+            waseetFetchAccountsFromSupabase(),
+            waseetFetchDealsFromSupabase()
+        ]);
 
         // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
         if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
         if (typeof renderNavbarUser === 'function') renderNavbarUser();
         if (typeof renderMyAccountsNavbarUser === 'function') renderMyAccountsNavbarUser();
+        if (typeof waseetSyncAllNavBadges === 'function') waseetSyncAllNavBadges();
         if (window.waseetApp) {
             if (typeof window.waseetApp.renderUserProfile === 'function') {
                 window.waseetApp.renderUserProfile();
@@ -432,7 +452,11 @@ async function waseetSyncAuthState() {
         }
     } catch (err) {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);
+    } finally {
+        window._waseetSyncAuthInFlight = null;
     }
+    })();
+    return window._waseetSyncAuthInFlight;
 }
 
 window.waseetSyncAuthState = waseetSyncAuthState;
@@ -1254,21 +1278,10 @@ async function waseetFetchDealsFromSupabase() {
             };
         });
 
-        // دمج الصفقات السحابية مع الصفقات المحلية دون فقدان أي صفقة
+        // اعتماد الصفقات السحابية من Supabase كمصدر وحيد وموثوق للحقيقة (منع إعادة رفع الصفقات المحذوفة من الكاش المحلي)
         const mergedMap = new Map();
         remoteDeals.forEach(d => {
             if (d && d.id) mergedMap.set(String(d.id), d);
-        });
-        (WASEET_STATE.deals || []).forEach(d => {
-            if (d && d.id && !mergedMap.has(String(d.id))) {
-                mergedMap.set(String(d.id), d);
-                waseetSaveDealToSupabase(d);
-            }
-        });
-        (WASEET_STATE.completedDeals || []).forEach(d => {
-            if (d && d.id && !mergedMap.has(String(d.id))) {
-                mergedMap.set(String(d.id), d);
-            }
         });
 
         const allMerged = Array.from(mergedMap.values());
@@ -1278,16 +1291,18 @@ async function waseetFetchDealsFromSupabase() {
         allMerged.forEach(d => {
             if (Number(d.dealNumber) > maxDealNum) maxDealNum = Number(d.dealNumber);
         });
-        const currentCounter = parseInt(localStorage.getItem('WASEET_DEAL_COUNTER') || '0');
-        if (maxDealNum > currentCounter) {
-            localStorage.setItem('WASEET_DEAL_COUNTER', String(maxDealNum));
+        if (allMerged.length === 0) {
+            localStorage.setItem('WASEET_DEAL_COUNTER', '0');
+        } else {
+            const currentCounter = parseInt(localStorage.getItem('WASEET_DEAL_COUNTER') || '0');
+            if (maxDealNum > currentCounter) {
+                localStorage.setItem('WASEET_DEAL_COUNTER', String(maxDealNum));
+            }
         }
 
         WASEET_STATE.deals = allMerged.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
         WASEET_STATE.completedDeals = allMerged.filter(d => d.status === 'completed' || d.status === 'cancelled');
-        if (!WASEET_STATE.activeDeal && WASEET_STATE.deals.length > 0) {
-            WASEET_STATE.activeDeal = WASEET_STATE.deals[0];
-        }
+        WASEET_STATE.activeDeal = WASEET_STATE.deals.length > 0 ? WASEET_STATE.deals[0] : null;
 
         // إذا كانت غرفة الوساطة مفتوحة، نحدّث مرجع الصفقة فيها دون فقدان أي رسالة
         if (typeof window !== 'undefined' && window.escrowRoom && window.escrowRoom.deal) {
@@ -1302,6 +1317,7 @@ async function waseetFetchDealsFromSupabase() {
         }
 
         if (typeof saveWaseetData === 'function') saveWaseetData();
+        if (typeof waseetSyncAllNavBadges === 'function') waseetSyncAllNavBadges();
         return allMerged;
     } catch (err) {
         console.warn('[Supabase Deals] استثناء جلب الصفقات:', err);
@@ -1339,8 +1355,12 @@ async function waseetRefreshMyWalletBalance() {
         const profile = await waseetFetchUserProfile(userId);
         if (!profile) return null;
 
-        const available = Number(profile.points_balance ?? profile.wallet_balance ?? 0);
-        const locked = Number(profile.locked_points ?? 0);
+        const available = profile.points_balance !== undefined && profile.points_balance !== null
+            ? Number(profile.points_balance)
+            : Number(profile.wallet_balance ?? 0);
+        const locked = profile.locked_points !== undefined && profile.locked_points !== null
+            ? Number(profile.locked_points)
+            : 0;
         const total = available + locked;
 
         if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
@@ -1348,11 +1368,10 @@ async function waseetRefreshMyWalletBalance() {
             if (typeof saveWaseetData === 'function') saveWaseetData();
         }
 
-        const totalPtsEl = document.getElementById('wallet-total-pts');
-        if (totalPtsEl) totalPtsEl.innerText = `${available} نقطة`;
-
-        const adminTotalPtsEl = document.getElementById('admin-wallet-total-pts');
-        if (adminTotalPtsEl) adminTotalPtsEl.innerText = `${available} نقطة`;
+        ['wallet-total-pts', 'admin-wallet-total-pts', 'deals-wallet-pts', 'chat-wallet-pts'].forEach(elId => {
+            const el = document.getElementById(elId);
+            if (el) el.innerText = `${available} نقطة`;
+        });
 
         if (window.waseetApp && typeof window.waseetApp.updateWalletDisplay === 'function') {
             window.waseetApp.updateWalletDisplay();
@@ -1686,10 +1705,150 @@ async function waseetUpdateAdminPendingDepositsBadge() {
         if (!error && typeof count === 'number') {
             const badges = document.querySelectorAll('#admin-nav-deposits-badge, .admin-deposits-badge-count');
             badges.forEach(el => {
-                el.innerText = String(count);
-                el.style.display = count > 0 ? 'inline-block' : 'none';
+                el.innerText = count > 0 ? String(count) : '';
+                el.style.display = count > 0 ? 'inline-flex' : 'none';
             });
         }
+    } catch (e) {}
+}
+
+/**
+ * مزامنة وإخفاء/إظهار فقاعات الإشعارات (Badges) لأزرار (قيد الشراء، قيد الفحص، المحادثات)
+ * بحيث تختفي تماماً إذا كان العدد صفر (0) وتظهر فوراً عند وجود عناصر أو رسائل جديدة
+ */
+function waseetSyncAllNavBadges() {
+    try {
+        if (typeof WASEET_STATE === 'undefined') return;
+        const user = WASEET_STATE.user;
+        const isMed = typeof isMediatorUser === 'function' ? isMediatorUser(user) : !!(user && (user.isAdmin || user.role === 'admin' || user.role === 'mediator'));
+
+        // 1. حساب عدد الصفقات النشطة (قيد الشراء)
+        const allActiveDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
+        let myActiveDealsCount = 0;
+        if (isMed) {
+            myActiveDealsCount = allActiveDeals.length;
+        } else if (user) {
+            myActiveDealsCount = allActiveDeals.filter(d =>
+                (d.buyer && (d.buyer.id === user.id || d.buyer.name === user.name)) ||
+                (d.seller && (d.seller.id === user.id || d.seller.name === user.name))
+            ).length;
+        }
+
+        const dealsBadgeSelectors = [
+            '#deals-badge-count',
+            '#admin-nav-deals-badge',
+            '#drawer-deals-badge-count'
+        ];
+        dealsBadgeSelectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                if (myActiveDealsCount > 0) {
+                    el.innerText = String(myActiveDealsCount);
+                    el.style.display = 'inline-flex';
+                } else {
+                    el.innerText = '';
+                    el.style.display = 'none';
+                }
+            });
+        });
+
+        // 2. حساب عدد الحسابات قيد الفحص (قيد الفحص)
+        const pendingCount = (WASEET_STATE.accounts || []).filter(a => a && a.status === 'pending_review').length;
+        const pendingBadgeSelectors = [
+            '#admin-nav-pending-badge',
+            '#drawer-pending-badge-count'
+        ];
+        pendingBadgeSelectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                if (pendingCount > 0) {
+                    el.innerText = String(pendingCount);
+                    el.style.display = 'inline-flex';
+                } else {
+                    el.innerText = '';
+                    el.style.display = 'none';
+                }
+            });
+        });
+
+        // 3. تحديث شارة المحادثات غير المقروءة
+        const path = (window.location.pathname || '').toLowerCase();
+        if (path.includes('chat.html') || path.includes('admin-chats.html') || path.includes('contact-support.html')) {
+            sessionStorage.setItem('WASEET_UNREAD_CHATS_COUNT', '0');
+        }
+        const unreadChats = parseInt(sessionStorage.getItem('WASEET_UNREAD_CHATS_COUNT') || '0', 10);
+        waseetRenderChatsUnreadBadge(unreadChats);
+    } catch (e) {}
+}
+
+function waseetRenderChatsUnreadBadge(count) {
+    const num = Math.max(0, Number(count) || 0);
+    sessionStorage.setItem('WASEET_UNREAD_CHATS_COUNT', String(num));
+
+    // ضمان وجود شارة إشعار داخل جميع أزرار المحادثات في الترويسة والقائمة الجانبية
+    const chatLinks = document.querySelectorAll('a[href="chat.html"], a[href="admin-chats.html"], a[href="contact-support.html"]');
+    chatLinks.forEach(link => {
+        let badge = link.querySelector('.chats-unread-badge, #admin-nav-chats-badge, #nav-chats-badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'deals-badge-count chats-unread-badge';
+            badge.style.display = 'none';
+            badge.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            badge.style.color = '#fff';
+            badge.style.marginRight = '4px';
+            link.appendChild(badge);
+        }
+        if (num > 0) {
+            badge.innerText = String(num);
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.innerText = '';
+            badge.style.display = 'none';
+        }
+    });
+}
+
+function waseetInitGlobalNavRealtimeBadges() {
+    const client = initWaseetSupabase();
+    if (!client || window._waseetGlobalNavBadgesChannel) return;
+
+    try {
+        waseetSyncAllNavBadges();
+        window._waseetGlobalNavBadgesChannel = client
+            .channel('waseet_global_nav_badges_rt')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'support_messages' },
+                (payload) => {
+                    const row = payload && payload.new;
+                    if (!row) return;
+                    const myId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user.id : null;
+                    if (myId && String(row.sender_id) === String(myId)) return;
+                    const isMed = typeof isMediatorUser === 'function' && isMediatorUser();
+                    if (!isMed && myId && String(row.receiver_id) !== String(myId)) return;
+
+                    const path = (window.location.pathname || '').toLowerCase();
+                    if (!path.includes('admin-chats.html') && !path.includes('contact-support.html')) {
+                        const cur = parseInt(sessionStorage.getItem('WASEET_UNREAD_CHATS_COUNT') || '0', 10);
+                        waseetRenderChatsUnreadBadge(cur + 1);
+                    }
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'deal_messages' },
+                (payload) => {
+                    const row = payload && payload.new;
+                    if (!row) return;
+                    const myId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user.id : null;
+                    if (myId && String(row.sender_id) === String(myId)) return;
+
+                    const path = (window.location.pathname || '').toLowerCase();
+                    if (!path.includes('chat.html')) {
+                        const cur = parseInt(sessionStorage.getItem('WASEET_UNREAD_CHATS_COUNT') || '0', 10);
+                        waseetRenderChatsUnreadBadge(cur + 1);
+                    }
+                }
+            )
+            .subscribe();
     } catch (e) {}
 }
 
@@ -1704,6 +1863,8 @@ window.waseetLockEscrowPointsInDb = waseetLockEscrowPointsInDb;
 window.waseetReleaseEscrowPointsInDb = waseetReleaseEscrowPointsInDb;
 window.waseetRefundEscrowPointsInDb = waseetRefundEscrowPointsInDb;
 window.waseetUpdateAdminPendingDepositsBadge = waseetUpdateAdminPendingDepositsBadge;
+window.waseetSyncAllNavBadges = waseetSyncAllNavBadges;
+window.waseetRenderChatsUnreadBadge = waseetRenderChatsUnreadBadge;
 
 /**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
@@ -1716,6 +1877,7 @@ function initWaseetAuthListener() {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
             await waseetSyncAuthState();
             await waseetUpdateAdminPendingDepositsBadge();
+            waseetSyncAllNavBadges();
         } else if (event === 'SIGNED_OUT') {
             if (typeof WASEET_STATE !== 'undefined') {
                 WASEET_STATE.user = null;
@@ -1726,6 +1888,7 @@ function initWaseetAuthListener() {
             }
             if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
             if (typeof updateChatDrawerProfile === 'function') updateChatDrawerProfile();
+            waseetSyncAllNavBadges();
         }
     });
 }
@@ -1735,9 +1898,9 @@ if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
         initWaseetSupabase();
         initWaseetAuthListener();
+        waseetSyncAllNavBadges();
+        waseetInitGlobalNavRealtimeBadges();
         waseetSyncAuthState();
-        waseetFetchAccountsFromSupabase();
-        waseetFetchDealsFromSupabase();
-        setTimeout(waseetUpdateAdminPendingDepositsBadge, 1200);
+        setTimeout(waseetUpdateAdminPendingDepositsBadge, 800);
     });
 }

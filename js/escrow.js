@@ -24,21 +24,79 @@ class WaseetEscrowRoom {
             if (!this.deal.status) this.deal.status = 'active';
         }
 
-        // Auto-detect viewer role strictly from real logged in user:
-        // 1. Mediator/Admin -> shows 3-screen mediator dashboard
-        // 2. Seller of the deal -> shows seller view
-        // 3. Buyer of the deal -> shows buyer view
-        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
-        if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
-            this.viewerRole = 'mediator';
-        } else if (currentUser && this.deal && this.deal.seller && (this.deal.seller.id === currentUser.id || this.deal.seller.name === currentUser.name)) {
-            this.viewerRole = 'seller';
-        } else {
-            this.viewerRole = 'buyer';
-        }
+        this._msgTimestamps = [];
+        this.viewerRole = this.detectViewerRole();
         this.mediatorTab = 'seller';
         this.buyerTab = 'chat';
         this.init();
+    }
+
+    detectViewerRole() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedRole = urlParams.get('role');
+        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+
+        if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
+            return 'mediator';
+        }
+        if (forcedRole === 'buyer' || forcedRole === 'seller') {
+            return forcedRole;
+        }
+        if (!currentUser || !this.deal) {
+            return 'buyer';
+        }
+
+        const myId = String(currentUser.id || '');
+        const buyerId = String((this.deal.buyer && this.deal.buyer.id) || this.deal.buyer_id || '');
+        const sellerId = String((this.deal.seller && this.deal.seller.id) || this.deal.seller_id || '');
+
+        // إذا كان المشتري والبائع لهما نفس المعرف (تجربة شراء حساب خاص)، نعطي الأولوية لدور المشتري لأنه من بدأ طلب الشراء
+        if (myId && buyerId && sellerId && buyerId === sellerId && myId === buyerId) {
+            return 'buyer';
+        }
+        if (myId && buyerId && myId === buyerId) {
+            return 'buyer';
+        }
+        if (myId && sellerId && myId === sellerId) {
+            return 'seller';
+        }
+        if (this.deal.buyer && this.deal.buyer.name && this.deal.buyer.name === currentUser.name) {
+            return 'buyer';
+        }
+        if (this.deal.seller && this.deal.seller.name && this.deal.seller.name === currentUser.name) {
+            return 'seller';
+        }
+        return 'buyer';
+    }
+
+    checkMessageRateLimit() {
+        const now = Date.now();
+        if (!this._msgTimestamps) this._msgTimestamps = [];
+        this._msgTimestamps = this._msgTimestamps.filter(ts => now - ts < 10000);
+
+        const lastTs = this._msgTimestamps.length > 0 ? this._msgTimestamps[this._msgTimestamps.length - 1] : 0;
+        if (now - lastTs < 1200 || this._msgTimestamps.length >= 5) {
+            this.showSpamWarningToast('يرجى الانتظار قليلاً قبل إرسال رسالة أخرى لمنع السبام.');
+            return false;
+        }
+        this._msgTimestamps.push(now);
+        return true;
+    }
+
+    showSpamWarningToast(message) {
+        let toast = document.getElementById('waseet-rate-limit-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'waseet-rate-limit-toast';
+            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(220,38,38,0.95);color:#fff;padding:0.65rem 1.2rem;border-radius:12px;font-family:var(--font-ar);font-size:0.86rem;font-weight:800;box-shadow:0 10px 25px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;gap:0.5rem;pointer-events:none;transition:opacity 0.25s ease;';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<i class="fas fa-hourglass-half"></i> <span>${message}</span>`;
+        toast.style.opacity = '1';
+        clearTimeout(this._spamToastTimer);
+        this._spamToastTimer = setTimeout(() => {
+            if (toast) toast.style.opacity = '0';
+        }, 2400);
     }
 
     init() {
@@ -113,6 +171,56 @@ class WaseetEscrowRoom {
 
         this.deal.sellerMessages = filterAndDedup(this.deal.sellerMessages, 'seller_mediator');
         this.deal.buyerMessages = filterAndDedup(this.deal.buyerMessages, 'buyer_mediator');
+
+        // ضمان وجود رسالة الترحيب التلقائية من الوسيط مع أزرار الردود السريعة (Quick Replies) لكل من المشتري والبائع
+        const nowStr = this.formatRowTime(new Date().toISOString());
+        const hasSellerQuickPrompt = this.deal.sellerMessages.some(m => m && (m.quickReplyRole === 'seller' || (m.sender === 'mediator' && String(m.text || '').includes('هل ترغب في البيع'))));
+        if (!hasSellerQuickPrompt) {
+            const firstMedSeller = this.deal.sellerMessages.find(m => m && m.sender === 'mediator');
+            if (firstMedSeller) {
+                firstMedSeller.name = 'الوسيط المعتمد';
+                if (!String(firstMedSeller.text || '').includes('هل ترغب في البيع')) {
+                    firstMedSeller.text = `${firstMedSeller.text} — هل ترغب في البيع؟`;
+                }
+                firstMedSeller.quickReplyRole = 'seller';
+                firstMedSeller.quickReplies = ['نعم', 'لا', 'غير متأكد'];
+            } else {
+                this.deal.sellerMessages.unshift({
+                    id: 'auto_med_seller_' + (this.deal.id || '1'),
+                    sender: 'mediator',
+                    name: 'الوسيط المعتمد',
+                    text: 'مرحباً بك في غرفة الوساطة الآمنة. هل ترغب في البيع؟',
+                    quickReplyRole: 'seller',
+                    quickReplies: ['نعم', 'لا', 'غير متأكد'],
+                    time: nowStr,
+                    channel_type: 'seller_mediator'
+                });
+            }
+        }
+
+        const hasBuyerQuickPrompt = this.deal.buyerMessages.some(m => m && (m.quickReplyRole === 'buyer' || (m.sender === 'mediator' && String(m.text || '').includes('هل تريد الشراء'))));
+        if (!hasBuyerQuickPrompt) {
+            const firstMedBuyer = this.deal.buyerMessages.find(m => m && m.sender === 'mediator');
+            if (firstMedBuyer) {
+                firstMedBuyer.name = 'الوسيط المعتمد';
+                if (!String(firstMedBuyer.text || '').includes('هل تريد الشراء')) {
+                    firstMedBuyer.text = `${firstMedBuyer.text} — هل تريد الشراء؟`;
+                }
+                firstMedBuyer.quickReplyRole = 'buyer';
+                firstMedBuyer.quickReplies = ['نعم', 'لا', 'غير متأكد'];
+            } else {
+                this.deal.buyerMessages.unshift({
+                    id: 'auto_med_buyer_' + (this.deal.id || '1'),
+                    sender: 'mediator',
+                    name: 'الوسيط المعتمد',
+                    text: 'مرحباً بك في غرفة الوساطة الآمنة. نقاطك مؤمنة في الخزينة، هل تريد الشراء؟',
+                    quickReplyRole: 'buyer',
+                    quickReplies: ['نعم', 'لا', 'غير متأكد'],
+                    time: nowStr,
+                    channel_type: 'buyer_mediator'
+                });
+            }
+        }
     }
 
     syncDealToGlobalState() {
@@ -365,13 +473,7 @@ class WaseetEscrowRoom {
 
             // Detect role again in case deal or user finished loading asynchronously
             const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
-            if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
-                this.viewerRole = 'mediator';
-            } else if (currentUser && this.deal.seller && (String(this.deal.seller.id) === String(currentUser.id) || this.deal.seller.name === currentUser.name)) {
-                this.viewerRole = 'seller';
-            } else {
-                this.viewerRole = 'buyer';
-            }
+            this.viewerRole = this.detectViewerRole();
 
             // ضمان وجود سجل المستخدم الحالي (أو المدير) في جدول public.profiles لتفادي خطأ deal_messages_sender_id_fkey
             if (typeof window.waseetEnsureUserProfileInDb === 'function') {
@@ -383,6 +485,7 @@ class WaseetEscrowRoom {
 
             const sellerId = this.deal.seller.id || this.deal.seller_id || this.deal.sellerId || null;
             const buyerId = this.deal.buyer.id || this.deal.buyer_id || this.deal.buyerId || null;
+            const isSameUserId = sellerId && buyerId && String(sellerId) === String(buyerId);
 
             let updated = false;
 
@@ -399,7 +502,8 @@ class WaseetEscrowRoom {
                         profs.forEach(p => {
                             const realName = p.name || p.username || p.full_name || (p.email ? p.email.split('@')[0] : null);
                             if (realName) {
-                                if (String(p.id) === String(sellerId) && this.deal.seller.name !== realName) {
+                                // إذا كان البائع والمشتري مختلفين، نحدث اسم البائع من ملفه الشخصي
+                                if (!isSameUserId && String(p.id) === String(sellerId) && this.deal.seller.name !== realName) {
                                     this.deal.seller.name = realName;
                                     updated = true;
                                 }
@@ -890,34 +994,29 @@ class WaseetEscrowRoom {
         }
 
         // ==========================================
-        // 2. BUYER VIEW (ONLY HIS CHAT & GUARANTEE CARD - Requirement 4 & 9)
-        // Strictly isolated: Buyer sees only mediator chat and receipt guarantee
+        // 2. BUYER VIEW (FULL-SCREEN CHAT WITHOUT SIDE CLUTTER BOX)
+        // Strictly isolated: Buyer sees only mediator chat expanding to fill the screen
         // ==========================================
         if (this.viewerRole === 'buyer') {
             container.innerHTML = `
-                <div class="escrow-split">
-                    <!-- Column 1: محادثة المشتري مع الوسيط المعتمد فقط -->
-                    <div class="chat-pane buyer-chat-pane">
+                <div class="escrow-split escrow-single-full">
+                    <div class="chat-pane buyer-chat-pane" style="width: 100%; flex: 1;">
                         <div class="chat-header">
                             <div class="chat-title">
                                 <i class="fas fa-comments text-orange"></i>
-                                <span>محادثة المشتري مع الوسيط المعتمد</span>
+                                <span>محادثة المشتري (${buyerName}) مع الوسيط المعتمد</span>
                             </div>
+                            <span class="badge-role buyer-badge"><i class="fas fa-circle" style="font-size:0.5rem;color:#10b981;margin-left:4px;"></i> متصل الآن</span>
                         </div>
                         <div class="chat-messages" id="chat-messages-buyer">
                             ${this.renderMessageList(this.deal.buyerMessages, 'buyer_mediator')}
                         </div>
                         <div class="chat-footer">
-                            <input type="text" id="input-buyer-single" class="chat-input" placeholder="اكتب استفسارك للوسيط المعتمد...">
-                            <button class="btn-3d btn-orange" onclick="window.escrowRoom.sendBuyerMessage()">
+                            <input type="text" id="input-buyer-single" class="chat-input" placeholder="اكتب رسالتك للوسيط المعتمد...">
+                            <button type="button" class="btn-3d btn-orange" onclick="window.escrowRoom.sendBuyerMessage()">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Column 2: بطاقة الحساب وضمان الاستلام للمشتري -->
-                    <div class="mediator-pane buyer-side-pane">
-                        ${this.renderBuyerSideCard()}
                     </div>
                 </div>
             `;
@@ -927,29 +1026,25 @@ class WaseetEscrowRoom {
         }
 
         // ==========================================
-        // 3. SELLER VIEW (2 SCREENS)
-        // Screen 1: الشات مع الوسيط فقط
-        // Screen 2: بطاقة المستحقات والضمان
+        // 3. SELLER VIEW (FULL-SCREEN CHAT WITHOUT SIDE CLUTTER BOX)
         // ==========================================
         if (this.viewerRole === 'seller') {
             container.innerHTML = `
-                <div class="escrow-split">
-                    <div class="mediator-pane">
-                        ${this.renderSellerSideCard()}
-                    </div>
-                    <div class="chat-pane">
+                <div class="escrow-split escrow-single-full">
+                    <div class="chat-pane seller-chat-pane" style="width: 100%; flex: 1;">
                         <div class="chat-header">
                             <div class="chat-title">
                                 <i class="fas fa-shield-alt text-silver"></i>
-                                <span>محادثة البائع مع الوسيط المعتمد</span>
+                                <span>محادثة البائع (${sellerName}) مع الوسيط المعتمد</span>
                             </div>
+                            <span class="badge-role seller-badge"><i class="fas fa-circle" style="font-size:0.5rem;color:#10b981;margin-left:4px;"></i> متصل الآن</span>
                         </div>
                         <div class="chat-messages" id="chat-messages-seller">
                             ${this.renderMessageList(this.deal.sellerMessages, 'seller_mediator')}
                         </div>
                         <div class="chat-footer">
-                            <input type="text" id="input-seller-single" class="chat-input" placeholder="اكتب للوسيط بخصوص الحساب...">
-                            <button class="btn-3d btn-gold" onclick="window.escrowRoom.sendSellerMessage()">
+                            <input type="text" id="input-seller-single" class="chat-input" placeholder="اكتب رسالتك للوسيط المعتمد...">
+                            <button type="button" class="btn-3d btn-gold" onclick="window.escrowRoom.sendSellerMessage()">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -1257,14 +1352,42 @@ class WaseetEscrowRoom {
                 senderBadge = '<span class="badge-role seller-badge"><i class="fas fa-store"></i> البائع</span>';
             }
 
+            // حل جذري لعكس الأسماء: نعتمد دائماً على الدور الحقيقي لمرسل الرسالة (msg.sender)
+            const trueAuthorName = this.resolveSenderDisplayName(msg.sender);
+
+            // أزرار الردود السريعة (Quick Replies) في الرسالة التلقائية للوسيط
+            let quickRepliesHtml = '';
+            if (msg.sender === 'mediator' && (Array.isArray(msg.quickReplies) || msg.quickReplyRole)) {
+                const qRole = msg.quickReplyRole || (expectedCh === 'seller_mediator' ? 'seller' : 'buyer');
+                const options = Array.isArray(msg.quickReplies) && msg.quickReplies.length > 0
+                    ? msg.quickReplies
+                    : ['نعم', 'لا', 'غير متأكد'];
+                const promptQuestion = qRole === 'seller' ? 'هل ترغب في البيع؟' : 'هل تريد الشراء؟';
+
+                quickRepliesHtml = `
+                    <div class="quick-replies-box" style="margin-top: 0.65rem; padding-top: 0.55rem; border-top: 1px dashed rgba(197, 160, 89, 0.35);">
+                        <div style="font-size: 0.8rem; font-weight: 800; color: var(--gold-light); margin-bottom: 0.45rem;">
+                            <i class="fas fa-bolt text-orange"></i> ${promptQuestion}
+                        </div>
+                        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                            ${options.map(opt => `
+                                <button type="button" class="btn-quick-reply-opt" onclick="window.escrowRoom.sendQuickReply('${qRole}', '${opt}')" style="background: rgba(197, 160, 89, 0.16); border: 1px solid var(--gold-primary); color: #fff; border-radius: 999px; padding: 0.28rem 0.85rem; font-family: var(--font-ar); font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="chat-msg ${senderClass}" id="escrow-msg-${safeMsgId}" data-msg-id="${safeMsgId}" data-channel-type="${safeChannel}">
                     <div class="msg-header">
-                        <span class="msg-author">${msg.name}</span>
+                        <span class="msg-author">${trueAuthorName}</span>
                         ${senderBadge}
                         <span class="msg-time">${msg.time}</span>
                     </div>
-                    <div class="msg-body">${msg.text}</div>
+                    <div class="msg-body">${msg.text}${quickRepliesHtml}</div>
                 </div>
             `;
         }).join('');
@@ -1275,13 +1398,19 @@ class WaseetEscrowRoom {
         const inputBuyer = document.getElementById('input-buyer-chat');
 
         if (inputSeller) {
-            inputSeller.onkeypress = (e) => {
-                if (e.key === 'Enter') this.sendMessageToSeller();
+            inputSeller.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.sendMessageToSeller();
+                }
             };
         }
         if (inputBuyer) {
-            inputBuyer.onkeypress = (e) => {
-                if (e.key === 'Enter') this.sendMessageToBuyer();
+            inputBuyer.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.sendMessageToBuyer();
+                }
             };
         }
     }
@@ -1289,94 +1418,124 @@ class WaseetEscrowRoom {
     bindSingleChatInput(inputId, sendFn) {
         const el = document.getElementById(inputId);
         if (el) {
-            el.onkeypress = (e) => {
-                if (e.key === 'Enter') sendFn();
+            el.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendFn();
+                }
             };
         }
     }
 
-    async handleSendEscrowMessage({ inputId, targetArrayKey, channelType, senderRole, senderDisplayName }) {
-        const input = document.getElementById(inputId);
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
+    async sendQuickReply(role, choiceText) {
+        try {
+            if (!choiceText) return;
+            const isSeller = role === 'seller';
+            const questionLabel = isSeller ? 'هل ترغب في البيع؟' : 'هل تريد الشراء؟';
+            const formattedText = `${questionLabel} — الإجابة: ${choiceText}`;
 
-        if (!this.deal || !this.deal.id) {
-            alert('لا توجد صفقة نشطة حالياً لإرسال الرسالة فيها.');
-            return;
+            const targetArrayKey = isSeller ? 'sellerMessages' : 'buyerMessages';
+            const channelType = isSeller ? 'seller_mediator' : 'buyer_mediator';
+            const senderRole = isSeller ? 'seller' : 'buyer';
+            const senderDisplayName = this.resolveSenderDisplayName(senderRole);
+
+            await this.handleSendEscrowMessage({
+                inputId: null,
+                directText: formattedText,
+                targetArrayKey,
+                channelType,
+                senderRole,
+                senderDisplayName
+            });
+        } catch (err) {
+            console.warn('[Escrow QuickReply] خطأ إرسال الرد السريع:', err);
         }
+    }
 
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        // توليد UUID حقيقي مشترك بين Optimistic UI وقاعدة البيانات لمنع تكرار الرسالة عند وصول حدث Realtime
-        const messageUuid = this.generateMessageUuid();
-        const currentUserId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id)
-            ? WASEET_STATE.user.id
-            : null;
+    async handleSendEscrowMessage({ inputId, directText = null, targetArrayKey, channelType, senderRole, senderDisplayName }) {
+        try {
+            const input = inputId ? document.getElementById(inputId) : null;
+            const text = directText !== null ? String(directText).trim() : (input ? input.value.trim() : '');
+            if (!text) return;
 
-        console.log('[Escrow UI] Sending message with user:', (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null), {
-            sender_id: currentUserId,
-            sender_role: senderRole,
-            channel_type: channelType,
-            message_id: messageUuid
-        });
+            if (!this.checkMessageRateLimit()) {
+                return;
+            }
 
-        const msgObj = {
-            id: messageUuid,
-            sender: senderRole,
-            sender_id: currentUserId,
-            name: senderDisplayName,
-            text: text,
-            time: timeStr,
-            channel_type: channelType,
-            created_at: now.toISOString(),
-            _optimistic: true
-        };
-
-        if (!Array.isArray(this.deal[targetArrayKey])) {
-            this.deal[targetArrayKey] = [];
-        }
-
-        // التأكد من عدم وجود نفس المعرف مسبقاً قبل الإضافة
-        if (!this.deal[targetArrayKey].some(m => m && String(m.id) === String(messageUuid))) {
-            this.deal[targetArrayKey].push(msgObj);
-        }
-
-        // 1. تفريغ الحقل وتحديث واجهة المحادثة المستهدفة فقط (DOM) فوراً
-        input.value = '';
-        input.focus();
-        this.syncDealToGlobalState();
-        saveWaseetData();
-        this.updateChatMessagesOnly(channelType);
-        this.scrollAllChats();
-        this.broadcastUpdate();
-
-        // 2. الحفظ الفوري في قاعدة بيانات Supabase (جدول deal_messages + deals) مع ضمان وجود الـ profile وفحص الأخطاء
-        if (typeof window.waseetSendEscrowMessageToSupabase === 'function') {
-            const { data, error } = await window.waseetSendEscrowMessageToSupabase(this.deal, msgObj, channelType, senderRole);
-            if (error) {
-                console.error('Escrow Message Insert Error:', error);
-                // إزالة الرسالة المؤقتة التي فشل إرسالها حتى لا تبقى معلقة بشكل مضلل
-                if (Array.isArray(this.deal[targetArrayKey])) {
-                    this.deal[targetArrayKey] = this.deal[targetArrayKey].filter(m => m && String(m.id) !== String(messageUuid));
-                    this.syncDealToGlobalState();
-                    saveWaseetData();
-                    this.updateChatMessagesOnly(channelType);
+            if (!this.deal || !this.deal.id) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تنبيه', 'لا توجد صفقة نشطة حالياً لإرسال الرسالة فيها.', 'warning');
                 }
                 return;
             }
-            if (data && data.id) {
-                msgObj.id = data.id;
-                msgObj.sender_id = data.sender_id || msgObj.sender_id;
-                msgObj._optimistic = false;
-                this.syncDealToGlobalState();
-                saveWaseetData();
+
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const messageUuid = this.generateMessageUuid();
+            const currentUserId = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id)
+                ? WASEET_STATE.user.id
+                : null;
+
+            const resolvedAuthor = this.resolveSenderDisplayName(senderRole) || senderDisplayName;
+
+            const msgObj = {
+                id: messageUuid,
+                sender: senderRole,
+                sender_id: currentUserId,
+                name: resolvedAuthor,
+                text: text,
+                time: timeStr,
+                channel_type: channelType,
+                created_at: now.toISOString(),
+                _optimistic: true
+            };
+
+            if (!Array.isArray(this.deal[targetArrayKey])) {
+                this.deal[targetArrayKey] = [];
             }
-        } else if (typeof window.waseetSaveDealToSupabase === 'function') {
-            const res = await window.waseetSaveDealToSupabase(this.deal, { returnError: true, showAlert: true });
-            if (res && res.error) {
-                console.error('Escrow Deal Save Error:', res.error);
+
+            if (!this.deal[targetArrayKey].some(m => m && String(m.id) === String(messageUuid))) {
+                this.deal[targetArrayKey].push(msgObj);
             }
+
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            this.syncDealToGlobalState();
+            saveWaseetData();
+            this.updateChatMessagesOnly(channelType);
+            this.scrollAllChats();
+            this.broadcastUpdate();
+
+            if (typeof window.waseetSendEscrowMessageToSupabase === 'function') {
+                const { data, error } = await window.waseetSendEscrowMessageToSupabase(this.deal, msgObj, channelType, senderRole);
+                if (error) {
+                    console.error('Escrow Message Insert Error:', error);
+                    if (Array.isArray(this.deal[targetArrayKey])) {
+                        this.deal[targetArrayKey] = this.deal[targetArrayKey].filter(m => m && String(m.id) !== String(messageUuid));
+                        this.syncDealToGlobalState();
+                        saveWaseetData();
+                        this.updateChatMessagesOnly(channelType);
+                    }
+                    return;
+                }
+                if (data && data.id) {
+                    msgObj.id = data.id;
+                    msgObj.sender_id = data.sender_id || msgObj.sender_id;
+                    msgObj._optimistic = false;
+                    this.syncDealToGlobalState();
+                    saveWaseetData();
+                }
+            } else if (typeof window.waseetSaveDealToSupabase === 'function') {
+                const res = await window.waseetSaveDealToSupabase(this.deal, { returnError: true, showAlert: false });
+                if (res && res.error) {
+                    console.error('Escrow Deal Save Error:', res.error);
+                }
+            }
+        } catch (err) {
+            console.error('[Escrow Send] استثناء غير متوقع أثناء إرسال الرسالة:', err);
+            this.showSpamWarningToast('تعذر إرسال الرسالة مؤقتاً، يرجى المحاولة بعد لحظات.');
         }
     }
 
@@ -1401,30 +1560,22 @@ class WaseetEscrowRoom {
     }
 
     sendBuyerMessage() {
-        const buyerName = (WASEET_STATE.user && WASEET_STATE.user.name)
-            ? WASEET_STATE.user.name + ' (المشتري)'
-            : ((this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name + ' (المشتري)' : 'المشتري');
-
         return this.handleSendEscrowMessage({
             inputId: 'input-buyer-single',
             targetArrayKey: 'buyerMessages',
             channelType: 'buyer_mediator',
             senderRole: 'buyer',
-            senderDisplayName: buyerName
+            senderDisplayName: this.resolveSenderDisplayName('buyer')
         });
     }
 
     sendSellerMessage() {
-        const sellerName = (WASEET_STATE.user && WASEET_STATE.user.name)
-            ? WASEET_STATE.user.name + ' (البائع)'
-            : ((this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name + ' (البائع)' : 'البائع');
-
         return this.handleSendEscrowMessage({
             inputId: 'input-seller-single',
             targetArrayKey: 'sellerMessages',
             channelType: 'seller_mediator',
             senderRole: 'seller',
-            senderDisplayName: sellerName
+            senderDisplayName: this.resolveSenderDisplayName('seller')
         });
     }
 

@@ -6083,5 +6083,148 @@ div[class*="netlify"],
     z-index: 1501;
 }
 
+/* ===================================================
+   تحديثات شاشة المحادثة الكاملة + زر العودة للمتجر + الردود السريعة
+=================================================== */
+body.chat-page-body {
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+body.chat-page-body .app-wrapper {
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .chat-main-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0.45rem 0.75rem 0.55rem !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .escrow-room-card {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+body.chat-page-body #escrow-workspace-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .escrow-split,
+body.chat-page-body .escrow-split.escrow-single-chat {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .escrow-tri-split {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .chat-pane {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+body.chat-page-body .chat-messages {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+body.chat-page-body .chat-input-bar {
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+}
+
+@media (max-width: 868px) {
+    body.chat-page-body .chat-main-container {
+        padding: 0.2rem 0.35rem 64px !important;
+    }
+    body.chat-page-body .escrow-room-card {
+        border-radius: 12px !important;
+    }
+}
+
+/* زر العودة للمتجر في الترويسة */
+.btn-nav-back-store {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.38rem !important;
+    border-color: rgba(197, 160, 89, 0.5) !important;
+    background: rgba(197, 160, 89, 0.1) !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-nav-back-store:hover {
+    background: rgba(197, 160, 89, 0.24) !important;
+    border-color: var(--gold-primary) !important;
+    transform: translateY(-1px) !important;
+}
+
+@media (max-width: 560px) {
+    .btn-nav-back-store {
+        padding: 0.32rem 0.55rem !important;
+        font-size: 0.72rem !important;
+    }
+}
+
+/* أزرار الردود السريعة داخل رسالة الوسيط التلقائية */
+.btn-quick-reply-opt:hover {
+    background: linear-gradient(135deg, var(--gold-primary), #b08d45) !important;
+    color: #090d16 !important;
+    border-color: var(--gold-light) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+
 
 

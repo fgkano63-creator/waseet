@@ -606,11 +606,22 @@ function saveWaseetData() {
 
 function loadWaseetData() {
     try {
-        // One-time purge of legacy development test deals so launch starts 100% clean
-        if (!localStorage.getItem('WASEET_DEALS_PURGED_LAUNCH')) {
+        // One-time purge of legacy development test deals & stale cached wallet balances so DB reset is 100% reflected
+        if (!localStorage.getItem('WASEET_DB_RESET_20261025_V3')) {
             localStorage.removeItem('WASEET_DEALS_ACTIVE');
             localStorage.removeItem('WASEET_DEALS_COMPLETED');
-            localStorage.setItem('WASEET_DEALS_PURGED_LAUNCH', 'true');
+            localStorage.removeItem('WASEET_DEAL_COUNTER');
+            try {
+                const rawUser = localStorage.getItem('WASEET_SAVED_USER_PERMANENT');
+                if (rawUser) {
+                    const parsedUser = JSON.parse(rawUser);
+                    if (parsedUser && parsedUser.wallet) {
+                        parsedUser.wallet = { available: 0, locked: 0, total: 0 };
+                        localStorage.setItem('WASEET_SAVED_USER_PERMANENT', JSON.stringify(parsedUser));
+                    }
+                }
+            } catch (err) {}
+            localStorage.setItem('WASEET_DB_RESET_20261025_V3', 'true');
         }
 
         // 1. Permanent User Login Recovery
