@@ -146,8 +146,8 @@ async function waseetFetchUserProfile(userId) {
 }
 
 /**
- * التأكد المضمون 100% من وجود سجل للمستخدم الحالي (أو المدير) في جدول public.profiles
- * لمنع خطأ violates foreign key constraint "deal_messages_sender_id_fkey"
+ * جلب أو مطابقة سجل المستخدم الحالي (أو المدير) من جدول public.profiles (قراءة فقط دون إرسال طلبات POST/Upsert من المتصفح)
+ * حيث يتم إنشاء الـ Profile تلقائياً عبر Trigger قاعدة البيانات (on_auth_user_created).
  */
 async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, senderRoleHint = null) {
     const client = initWaseetSupabase();
@@ -195,68 +195,33 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
 
         const targetRole = isAdmin ? 'admin' : 'user';
 
-        // 1. إذا كان لدينا معرف مرشح صالح، نتحقق أولاً من وجوده فعلياً في جدول public.profiles باستخدام select('*')
+        // 1. القراءة المباشرة من جدول public.profiles (دون أي محاولة POST / Upsert من المتصفح)
         if (rawCandidateId && waseetIsValidUuid(rawCandidateId)) {
-            const { data: existingProf, error: checkErr } = await client
+            const { data: existingProf } = await client
                 .from('profiles')
                 .select('*')
                 .eq('id', rawCandidateId)
                 .maybeSingle();
-
-            if (checkErr) {
-                console.warn('[Supabase Profiles] خطأ أثناء فحص وجود المستخدم في profiles:', checkErr.message);
-            }
 
             if (existingProf && existingProf.id) {
                 if (stateUser && stateUser.id !== existingProf.id) {
                     stateUser.id = existingProf.id;
                     if (typeof saveWaseetData === 'function') saveWaseetData();
                 }
-                console.log('[Supabase Profiles] تم تأكيد وجود sender_id في جدول profiles:', existingProf.id);
                 return existingProf;
             }
 
-            // 2. إذا لم يكن موجوداً، نحاول إنشاءه بعدة صيغ متوافقة مع مختلف هياكل جدول profiles
-            const candidatePayloads = [
-                { id: rawCandidateId, name: nameVal, email: emailVal || undefined, avatar_url: avatarVal, role: targetRole },
-                { id: rawCandidateId, username: nameVal, avatar_url: avatarVal, role: targetRole },
-                { id: rawCandidateId, name: nameVal, role: targetRole },
-                { id: rawCandidateId, role: targetRole },
-                { id: rawCandidateId }
-            ];
-
-            for (const payload of candidatePayloads) {
-                const { data: upserted, error: upsertErr } = await client
-                    .from('profiles')
-                    .upsert(payload, { onConflict: 'id' })
-                    .select('*')
-                    .maybeSingle();
-
-                if (!upsertErr && upserted && upserted.id) {
-                    console.log('[Supabase Profiles] تم إنشاء/تأكيد سجل المستخدم بنجاح في profiles:', upserted.id);
-                    if (stateUser) {
-                        stateUser.id = upserted.id;
-                        if (typeof saveWaseetData === 'function') saveWaseetData();
-                    }
-                    return upserted;
-                }
-            }
-
-            // فحص نهائي بعد محاولات الـ upsert للتأكد مما إذا تم إدراج الصف فعلياً
-            const { data: verifiedAfterUpsert } = await client
-                .from('profiles')
-                .select('*')
-                .eq('id', rawCandidateId)
-                .maybeSingle();
-
-            if (verifiedAfterUpsert && verifiedAfterUpsert.id) {
-                console.log('[Supabase Profiles] تم التحقق من وجود السجل بعد الإدراج:', verifiedAfterUpsert.id);
-                return verifiedAfterUpsert;
-            }
+            // إذا كان المستخدم مصادقاً بمعرف UUID رسمي، نعيد بياناته مباشرة دون إرسال طلبات POST خاطئة
+            return {
+                id: rawCandidateId,
+                email: emailVal,
+                name: nameVal,
+                avatar_url: avatarVal,
+                role: targetRole
+            };
         }
 
-        // 3. خطة بديلة مضمونة 100%: جلب معرّف موثق وموجود فعلياً في جدول public.profiles
-        console.warn('[Supabase Profiles] جاري البحث عن سجل موثق مطابق في جدول public.profiles...');
+        // 2. في حال عدم توفر معرف مباشر، البحث عن السجل المطابق بالقراءة فقط (SELECT)
         const { data: allProfiles, error: listErr } = await client
             .from('profiles')
             .select('*')
@@ -265,7 +230,6 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
         if (!listErr && Array.isArray(allProfiles) && allProfiles.length > 0) {
             let matchedProfile = null;
 
-            // أ) إذا كان المرسل هو الوسيط/المدير، نبحث عن حساب المدير في جدول profiles
             if (isAdmin) {
                 matchedProfile = allProfiles.find(p =>
                     p.role === 'admin' ||
@@ -274,7 +238,6 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
                 );
             }
 
-            // ب) البحث عبر البريد الإلكتروني أو الاسم
             if (!matchedProfile && emailLower) {
                 matchedProfile = allProfiles.find(p => p.email && String(p.email).toLowerCase().trim() === emailLower);
             }
@@ -282,7 +245,6 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
                 matchedProfile = allProfiles.find(p => (p.name && p.name === nameVal) || (p.username && p.username === nameVal));
             }
 
-            // ج) المطابقة مع أطراف الصفقة المسجلين فعلياً في جدول profiles
             if (!matchedProfile && dealContext) {
                 const dealBuyerId = dealContext.buyer?.id || dealContext.buyer_id;
                 const dealSellerId = dealContext.seller?.id || dealContext.seller_id;
@@ -299,13 +261,11 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
                 }
             }
 
-            // د) أخذ أول ملف شخصي صالح في حال تعذر كل ما سبق لضمان عدم كسر قيد المفتاح الأجنبي
             if (!matchedProfile) {
                 matchedProfile = allProfiles[0];
             }
 
             if (matchedProfile && matchedProfile.id) {
-                console.log('[Supabase Profiles] تم اعتماد معرف موثق من جدول profiles:', matchedProfile.id);
                 if (stateUser && !waseetIsValidUuid(stateUser.id)) {
                     stateUser.id = matchedProfile.id;
                     if (typeof saveWaseetData === 'function') saveWaseetData();
@@ -316,7 +276,6 @@ async function waseetEnsureUserProfileInDb(userHint = null, dealContext = null, 
 
         return null;
     } catch (err) {
-        console.warn('[Supabase Profiles] استثناء أثناء تأكيد ملف المستخدم في profiles:', err);
         return null;
     }
 }
@@ -395,11 +354,6 @@ async function waseetSyncAuthState() {
             const el = document.getElementById(elId);
             if (el) el.innerText = `${rawAvail} نقطة`;
         });
-
-        // التأكد من إنشاء/تحديث حساب المستخدم أو المدير في جدول public.profiles بشكل سليم
-        if (!profile || (isAdmin && profile.role !== 'admin')) {
-            await waseetEnsureUserProfileInDb(mappedUser);
-        }
 
         // تحديث عناصر الشريط العلوي فوراً قبل انتظار الجلب الشبكي المطول
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
@@ -497,23 +451,6 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
                 alert('فشل النشر: ' + authErr.message);
             }
             return options.returnFullResult ? { data: null, error: authErr } : null;
-        }
-
-        // التأكد من وجود صف البائع في جدول profiles لمنع فشل المفتاح الأجنبي (Foreign Key seller_id)
-        try {
-            const sellerName = account.sellerName
-                || sessionUser?.user_metadata?.full_name
-                || sessionUser?.user_metadata?.name
-                || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.name : null)
-                || (sessionUser?.email ? sessionUser.email.split('@')[0] : 'بائع معتمد');
-            await client.from('profiles').upsert({
-                id: sellerUuid,
-                email: sessionUser?.email || account.sellerEmail || '',
-                name: sellerName,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'id', ignoreDuplicates: true });
-        } catch (profErr) {
-            console.warn('[Supabase Accounts] ملاحظة مزامنة ملف البائع:', profErr);
         }
 
         // توحيد حالة الفحص للحسابات المعلقة
@@ -1063,9 +1000,6 @@ async function waseetSendEscrowMessageToSupabase(deal, msgObj, channelType, send
 
         // 4. إذا ظهر خطأ Foreign Key على sender_id رغم المحاولة الأولى، نجلب معرفاً موجوداً وموثقاً من جدول profiles ونعيد المحاولة فوراً
         if (error && String(error.message || '').includes('deal_messages_sender_id_fkey')) {
-            console.warn('[Escrow Message] محاولة إصلاح تلقائي لسجل المرسل في profiles بعد خطأ FK...');
-            await client.from('profiles').upsert({ id: senderUuid }, { onConflict: 'id' });
-
             const { data: fallbackProfiles } = await client
                 .from('profiles')
                 .select('*')
