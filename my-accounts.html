@@ -29,7 +29,7 @@
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
     <!-- Custom 3D Design Styles -->
-    <link rel="stylesheet" href="css/style.css?v=20261017_myaccounts">
+    <link rel="stylesheet" href="css/style.css?v=20261025_v8">
 
     <!-- Official Facebook JavaScript SDK -->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
@@ -279,8 +279,8 @@
     <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
         <div class="drawer-header">
             <div class="drawer-brand">
-                <img src="assets/logo.png" alt="WASEET" class="drawer-logo">
-                <span class="drawer-title">WASEET</span>
+                <img src="assets/logo.png?v=20261025_v7" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
             </div>
             <button class="drawer-close-btn" onclick="toggleMyAccountsDrawer()">&times;</button>
         </div>
@@ -290,16 +290,41 @@
         </div>
 
         <div class="drawer-section">
-            <h4 class="drawer-section-title">التنقل السريع</h4>
-            <ul class="drawer-links-list">
-                <li><a href="index.html"><i class="fas fa-store text-gold"></i> المتجر وسوق الحسابات</a></li>
-                <li><a href="my-accounts.html" class="active"><i class="fas fa-boxes text-orange"></i> حساباتي المعروضة للبيع</a></li>
-                <li><a href="deals.html"><i class="fas fa-handshake text-gold"></i> قيد الشراء</a></li>
-                <li><a href="chat.html"><i class="fas fa-comments text-orange"></i> غرفة الوساطة المباشرة</a></li>
-                <li><a href="contact-support.html"><i class="fas fa-headset text-gold"></i> تواصل مع الوسيط المعتمد</a></li>
-                <li id="drawer-pending-accounts-link" style="display: none;"><a href="pending-accounts.html"><i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص</a></li>
-                <li id="drawer-admin-chats-link" style="display: none;"><a href="admin-chats.html"><i class="fas fa-crown text-gold"></i> محادثات الإدارة والوساطة</a></li>
-            </ul>
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="my-accounts.html" class="drawer-shortcut-card active" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-boxes text-orange"></i>
+                    <span>حساباتي</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قيد الشراء</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="wallet.html" class="drawer-shortcut-card" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-wallet text-gold"></i>
+                    <span>محفظتي والنقاط</span>
+                </a>
+                <a href="contact-support.html" class="drawer-shortcut-card" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-accounts-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-clipboard-check text-orange"></i>
+                    <span>حسابات قيد الفحص</span>
+                </a>
+                <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-crown text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -480,10 +505,10 @@
 
             if (drawerUser) {
                 if (user) {
-                    const avatar = user.avatar || 'assets/logo.png';
+                    const avatar = (user.user_metadata && user.user_metadata.avatar_url) || user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
                     const roleBadge = isAdmin ? '👑 الوسيط المعتمد' : '🏷️ بائع موثق';
                     drawerUser.innerHTML = `
-                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
+                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta" style="flex: 1;">
                             <span class="drawer-user-name">${user.name}</span>
                             <span class="drawer-user-role">${roleBadge}</span>

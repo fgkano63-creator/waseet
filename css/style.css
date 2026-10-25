@@ -4039,50 +4039,54 @@ html, body {
 }
 
 /* Backdrop */
-.mobile-drawer-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+.mobile-drawer-overlay,
+.drawer-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.78) !important;
     backdrop-filter: blur(8px);
-    z-index: 2000;
+    z-index: 9998 !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
 }
 
-.mobile-drawer-overlay.active {
-    opacity: 1;
-    visibility: visible;
+.mobile-drawer-overlay.active,
+.drawer-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 /* Sliding Sidebar / Drawer */
 .mobile-drawer-sidebar,
 .mobile-drawer {
-    position: fixed;
-    top: 0;
-    right: -340px;
-    width: 310px;
-    max-width: 86vw;
-    height: 100vh;
-    height: 100dvh;
-    background: linear-gradient(180deg, #131725 0%, #0a0d14 100%);
-    border-left: 1px solid var(--gold-primary);
-    box-shadow: -15px 0 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(197, 160, 89, 0.12);
-    z-index: 2001;
-    display: flex;
-    flex-direction: column;
+    position: fixed !important;
+    top: 0 !important;
+    right: -350px !important;
+    width: 310px !important;
+    max-width: 86vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    background: linear-gradient(180deg, #131725 0%, #0a0d14 100%) !important;
+    border-left: 1px solid var(--gold-primary) !important;
+    box-shadow: -15px 0 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(197, 160, 89, 0.12) !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
     justify-content: flex-start !important;
     gap: 0.75rem;
-    overflow-y: auto;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
     padding: max(1rem, env(safe-area-inset-top, 14px)) 1.1rem 2rem 1.1rem;
     box-sizing: border-box;
 }
 
 .mobile-drawer-sidebar.active,
 .mobile-drawer.active {
-    right: 0;
+    right: 0 !important;
 }
 
 .drawer-header {
@@ -4093,6 +4097,33 @@ html, body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     margin-bottom: 0;
     flex: 0 0 auto !important;
+}
+
+.drawer-brand {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+}
+
+.drawer-title {
+    color: #fff !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 0.5px;
+}
+
+.drawer-logo,
+.drawer-brand img,
+.mobile-drawer-sidebar .drawer-header img:not(.drawer-avatar),
+.mobile-drawer .drawer-header img:not(.drawer-avatar) {
+    width: 38px !important;
+    height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+    object-fit: contain !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    flex-shrink: 0 !important;
 }
 
 .drawer-user-card {
@@ -4109,12 +4140,16 @@ html, body {
     margin-bottom: 0;
 }
 
-.drawer-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--gold-primary);
+.drawer-avatar,
+.drawer-user-card img {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 2px solid var(--gold-primary) !important;
+    flex-shrink: 0 !important;
 }
 
 .drawer-user-meta {
@@ -6290,10 +6325,15 @@ img.brand-logo-img[src*="logo.png"] {
 
 .drawer-logo,
 img.drawer-logo[src*="logo.png"] {
+    width: 38px !important;
+    height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
     border-radius: 0 !important;
     background: transparent !important;
     background-color: transparent !important;
     object-fit: contain !important;
+    flex-shrink: 0 !important;
 }
 
 /* أزرار التنقل السريع (الأسهم Back & Forward Arrows) في أعلى لوحة التحكم والترويسة */
