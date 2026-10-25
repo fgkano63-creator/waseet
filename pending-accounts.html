@@ -115,12 +115,8 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة اليسرى: العودة للمتجر + رصيد المحفظة + زر الحساب + القائمة ☰ -->
+                <!-- المجموعة اليسرى: رصيد المحفظة + زر الحساب + القائمة ☰ -->
                 <div class="nav-left-group">
-                    <a href="index.html" class="btn-nav-back-store" title="العودة للمتجر الرئيسي">
-                        <i class="fas fa-store text-gold"></i>
-                        <span>العودة للمتجر</span>
-                    </a>
                     <!-- رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -475,8 +471,6 @@
                     container.innerHTML = `
                         <div class="user-profile-pill" onclick="togglePendingDrawer()" title="${user.name} (الوسيط المعتمد)">
                             <img src="${avatar}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                            <span class="user-name-label">${user.name}</span>
-                            ${roleBadge}
                         </div>
                     `;
                 } else {

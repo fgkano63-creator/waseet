@@ -29,7 +29,7 @@
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
     <!-- Custom 3D Design Styles -->
-    <link rel="stylesheet" href="css/style.css?v=20261025_v5">
+    <link rel="stylesheet" href="css/style.css?v=20261025_v6">
 
     <!-- Official Facebook JavaScript SDK -->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
@@ -118,12 +118,8 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): العودة للمتجر + رصيد المحفظة + زر الحساب + القائمة ☰ -->
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ -->
                 <div class="nav-left-group">
-                    <a href="index.html" class="btn-nav-back-store" title="العودة للمتجر الرئيسي">
-                        <i class="fas fa-store text-gold"></i>
-                        <span>العودة للمتجر</span>
-                    </a>
                     <!-- 1. رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -430,9 +426,7 @@
                     const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
                     navUserBox.innerHTML = `
                         <div class="user-profile-pill nav-user-chip" onclick="toggleChatDrawer()" title="${user.name}">
-                            <img src="${avatar}" referrerpolicy="no-referrer" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                            <span class="user-name-label">${user.name}</span>
-                            <span class="user-role-badge">${roleTag}</span>
+                            <img src="${avatar}" alt="${user.name}" referrerpolicy="no-referrer" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         </div>
                     `;
                 } else {

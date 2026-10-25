@@ -128,12 +128,10 @@ class WaseetApp {
                 ? '<i class="fas fa-crown text-gold" style="font-size: 0.8rem; margin-right: 0.25rem;" title="الوسيط المعتمد (المدير)"></i>'
                 : '';
 
-            // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي
+            // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي فقط بدون الاسم بجانبها
             container.innerHTML = `
                 <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${user.name} - انقر لإدارة الحساب أو تسجيل الخروج">
                     <img src="${avatarUrl}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                    <span class="user-name-label">${user.name}</span>
-                    ${roleBadge}
                 </div>
             `;
         } else {

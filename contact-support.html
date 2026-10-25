@@ -370,12 +370,8 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): العودة للمتجر + رصيد المحفظة + زر الحساب + أيقونة ☰ -->
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + أيقونة ☰ -->
                 <div class="nav-left-group">
-                    <a href="index.html" class="btn-nav-back-store" title="العودة للمتجر الرئيسي">
-                        <i class="fas fa-store text-gold"></i>
-                        <span>العودة للمتجر</span>
-                    </a>
                     <!-- 1. رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -723,9 +719,8 @@
                 if (currentUser && !currentUser.isGuest) {
                     const avatar = currentUser.avatar || 'assets/logo.png';
                     container.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleSupportDrawer()">
-                            <img src="${avatar}" alt="${currentUser.name}" style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold-primary); object-fit: cover;" onerror="this.src='assets/logo.png'">
-                            <span style="font-weight: 700; color: #fff; font-size: 0.85rem; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${currentUser.name}</span>
+                        <div class="user-profile-pill" onclick="toggleSupportDrawer()" title="${currentUser.name}">
+                            <img src="${avatar}" alt="${currentUser.name}" class="user-avatar-img" onerror="this.src='assets/logo.png'">
                         </div>
                     `;
                 } else {

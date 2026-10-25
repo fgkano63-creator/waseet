@@ -29,7 +29,7 @@
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
     <!-- Custom 3D Design Styles -->
-    <link rel="stylesheet" href="css/style.css?v=20261025_v5">
+    <link rel="stylesheet" href="css/style.css?v=20261025_v6">
 
     <!-- Official Facebook JavaScript SDK -->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ar_AR/sdk.js"></script>
@@ -256,12 +256,8 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): العودة للمتجر + رصيد المحفظة + زر الحساب + القائمة ☰ -->
+                <!-- المجموعة 3 (أقصى اليسار): رصيد المحفظة + زر الحساب + القائمة ☰ -->
                 <div class="nav-left-group">
-                    <a href="index.html" class="btn-nav-back-store" title="العودة للمتجر الرئيسي">
-                        <i class="fas fa-store text-gold"></i>
-                        <span>العودة للمتجر</span>
-                    </a>
                     <!-- 1. رصيد المحفظة -->
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -574,10 +570,8 @@
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
                     const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
                     navUserBox.innerHTML = `
-                        <div class="nav-user-chip" onclick="toggleDealsDrawer()" style="cursor: pointer; display: flex; align-items: center; gap: 0.55rem; background: rgba(14, 18, 28, 0.85); border: 1px solid var(--border-metal); padding: 3px 12px 3px 4px; border-radius: 999px;">
-                            <img src="${avatar}" referrerpolicy="no-referrer" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold-primary); display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">${user.name}</span>
-                            <span style="font-size: 0.72rem; color: var(--gold-primary); font-weight: 800;">${roleTag}</span>
+                        <div class="user-profile-pill nav-user-chip" onclick="toggleDealsDrawer()" title="${user.name}">
+                            <img src="${avatar}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         </div>
                     `;
                 } else {
