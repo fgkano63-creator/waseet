@@ -1692,24 +1692,23 @@ function waseetInitNavigationEnhancements() {
             link.setAttribute('rel', 'noopener noreferrer');
         });
 
-        // 2. التأكد من وجود زري (حساباتي) و (محادثة الوسيط) في شريط تنقل البائع والمشتري (#nav-user-middle-group)
+        // 2. التأكد من عدم تكرار الأزرار داخل شريط تنقل البائع والمشتري (#nav-user-middle-group)
         const userNav = document.getElementById('nav-user-middle-group');
         if (userNav) {
-            const path = (window.location.pathname || '').toLowerCase();
-            if (!userNav.querySelector('a[href="my-accounts.html"]')) {
-                const myAccLink = document.createElement('a');
-                myAccLink.href = 'my-accounts.html';
-                myAccLink.className = 'btn-nav-middle' + (path.includes('my-accounts.html') ? ' active' : '');
-                myAccLink.innerHTML = '<i class="fas fa-boxes text-gold"></i> حساباتي';
-                userNav.appendChild(myAccLink);
-            }
-            if (!userNav.querySelector('a[href="contact-support.html"]')) {
-                const supportChatLink = document.createElement('a');
-                supportChatLink.href = 'contact-support.html';
-                supportChatLink.className = 'btn-nav-middle' + (path.includes('contact-support.html') ? ' active' : '');
-                supportChatLink.innerHTML = '<i class="fas fa-headset text-orange"></i> محادثة الوسيط <span class="deals-badge-count chats-unread-badge" style="display: none;"></span>';
-                userNav.appendChild(supportChatLink);
-            }
+            const seenMyAcc = [];
+            const seenSupport = [];
+            userNav.querySelectorAll('a').forEach(a => {
+                const href = (a.getAttribute('href') || '').toLowerCase();
+                const txt = (a.textContent || '').trim();
+                if (href.includes('my-accounts') || txt.includes('حساباتي')) {
+                    seenMyAcc.push(a);
+                } else if (href.includes('contact-support') || txt.includes('محادثة الوسيط')) {
+                    seenSupport.push(a);
+                }
+            });
+            // إزالة أي أزرار مكررة إن وجدت
+            for (let i = 1; i < seenMyAcc.length; i++) seenMyAcc[i].remove();
+            for (let i = 1; i < seenSupport.length; i++) seenSupport[i].remove();
         }
 
         // 3. إضافة أزرار الأسهم (Back & Forward Arrows) في الترويسة العلوية لتسهيل التنقل بين الصفحات
