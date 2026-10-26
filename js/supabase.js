@@ -114,6 +114,10 @@ async function waseetSignOut() {
         if (typeof saveWaseetData === 'function') saveWaseetData();
     }
 
+    if (window.waseetNotifications && typeof window.waseetNotifications.syncWithUser === 'function') {
+        window.waseetNotifications.syncWithUser(null);
+    }
+
     localStorage.removeItem('WASEET_SAVED_USER_PERMANENT');
 
     // إعادة تحميل خفيفة لتحديث الواجهة بالحالة الجديدة
@@ -347,6 +351,11 @@ async function waseetSyncAuthState() {
         if (typeof WASEET_STATE !== 'undefined') {
             WASEET_STATE.user = mappedUser;
             if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+
+        // مزامنة نظام الإشعارات وشارات التطبيق للمستخدم الحالي
+        if (window.waseetNotifications && typeof window.waseetNotifications.syncWithUser === 'function') {
+            window.waseetNotifications.syncWithUser(mappedUser);
         }
 
         // تحديث جميع عناصر المحفظة في الترويسة فوراً
@@ -1975,6 +1984,48 @@ window.waseetSyncAllNavBadges = waseetSyncAllNavBadges;
 window.waseetRenderChatsUnreadBadge = waseetRenderChatsUnreadBadge;
 
 /**
+ * إرسال إشعار لمستخدم في منصة وسيط عبر Supabase RPC أو إدراج مباشر
+ */
+async function waseetSendNotification(userId, title, message, link = '') {
+    const client = initWaseetSupabase();
+    if (!client || !userId || !title) return false;
+
+    try {
+        // 1. محاولة استدعاء الدالة السحابية send_waseet_notification
+        const { data: rpcRes, error: rpcErr } = await client.rpc('send_waseet_notification', {
+            p_user_id: userId,
+            p_title: title,
+            p_message: message || '',
+            p_link: link || ''
+        });
+
+        if (!rpcErr) {
+            return true;
+        }
+
+        // 2. كحل احتياطي: إدراج مباشر في جدول notifications
+        const { error: insertErr } = await client.from('notifications').insert([{
+            user_id: userId,
+            title: title,
+            message: message || '',
+            link: link || '',
+            is_read: false
+        }]);
+
+        if (insertErr) {
+            console.warn('[Supabase Notification] Insert fallback error:', insertErr.message);
+            return false;
+        }
+
+        return true;
+    } catch (err) {
+        console.warn('[Supabase Notification] Exception:', err);
+        return false;
+    }
+}
+window.waseetSendNotification = waseetSendNotification;
+
+/**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
  */
 function initWaseetAuthListener() {
@@ -1990,6 +2041,9 @@ function initWaseetAuthListener() {
             if (typeof WASEET_STATE !== 'undefined') {
                 WASEET_STATE.user = null;
                 if (typeof saveWaseetData === 'function') saveWaseetData();
+            }
+            if (window.waseetNotifications && typeof window.waseetNotifications.syncWithUser === 'function') {
+                window.waseetNotifications.syncWithUser(null);
             }
             if (window.waseetApp && typeof window.waseetApp.renderUserProfile === 'function') {
                 window.waseetApp.renderUserProfile();
