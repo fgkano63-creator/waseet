@@ -212,6 +212,10 @@
             this.supportRealtimeChannel = null;
             this.audioCtx = null;
             this.currentUser = null;
+            this.isFetching = false;
+            this.lastFetchAt = 0;
+            this.subscribedUserId = null;
+            this.hasWarnedGrant = false;
 
             this.init();
         }
@@ -360,8 +364,11 @@
 
             if (user && user.id) {
                 this.fetchNotifications();
-                this.subscribeRealtime(user.id);
+                if (this.subscribedUserId !== user.id) {
+                    this.subscribeRealtime(user.id);
+                }
             } else {
+                this.subscribedUserId = null;
                 this.notifications = [];
                 WaseetNotificationStore.setState({
                     notifications: [],
@@ -393,6 +400,12 @@
             const client = initWaseetSupabase();
             if (!client) return;
 
+            if (this.isFetching) return;
+            const now = Date.now();
+            if (!isSilent && (now - this.lastFetchAt < 1500)) return;
+            this.isFetching = true;
+            this.lastFetchAt = now;
+
             try {
                 // 1. جلب الإشعارات الرسمية من جدول notifications
                 const { data: notifData, error: notifErr } = await client
@@ -402,8 +415,15 @@
                     .order('created_at', { ascending: false })
                     .limit(40);
 
-                if (notifErr && notifErr.code !== '42P01') {
-                    console.warn('[Notifications] fetch error:', notifErr.message);
+                if (notifErr) {
+                    if (notifErr.code === '42501' || (notifErr.message && notifErr.message.includes('permission denied'))) {
+                        if (!this.hasWarnedGrant) {
+                            console.info('[Notifications] تنبيه: صلاحيات جدول notifications بحاجة للتفعيل في Supabase SQL Editor عبر أمر GRANT.');
+                            this.hasWarnedGrant = true;
+                        }
+                    } else if (notifErr.code !== '42P01') {
+                        console.warn('[Notifications] fetch error:', notifErr.message);
+                    }
                 }
 
                 this.notifications = Array.isArray(notifData) ? [...notifData] : [];
@@ -524,6 +544,8 @@
                 this.renderDropdownItems();
             } catch (err) {
                 console.warn('[Notifications] fetch exception:', err);
+            } finally {
+                this.isFetching = false;
             }
         }
 
@@ -534,6 +556,8 @@
             if (!userId || typeof initWaseetSupabase !== 'function') return;
             const client = initWaseetSupabase();
             if (!client) return;
+
+            this.subscribedUserId = userId;
 
             // إزالة القنوات السابقة إن وجدت
             if (this.realtimeChannel) {

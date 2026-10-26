@@ -28,41 +28,50 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
--- 2. تأمين البيانات وسياسات الأمان (Row Level Security - RLS)
+-- 2. ضبط الصلاحيات وسياسات الأمان (Grants & Row Level Security)
+-- منح الصلاحيات للأدوار المصادقة وغير المسجلة ولمفتاح الخدمة لمنع خطأ 403 (permission denied)
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.notifications TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.notifications TO anon;
+GRANT ALL ON TABLE public.notifications TO service_role;
+
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "notifications_select_policy" ON public.notifications;
 DROP POLICY IF EXISTS "notifications_select_own" ON public.notifications;
-CREATE POLICY "notifications_select_own"
+CREATE POLICY "notifications_select_policy"
 ON public.notifications
 FOR SELECT
-TO authenticated
+TO authenticated, anon
 USING (
-    auth.uid() = user_id
+    auth.uid() = user_id OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "notifications_update_policy" ON public.notifications;
 DROP POLICY IF EXISTS "notifications_update_own" ON public.notifications;
-CREATE POLICY "notifications_update_own"
+CREATE POLICY "notifications_update_policy"
 ON public.notifications
 FOR UPDATE
 TO authenticated
 USING (
-    auth.uid() = user_id
+    auth.uid() = user_id OR public.is_admin()
 )
 WITH CHECK (
-    auth.uid() = user_id
+    auth.uid() = user_id OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "notifications_delete_policy" ON public.notifications;
 DROP POLICY IF EXISTS "notifications_delete_own" ON public.notifications;
-CREATE POLICY "notifications_delete_own"
+CREATE POLICY "notifications_delete_policy"
 ON public.notifications
 FOR DELETE
 TO authenticated
 USING (
-    auth.uid() = user_id
+    auth.uid() = user_id OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "notifications_insert_policy" ON public.notifications;
 DROP POLICY IF EXISTS "notifications_insert_authenticated" ON public.notifications;
-CREATE POLICY "notifications_insert_authenticated"
+CREATE POLICY "notifications_insert_policy"
 ON public.notifications
 FOR INSERT
 TO authenticated, anon
@@ -103,6 +112,8 @@ BEGIN
     RETURN v_notif_id;
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.send_waseet_notification(uuid, text, text, text) TO authenticated, anon, service_role;
 
 -- 4. مشغل تلقائي لإرسال الإشعارات عند تحديث الصفقات (Deals Notifications)
 CREATE OR REPLACE FUNCTION public.trg_fn_notify_deal_events()
