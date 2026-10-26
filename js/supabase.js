@@ -1837,6 +1837,9 @@ function waseetSyncAllNavBadges() {
         }
         const unreadChats = parseInt(sessionStorage.getItem('WASEET_UNREAD_CHATS_COUNT') || '0', 10);
         waseetRenderChatsUnreadBadge(unreadChats);
+        if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.renderAllBadges === 'function') {
+            window.WaseetNotificationStore.renderAllBadges();
+        }
     } catch (e) {}
 }
 
@@ -1900,27 +1903,32 @@ function waseetRenderChatsUnreadBadge(count) {
     const num = Math.max(0, Number(count) || 0);
     sessionStorage.setItem('WASEET_UNREAD_CHATS_COUNT', String(num));
 
-    // ضمان وجود شارة إشعار داخل جميع أزرار المحادثات في الترويسة والقائمة الجانبية
-    const chatLinks = document.querySelectorAll('a[href="chat.html"], a[href="admin-chats.html"], a[href="contact-support.html"]');
-    chatLinks.forEach(link => {
-        let badge = link.querySelector('.chats-unread-badge, #admin-nav-chats-badge, #nav-chats-badge');
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'deals-badge-count chats-unread-badge';
-            badge.style.display = 'none';
-            badge.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-            badge.style.color = '#fff';
-            badge.style.marginRight = '4px';
-            link.appendChild(badge);
-        }
-        if (num > 0) {
-            badge.innerText = String(num);
-            badge.style.display = 'inline-flex';
-        } else {
-            badge.innerText = '';
-            badge.style.display = 'none';
-        }
-    });
+    // ربط فوري مع مخزن الحالة العام (Global State Store) لتوحيد الشارات
+    if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.setState === 'function') {
+        window.WaseetNotificationStore.setState({ unreadSupportCount: num });
+    } else {
+        // ضمان وجود شارة إشعار داخل جميع أزرار المحادثات في الترويسة والقائمة الجانبية
+        const chatLinks = document.querySelectorAll('a[href="chat.html"], a[href="admin-chats.html"], a[href="contact-support.html"]');
+        chatLinks.forEach(link => {
+            let badge = link.querySelector('.chats-unread-badge, #admin-nav-chats-badge, #nav-chats-badge, #admin-nav-support-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'deals-badge-count chats-unread-badge';
+                badge.style.display = 'none';
+                badge.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                badge.style.color = '#fff';
+                badge.style.marginRight = '4px';
+                link.appendChild(badge);
+            }
+            if (num > 0) {
+                badge.innerText = String(num);
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.innerText = '';
+                badge.style.display = 'none';
+            }
+        });
+    }
 }
 
 function waseetInitGlobalNavRealtimeBadges() {

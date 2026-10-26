@@ -554,7 +554,7 @@
     <script src="js/data.js"></script>
     <script src="js/dialog.js"></script>
     <script src="js/particles.js"></script>
-    <script src="js/notifications.js?v=20261026_v1"></script>
+    <script src="js/notifications.js?v=20261026_v2"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>
@@ -652,6 +652,11 @@
             renderNavbarUser();
             setupQuickChips();
             setupChatForm();
+
+            localStorage.setItem('WASEET_USER_LAST_SEEN_SUPPORT', new Date().toISOString());
+            if (window.WaseetNotificationStore) {
+                window.WaseetNotificationStore.setState({ unreadSupportCount: 0 });
+            }
 
             // تحميل الرسائل وبدء Realtime
             await loadMessages(currentUser.id);
@@ -1118,3 +1123,4 @@
     </script>
 </body>
 </html>
+

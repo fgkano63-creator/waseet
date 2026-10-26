@@ -102,6 +102,9 @@ class WaseetApp {
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             window.waseetSyncAllNavBadges();
         }
+        if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.renderAllBadges === 'function') {
+            window.WaseetNotificationStore.renderAllBadges();
+        }
 
         // روابط القائمة الجانبية للمدير
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
@@ -583,6 +586,9 @@ class WaseetApp {
         }
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             window.waseetSyncAllNavBadges();
+        }
+        if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.renderAllBadges === 'function') {
+            window.WaseetNotificationStore.renderAllBadges();
         }
     }
 

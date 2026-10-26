@@ -198,7 +198,7 @@
     <script src="js/calculator.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/dialog.js"></script>
-    <script src="js/notifications.js?v=20261026_v1"></script>
+    <script src="js/notifications.js?v=20261026_v2"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>
@@ -607,6 +607,11 @@
                 }
             });
 
+            localStorage.setItem('WASEET_ADMIN_LAST_SEEN_SUPPORT', new Date().toISOString());
+            if (window.WaseetNotificationStore) {
+                window.WaseetNotificationStore.setState({ unreadSupportCount: 0 });
+            }
+
             await reload();
             setupRealtime();
 
@@ -623,3 +628,4 @@
     </script>
 </body>
 </html>
+

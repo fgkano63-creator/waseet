@@ -290,24 +290,57 @@ BEGIN
 END $$;
 
 -- 7. مشغل إشعارات رسائل الدعم الفني / الوسيط (Support Messages)
+-- يرسل إشعارات متبادلة:
+-- - عند رد المدير/الوسيط: يصل إشعار للمستخدم المستهدف
+-- - عند إرسال مستخدم رسالة دعم: يصل إشعار فوري لكافة مدراء ووسطاء المنصة
 CREATE OR REPLACE FUNCTION public.trg_fn_notify_support_messages()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+    v_admin_rec RECORD;
+    v_sender_name TEXT := 'مستخدم';
 BEGIN
-    -- إذا كانت الرسالة مرسلة من الوسيط أو الإدارة، نرسل إشعاراً فورياً للمستخدم
-    IF TG_OP = 'INSERT' AND NEW.sender_role IN ('admin', 'mediator') THEN
-        IF NEW.user_id IS NOT NULL THEN
-            PERFORM public.send_waseet_notification(
-                NEW.user_id,
-                'رسالة جديدة من الوسيط المعتمد 💬',
-                substring(COALESCE(NEW.message, 'لديك رد جديد من فريق الوساطة والدعم') from 1 for 100),
-                'contact-support.html'
-            );
+    IF TG_OP = 'INSERT' THEN
+        -- حالة 1: الرسالة مرسلة من الوسيط أو الإدارة -> نرسل إشعاراً فورياً للمستخدم المستهدف
+        IF NEW.sender_role IN ('admin', 'mediator') THEN
+            IF NEW.user_id IS NOT NULL THEN
+                PERFORM public.send_waseet_notification(
+                    NEW.user_id,
+                    'رسالة جديدة من الوسيط المعتمد 💬',
+                    substring(COALESCE(NEW.message, 'لديك رد جديد من فريق الوساطة والدعم') from 1 for 100),
+                    'contact-support.html'
+                );
+            END IF;
+
+        -- حالة 2: الرسالة مرسلة من مستخدم عادي -> نرسل إشعاراً فورياً لكافة مدراء ووسطاء المنصة
+        ELSE
+            -- محاولة استخراج اسم المرسل من جدول profiles
+            SELECT COALESCE(name, split_part(email, '@', 1), 'مستخدم')
+            INTO v_sender_name
+            FROM public.profiles
+            WHERE id = NEW.user_id;
+
+            FOR v_admin_rec IN (
+                SELECT DISTINCT id FROM public.profiles
+                WHERE role IN ('admin', 'mediator')
+                   OR lower(email) IN ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com')
+            ) LOOP
+                -- تجنب إرسال إشعار للمرسل إذا كان هو نفسه مسجلاً كمدير
+                IF v_admin_rec.id IS DISTINCT FROM NEW.user_id THEN
+                    PERFORM public.send_waseet_notification(
+                        v_admin_rec.id,
+                        'رسالة دعم جديدة من ' || COALESCE(v_sender_name, 'مستخدم') || ' 💬',
+                        substring(COALESCE(NEW.message, 'رسالة جديدة في محادثات الإدارة') from 1 for 100),
+                        'admin-chats.html?user=' || COALESCE(NEW.user_id::text, '')
+                    );
+                END IF;
+            END LOOP;
         END IF;
     END IF;
+
     RETURN NEW;
 END;
 $$;
@@ -320,6 +353,51 @@ BEGIN
         AFTER INSERT ON public.support_messages
         FOR EACH ROW
         EXECUTE FUNCTION public.trg_fn_notify_support_messages();
+    END IF;
+END $$;
+
+-- توليد إشعارات مبدئية لرسائل الدعم الحديثة التي لم يرد عليها لضمان عدم ظهور جرس المدير فارغاً
+DO $$
+DECLARE
+    v_msg RECORD;
+    v_admin_rec RECORD;
+    v_sender_name TEXT;
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'support_messages') THEN
+        FOR v_msg IN (
+            SELECT * FROM public.support_messages
+            WHERE sender_role = 'user'
+            ORDER BY created_at DESC
+            LIMIT 10
+        ) LOOP
+            SELECT COALESCE(name, split_part(email, '@', 1), 'مستخدم')
+            INTO v_sender_name
+            FROM public.profiles
+            WHERE id = v_msg.user_id;
+
+            FOR v_admin_rec IN (
+                SELECT DISTINCT id FROM public.profiles
+                WHERE role IN ('admin', 'mediator')
+                   OR lower(email) IN ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com')
+            ) LOOP
+                IF v_admin_rec.id IS DISTINCT FROM v_msg.user_id THEN
+                    -- عدم التكرار إذا كان الإشعار موجوداً بالفعل
+                    IF NOT EXISTS (
+                        SELECT 1 FROM public.notifications
+                        WHERE user_id = v_admin_rec.id
+                          AND link = ('admin-chats.html?user=' || v_msg.user_id::text)
+                          AND is_read = false
+                    ) THEN
+                        PERFORM public.send_waseet_notification(
+                            v_admin_rec.id,
+                            'رسالة دعم جديدة من ' || COALESCE(v_sender_name, 'مستخدم') || ' 💬',
+                            substring(COALESCE(v_msg.message, 'رسالة جديدة في محادثات الإدارة') from 1 for 100),
+                            'admin-chats.html?user=' || COALESCE(v_msg.user_id::text, '')
+                        );
+                    END IF;
+                END IF;
+            END LOOP;
+        END LOOP;
     END IF;
 END $$;
 

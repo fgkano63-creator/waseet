@@ -49,8 +49,10 @@
         <a href="admin-chats.html" class="support-floating-pill" id="support-floating-btn" title="صندوق محادثات الدعم (الإدارة)" style="text-decoration: none;">
             <div class="support-floating-icon">
                 <i class="fas fa-headset"></i>
+                <span class="support-badge-pulse" id="support-unread-dot" style="display: none;"></span>
             </div>
             <span class="support-floating-label">محادثات الإدارة</span>
+            <span class="deals-badge-count chats-unread-badge support-floating-badge" id="support-floating-badge" style="display: none;"></span>
         </a>
         ` : `
         <a href="contact-support.html" class="support-floating-pill" id="support-floating-btn" title="محادثة مباشرة مع الوسيط المعتمد" style="text-decoration: none;">
@@ -59,10 +61,16 @@
                 <span class="support-badge-pulse" id="support-unread-dot" style="display: none;"></span>
             </div>
             <span class="support-floating-label">تواصل مع الوسيط</span>
+            <span class="deals-badge-count chats-unread-badge support-floating-badge" id="support-floating-badge" style="display: none;"></span>
         </a>
         `;
 
         document.body.insertAdjacentHTML('beforeend', floatingBtnHtml);
+
+        // مزامنة فورية مع مخزن الإشعارات العام (Global Store)
+        if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.renderAllBadges === 'function') {
+            window.WaseetNotificationStore.renderAllBadges();
+        }
     }
 
     /**
@@ -359,6 +367,10 @@
                     if (newMsg.sender_role === 'admin') {
                         playSupportChime();
                         if (!isChatPage) {
+                            if (window.WaseetNotificationStore) {
+                                const cur = window.WaseetNotificationStore.getState().unreadSupportCount || 0;
+                                window.WaseetNotificationStore.setState({ unreadSupportCount: cur + 1 });
+                            }
                             const unreadDot = document.getElementById('support-unread-dot');
                             if (unreadDot) unreadDot.style.display = 'block';
                             if (typeof waseetAlert === 'function') {
