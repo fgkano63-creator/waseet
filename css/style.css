@@ -464,6 +464,73 @@ body::before {
     box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
 }
 
+/* ==========================================================================
+   Hero Section Badge Row with Navigation History Arrows (Desktop & Mobile)
+   ========================================================================== */
+.hero-badge-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 1.5rem;
+    min-height: 44px;
+}
+
+.hero-badge-row .hero-badge {
+    margin-bottom: 0 !important;
+    position: relative;
+    z-index: 2;
+    max-width: calc(100% - 104px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-hero-history-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(18, 24, 38, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(197, 160, 89, 0.4);
+    color: var(--gold-light);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 10px rgba(197, 160, 89, 0.15);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-hero-history-arrow:hover {
+    background: rgba(197, 160, 89, 0.22);
+    border-color: var(--gold-primary);
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 20px rgba(197, 160, 89, 0.35);
+}
+
+.btn-hero-history-arrow:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+/* السهم الأيمن (الرجوع) يلتصق بأقصى يمين الحاوية */
+.btn-hero-history-right {
+    right: 0;
+}
+
+/* السهم الأيسر (التقدم) يلتصق بأقصى يسار الحاوية */
+.btn-hero-history-left {
+    left: 0;
+}
+
 .hero-title {
     font-size: 2.8rem;
     font-weight: 900;
@@ -2967,6 +3034,20 @@ html, body {
         padding: 0.25rem 0.65rem !important;
         margin-bottom: 0.5rem !important;
     }
+    .hero-badge-row {
+        margin-bottom: 0.6rem !important;
+        min-height: 36px;
+    }
+    .hero-badge-row .hero-badge {
+        margin-bottom: 0 !important;
+        max-width: calc(100% - 84px);
+    }
+    .btn-hero-history-arrow {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        font-size: 0.8rem;
+    }
     .hero-title {
         font-size: clamp(1.35rem, 5.5vw, 1.75rem) !important;
         line-height: 1.25 !important;
@@ -3502,6 +3583,22 @@ html, body {
 
 /* 2. Extra Small Screens (Smartphones < 480px) */
 @media (max-width: 480px) {
+    .hero-badge-row {
+        margin-bottom: 0.5rem !important;
+        min-height: 34px;
+    }
+    .hero-badge-row .hero-badge {
+        font-size: 0.68rem !important;
+        padding: 0.2rem 0.5rem !important;
+        gap: 0.35rem;
+        max-width: calc(100% - 76px);
+    }
+    .btn-hero-history-arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+    }
     .filter-bar {
         grid-template-columns: 1fr;
     }

@@ -42,16 +42,8 @@
         <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
         <header class="header-navbar">
             <div class="container nav-container">
-                <!-- المجموعة 1 (أقصى اليمين): أزرار التنقل (الأسهم) + شعار الموقع -->
+                <!-- المجموعة 1 (أقصى اليمين): شعار الموقع -->
                 <div class="nav-brand-group">
-                    <div class="waseet-history-nav-arrows">
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
                     <a href="index.html" class="brand-wrap">
                         <img src="assets/logo.png?v=20261026_orig" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
@@ -151,9 +143,22 @@
         <!-- ================= Hero Section ================= -->
         <section class="hero-section">
             <div class="container">
-                <div class="hero-badge">
-                    <i class="fas fa-shield-check text-gold"></i>
-                    <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
+                <div class="hero-badge-row">
+                    <!-- سهم العودة (أقصى اليمين) -->
+                    <button type="button" class="btn-history-arrow btn-hero-history-arrow btn-hero-history-right" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <!-- شارة الأمان والموثوقية في المنتصف -->
+                    <div class="hero-badge">
+                        <i class="fas fa-shield-check text-gold"></i>
+                        <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
+                    </div>
+
+                    <!-- سهم التقدم (أقصى اليسار) -->
+                    <button type="button" class="btn-history-arrow btn-hero-history-arrow btn-hero-history-left" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                 </div>
 
                 <h1 class="hero-title">

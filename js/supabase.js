@@ -1720,22 +1720,24 @@ function waseetInitNavigationEnhancements() {
             for (let i = 1; i < seenSupport.length; i++) seenSupport[i].remove();
         }
 
-        // 3. إضافة أزرار الأسهم (Back & Forward Arrows) في الترويسة العلوية لتسهيل التنقل بين الصفحات
-        const brandGroups = document.querySelectorAll('.nav-brand-group, .wa-topbar');
-        brandGroups.forEach(group => {
-            if (group.querySelector('.waseet-history-nav-arrows')) return;
-            const arrowsWrap = document.createElement('div');
-            arrowsWrap.className = 'waseet-history-nav-arrows';
-            arrowsWrap.innerHTML = `
-                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-            `;
-            group.insertBefore(arrowsWrap, group.firstChild);
-        });
+        // 3. إضافة أزرار الأسهم (Back & Forward Arrows) في الترويسة العلوية لتسهيل التنقل بين الصفحات (للصفحات الفرعية، بينما الصفحة الرئيسية نُقلت لقسم الهيرو)
+        if (!document.querySelector('.hero-section, .hero-badge-row')) {
+            const brandGroups = document.querySelectorAll('.nav-brand-group, .wa-topbar');
+            brandGroups.forEach(group => {
+                if (group.querySelector('.waseet-history-nav-arrows')) return;
+                const arrowsWrap = document.createElement('div');
+                arrowsWrap.className = 'waseet-history-nav-arrows';
+                arrowsWrap.innerHTML = `
+                    <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                `;
+                group.insertBefore(arrowsWrap, group.firstChild);
+            });
+        }
     } catch (e) {}
 }
 window.waseetInitNavigationEnhancements = waseetInitNavigationEnhancements;
