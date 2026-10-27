@@ -469,85 +469,12 @@ body::before {
 /* ==========================================================================
    WASEET Global Navigation History Arrows (Fixed & Unified across All Pages)
    ========================================================================== */
-.waseet-global-nav-arrows {
-    pointer-events: none;
-    position: static;
-}
-
-.btn-global-history-arrow {
-    position: fixed;
-    top: 104px;
-    z-index: 990;
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: rgba(18, 24, 38, 0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(197, 160, 89, 0.45);
-    color: var(--gold-light);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.55), 0 0 12px rgba(197, 160, 89, 0.2);
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: auto;
-}
-
-.btn-global-history-arrow:hover {
-    background: rgba(197, 160, 89, 0.25);
-    border-color: var(--gold-primary);
-    color: #ffffff;
-    transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(197, 160, 89, 0.42);
-}
-
-.btn-global-history-arrow:active {
-    transform: scale(0.93);
-}
-
-/* السهم الأيمن يلتصق بيمين الشاشة 20px */
-.btn-global-history-right {
-    right: 20px;
-}
-
-/* السهم الأيسر يلتصق بيسار الشاشة 20px */
-.btn-global-history-left {
-    left: 20px;
-}
-
-@media (max-width: 768px) {
-    .btn-global-history-arrow {
-        top: 90px;
-        width: 32px;
-        height: 32px;
-        border-radius: 9px;
-        font-size: 0.8rem;
-    }
-    .btn-global-history-right {
-        right: 12px;
-    }
-    .btn-global-history-left {
-        left: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .btn-global-history-arrow {
-        top: 86px;
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-    }
-    .btn-global-history-right {
-        right: 8px;
-    }
-    .btn-global-history-left {
-        left: 8px;
-    }
+.waseet-global-nav-arrows,
+.btn-global-history-arrow,
+.waseet-history-nav-arrows,
+.btn-history-arrow,
+.btn-hero-history-arrow {
+    display: none !important;
 }
 
 .hero-title {
@@ -6565,55 +6492,7 @@ img.drawer-logo[src*="logo.png"] {
     flex-shrink: 0 !important;
 }
 
-/* أزرار التنقل السريع (الأسهم Back & Forward Arrows) في أعلى لوحة التحكم والترويسة */
-.waseet-history-nav-arrows {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-left: 0.45rem;
-    flex-shrink: 0;
-}
 
-.btn-history-arrow {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    border: 1px solid rgba(197, 160, 89, 0.38);
-    background: rgba(18, 24, 38, 0.85);
-    color: var(--gold-light);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-.btn-history-arrow:hover {
-    background: rgba(197, 160, 89, 0.22);
-    border-color: var(--gold-primary);
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(197, 160, 89, 0.25);
-}
-
-.btn-history-arrow:active {
-    transform: scale(0.95);
-}
-
-@media (max-width: 768px) {
-    .btn-history-arrow {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        font-size: 0.76rem;
-    }
-    .waseet-history-nav-arrows {
-        gap: 0.25rem;
-        margin-left: 0.25rem;
-    }
-}
 
 /* ==========================================================================
    WASEET Notifications System & App Badging Styles

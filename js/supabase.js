@@ -1726,23 +1726,8 @@ function waseetInitNavigationEnhancements() {
             for (let i = 1; i < seenSupport.length; i++) seenSupport[i].remove();
         }
 
-        // 3. إزالة أي أزرار أسهم قديمة من الـ Navbar عالمياً وتفعيل الحاوية العامة الموحدة (Global Navigation Arrows)
-        document.querySelectorAll('.waseet-history-nav-arrows, .nav-brand-group .waseet-history-nav-arrows, .wa-topbar .waseet-history-nav-arrows, .btn-hero-history-arrow').forEach(el => el.remove());
-
-        if (!document.querySelector('.waseet-global-nav-arrows')) {
-            const globalArrows = document.createElement('div');
-            globalArrows.className = 'waseet-global-nav-arrows';
-            globalArrows.id = 'waseet-global-nav-arrows';
-            globalArrows.innerHTML = `
-                <button type="button" class="btn-global-history-arrow btn-global-history-right" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <button type="button" class="btn-global-history-arrow btn-global-history-left" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-            `;
-            document.body.appendChild(globalArrows);
-        }
+        // 3. حذف أزرار أسهم التنقل (الرجوع والتقدم) نهائياً من جميع الصفحات
+        document.querySelectorAll('.waseet-global-nav-arrows, .btn-global-history-arrow, .waseet-history-nav-arrows, .btn-history-arrow, .btn-hero-history-arrow').forEach(el => el.remove());
     } catch (e) {}
 }
 window.waseetInitNavigationEnhancements = waseetInitNavigationEnhancements;
