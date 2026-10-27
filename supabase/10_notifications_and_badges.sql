@@ -131,7 +131,7 @@ BEGIN
                 NEW.seller_id,
                 'تم حجز حسابك للوساطة! 🔒',
                 'قام مشترٍ بحجز حسابك وتم تجميد النقاط في خزينة الوسيط. يرجى متابعة غرفة الصفقة.',
-                'deals.html'
+                'chat.html?dealId=' || NEW.id
             );
         END IF;
 
@@ -140,8 +140,8 @@ BEGIN
             PERFORM public.send_waseet_notification(
                 NEW.buyer_id,
                 'تم حجز الحساب بنجاح! 🎉',
-                'تم تجميد نقاط الصفقة في خزينة وسيط الآمنة. بإمكانك فحص الحساب الآن.',
-                'deals.html'
+                'تم تجميد نقاط الصفقة في خزينة وسيط الآمنة. بإمكانك متابعة الحساب الآن.',
+                'chat.html?dealId=' || NEW.id
             );
         END IF;
         RETURN NEW;
@@ -163,8 +163,8 @@ BEGIN
                 PERFORM public.send_waseet_notification(
                     NEW.buyer_id,
                     'تهانينا! اكتملت صفقة الوساطة 🛡️',
-                    'تم نقل الحساب إليك بنجاح ويسري ضمان المنصة الذهبي.',
-                    'deals.html'
+                    'تم تسليم الحساب إليك بنجاح! انقر هنا لعرض واستلام بيانات الدخول كاملة.',
+                    'my-accounts.html?tab=purchases'
                 );
             END IF;
         -- إلغاء الصفقة
@@ -192,7 +192,7 @@ BEGIN
                     NEW.buyer_id,
                     'بيانات الحساب جاهزة للفحص 🔑',
                     'قام الوسيط بتدقيق بيانات الدخول، يمكنك الآن تجربة الحساب وتأكيد النقل.',
-                    'deals.html'
+                    'chat.html?dealId=' || NEW.id
                 );
             END IF;
         END IF;

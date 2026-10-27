@@ -899,7 +899,19 @@
 
             // التوجيه الذكي
             if (notif.link && typeof notif.link === 'string' && notif.link.trim() !== '') {
-                const targetLink = notif.link.trim();
+                let targetLink = notif.link.trim();
+
+                // إصلاح روابط الصفقات المكتملة لتوجه المشتري مباشرة لبيانات استلام الحساب في my-accounts.html أو chat.html
+                const nTitle = (notif.title || '').toLowerCase();
+                const nMsg = (notif.message || '').toLowerCase();
+                if (targetLink === 'deals.html' || targetLink.includes('deals.html')) {
+                    if (nTitle.includes('اكتملت') || nMsg.includes('اكتملت') || nMsg.includes('نقل الحساب') || nMsg.includes('تسليم')) {
+                        targetLink = 'my-accounts.html?tab=purchases';
+                    } else if (nTitle.includes('فحص') || nMsg.includes('فحص') || nTitle.includes('حجز') || nMsg.includes('حجز')) {
+                        targetLink = 'chat.html';
+                    }
+                }
+
                 setTimeout(() => {
                     window.location.href = targetLink;
                 }, 80);

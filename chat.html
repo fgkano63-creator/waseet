@@ -272,6 +272,21 @@
         </a>
     </nav>
 
+    <!-- ================= Modal: استلام بيانات الحساب للمشتري (Buyer Delivery Modal) ================= -->
+    <div class="modal-overlay" id="modal-buyer-delivery" style="display: none; z-index: 10008;">
+        <div class="modal-card card-3d" style="max-width: 540px; width: 95%; border: 1px solid #10b981; box-shadow: 0 0 35px rgba(16, 185, 129, 0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(197, 160, 89, 0.15)); border-bottom: 1px solid rgba(16, 185, 129, 0.35);">
+                <h3 class="modal-title" style="color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fas fa-box-open" style="color: #10b981;"></i> بيانات تسجيل دخول الحساب المُستلم
+                </h3>
+                <button type="button" class="btn-close-modal" onclick="window.escrowRoom && window.escrowRoom.closeBuyerDeliveryModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="buyer-delivery-modal-body" style="padding: 1.25rem 1.4rem;">
+                <!-- Filled dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/supabase.js?v=20261017_v4"></script>

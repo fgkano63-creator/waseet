@@ -165,6 +165,18 @@
                 </div>
             </div>
 
+            <!-- Accounts View Tabs (حساباتي المعروضة للبيع vs حساباتي المشتراة) -->
+            <div class="my-accounts-tabs-bar">
+                <button type="button" class="btn-account-tab active" id="tab-btn-sales" onclick="switchMyAccountsTab('sales')">
+                    <i class="fas fa-store text-gold"></i> حساباتي المعروضة للبيع
+                    <span class="tab-badge" id="sales-tab-count">0</span>
+                </button>
+                <button type="button" class="btn-account-tab" id="tab-btn-purchases" onclick="switchMyAccountsTab('purchases')">
+                    <i class="fas fa-shopping-bag text-orange"></i> حساباتي المشتراة
+                    <span class="tab-badge" id="purchases-tab-count">0</span>
+                </button>
+            </div>
+
             <!-- Stats Bar -->
             <div class="my-accounts-stats-bar">
                 <div class="my-account-stat-card">
@@ -217,6 +229,21 @@
             منصة WASEET للوساطة الآمنة • جميع الحقوق محفوظة &copy; 2026
         </footer>
 
+    </div>
+
+    <!-- ================= View Purchased Credentials Modal ================= -->
+    <div class="modal-overlay" id="modal-view-purchased-creds" style="display: none; z-index: 10007;">
+        <div class="modal-card card-3d" style="max-width: 540px; width: 95%; border: 1px solid #10b981; box-shadow: 0 0 35px rgba(16, 185, 129, 0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(197, 160, 89, 0.15)); border-bottom: 1px solid rgba(16, 185, 129, 0.35);">
+                <h3 class="modal-title" style="color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fas fa-key" style="color: #10b981;"></i> بيانات تسجيل دخول الحساب المُشترى
+                </h3>
+                <button type="button" class="btn-close-modal" id="btn-close-creds-modal" onclick="closePurchasedCredsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="purchased-creds-modal-body" style="padding: 1.25rem 1.4rem;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
     </div>
 
     <!-- ================= Edit Account Modal ================= -->
@@ -525,6 +552,10 @@
             }
         }
 
+        let myAccountsList = [];
+        let myPurchasesList = [];
+        let currentMyAccountsTab = 'sales'; // 'sales' | 'purchases'
+
         async function loadMyAccountsData() {
             const container = document.getElementById('my-accounts-grid-container');
             if (!container) return;
@@ -532,7 +563,7 @@
             const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
             let currentUser = WASEET_STATE.user || null;
 
-            // التحقق المباشر من جلسة Supabase لضمان توفر معرف البائع (currentUser.id) حتى قبل اكتمال المزامنة الخلفية
+            // التحقق المباشر من جلسة Supabase لضمان توفر معرف المستخدم (currentUser.id)
             if (client && client.auth) {
                 try {
                     const { data: sessionRes } = await client.auth.getSession();
@@ -542,7 +573,7 @@
                             currentUser = {
                                 id: sessionUser.id,
                                 email: sessionUser.email || '',
-                                name: (sessionUser.user_metadata && (sessionUser.user_metadata.full_name || sessionUser.user_metadata.name)) || (sessionUser.email ? sessionUser.email.split('@')[0] : 'بائع موثق'),
+                                name: (sessionUser.user_metadata && (sessionUser.user_metadata.full_name || sessionUser.user_metadata.name)) || (sessionUser.email ? sessionUser.email.split('@')[0] : 'مستخدم موثق'),
                                 avatar: (sessionUser.user_metadata && sessionUser.user_metadata.avatar_url) || null
                             };
                             WASEET_STATE.user = currentUser;
@@ -563,7 +594,7 @@
                         <i class="fas fa-lock" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 1rem; display: block;"></i>
                         <h3 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.3rem;">تسجيل الدخول مطلوب</h3>
                         <p style="color: var(--silver-muted); margin-bottom: 1.4rem;">
-                            يرجى تسجيل الدخول بحسابك لعرض الحسابات التي نشرتها للبيع، ومتابعة مراجعة الوسيط المعتمد لها.
+                            يرجى تسجيل الدخول بحسابك لعرض الحسابات المعروضة للبيع أو حساباتك المشتراة.
                         </p>
                         <button class="btn-3d btn-gold" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();" style="padding: 0.6rem 1.6rem;">
                             <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
@@ -580,9 +611,11 @@
                 </div>
             `;
 
+            // ==========================================
+            // 1. جلب حسابات المبيعات (حساباتي المعروضة للبيع)
+            // ==========================================
             const mergedMap = new Map();
 
-            // 1. استعلام Supabase للحسابات التي قام المستخدم الحالي بنشرها (.eq('seller_id', currentUser.id))
             if (client && currentUser.id && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUser.id))) {
                 try {
                     const { data, error } = await client
@@ -629,7 +662,7 @@
                 }
             }
 
-            // 2. دمج الحسابات المنشأة محلياً لهذا المستخدم من WASEET_USER_ACCOUNTS و WASEET_STATE.accounts
+            // دمج الحسابات المنشأة محلياً لهذا المستخدم من WASEET_USER_ACCOUNTS و WASEET_STATE.accounts
             let savedUserAccounts = [];
             try {
                 savedUserAccounts = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
@@ -655,10 +688,146 @@
                 }
             });
 
-            const accounts = Array.from(mergedMap.values());
-            myAccountsList = accounts;
-            updateMyAccountsStats(accounts);
-            renderMyAccountsGrid(accounts);
+            myAccountsList = Array.from(mergedMap.values());
+
+            // ==========================================
+            // 2. جلب الحسابات المشتراة (حساباتي المشتراة)
+            // ==========================================
+            const purchasesMap = new Map();
+
+            if (client && currentUser.id && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUser.id))) {
+                try {
+                    // أ) الحسابات التي حالتها sold أو completed وتعود لهذا المشتري (buyer_id = currentUser.id)
+                    const { data: boughtAccs } = await client
+                        .from('marketplace_accounts')
+                        .select('*')
+                        .eq('buyer_id', currentUser.id)
+                        .order('updated_at', { ascending: false });
+
+                    if (Array.isArray(boughtAccs)) {
+                        boughtAccs.forEach(acc => {
+                            const details = (acc.details && typeof acc.details === 'object') ? acc.details : {};
+                            const imgs = (Array.isArray(acc.images) && acc.images.length) ? acc.images : ['assets/logo.png'];
+                            purchasesMap.set(String(acc.id), {
+                                id: acc.id,
+                                accountNumber: acc.account_number,
+                                game: details.originalGame || acc.game || 'free_fire',
+                                title: acc.title,
+                                level: acc.level || 50,
+                                bindStatus: acc.bind_status || 'single',
+                                server: acc.server || 'mena',
+                                buyerPrice: Number(acc.seller_price) || 0,
+                                images: imgs,
+                                image: imgs[0],
+                                status: acc.status || 'sold',
+                                credentials: acc.credentials || {},
+                                details: details,
+                                isPurchased: true
+                            });
+                        });
+                    }
+
+                    // ب) استعلام الصفقات المكتملة للمشتري من جدول deals
+                    const { data: userDeals } = await client
+                        .from('deals')
+                        .select('*')
+                        .eq('buyer_id', currentUser.id)
+                        .in('status', ['completed', 'buyer_inspecting', 'active'])
+                        .order('created_at', { ascending: false });
+
+                    if (Array.isArray(userDeals)) {
+                        userDeals.forEach(d => {
+                            const accKey = String(d.account_id || d.id);
+                            const existing = purchasesMap.get(accKey);
+                            if (existing) {
+                                existing.dealId = d.id;
+                                if (!existing.credentials || !existing.credentials.email) {
+                                    existing.credentials = Object.assign({}, existing.credentials, d.credentials || {});
+                                }
+                            } else {
+                                purchasesMap.set(accKey, {
+                                    id: accKey,
+                                    dealId: d.id,
+                                    accountNumber: d.account_number || d.id,
+                                    game: d.game || 'free_fire',
+                                    title: d.accountTitle || d.title || 'حساب وسيط مكتمل',
+                                    level: d.level || 50,
+                                    bindStatus: 'single',
+                                    server: 'mena',
+                                    buyerPrice: Number(d.total_points || d.totalPoints || d.seller_price) || 0,
+                                    images: ['assets/logo.png'],
+                                    image: 'assets/logo.png',
+                                    status: d.status || 'completed',
+                                    credentials: d.credentials || {},
+                                    isPurchased: true
+                                });
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.warn('[My Accounts] خطأ جلب المشتريات من Supabase:', e);
+                }
+            }
+
+            // ج) فحص الصفقات المحلية المكتملة في WASEET_STATE
+            const allLocalDeals = [...(WASEET_STATE.completedDeals || []), ...(WASEET_STATE.deals || [])];
+            allLocalDeals.forEach(d => {
+                if (!d) return;
+                const buyerMatches =
+                    (currentUser.id && (String(d.buyer_id) === String(currentUser.id) || (d.buyer && String(d.buyer.id) === String(currentUser.id)))) ||
+                    (currentUser.name && d.buyer && d.buyer.name === currentUser.name) ||
+                    (d.status === 'completed');
+
+                if (buyerMatches) {
+                    const accKey = String(d.accountId || d.id);
+                    if (!purchasesMap.has(accKey)) {
+                        purchasesMap.set(accKey, {
+                            id: accKey,
+                            dealId: d.id,
+                            accountNumber: d.accountNumber || d.id,
+                            game: d.game || 'free_fire',
+                            title: d.accountTitle || 'حساب وسيط مكتمل',
+                            level: d.level || 50,
+                            bindStatus: 'single',
+                            server: 'mena',
+                            buyerPrice: Number(d.totalPoints || d.sellerPrice) || 0,
+                            images: ['assets/logo.png'],
+                            image: 'assets/logo.png',
+                            status: d.status || 'completed',
+                            credentials: d.credentials || {},
+                            isPurchased: true
+                        });
+                    }
+                }
+            });
+
+            myPurchasesList = Array.from(purchasesMap.values());
+
+            // تحديث شارات العداد في أزرار التبويب
+            const salesCountEl = document.getElementById('sales-tab-count');
+            const purchasesCountEl = document.getElementById('purchases-tab-count');
+            if (salesCountEl) salesCountEl.innerText = myAccountsList.length;
+            if (purchasesCountEl) purchasesCountEl.innerText = myPurchasesList.length;
+
+            // التحقق من المعلمة في الرابط (?tab=purchases)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'purchases') {
+                currentMyAccountsTab = 'purchases';
+            }
+
+            switchMyAccountsTab(currentMyAccountsTab);
+        }
+
+        function switchMyAccountsTab(tab) {
+            currentMyAccountsTab = tab;
+            const salesBtn = document.getElementById('tab-btn-sales');
+            const purchasesBtn = document.getElementById('tab-btn-purchases');
+            if (salesBtn) salesBtn.classList.toggle('active', tab === 'sales');
+            if (purchasesBtn) purchasesBtn.classList.toggle('active', tab === 'purchases');
+
+            const list = tab === 'sales' ? myAccountsList : myPurchasesList;
+            updateMyAccountsStats(list);
+            renderMyAccountsGrid(list);
         }
 
         function updateMyAccountsStats(accounts) {
@@ -666,6 +835,17 @@
             const availEl = document.getElementById('stat-available-accounts');
             const pendEl = document.getElementById('stat-pending-accounts');
             const rejEl = document.getElementById('stat-rejected-accounts');
+
+            if (currentMyAccountsTab === 'purchases') {
+                const total = accounts.length;
+                const completed = accounts.filter(a => a.status === 'completed' || a.status === 'sold').length;
+                const inProgress = accounts.filter(a => a.status !== 'completed' && a.status !== 'sold').length;
+                if (totalEl) totalEl.innerText = total;
+                if (availEl) availEl.innerText = completed;
+                if (pendEl) pendEl.innerText = inProgress;
+                if (rejEl) rejEl.innerText = completed;
+                return;
+            }
 
             const total = accounts.length;
             const avail = accounts.filter(a => a.status === 'available' || a.status === 'approved').length;
@@ -682,6 +862,73 @@
             const container = document.getElementById('my-accounts-grid-container');
             if (!container) return;
 
+            // ==========================================
+            // وضع عرض الحسابات المشتراة (Purchases Tab)
+            // ==========================================
+            if (currentMyAccountsTab === 'purchases') {
+                if (!accounts || accounts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-deals-box" style="margin-top: 1.5rem;">
+                            <i class="fas fa-shopping-bag" style="font-size: 3rem; color: #10b981; margin-bottom: 1rem; display: block;"></i>
+                            <h3 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.3rem;">لم تقم بشراء أي حساب حتى الآن</h3>
+                            <p style="color: var(--silver-muted); margin-bottom: 1.4rem;">
+                                تصفح المتجر الآن واختر حسابك المفضل ليتم فحصه وتسليمه لك بأمان تام وضمان ذهبي ضد الاسترجاع.
+                            </p>
+                            <a href="index.html#marketplace" class="btn-3d btn-green" style="padding: 0.6rem 1.6rem; text-decoration: none;">
+                                <i class="fas fa-store"></i> تصفح متجر الحسابات
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="accounts-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                        ${accounts.map(acc => {
+                            const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'assets/logo.png';
+                            return `
+                                <div class="account-card-3d card-3d" id="purchased-card-${acc.id}" style="border: 1px solid rgba(16, 185, 129, 0.45); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                                    <div class="card-media">
+                                        <img src="${imgUrl}" alt="${acc.title}" class="card-img">
+                                        <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
+                                            <span style="background: rgba(16, 185, 129, 0.95); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-shield-alt"></i> ضمان وسيط 48h</span>
+                                        </div>
+                                        <div class="account-num-tag" style="position: absolute; top: 8px; left: 8px;">
+                                            #${acc.accountNumber || String(acc.id).substring(0, 5)}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
+                                        <div class="card-specs">
+                                            <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
+                                            <span class="spec-chip" style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> تم الاستلام بنجاح</span>
+                                        </div>
+                                        <div class="card-footer" style="padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; display: flex; flex-direction: column; gap: 0.45rem;">
+                                            <div class="price-col" style="margin-bottom: 0.2rem;">
+                                                <span class="price-sub">سعر الشراء الإجمالي</span>
+                                                <span class="price-main" style="color: #10b981;">${acc.buyerPrice || 0} نقطة</span>
+                                            </div>
+                                            <button type="button" class="btn-3d btn-receive-credentials" onclick="openPurchasedCredsModal('${acc.id}')" style="width: 100%; justify-content: center;">
+                                                <i class="fas fa-key"></i> عرض بيانات الدخول
+                                            </button>
+                                            ${acc.dealId ? `
+                                                <a href="chat.html?dealId=${acc.dealId}" class="btn-3d btn-outline" style="width: 100%; text-decoration: none; padding: 0.45rem; font-size: 0.82rem; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                                    <i class="fas fa-comments text-orange"></i> محادثة الوساطة
+                                                </a>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                return;
+            }
+
+            // ==========================================
+            // وضع عرض حسابات البيع (Sales Tab)
+            // ==========================================
             if (!accounts || accounts.length === 0) {
                 container.innerHTML = `
                     <div class="empty-deals-box" style="margin-top: 1.5rem;">
@@ -701,6 +948,190 @@
             container.innerHTML = `
                 <div class="accounts-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
                     ${accounts.map(acc => {
+                        const pricing = typeof calculateWaseetFee === 'function' 
+                            ? calculateWaseetFee(acc.sellerPrice) 
+                            : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
+                        
+                        let statusTag = '';
+                        if (acc.status === 'available' || acc.status === 'approved') {
+                            statusTag = `<span style="background: rgba(16, 185, 129, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-check-circle"></i> معتمد في المتجر</span>`;
+                        } else if (acc.status === 'rejected') {
+                            statusTag = `<span style="background: rgba(239, 68, 68, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                        } else {
+                            statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد فحص الوسيط</span>`;
+                        }
+
+                        const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'assets/logo.png';
+
+                        return `
+                            <div class="account-card-3d card-3d" id="card-${acc.id}">
+                                <div class="card-media">
+                                    <img src="${imgUrl}" alt="${acc.title}" class="card-img">
+                                    <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
+                                        ${statusTag}
+                                    </div>
+                                    <div class="account-num-tag" style="position: absolute; top: 8px; left: 8px;">
+                                        #${acc.accountNumber || acc.id.toString().substring(0, 5)}
+                                    </div>
+                                    <div class="level-tag" style="position: absolute; bottom: 8px; right: 8px;">
+                                        Lv. ${acc.level || 50}
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
+                                    <div class="card-specs">
+                                        <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
+                                        <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
+                                    </div>
+                                    <div class="card-footer" style="padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto;">
+                                        <div class="price-col" style="margin-bottom: 0.4rem;">
+                                            <span class="price-sub">صافي ربحك: ${pricing.sellerPrice} نقطة (يظهر للمشتري: ${pricing.buyerPrice} نقطة)</span>
+                                            <span class="price-main">${pricing.sellerPrice} نقطة</span>
+                                        </div>
+                                        <div class="my-account-card-actions">
+                                            <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">
+                                                <i class="fas fa-edit"></i> تعديل الحساب
+                                            </button>
+                                            <button type="button" class="btn-account-delete" onclick="handleDeleteAccount('${acc.id}')">
+                                                <i class="fas fa-trash-alt"></i> حذف الحساب
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // نوافذ بيانات الاستلام للمشتري (Purchased Creds Modal)
+        // ==========================================
+        function openPurchasedCredsModal(accId) {
+            const acc = myPurchasesList.find(a => String(a.id) === String(accId));
+            if (!acc) return;
+
+            const creds = acc.credentials || {};
+            const safeLoginType = creds.loginType || 'جوجل Gmail';
+            const safeEmail = creds.email || 'لم يتم تحديد بريد';
+            const rawPwd = creds.rawPassword || creds.password || '••••••••';
+            const safeBackup = creds.backupCodes || creds.notes || creds.recoveryEmail || 'لا توجد أكواد إضافية';
+
+            const body = document.getElementById('purchased-creds-modal-body');
+            if (body) {
+                body.innerHTML = `
+                    <div class="success-card-highlight" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem; text-align: center;">
+                        <i class="fas fa-crown text-gold" style="font-size: 2.2rem; margin-bottom: 0.4rem; display: block;"></i>
+                        <h4 style="color: #fff; font-size: 1.15rem; margin: 0 0 0.3rem;">🎉 ${acc.title}</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.84rem; margin: 0; line-height: 1.6;">
+                            تم تسليم الحساب إليك بنجاح مع سريان ضمان منصة WASEET الذهبي لمدة 48 ساعة ضد الاسترجاع.
+                        </p>
+                    </div>
+
+                    <div class="delivery-credentials-card" style="background: rgba(8, 10, 16, 0.9); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 14px; padding: 1.2rem;">
+                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
+                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-link text-gold"></i> نوع الربط:</span>
+                            <span class="cred-value font-mono text-silver" style="font-weight: 700;">${safeLoginType}</span>
+                        </div>
+
+                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
+                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرف:</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="cred-value font-mono text-gold" id="p-modal-email" style="font-weight: 700;">${safeEmail}</span>
+                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeEmail}', 'تم نسخ البريد الإلكتروني')" title="نسخ البريد">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
+                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="cred-value font-mono" id="p-modal-pwd" style="color: #10b981; font-weight: 700;">••••••••••••</span>
+                                <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('${rawPwd}')" title="إظهار / إخفاء">
+                                    <i class="fas fa-eye" id="p-modal-eye"></i>
+                                </button>
+                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
+                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="cred-value font-mono text-silver" style="font-size: 0.85rem;">${safeBackup}</span>
+                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeBackup}', 'تم نسخ الملاحظات')" title="نسخ">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.2rem;">
+                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-virus text-gold"></i> حماية WASEET:</span>
+                            <span class="cred-value" style="color: #10b981; font-weight: 700; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> 48 ساعة ضد الاسترجاع</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="copyAllPurchasedCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeBackup}')">
+                            <i class="fas fa-clipboard-check"></i> نسخ كافة بيانات الدخول
+                        </button>
+                        ${acc.dealId ? `
+                            <a href="chat.html?dealId=${acc.dealId}" class="btn-3d btn-outline" style="padding: 0.75rem 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <i class="fas fa-comments text-orange"></i> غرفة المحادثة
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            const modal = document.getElementById('modal-view-purchased-creds');
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closePurchasedCredsModal() {
+            const modal = document.getElementById('modal-view-purchased-creds');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+        }
+
+        function togglePurchasedPw(rawPwd) {
+            const el = document.getElementById('p-modal-pwd');
+            const eye = document.getElementById('p-modal-eye');
+            if (!el) return;
+            if (el.innerText.includes('•')) {
+                el.innerText = rawPwd;
+                if (eye) { eye.classList.remove('fa-eye'); eye.classList.add('fa-eye-slash'); }
+            } else {
+                el.innerText = '••••••••••••';
+                if (eye) { eye.classList.remove('fa-eye-slash'); eye.classList.add('fa-eye'); }
+            }
+        }
+
+        async function copyPurchasedText(text, msg = 'تم النسخ بنجاح') {
+            try {
+                await navigator.clipboard.writeText(text);
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تم النسخ', msg, 'success');
+                } else {
+                    alert(msg);
+                }
+            } catch (e) {
+                prompt('انسخ النص التالي:', text);
+            }
+        }
+
+        async function copyAllPurchasedCredentials(loginType, email, pwd, backup) {
+            const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):\n-----------------------------------\nنوع الربط: ${loginType}\nالبريد / اسم المستخدم: ${email}\nكلمة المرور: ${pwd}\nأكواد الاسترداد / الملاحظات: ${backup}\n-----------------------------------\nالحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة.`;
+            await copyPurchasedText(fullText, 'تم نسخ كافة بيانات تسجيل الدخول بنجاح!');
+        }
                         const pricing = typeof calculateWaseetFee === 'function' 
                             ? calculateWaseetFee(acc.sellerPrice) 
                             : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
