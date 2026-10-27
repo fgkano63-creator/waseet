@@ -1692,13 +1692,19 @@ window.waseetHistoryForward = waseetHistoryForward;
  */
 function waseetInitNavigationEnhancements() {
     try {
-        const DIRECT_SUPPORT_URL = 'https://wa.me/qr/KN2ECHUNFKEPP1';
+        const DIRECT_SUPPORT_URL = 'https://wa.me/218931467923';
+        const DIRECT_SUPPORT_PHONE = '+2180931467923';
+        window.WASEET_SUPPORT_PHONE = DIRECT_SUPPORT_PHONE;
+        window.WASEET_SUPPORT_URL = DIRECT_SUPPORT_URL;
 
         // 1. تحديث كافة روابط الدعم المباشر / واتساب لتوجه إلى الرابط الرسمي المعتمد
         document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
             link.setAttribute('href', DIRECT_SUPPORT_URL);
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener noreferrer');
+            if (!link.getAttribute('title')) {
+                link.setAttribute('title', `واتساب الدعم المباشر: ${DIRECT_SUPPORT_PHONE}`);
+            }
         });
 
         // 2. التأكد من عدم تكرار الأزرار داخل شريط تنقل البائع والمشتري (#nav-user-middle-group)
