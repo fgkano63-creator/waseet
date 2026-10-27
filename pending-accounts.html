@@ -5,13 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WASEET | الحسابات قيد الفحص والمراجعة (Verification Desk)</title>
 
-    <!-- Google Fonts -->
+    <!-- Preconnect & Preload Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap">
+    </noscript>
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome Icons (Preloaded & Non-blocking) -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
+
+    <!-- Preload Critical Logo for Fast LCP -->
+    <link rel="preload" as="image" href="assets/logo.png?v=20261027_orig" fetchpriority="high">
 
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
@@ -247,7 +258,7 @@
         </main>
 
         <!-- ================= Modal: Detailed Account Inspection (Large Slider & Plain Credentials) ================= -->
-        <div class="modal-overlay" id="modal-inspect-account-detail" style="display: none; z-index: 9999;">
+        <div class="modal-overlay" id="modal-inspect-account-detail" style="z-index: 9999;" onclick="if(event.target === this) closeInspectionModal();">
             <div class="modal-inspect-box">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-metal); padding-bottom: 0.8rem;">
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
@@ -817,7 +828,7 @@
                                 <button type="button" class="btn-reject-quick" onclick="rejectPendingAccount('${safeId}')" title="رفض الحساب وحذفه">
                                     <i class="fas fa-trash-alt"></i> رفض الحساب (تحايل/خطأ)
                                 </button>
-                                <button type="button" class="btn-inspect-large" onclick="openInspectionModal('${safeId}')" title="فتح نافذة الفحص الشامل والصور وكلمة المرور">
+                                <button type="button" class="btn-inspect-large" data-account-id="${safeId}" onclick="openInspectionModal('${safeId}')" title="فتح نافذة الفحص الشامل والصور وكلمة المرور">
                                     <i class="fas fa-microscope"></i> فحص الحساب والصور
                                 </button>
                             </div>
@@ -833,9 +844,60 @@
         /* ================= Inspection Modal Logic ================= */
         let currentInspectingAccount = null;
 
-        function openInspectionModal(accId) {
-            const acc = allPendingAccounts.find(a => String(a.id) === String(accId));
-            if (!acc) return;
+        async function openInspectionModal(accId) {
+            let acc = (allPendingAccounts || []).find(a => String(a.id) === String(accId) || String(a.accountNumber) === String(accId));
+
+            // جلب بيانات الحساب مباشرة من Supabase في حال لم يكن موجوداً بالقائمة المحلية
+            if (!acc && typeof initWaseetSupabase === 'function') {
+                try {
+                    const client = initWaseetSupabase();
+                    if (client) {
+                        const { data, error } = await client.from('marketplace_accounts').select('*').eq('id', accId).maybeSingle();
+                        if (data && !error) {
+                            const details = safeParsePendingJson(data.details, {});
+                            const parsedImgs = Array.isArray(data.images) ? data.images : safeParsePendingJson(data.images, []);
+                            const imgs = (Array.isArray(parsedImgs) && parsedImgs.length) ? parsedImgs : (data.image_url ? [data.image_url] : ['assets/logo.png']);
+                            acc = {
+                                id: data.id,
+                                accountNumber: data.account_number || `FF-${String(data.id).slice(0, 4)}`,
+                                title: data.title || 'حساب قيد الفحص',
+                                game: details.originalGame || data.game || 'free_fire',
+                                level: data.level || 50,
+                                primeLevel: data.prime_level || 1,
+                                sellerPrice: parseFloat(data.seller_price) || 0,
+                                sellerId: data.seller_id,
+                                sellerName: details.sellerName || data.seller_name || 'بائع موثق',
+                                status: data.status || 'pending_verification',
+                                createdAt: data.created_at,
+                                bindStatus: data.bind_status || 'single',
+                                loginType: data.login_type || 'google',
+                                accountNotes: details.accountNotes || details.notes || data.account_notes || data.notes || '',
+                                evoGunsCount: details.evoGunsCount || data.evo_guns_count || 0,
+                                iconicPants: Array.isArray(details.iconicPants) ? details.iconicPants.join('، ') : String(details.iconicPants || data.iconic_pants || ''),
+                                rareSkins: Array.isArray(details.rareSkins) ? details.rareSkins.join('، ') : String(details.rareSkins || data.rare_skins || ''),
+                                image: imgs[0] || 'assets/logo.png',
+                                images: imgs,
+                                details: details,
+                                credentials: safeExtractPendingCreds(data, details)
+                            };
+                            if (Array.isArray(allPendingAccounts)) {
+                                allPendingAccounts.push(acc);
+                            }
+                        }
+                    }
+                } catch (fetchErr) {
+                    console.warn('[Inspection Modal] Supabase fetch error:', fetchErr);
+                }
+            }
+
+            if (!acc) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تنبيه', 'تعذر العثور على بيانات هذا الحساب، يرجى تحديث الصفحة والمحاولة مجدداً.', 'warning');
+                } else {
+                    alert('تعذر العثور على بيانات هذا الحساب، يرجى تحديث الصفحة والمحاولة مجدداً.');
+                }
+                return;
+            }
 
             currentInspectingAccount = acc;
             inspectActiveImages = (Array.isArray(acc.images) && acc.images.length) ? acc.images : [acc.image || 'assets/logo.png'];
@@ -1007,12 +1069,19 @@
             }
 
             modal.style.display = 'flex';
+            modal.classList.add('active');
         }
 
         function closeInspectionModal() {
             const modal = document.getElementById('modal-inspect-account-detail');
-            if (modal) modal.style.display = 'none';
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
         }
+
+        window.openInspectionModal = openInspectionModal;
+        window.closeInspectionModal = closeInspectionModal;
 
         function prevInspectSlide() {
             if (!inspectActiveImages.length) return;
@@ -1106,6 +1175,21 @@
                 if (typeof waseetAlert === 'function') waseetAlert('تم النسخ', msg, 'info');
             }
         }
+
+        window.toggleInspectPwVisibility = toggleInspectPwVisibility;
+        window.copyInspectCred = copyInspectCred;
+        window.copyInspectText = copyInspectText;
+        window.prevInspectSlide = prevInspectSlide;
+        window.nextInspectSlide = nextInspectSlide;
+        window.selectInspectSlide = selectInspectSlide;
+        window.zoomInspectImage = zoomInspectImage;
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-inspect-large');
+            if (btn && btn.dataset && btn.dataset.accountId) {
+                openInspectionModal(btn.dataset.accountId);
+            }
+        });
 
         /* ================= Approval & Rejection Logic ================= */
         async function approvePendingAccount(accId) {

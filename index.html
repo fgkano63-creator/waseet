@@ -5,13 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>وسيط | WASEET - منصة الوساطة الآمنة لحسابات الألعاب</title>
     
-    <!-- Google Fonts -->
+    <!-- Preconnect & Preload Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap">
+    </noscript>
     
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome Icons (Preloaded & Non-blocking) -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
+
+    <!-- Preload Critical Logo for Fast LCP -->
+    <link rel="preload" as="image" href="assets/logo.png?v=20261027_orig" fetchpriority="high">
     
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
@@ -31,6 +42,83 @@
 
     <!-- Custom 3D Design Styles -->
     <link rel="stylesheet" href="css/style.css?v=20261026_v1">
+
+    <!-- Critical Above-The-Fold Styles for Instant LCP & Fast Header Render -->
+    <style>
+        :root {
+            --font-en: 'Rajdhani', 'Orbitron', 'Cairo', system-ui, -apple-system, sans-serif;
+            --font-ar: 'Cairo', 'Tajawal', system-ui, -apple-system, sans-serif;
+            --gold-primary: #c5a059;
+            --gold-light: #dfb76c;
+            --bg-black: #000000;
+        }
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-ar);
+        }
+        .header-navbar {
+            background: rgba(10, 12, 18, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.75rem 0;
+            contain: layout style;
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .nav-brand-group {
+            display: flex;
+            align-items: center;
+        }
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+        }
+        .brand-logo-img {
+            height: 60px;
+            width: auto;
+            max-width: 140px;
+            object-fit: contain;
+        }
+        .brand-title {
+            font-family: var(--font-en);
+            font-display: swap;
+            font-size: 1.85rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2b2 25%, #dfb76c 50%, #ea580c 80%, #9a3412 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            contain: layout style;
+            content-visibility: visible;
+        }
+        .brand-subtitle {
+            font-family: var(--font-ar);
+            font-size: 0.75rem;
+            color: #dfb76c;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .header-navbar { padding: 0.45rem 0; }
+            .nav-container { padding: 0 0.75rem; }
+            .brand-logo-img { height: 48px; }
+            .brand-title { font-size: 1.15rem; letter-spacing: 0.5px; }
+            .brand-subtitle { display: none; }
+        }
+    </style>
 </head>
 <body>
 
@@ -1094,20 +1182,20 @@
         </div>
     </aside>
 
-    <!-- Scripts -->
-    <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/purify.min.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/calculator.js"></script>
-    <script src="js/particles.js"></script>
-    <script src="js/escrow.js"></script>
-    <script src="js/dialog.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/notifications.js?v=20261026_w2"></script>
-    <script src="js/app.js?v=20261017_v1"></script>
-    <script src="js/support.js?v=20261017"></script>
-    <script src="js/pwa-register.js"></script>
+    <!-- Scripts (Deferred for Fast LCP & Unblocked Parser) -->
+    <script src="js/vendor/supabase.min.js" defer></script>
+    <script src="js/supabase.js" defer></script>
+    <script src="js/purify.min.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/calculator.js" defer></script>
+    <script src="js/particles.js" defer></script>
+    <script src="js/escrow.js" defer></script>
+    <script src="js/dialog.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/notifications.js?v=20261026_w2" defer></script>
+    <script src="js/app.js?v=20261017_v1" defer></script>
+    <script src="js/support.js?v=20261017" defer></script>
+    <script src="js/pwa-register.js" defer></script>
 </body>
 </html>
 

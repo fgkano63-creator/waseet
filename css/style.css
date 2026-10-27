@@ -28,7 +28,7 @@
     --border-highlight: rgba(255, 255, 255, 0.12);
 
     --font-ar: 'Tajawal', 'Cairo', system-ui, -apple-system, sans-serif;
-    --font-en: 'Rajdhani', 'Orbitron', sans-serif;
+    --font-en: 'Rajdhani', 'Orbitron', 'Cairo', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -206,6 +206,8 @@ body::before {
     filter: drop-shadow(0 2px 8px rgba(223, 183, 108, 0.6))
             drop-shadow(0 4px 14px rgba(234, 88, 12, 0.45));
     animation: textShine3D 4.5s linear infinite;
+    contain: layout style;
+    content-visibility: visible;
 }
 
 @keyframes textShine3D {
