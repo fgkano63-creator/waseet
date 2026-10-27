@@ -38,8 +38,8 @@
     <style>
         .deals-page-container {
             max-width: 960px;
-            margin: 2rem auto 4rem;
-            padding: 0 1rem;
+            margin: var(--page-gap-top) auto var(--page-gap-bottom);
+            padding: 0 var(--page-gutter);
         }
         .deals-header-card {
             text-align: center;
@@ -151,10 +151,6 @@
             color: var(--silver-muted);
         }
         @media (max-width: 768px) {
-            .deals-page-container {
-                margin: 1.2rem auto 4.5rem;
-                padding: 0 0.8rem;
-            }
             .deals-header-card .page-title {
                 font-size: 1.4rem;
             }
@@ -408,6 +404,7 @@
     <script src="js/dialog.js"></script>
     <script src="js/support.js?v=20261017"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
     <script src="js/pwa-register.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {

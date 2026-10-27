@@ -46,12 +46,6 @@
             color: #f1f5f9;
             border: 1px solid rgba(197, 160, 89, 0.4);
         }
-        .wa-topbar {
-            display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
-            max-width: 1300px; margin: 1rem auto 0; padding: 0 1rem;
-        }
-        .wa-topbar .brand-wrap { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-        .wa-topbar .brand-logo-img { width: auto !important; height: 58px !important; object-fit: contain; background: transparent !important; }
         .wa-back-btn {
             display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none;
             padding: 0.5rem 1rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
@@ -83,32 +77,84 @@
         }
         @media (max-width: 868px) {
             .wa-mobile-back { display: inline-flex; }
-            .whatsapp-admin-wrapper { height: calc(100vh - 90px); min-height: 480px; margin-top: 0.8rem; padding: 0 0.5rem; }
-            .wa-topbar .brand-subtitle { display: none; }
+            .whatsapp-admin-wrapper { height: calc(100vh - 118px); height: calc(100dvh - 118px); min-height: 480px; margin-top: 0.6rem; margin-bottom: 1rem; }
         }
     </style>
 </head>
-<body>
+<body class="is-admin-mode" data-waseet-nav="auto">
     <canvas id="ambient-canvas"></canvas>
 
-    <!-- Top Bar -->
-    <div class="wa-topbar">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <a href="index.html" class="brand-wrap">
-                <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
-                <div class="brand-text-col">
-                    <span class="brand-title">WASEET</span>
-                    <span class="brand-subtitle">وسيط • محادثات الإدارة والدعم المباشر</span>
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <!-- المجموعة 1 (أقصى اليمين): الشعار -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • محادثات الإدارة والدعم المباشر</span>
+                        </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-            <a href="index.html" class="wa-back-btn"><i class="fas fa-store text-gold"></i> العودة للمتجر</a>
-            <a href="admin-deposits.html" class="wa-back-btn" style="border-color: #10b981; color: #34d399;" title="إدارة طلبات شحن النقاط"><i class="fas fa-money-check-alt"></i> شحن النقاط</a>
-            <a href="pending-accounts.html" class="wa-back-btn"><i class="fas fa-clipboard-check text-orange"></i> قيد الفحص</a>
-            <a href="deals.html" class="wa-back-btn"><i class="fas fa-crown text-gold"></i> قيد الشراء</a>
-        </div>
-    </div>
+
+                <!-- المجموعة 2 (المستخدم العادي) -->
+                <nav class="nav-middle-group" id="nav-user-middle-group" style="display: none;">
+                    <a href="index.html#marketplace" class="btn-nav-middle"><i class="fas fa-store text-gold"></i> المتجر</a>
+                    <a href="deals.html" class="btn-nav-middle"><i class="fas fa-shield-alt text-gold"></i> قيد الشراء</a>
+                    <a href="my-accounts.html" class="btn-nav-middle"><i class="fas fa-boxes text-gold"></i> حساباتي</a>
+                    <a href="contact-support.html" class="btn-nav-middle"><i class="fas fa-headset text-orange"></i> محادثة الوسيط</a>
+                </nav>
+
+                <!-- المجموعة 2 المخصصة للمدير -->
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                        <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
+                    </a>
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin active" title="محادثات الدعم والإدارة">
+                        <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
+                    </a>
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                        <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;"></span>
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;"></span>
+                    </a>
+                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
+                        <i class="fas fa-comments text-orange"></i> المحادثات
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-chats-badge" style="display: none;"></span>
+                    </a>
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): المحفظة + الحساب + الجرس (يُحقن تلقائياً) + ☰ -->
+                <div class="nav-left-group">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                    <div id="nav-user-container"></div>
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
     <!-- Access denied (non-admin) -->
     <div id="wa-access-denied" class="wa-denied-box" style="display: none;">
@@ -182,6 +228,74 @@
         </div>
     </div>
 
+    <!-- ================= Sliding Drawer Menu ================= -->
+    <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleWaseetDrawer(false)"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+            </div>
+            <button class="drawer-close-btn" onclick="toggleWaseetDrawer(false)">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card"></div>
+        <div class="drawer-auth-actions" id="drawer-auth-actions" style="padding: 0 1.25rem 0.75rem;"></div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قيد الشراء</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-clipboard-check text-orange"></i>
+                    <span>حسابات قيد الفحص</span>
+                </a>
+                <a href="admin-chats.html" class="drawer-shortcut-card active" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-inbox text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card" data-admin-only onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-boxes text-gold"></i>
+                    <span>حساباتي</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="contact-support.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
+                </a>
+                <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+                <a href="index.html#open-sell" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    <span>بيع حساب</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" title="واتساب الدعم المباشر: +2180931467923"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم المباشر (<span dir="ltr">+2180931467923</span>)</a></li>
+            </ul>
+        </div>
+    </aside>
+
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/supabase.js"></script>
@@ -191,6 +305,7 @@
     <script src="js/particles.js"></script>
     <script src="js/dialog.js"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>

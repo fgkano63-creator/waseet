@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASEET | المتجر والملف الشخصي</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Waseet">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261027_profile">
+
+    <style>
+        .store-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88);
+            z-index: 9999; display: none; align-items: center; justify-content: center;
+            padding: 1rem; backdrop-filter: blur(8px);
+        }
+        .store-modal-card {
+            background: linear-gradient(145deg, #121826, #0a0d16);
+            border: 1px solid var(--border-metal);
+            border-radius: 20px; max-width: 680px; width: 100%;
+            max-height: 90vh; overflow-y: auto; padding: 1.5rem;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 30px rgba(197, 160, 89, 0.15);
+            position: relative;
+        }
+        .store-modal-close {
+            position: absolute; top: 1rem; left: 1rem; background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-metal); color: #fff; width: 36px; height: 36px;
+            border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .store-modal-close:hover { background: #ef4444; color: #fff; }
+        .gallery-main-img-box {
+            position: relative; width: 100%; height: 320px; background: #070a10;
+            border-radius: 14px; overflow: hidden; border: 1px solid var(--border-metal);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 0.9rem;
+        }
+        .gallery-main-img-box img {
+            width: 100%; height: 100%; object-fit: contain;
+        }
+        .gallery-nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(14, 18, 28, 0.8); border: 1px solid var(--gold-primary);
+            color: var(--gold-light); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 1.1rem; transition: all 0.2s;
+        }
+        .gallery-nav-btn:hover { background: var(--gold-primary); color: #000; }
+        .gallery-nav-btn.prev-btn { right: 10px; }
+        .gallery-nav-btn.next-btn { left: 10px; }
+        .gallery-thumbs-row {
+            display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;
+        }
+        .gallery-thumb-item {
+            width: 60px; height: 60px; border-radius: 8px; overflow: hidden;
+            border: 2px solid transparent; cursor: pointer; flex-shrink: 0;
+            background: #000; opacity: 0.65; transition: all 0.2s;
+        }
+        .gallery-thumb-item.active, .gallery-thumb-item:hover {
+            border-color: var(--gold-primary); opacity: 1; transform: scale(1.05);
+        }
+        .gallery-thumb-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+    </style>
+</head>
+<body data-waseet-nav="auto">
+
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <!-- المجموعة 1 (أقصى اليمين): الشعار -->
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">وسيط • متجر البائع والملف الشخصي</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- المجموعة 2 (المستخدم العادي) -->
+                <nav class="nav-middle-group" id="nav-user-middle-group">
+                    <a href="index.html#marketplace" class="btn-nav-middle"><i class="fas fa-store text-gold"></i> المتجر</a>
+                    <a href="deals.html" class="btn-nav-middle"><i class="fas fa-shield-alt text-gold"></i> قيد الشراء</a>
+                    <a href="my-accounts.html" class="btn-nav-middle"><i class="fas fa-boxes text-gold"></i> حساباتي</a>
+                    <a href="contact-support.html" class="btn-nav-middle"><i class="fas fa-headset text-orange"></i> محادثة الوسيط</a>
+                </nav>
+
+                <!-- المجموعة 2 المخصصة للمدير (تظهر تلقائياً للمدير) -->
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                        <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
+                        <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
+                    </a>
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                        <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
+                    </a>
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                        <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                        <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;"></span>
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
+                        <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;"></span>
+                    </a>
+                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
+                        <i class="fas fa-comments text-orange"></i> المحادثات
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-chats-badge" style="display: none;"></span>
+                    </a>
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- المجموعة 3 (أقصى اليسار): المحفظة + الحساب + الجرس (يُحقن تلقائياً) + ☰ -->
+                <div class="nav-left-group">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                    <div id="nav-user-container"></div>
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= Main Profile & Storefront Content ================= -->
+        <main class="profile-page-container">
+
+            <!-- مؤشر التحميل الأولي -->
+            <div id="profile-loading-state" style="text-align: center; padding: 5rem 1rem; color: var(--silver-muted);">
+                <i class="fas fa-circle-notch fa-spin text-gold" style="font-size: 2.8rem; margin-bottom: 1.2rem;"></i>
+                <h3 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem;">جاري تحميل بيانات المتجر والملف الشخصي...</h3>
+                <p style="font-size: 0.9rem; margin: 0;">يتم جلب سجل المبيعات والمستوى المعتمد من منصة وسيط</p>
+            </div>
+
+            <!-- رسالة المستخدم غير موجود -->
+            <div id="profile-not-found" style="display: none; text-align: center; padding: 4.5rem 1.5rem; background: rgba(18, 24, 38, 0.9); border: 1px solid var(--border-metal); border-radius: 20px; max-width: 600px; margin: 3rem auto;">
+                <i class="fas fa-user-slash text-gold" style="font-size: 3.5rem; margin-bottom: 1.2rem;"></i>
+                <h2 style="color: #fff; margin-bottom: 0.8rem;">الملف الشخصي غير موجود</h2>
+                <p style="color: var(--silver-muted); margin-bottom: 1.6rem; line-height: 1.6;">
+                    لم يتم العثور على هذا المستخدم في المنصة أو تم نقل الرابط. يمكنك تصفح السوق العام للحسابات.
+                </p>
+                <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> الانتقال لسوق الحسابات</a>
+            </div>
+
+            <!-- المحتوى الفعلي للملف والمتجر -->
+            <div id="profile-content-area" style="display: none;">
+
+                <!-- 1. بطاقة الهوية والمستوى الشخصي 3D -->
+                <section class="profile-hero-card">
+                    <div class="profile-header-flex">
+                        <div class="profile-identity-col">
+                            <div class="profile-avatar-wrap">
+                                <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="صورة البائع" class="profile-avatar-img" referrerpolicy="no-referrer">
+                                <span class="profile-online-dot" title="متصل الآن على منصة وسيط"></span>
+                            </div>
+                            <div>
+                                <h1 class="profile-name-title">
+                                    <span id="profile-name">اسم المستخدم</span>
+                                    <span class="profile-verified-badge" title="هوية موثقة لدى وسيط"><i class="fas fa-shield-check"></i> موثق</span>
+                                </h1>
+                                <div style="margin-top: 0.35rem;" id="profile-tier-container">
+                                    <span class="seller-tier-badge tier-new" id="profile-tier-badge">
+                                        <i class="fas fa-seedling"></i> <span>بائع جديد</span>
+                                    </span>
+                                </div>
+                                <div class="profile-meta-row">
+                                    <span><i class="far fa-calendar-alt text-gold"></i> <span id="profile-join-date">عضو حديث</span></span>
+                                    <span><i class="fas fa-shield-alt text-emerald" style="color: #10b981;"></i> وساطة مشفرة 100%</span>
+                                    <span id="profile-role-pill" style="display: none; background: rgba(234, 88, 12, 0.2); border: 1px solid var(--orange-bright); color: var(--orange-bright); font-size: 0.74rem; padding: 2px 8px; border-radius: 999px; font-weight: 800;">الوسيط المعتمد</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions-col">
+                            <button type="button" class="btn-share-store" onclick="ProfileStore.shareStoreLink()" title="نسخ رابط المتجر لمشاركته مع المشترين">
+                                <i class="fas fa-share-alt"></i> <span>مشاركة المتجر</span>
+                            </button>
+                            <a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" class="btn-3d btn-outline" style="border-color: #25D366; color: #25D366; text-decoration: none;" title="الدعم المباشر للوساطة">
+                                <i class="fab fa-whatsapp"></i> <span>وسيط الصفقة</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. شبكة إحصائيات المبيعات والشراء (3 كروت) -->
+                <section class="profile-stats-grid">
+                    <div class="profile-stat-box" style="border-right: 4px solid #10b981;">
+                        <div>
+                            <div class="stat-box-title">الحسابات المباعة</div>
+                            <div class="stat-box-num" style="color: #34d399;" id="stat-sold-count">0</div>
+                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">صفقات مكتملة وناجحة</div>
+                        </div>
+                        <i class="fas fa-check-double stat-box-icon" style="color: #10b981;"></i>
+                    </div>
+
+                    <div class="profile-stat-box" style="border-right: 4px solid #06b6d4;">
+                        <div>
+                            <div class="stat-box-title">الحسابات المشتراة</div>
+                            <div class="stat-box-num" style="color: #38bdf8;" id="stat-bought-count">0</div>
+                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">عمليات شراء واستلام آمنة</div>
+                        </div>
+                        <i class="fas fa-shopping-bag stat-box-icon" style="color: #06b6d4;"></i>
+                    </div>
+
+                    <div class="profile-stat-box" style="border-right: 4px solid var(--gold-primary);">
+                        <div>
+                            <div class="stat-box-title">معروضات المتجر النشطة</div>
+                            <div class="stat-box-num" style="color: var(--gold-light);" id="stat-active-count">0</div>
+                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">حسابات متاحة للشراء الفوري</div>
+                        </div>
+                        <i class="fas fa-store stat-box-icon" style="color: var(--gold-primary);"></i>
+                    </div>
+                </section>
+
+                <!-- 3. قسم معروضات المتجر (Storefront Grid) -->
+                <section class="storefront-section">
+                    <div class="storefront-header">
+                        <h2 class="storefront-title">
+                            <i class="fas fa-gamepad text-gold"></i>
+                            <span id="storefront-owner-heading">معروضات المتجر</span>
+                        </h2>
+                        <span class="storefront-count-pill" id="storefront-counter-pill">0 حساب متاح</span>
+                    </div>
+
+                    <!-- شبكة الكروت ثلاثية الأبعاد -->
+                    <div class="accounts-grid" id="storefront-grid"></div>
+
+                    <!-- حالة خلو المتجر من المعروضات -->
+                    <div class="storefront-empty" id="storefront-empty-state" style="display: none;">
+                        <i class="fas fa-store-slash"></i>
+                        <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">لا توجد حسابات معروضة حالياً</h3>
+                        <p style="margin: 0; font-size: 0.92rem;">هذا المتجر لا يحتوي على حسابات نشطة للبيع في الوقت الحالي. تحقق مجدداً لاحقاً!</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= Sliding Drawer Menu ================= -->
+    <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleWaseetDrawer(false)"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+            </div>
+            <button class="drawer-close-btn" onclick="toggleWaseetDrawer(false)">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card"></div>
+        <div class="drawer-auth-actions" id="drawer-auth-actions" style="padding: 0 1.25rem 0.75rem;"></div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قيد الشراء</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-clipboard-check text-orange"></i>
+                    <span>حسابات قيد الفحص</span>
+                </a>
+                <a href="admin-chats.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-inbox text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card" data-admin-only onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-boxes text-gold"></i>
+                    <span>حساباتي</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="contact-support.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
+                </a>
+                <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+                <a href="index.html#open-sell" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    <span>بيع حساب</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" title="واتساب الدعم المباشر: +2180931467923"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم المباشر (<span dir="ltr">+2180931467923</span>)</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ================= Mobile App Bottom Navigation Bar ================= -->
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#marketplace" class="mobile-nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <a href="wallet.html" class="mobile-nav-item mobile-nav-center-action" title="محفظتي">
+            <div class="center-action-circle">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <span>محفظتي</span>
+        </a>
+        <a href="deals.html" class="mobile-nav-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>قيد الشراء</span>
+        </a>
+        <a href="contact-support.html" class="mobile-nav-item">
+            <i class="fas fa-headset"></i>
+            <span>الوسيط</span>
+        </a>
+    </nav>
+
+    <!-- ================= Modal: تفاصيل الحساب والصور ================= -->
+    <div class="store-modal-overlay" id="store-account-modal" onclick="if(event.target===this) ProfileStore.closeModal()">
+        <div class="store-modal-card">
+            <button type="button" class="store-modal-close" onclick="ProfileStore.closeModal()">&times;</button>
+            
+            <div class="gallery-main-img-box">
+                <img id="modal-main-img" src="" alt="صورة الحساب">
+                <button type="button" class="gallery-nav-btn prev-btn" onclick="ProfileStore.prevImage()"><i class="fas fa-chevron-right"></i></button>
+                <button type="button" class="gallery-nav-btn next-btn" onclick="ProfileStore.nextImage()"><i class="fas fa-chevron-left"></i></button>
+            </div>
+            
+            <div class="gallery-thumbs-row" id="modal-thumbs-row"></div>
+
+            <div style="margin-top: 1.2rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+                    <h2 id="modal-acc-title" style="color: #fff; font-size: 1.25rem; margin: 0;"></h2>
+                    <span id="modal-acc-game" style="background: rgba(197, 160, 89, 0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); font-size: 0.8rem; font-weight: 800; padding: 2px 10px; border-radius: 999px;"></span>
+                </div>
+
+                <div class="card-specs" id="modal-acc-specs" style="margin: 0.9rem 0;"></div>
+
+                <div id="modal-acc-notes" style="background: rgba(14, 18, 28, 0.7); border: 1px solid var(--border-metal); border-radius: 12px; padding: 0.85rem; color: var(--silver-light); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.2rem; display: none;"></div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.76rem;" id="modal-seller-price-note"></div>
+                        <div style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="modal-total-price"></div>
+                    </div>
+                    <button type="button" class="btn-3d btn-orange" id="modal-buy-btn" style="padding: 0.75rem 1.6rem; font-size: 1rem;">
+                        <i class="fas fa-shield-alt"></i> طلب وساطة وشراء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js?v=20261027"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js?v=20261027"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/pwa-register.js"></script>
+
+    <!-- Profile & Storefront Logic -->
+    <script>
+    const ProfileStore = (function () {
+        'use strict';
+
+        const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+        let targetUserId = null;
+        let profileData = null;
+        let activeAccounts = [];
+        let modalActiveAccount = null;
+        let modalImageIndex = 0;
+
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        /* ── دالة نظام المستويات (Seller Tiers) ── */
+        function computeSellerTier(soldCount) {
+            const n = Number(soldCount) || 0;
+            if (n >= 100) {
+                return {
+                    name: 'المستوى الذهبي 🥇',
+                    badgeClass: 'tier-gold',
+                    icon: 'fa-crown',
+                    description: 'بائع خبير معتمد بمبيعات تتجاوز 100 حساب'
+                };
+            }
+            if (n >= 50) {
+                return {
+                    name: 'المستوى البلاتيني 💎',
+                    badgeClass: 'tier-platinum',
+                    icon: 'fa-gem',
+                    description: 'بائع محترف بمبيعات تتجاوز 50 حساب'
+                };
+            }
+            if (n >= 10) {
+                return {
+                    name: 'المستوى الفضي 🥈',
+                    badgeClass: 'tier-silver',
+                    icon: 'fa-medal',
+                    description: 'بائع نشط وموثوق بأكثر من 10 مبيعات'
+                };
+            }
+            if (n >= 1) {
+                return {
+                    name: 'المستوى النحاسي 🥉',
+                    badgeClass: 'tier-copper',
+                    icon: 'fa-award',
+                    description: 'بائع واعد في بداية مسيرته'
+                };
+            }
+            return {
+                name: 'بائع جديد 🌱',
+                badgeClass: 'tier-new',
+                icon: 'fa-seedling',
+                description: 'عضو مسجل وجديد في منصة وسيط'
+            };
+        }
+
+        /* ── جلب البيانات من Supabase ── */
+        async function loadProfileAndStore() {
+            const urlParams = new URLSearchParams(window.location.search);
+            targetUserId = urlParams.get('id') || urlParams.get('user');
+
+            // إذا لم يتم تمرير ID، يتم التوجيه فوراً للصفحة الرئيسية
+            if (!targetUserId || !targetUserId.trim()) {
+                window.location.replace('index.html');
+                return;
+            }
+
+            targetUserId = targetUserId.trim();
+
+            // دعم المعاينة السريعة للمتجر والمستويات (Demo / Preview Mode)
+            if (targetUserId === 'demo' || targetUserId === 'preview' || urlParams.get('demo')) {
+                const sampleAccounts = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.accounts && WASEET_STATE.accounts.length)
+                    ? WASEET_STATE.accounts.slice(0, 3)
+                    : [
+                        {
+                            id: 'demo-acc-1',
+                            accountNumber: 1088,
+                            title: 'حساب فري فاير برايم 7 أسطوري - سكن الساكورا وبنطلون الجاز',
+                            game: 'free_fire',
+                            level: 74,
+                            primeLevel: 7,
+                            bindStatus: 'single',
+                            sellerPrice: 450,
+                            image: 'assets/logo.png',
+                            images: ['assets/logo.png'],
+                            iconicPants: ['بنطلون الجاز'],
+                            accountNotes: 'حساب مشحون من السيزون الأول، يحتوي على رقصات وسكنات نادرة جداً.'
+                        },
+                        {
+                            id: 'demo-acc-2',
+                            accountNumber: 1092,
+                            title: 'حساب ببجي موبايل - إم فور ثلجي ماكس وسكنات أسطورية',
+                            game: 'pubg',
+                            level: 68,
+                            primeLevel: 5,
+                            badge: 'ميثيك ماكس',
+                            bindStatus: 'single',
+                            sellerPrice: 620,
+                            image: 'assets/logo.png',
+                            images: ['assets/logo.png'],
+                            accountNotes: 'حساب عالمي مشحون RP متعدد، ربط جوجل نظيف.'
+                        }
+                    ];
+                activeAccounts = sampleAccounts;
+                renderProfileView({
+                    profile: {
+                        id: 'demo-seller-uuid',
+                        name: 'متجر ميمو الأسطوري (Memo Store)',
+                        avatar_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200',
+                        created_at: '2024-01-15T00:00:00Z',
+                        role: 'user'
+                    },
+                    soldCount: 114,
+                    boughtCount: 42,
+                    activeCount: sampleAccounts.length,
+                    listings: sampleAccounts
+                });
+                return;
+            }
+
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+
+            try {
+                let statsRpc = null;
+
+                // 1. استدعاء دالة RPC إن وُجدت
+                if (client) {
+                    try {
+                        const { data: rpcRes, error: rpcErr } = await client.rpc('get_seller_profile_stats', { p_user_id: targetUserId });
+                        if (!rpcErr && rpcRes) statsRpc = rpcRes;
+                    } catch (e) {
+                        console.warn('[Profile] RPC error or unmigrated, falling back to direct queries:', e);
+                    }
+                }
+
+                // 2. جلب الملف الشخصي من profiles
+                let profileRow = null;
+                if (client) {
+                    try {
+                        const { data, error } = await client
+                            .from('profiles')
+                            .select('*')
+                            .eq('id', targetUserId)
+                            .maybeSingle();
+                        if (!error && data) profileRow = data;
+                    } catch (e) {}
+                }
+
+                // 3. حساب الإحصائيات بالاستعلام المباشر
+                let soldCount = 0;
+                let boughtCount = 0;
+                let activeCount = 0;
+
+                if (statsRpc) {
+                    soldCount = Number(statsRpc.sold_count) || 0;
+                    boughtCount = Number(statsRpc.bought_count) || 0;
+                    activeCount = Number(statsRpc.active_count) || 0;
+                    if (!profileRow && statsRpc.name) {
+                        profileRow = {
+                            id: targetUserId,
+                            name: statsRpc.name,
+                            avatar_url: statsRpc.avatar_url,
+                            created_at: statsRpc.created_at,
+                            role: statsRpc.role
+                        };
+                    }
+                } else if (client) {
+                    try {
+                        // عدد المباع
+                        const { count: sCount } = await client
+                            .from('marketplace_accounts')
+                            .select('id', { count: 'exact', head: true })
+                            .eq('seller_id', targetUserId)
+                            .in('status', ['sold', 'completed']);
+                        soldCount = sCount || 0;
+
+                        // عدد المشترى
+                        const { count: bCount } = await client
+                            .from('marketplace_accounts')
+                            .select('id', { count: 'exact', head: true })
+                            .eq('buyer_id', targetUserId)
+                            .in('status', ['sold', 'completed']);
+                        boughtCount = bCount || 0;
+                    } catch (e) {}
+                }
+
+                // 4. جلب الحسابات المعروضة للبيع حالياً لهذا المستخدم
+                let rawListings = [];
+                if (client) {
+                    try {
+                        const { data: listData, error: listErr } = await client
+                            .from('marketplace_accounts')
+                            .select('*')
+                            .eq('seller_id', targetUserId)
+                            .in('status', ['available', 'approved'])
+                            .order('created_at', { ascending: false });
+                        if (!listErr && Array.isArray(listData)) {
+                            rawListings = listData;
+                        }
+                    } catch (e) {}
+                }
+
+                // إذا لم يوجد حساب بروفايل في جدول profiles، نحاول فحصه في البيانات المحلية أو إظهار المستخدم غير موجود
+                if (!profileRow && rawListings.length === 0 && soldCount === 0 && boughtCount === 0) {
+                    // فحص إذا كان المستخدم مسجلاً محلياً
+                    const localUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id === targetUserId)
+                        ? WASEET_STATE.user
+                        : null;
+                    if (localUser) {
+                        profileRow = {
+                            id: localUser.id,
+                            name: localUser.name,
+                            avatar_url: localUser.avatar || localUser.avatar_url,
+                            created_at: new Date().toISOString(),
+                            role: localUser.role || 'user'
+                        };
+                    } else {
+                        document.getElementById('profile-loading-state').style.display = 'none';
+                        document.getElementById('profile-not-found').style.display = 'block';
+                        return;
+                    }
+                }
+
+                profileData = profileRow || {
+                    id: targetUserId,
+                    name: 'مستخدم وسيط',
+                    avatar_url: DEFAULT_AVATAR,
+                    created_at: new Date().toISOString(),
+                    role: 'user'
+                };
+
+                // مواءمة معروضات المتجر
+                const profilesMap = {};
+                profilesMap[targetUserId] = profileData;
+                activeAccounts = rawListings.map(r => {
+                    if (typeof waseetMapRemoteAccountRow === 'function') {
+                        return waseetMapRemoteAccountRow(r, profilesMap);
+                    }
+                    return r;
+                }).filter(Boolean);
+
+                activeCount = activeAccounts.length;
+
+                // تحديث الواجهة
+                renderProfileView({
+                    profile: profileData,
+                    soldCount,
+                    boughtCount,
+                    activeCount,
+                    listings: activeAccounts
+                });
+
+            } catch (err) {
+                console.error('[ProfileStore] خطأ أثناء جلب البيانات:', err);
+                document.getElementById('profile-loading-state').style.display = 'none';
+                document.getElementById('profile-not-found').style.display = 'block';
+            }
+        }
+
+        /* ── رسم الواجهة بالكامل ── */
+        function renderProfileView(data) {
+            document.getElementById('profile-loading-state').style.display = 'none';
+            document.getElementById('profile-not-found').style.display = 'none';
+            document.getElementById('profile-content-area').style.display = 'block';
+
+            const p = data.profile;
+            const nameEl = document.getElementById('profile-name');
+            const avatarEl = document.getElementById('profile-avatar');
+            const joinDateEl = document.getElementById('profile-join-date');
+            const rolePill = document.getElementById('profile-role-pill');
+            const ownerHeading = document.getElementById('storefront-owner-heading');
+
+            const userName = p.name || p.username || 'مستخدم وسيط';
+            if (nameEl) nameEl.textContent = userName;
+            const prefix = userName.trim().startsWith('متجر') ? 'معروضات ' : 'معروضات متجر ';
+            if (ownerHeading) ownerHeading.textContent = prefix + userName;
+            document.title = 'WASEET | متجر ' + userName;
+
+            if (avatarEl) {
+                avatarEl.src = p.avatar_url || DEFAULT_AVATAR;
+                avatarEl.onerror = function () { this.src = DEFAULT_AVATAR; };
+            }
+
+            if (joinDateEl) {
+                if (p.created_at) {
+                    try {
+                        const d = new Date(p.created_at);
+                        const monthName = d.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+                        joinDateEl.textContent = 'عضو منذ ' + monthName;
+                    } catch (e) {
+                        joinDateEl.textContent = 'عضو موثق';
+                    }
+                } else {
+                    joinDateEl.textContent = 'عضو موثق';
+                }
+            }
+
+            if (rolePill) {
+                const isAdmin = p.role === 'admin' || p.role === 'mediator';
+                rolePill.style.display = isAdmin ? 'inline-block' : 'none';
+            }
+
+            // تطبيق نظام المستويات
+            const tier = computeSellerTier(data.soldCount);
+            const badgeBox = document.getElementById('profile-tier-container');
+            if (badgeBox) {
+                badgeBox.innerHTML = `
+                    <span class="seller-tier-badge ${tier.badgeClass}" title="${tier.description}">
+                        <i class="fas ${tier.icon}"></i>
+                        <span>${tier.name}</span>
+                    </span>
+                `;
+            }
+
+            // أرقام الإحصائيات
+            document.getElementById('stat-sold-count').textContent = data.soldCount;
+            document.getElementById('stat-bought-count').textContent = data.boughtCount;
+            document.getElementById('stat-active-count').textContent = data.activeCount;
+            document.getElementById('storefront-counter-pill').textContent = data.activeCount + ' حساب متاح';
+
+            // رسم شبكة الحسابات المعروضة
+            renderStorefrontGrid(data.listings);
+        }
+
+        /* ── رسم شبكة الحسابات المعروضة ── */
+        function renderStorefrontGrid(accounts) {
+            const grid = document.getElementById('storefront-grid');
+            const empty = document.getElementById('storefront-empty-state');
+            if (!grid) return;
+
+            if (!accounts || accounts.length === 0) {
+                grid.innerHTML = '';
+                if (empty) empty.style.display = 'block';
+                return;
+            }
+
+            if (empty) empty.style.display = 'none';
+
+            grid.innerHTML = accounts.map((acc, index) => {
+                const price = typeof calculateWaseetFee === 'function'
+                    ? calculateWaseetFee(acc.sellerPrice || acc.seller_price || 0)
+                    : { buyerPrice: acc.sellerPrice || 0, fee: 0, sellerPrice: acc.sellerPrice || 0 };
+
+                const imagesList = (acc.images && acc.images.length > 0)
+                    ? acc.images
+                    : [acc.image || 'assets/logo.png'];
+
+                const pantsTag = (acc.iconicPants && acc.iconicPants.length > 0 && acc.iconicPants[0] !== 'بنطلون مميز')
+                    ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${esc(acc.iconicPants[0])}</span>`
+                    : '';
+
+                const accNum = acc.accountNumber || (index + 1001);
+                let primeBadgeHtml = '';
+                if (acc.game === 'free_fire') {
+                    primeBadgeHtml = `<div class="prime-badge-3d"><i class="fas fa-crown"></i> برايم ${acc.primeLevel || 1}</div>`;
+                } else if (acc.badge) {
+                    primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff;"><i class="fas fa-award"></i> ${esc(acc.badge)}</div>`;
+                }
+
+                return `
+                    <div class="account-card-3d card-3d">
+                        <div class="card-media" onclick="ProfileStore.openModal('${acc.id}')" style="cursor: pointer;" title="انقر لعرض كامل الصور والمواصفات">
+                            <img src="${esc(imagesList[0])}" alt="${esc(acc.title)}" class="card-img" onerror="this.onerror=null; this.src='assets/logo.png'; this.style.objectFit='contain';">
+                            ${primeBadgeHtml}
+                            <div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${accNum}</div>
+                            <div class="level-tag">Lv. ${acc.level || 50}</div>
+                            <button class="btn-gallery-badge" onclick="event.stopPropagation(); ProfileStore.openModal('${acc.id}')">
+                                <i class="fas fa-layer-group"></i> ${imagesList.length} صور
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title" onclick="ProfileStore.openModal('${acc.id}')" style="cursor: pointer;">${esc(acc.title)}</h3>
+                            <div class="card-specs">
+                                <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
+                                <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
+                                ${pantsTag}
+                            </div>
+                            <div class="card-footer">
+                                <div class="price-col">
+                                    <span class="price-sub">صافي البائع: ${price.sellerPrice} نقطة</span>
+                                    <span class="price-main">${price.buyerPrice} <small style="font-size: 0.72em;">نقطة</small></span>
+                                </div>
+                                <button class="btn-3d btn-orange" onclick="ProfileStore.requestEscrow('${acc.id}')">
+                                    <i class="fas fa-shield-alt"></i> طلب وساطة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* ── مشاركة رابط المتجر ── */
+        async function shareStoreLink() {
+            const url = window.location.href;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+
+                if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.showToastNotification === 'function') {
+                    window.WaseetNotificationStore.showToastNotification({
+                        title: 'تم نسخ رابط المتجر!',
+                        message: 'يمكنك الآن إرسال الرابط لمشترينك على واتساب ومواقع التواصل.',
+                        type: 'deal'
+                    });
+                } else if (typeof waseetAlert === 'function') {
+                    waseetAlert('تم نسخ رابط المتجر!', 'تم نسخ الرابط إلى الحافظة بنجاح، يمكنك مشاركته الآن.', 'success');
+                } else {
+                    alert('تم نسخ رابط المتجر بنجاح!');
+                }
+            } catch (e) {
+                prompt('انسخ رابط متجرك من هنا:', url);
+            }
+        }
+
+        /* ── نافذة فحص وتفاصيل الحساب والصور ── */
+        function openModal(accountId) {
+            const acc = activeAccounts.find(a => a.id === accountId);
+            if (!acc) return;
+            modalActiveAccount = acc;
+            modalImageIndex = 0;
+
+            const modal = document.getElementById('store-account-modal');
+            const titleEl = document.getElementById('modal-acc-title');
+            const gameEl = document.getElementById('modal-acc-game');
+            const specsEl = document.getElementById('modal-acc-specs');
+            const notesEl = document.getElementById('modal-acc-notes');
+            const priceNoteEl = document.getElementById('modal-seller-price-note');
+            const totalPriceEl = document.getElementById('modal-total-price');
+            const buyBtn = document.getElementById('modal-buy-btn');
+
+            titleEl.textContent = acc.title;
+            gameEl.textContent = acc.game === 'free_fire' ? 'فري فاير Free Fire' : (acc.game || 'ألعاب');
+
+            const price = typeof calculateWaseetFee === 'function'
+                ? calculateWaseetFee(acc.sellerPrice || 0)
+                : { buyerPrice: acc.sellerPrice || 0, fee: 0, sellerPrice: acc.sellerPrice || 0 };
+
+            priceNoteEl.textContent = `صافي البائع: ${price.sellerPrice} نقطة + عمولة الوساطة ${price.fee} نقطة`;
+            totalPriceEl.textContent = `${price.buyerPrice} نقطة`;
+
+            specsEl.innerHTML = `
+                <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
+                <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
+                <span class="spec-chip"><i class="fas fa-layer-group text-gold"></i> المستوى ${acc.level || 50}</span>
+                <span class="spec-chip"><i class="fas fa-shield-alt text-emerald" style="color: #10b981;"></i> وساطة آمنة 100%</span>
+            `;
+
+            if (acc.accountNotes && acc.accountNotes.trim()) {
+                notesEl.textContent = acc.accountNotes;
+                notesEl.style.display = 'block';
+            } else {
+                notesEl.style.display = 'none';
+            }
+
+            buyBtn.onclick = () => {
+                closeModal();
+                requestEscrow(acc.id);
+            };
+
+            renderModalGallery();
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('store-account-modal');
+            if (modal) modal.style.display = 'none';
+            modalActiveAccount = null;
+        }
+
+        function renderModalGallery() {
+            if (!modalActiveAccount) return;
+            const imgs = (modalActiveAccount.images && modalActiveAccount.images.length > 0)
+                ? modalActiveAccount.images
+                : [modalActiveAccount.image || 'assets/logo.png'];
+
+            const mainImg = document.getElementById('modal-main-img');
+            const thumbsRow = document.getElementById('modal-thumbs-row');
+
+            if (modalImageIndex >= imgs.length) modalImageIndex = 0;
+            if (modalImageIndex < 0) modalImageIndex = imgs.length - 1;
+
+            mainImg.src = imgs[modalImageIndex];
+
+            thumbsRow.innerHTML = imgs.map((imgSrc, i) => `
+                <div class="gallery-thumb-item ${i === modalImageIndex ? 'active' : ''}" onclick="ProfileStore.setImageIndex(${i})">
+                    <img src="${esc(imgSrc)}" alt="" onerror="this.src='assets/logo.png'">
+                </div>
+            `).join('');
+        }
+
+        function nextImage() {
+            modalImageIndex++;
+            renderModalGallery();
+        }
+
+        function prevImage() {
+            modalImageIndex--;
+            renderModalGallery();
+        }
+
+        function setImageIndex(i) {
+            modalImageIndex = i;
+            renderModalGallery();
+        }
+
+        /* ── طلب الوساطة والشراء بالنقاط ── */
+        async function requestEscrow(accountId) {
+            const acc = activeAccounts.find(a => a.id === accountId);
+            if (!acc) return;
+
+            // التحقق من تسجيل الدخول
+            const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+            if (!currentUser) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول أولاً لتتمكن من طلب الوساطة وشراء الحساب.', 'warning');
+                } else {
+                    alert('يرجى تسجيل الدخول أولاً!');
+                }
+                if (typeof waseetSignInWithGoogle === 'function') {
+                    waseetSignInWithGoogle();
+                }
+                return;
+            }
+
+            // تحديث الرصيد قبل التحقق
+            if (typeof window.waseetRefreshMyWalletBalance === 'function') {
+                try { await window.waseetRefreshMyWalletBalance(); } catch (e) {}
+            }
+
+            const price = typeof calculateWaseetFee === 'function'
+                ? calculateWaseetFee(acc.sellerPrice || 0)
+                : { buyerPrice: acc.sellerPrice || 0, fee: 0, sellerPrice: acc.sellerPrice || 0 };
+
+            const myPts = (currentUser.wallet && Number(currentUser.wallet.available)) || 0;
+
+            const confirmed = (typeof waseetConfirm === 'function')
+                ? await waseetConfirm(
+                    'طلب وساطة لشراء هذا الحساب',
+                    `هل تود حجز ${price.buyerPrice} نقطة من محفظتك لشراء حساب "${acc.title}"؟\n(صافي البائع: ${price.sellerPrice} نقطة + عمولة الوساطة: ${price.fee} نقطة).\nسيتم حجز النقاط بخزينة الوساطة الآمنة حتى تفحص الحساب وتؤكد استلامه.`,
+                    'نعم، تأكيد الشراء والوساطة',
+                    'إلغاء',
+                    'escrow'
+                )
+                : confirm(`تأكيد شراء الحساب مقابل ${price.buyerPrice} نقطة؟`);
+
+            if (!confirmed) return;
+
+            if (myPts < price.buyerPrice) {
+                const addPts = (typeof waseetConfirm === 'function')
+                    ? await waseetConfirm(
+                        'رصيد النقاط غير كافٍ',
+                        `رصيدك المتاح (${myPts} نقطة) لا يكفي لشراء الحساب (${price.buyerPrice} نقطة).\nهل تود الانتقال إلى صفحة المحفظة لشحن النقاط الآن؟`,
+                        'شحن المحفظة الآن',
+                        'إلغاء',
+                        'warning'
+                    )
+                    : confirm('رصيد المحفظة لا يكفي، شحن النقاط الآن؟');
+                if (addPts) window.location.href = 'wallet.html';
+                return;
+            }
+
+            // إنشاء الصفقة في Supabase وحجز النقاط
+            try {
+                if (typeof waseetCreateEscrowDealOnSupabase === 'function') {
+                    const deal = await waseetCreateEscrowDealOnSupabase({
+                        account_id: acc.id,
+                        buyer_id: currentUser.id,
+                        seller_id: acc.seller_id || acc.sellerId,
+                        total_amount: price.buyerPrice,
+                        seller_amount: price.sellerPrice,
+                        fee_amount: price.fee,
+                        account_title: acc.title
+                    });
+
+                    if (deal && deal.id) {
+                        window.location.href = `chat.html?dealId=${deal.id}&role=buyer`;
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('[ProfileStore] فشل إنشاء الصفقة عبر Supabase مباشرة، جاري المتابعة:', err);
+            }
+
+            // توجيه المستخدم لغرفة الوساطة أو المتجر الرئيسي
+            window.location.href = `index.html#marketplace`;
+        }
+
+        return {
+            init: loadProfileAndStore,
+            shareStoreLink,
+            openModal,
+            closeModal,
+            nextImage,
+            prevImage,
+            setImageIndex,
+            requestEscrow
+        };
+    })();
+
+    document.addEventListener('DOMContentLoaded', ProfileStore.init);
+    </script>
+</body>
+</html>

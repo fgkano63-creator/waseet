@@ -35,8 +35,8 @@
     <style>
         .wallet-page-container {
             max-width: 1180px;
-            margin: 1.5rem auto 5.5rem;
-            padding: 0 1rem;
+            margin: var(--page-gap-top) auto var(--page-gap-bottom);
+            padding: 0 var(--page-gutter);
         }
 
         .wallet-hero-grid {
@@ -119,10 +119,6 @@
 
         /* تصغير بطاقات الرصيد وخصائص المحفظة للتناسق مع الهواتف */
         @media (max-width: 768px) {
-            .wallet-page-container {
-                margin: 0.75rem auto 4.5rem !important;
-                padding: 0 0.65rem !important;
-            }
             .wallet-hero-grid {
                 grid-template-columns: 1fr 1fr !important;
                 gap: 0.5rem !important;
@@ -1127,6 +1123,7 @@
     <script src="js/dialog.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>

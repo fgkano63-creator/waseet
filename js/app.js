@@ -766,6 +766,7 @@ class WaseetApp {
                         <div class="card-specs">
                             <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
                             <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
+                            ${(acc.seller_id || acc.sellerId) ? `<a href="profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}" class="spec-chip" onclick="event.stopPropagation()" style="text-decoration:none; color: var(--gold-light);" title="زيارة متجر البائع ومبيعاته"><i class="fas fa-store text-gold"></i> ${acc.sellerName || 'متجر البائع'}</a>` : ''}
                             ${pantsTag}
                         </div>
                         <div class="card-footer">
@@ -895,9 +896,9 @@ class WaseetApp {
                     <div class="spec-box-label"><i class="fas fa-link text-silver"></i> نوع وحالة الربط</div>
                     <div class="spec-box-value">${acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك'} (${acc.bindStatus === 'single' ? 'ربط أحادي آمن' : 'ربط ثنائي'})</div>
                 </div>
-                <div class="spec-box">
-                    <div class="spec-box-label"><i class="fas fa-user-shield text-gold"></i> تقييم البائع بالمنصة</div>
-                    <div class="spec-box-value">${acc.sellerName} (⭐ ${acc.sellerRating} • ${acc.sellerDeals} صفقة ناجحة)</div>
+                <div class="spec-box" style="${(acc.seller_id || acc.sellerId) ? 'cursor: pointer;' : ''}" onclick="${(acc.seller_id || acc.sellerId) ? `window.location.href='profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}'` : ''}">
+                    <div class="spec-box-label"><i class="fas fa-store text-gold"></i> متجر وملف البائع</div>
+                    <div class="spec-box-value" style="color: var(--gold-light);">${acc.sellerName} ${(acc.seller_id || acc.sellerId) ? '<span style="font-size: 0.78rem; text-decoration: underline;">(زيارة المتجر ↗)</span>' : ''}</div>
                 </div>
             </div>
 

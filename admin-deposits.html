@@ -35,8 +35,8 @@
     <style>
         .admin-deposits-container {
             max-width: 1220px;
-            margin: 1.5rem auto 5.5rem;
-            padding: 0 1rem;
+            margin: var(--page-gap-top) auto var(--page-gap-bottom);
+            padding: 0 var(--page-gutter);
         }
 
         .admin-stats-bar {
@@ -261,7 +261,7 @@
         }
     </style>
 </head>
-<body class="is-admin-mode">
+<body class="is-admin-mode" data-waseet-nav="auto">
 
     <canvas id="ambient-canvas"></canvas>
 
@@ -305,6 +305,17 @@
                 </nav>
 
                 <div class="nav-left-group">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                    <div id="nav-user-container"></div>
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -387,6 +398,74 @@
         </main>
     </div>
 
+    <!-- ================= Sliding Drawer Menu ================= -->
+    <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleWaseetDrawer(false)"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+            </div>
+            <button class="drawer-close-btn" onclick="toggleWaseetDrawer(false)">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card"></div>
+        <div class="drawer-auth-actions" id="drawer-auth-actions" style="padding: 0 1.25rem 0.75rem;"></div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+            <div class="drawer-shortcuts-grid">
+                <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-store text-gold"></i>
+                    <span>سوق الحسابات</span>
+                </a>
+                <a href="deals.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span>قيد الشراء</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-clipboard-check text-orange"></i>
+                    <span>حسابات قيد الفحص</span>
+                </a>
+                <a href="admin-chats.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-inbox text-gold"></i>
+                    <span>محادثات الإدارة</span>
+                </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card active" data-admin-only onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-boxes text-gold"></i>
+                    <span>حساباتي</span>
+                </a>
+                <a href="chat.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-comments text-orange"></i>
+                    <span>غرفة الوساطة</span>
+                </a>
+                <a href="contact-support.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-headset text-orange"></i>
+                    <span>تواصل مع الوسيط</span>
+                </a>
+                <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-calculator text-silver"></i>
+                    <span>حاسبة العمولات</span>
+                </a>
+                <a href="index.html#open-sell" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-plus-circle text-orange"></i>
+                    <span>بيع حساب</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h4 class="drawer-section-title">المساعدة والدعم</h4>
+            <ul class="drawer-links-list">
+                <li><a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" title="واتساب الدعم المباشر: +2180931467923"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم المباشر (<span dir="ltr">+2180931467923</span>)</a></li>
+            </ul>
+        </div>
+    </aside>
+
     <!-- عارض صورة الإيصال بالحجم الكامل -->
     <div id="admin-receipt-lightbox" onclick="this.style.display='none'" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;">
         <img id="admin-receipt-lightbox-img" src="" alt="إيصال التحويل" style="max-width: 95%; max-height: 92vh; border-radius: 14px; border: 2px solid var(--gold-primary); box-shadow: 0 25px 70px rgba(0,0,0,0.95);">
@@ -400,6 +479,7 @@
     <script src="js/dialog.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>
