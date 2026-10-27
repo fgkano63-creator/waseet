@@ -14,12 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png?v=20261026_w2">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png?v=20261026_w2">
-    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=20261026_w2">
-    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=20261026_w2">
-    <link rel="apple-touch-icon" href="/assets/favicons/apple-touch-icon.png?v=20261026_w2">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png?v=20261026_w2">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
 
     <!-- PWA & Mobile Web App Meta Tags -->
     <link rel="manifest" href="/manifest.json">
@@ -39,13 +39,23 @@
 
     <div class="app-wrapper">
 
+        <!-- أزرار التنقل السريع العالمية (Back & Forward Global Arrows) -->
+        <div class="waseet-global-nav-arrows">
+            <button type="button" class="btn-global-history-arrow btn-global-history-right" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="button" class="btn-global-history-arrow btn-global-history-left" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+
         <!-- ================= Header / Navbar (3 Groups Layout) ================= -->
         <header class="header-navbar">
             <div class="container nav-container">
                 <!-- المجموعة 1 (أقصى اليمين): شعار الموقع -->
                 <div class="nav-brand-group">
                     <a href="index.html" class="brand-wrap">
-                        <img src="assets/logo.png?v=20261026_orig" alt="WASEET Logo" class="brand-logo-img">
+                        <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
                             <span class="brand-title">WASEET</span>
                             <span class="brand-subtitle">وسيط • حماية وضمان الألعاب</span>
@@ -143,22 +153,9 @@
         <!-- ================= Hero Section ================= -->
         <section class="hero-section">
             <div class="container">
-                <div class="hero-badge-row">
-                    <!-- سهم العودة (أقصى اليمين) -->
-                    <button type="button" class="btn-history-arrow btn-hero-history-arrow btn-hero-history-right" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-
-                    <!-- شارة الأمان والموثوقية في المنتصف -->
-                    <div class="hero-badge">
-                        <i class="fas fa-shield-check text-gold"></i>
-                        <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
-                    </div>
-
-                    <!-- سهم التقدم (أقصى اليسار) -->
-                    <button type="button" class="btn-history-arrow btn-hero-history-arrow btn-hero-history-left" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                <div class="hero-badge">
+                    <i class="fas fa-shield-check text-gold"></i>
+                    <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
                 </div>
 
                 <h1 class="hero-title">

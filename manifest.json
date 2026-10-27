@@ -18,25 +18,25 @@
   ],
   "icons": [
     {
-      "src": "/assets/favicons/icon-192x192.png",
+      "src": "assets/pwa-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/favicons/icon-192x192.png",
+      "src": "assets/pwa-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/assets/favicons/icon-512x512.png",
+      "src": "assets/pwa-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/favicons/icon-512x512.png",
+      "src": "assets/pwa-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

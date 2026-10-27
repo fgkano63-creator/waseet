@@ -14,12 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png?v=20261026_w2">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png?v=20261026_w2">
-    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=20261026_w2">
-    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=20261026_w2">
-    <link rel="apple-touch-icon" href="/assets/favicons/apple-touch-icon.png?v=20261026_w2">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png?v=20261026_w2">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
 
     <!-- PWA & Mobile Web App Meta Tags -->
     <link rel="manifest" href="/manifest.json">
@@ -271,16 +271,8 @@
         <header class="header-navbar">
             <div class="container nav-container">
                 <div class="nav-brand-group">
-                    <div class="waseet-history-nav-arrows">
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة" aria-label="الرجوع للصفحة السابقة">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية" aria-label="التقدم للصفحة التالية">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
                     <a href="index.html" class="brand-wrap">
-                        <img src="assets/logo.png?v=20261026_orig" alt="WASEET Logo" class="brand-logo-img">
+                        <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
                             <span class="brand-title">WASEET</span>
                             <span class="brand-subtitle">لوحة الإدارة • طلبات شحن النقاط</span>
@@ -377,14 +369,6 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; max-width: 420px;">
-                    <div class="waseet-history-nav-arrows">
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryBack ? window.waseetHistoryBack() : window.history.back()" title="الرجوع للصفحة السابقة">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="btn-history-arrow" onclick="window.waseetHistoryForward ? window.waseetHistoryForward() : window.history.forward()" title="التقدم للصفحة التالية">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
                     <input type="text" id="admin-deposit-search" placeholder="ابحث باسم المستخدم أو البريد..." oninput="renderAdminDepositCards()" style="flex: 1; padding: 0.55rem 0.9rem; border-radius: 10px; background: rgba(22, 28, 44, 0.9); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; outline: none;">
                     <button type="button" class="btn-3d btn-outline" onclick="loadAdminDeposits()" title="تحديث القائمة" style="padding: 0.55rem 0.85rem;">
                         <i class="fas fa-sync-alt" id="admin-deposits-refresh-icon"></i>
