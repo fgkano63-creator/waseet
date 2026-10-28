@@ -552,17 +552,20 @@ class WaseetEscrowRoom {
                         foundCreds = acc.credentials;
                     }
                 }
-                if (!foundCreds && window.waseetSupabaseClient && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accId))) {
+                // أمني: جلب بيانات الدخول الحساسة حصرياً عبر Secure RPC للمصرح لهم
+                if (!foundCreds && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accId))) {
                     try {
-                        const { data: accData } = await window.waseetSupabaseClient
-                            .from('marketplace_accounts')
-                            .select('credentials, details, login_type')
-                            .eq('id', accId)
-                            .maybeSingle();
-                        if (accData && accData.credentials) {
-                            foundCreds = accData.credentials;
-                            if (accData.login_type && !foundCreds.loginType) {
-                                foundCreds.loginType = accData.login_type;
+                        if (typeof window.waseetGetAccountCredentialsSecure === 'function') {
+                            const secCreds = await window.waseetGetAccountCredentialsSecure(accId);
+                            if (secCreds && (secCreds.email_or_phone || secCreds.password)) {
+                                foundCreds = {
+                                    email: secCreds.email_or_phone,
+                                    email_or_phone: secCreds.email_or_phone,
+                                    password: secCreds.password,
+                                    rawPassword: secCreds.password,
+                                    recovery_email: secCreds.recovery_email,
+                                    recovery_password: secCreds.recovery_password
+                                };
                             }
                         }
                     } catch (e) {}
@@ -1418,6 +1421,23 @@ class WaseetEscrowRoom {
         `;
     }
 
+    sanitizeText(str) {
+        if (!str) return '';
+        const raw = String(str);
+        if (typeof window.DOMPurify !== 'undefined' && typeof window.DOMPurify.sanitize === 'function') {
+            return window.DOMPurify.sanitize(raw, {
+                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'span', 'br', 'code'],
+                ALLOWED_ATTR: ['href', 'target', 'class', 'style']
+            });
+        }
+        return raw
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     renderMessageList(messagesArray, expectedChannelType = null) {
         if (!messagesArray || !messagesArray.length) {
             return '<div style="color: var(--silver-muted); text-align: center; font-size: 0.8rem; padding: 2rem;">لا توجد رسائل سابقة.</div>';
@@ -1461,13 +1481,15 @@ class WaseetEscrowRoom {
         return filteredMessages.map(msg => {
             const safeMsgId = String(msg.id || '').replace(/"/g, '&quot;');
             const safeChannel = String(msg.channel_type || expectedCh || '').replace(/"/g, '&quot;');
+            const safeText = this.sanitizeText(msg.text);
+            const safeTime = this.sanitizeText(msg.time || '');
 
             if (msg.sender === 'system') {
                 return `
                     <div class="chat-msg system-msg" id="escrow-msg-${safeMsgId}" data-msg-id="${safeMsgId}" data-channel-type="${safeChannel}">
                         <i class="fas fa-info-circle text-gold"></i>
-                        <span>${msg.text}</span>
-                        <span class="msg-time">${msg.time}</span>
+                        <span>${safeText}</span>
+                        <span class="msg-time">${safeTime}</span>
                     </div>
                 `;
             }
@@ -1488,6 +1510,7 @@ class WaseetEscrowRoom {
 
             // حل جذري لعكس الأسماء: نعتمد دائماً على الدور الحقيقي لمرسل الرسالة (msg.sender)
             const trueAuthorName = this.resolveSenderDisplayName(msg.sender);
+            const safeAuthorName = this.sanitizeText(trueAuthorName);
 
             // أزرار الردود السريعة (Quick Replies) في الرسالة التلقائية للوسيط
             let quickRepliesHtml = '';
@@ -1504,11 +1527,15 @@ class WaseetEscrowRoom {
                             <i class="fas fa-bolt text-orange"></i> ${promptQuestion}
                         </div>
                         <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-                            ${options.map(opt => `
-                                <button type="button" class="btn-quick-reply-opt" onclick="window.escrowRoom.sendQuickReply('${qRole}', '${opt}')" style="background: rgba(197, 160, 89, 0.16); border: 1px solid var(--gold-primary); color: #fff; border-radius: 999px; padding: 0.28rem 0.85rem; font-family: var(--font-ar); font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
-                                    ${opt}
+                            ${options.map(opt => {
+                                const cleanOpt = this.sanitizeText(opt);
+                                const escOptParam = cleanOpt.replace(/'/g, "\\'");
+                                return `
+                                <button type="button" class="btn-quick-reply-opt" onclick="window.escrowRoom.sendQuickReply('${qRole}', '${escOptParam}')" style="background: rgba(197, 160, 89, 0.16); border: 1px solid var(--gold-primary); color: #fff; border-radius: 999px; padding: 0.28rem 0.85rem; font-family: var(--font-ar); font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
+                                    ${cleanOpt}
                                 </button>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -1517,14 +1544,14 @@ class WaseetEscrowRoom {
             return `
                 <div class="chat-msg ${senderClass}" id="escrow-msg-${safeMsgId}" data-msg-id="${safeMsgId}" data-channel-type="${safeChannel}">
                     <div class="msg-header">
-                        <span class="msg-author">${trueAuthorName}</span>
+                        <span class="msg-author">${safeAuthorName}</span>
                         ${senderBadge}
-                        <span class="msg-time">${msg.time}</span>
+                        <span class="msg-time">${safeTime}</span>
                     </div>
-                    <div class="msg-body">${msg.text}${quickRepliesHtml}</div>
+                    <div class="msg-body">${safeText}${quickRepliesHtml}</div>
                 </div>
             `;
-        }).join('');
+        }).join('');;
     }
 
     bindMediatorInputs() {

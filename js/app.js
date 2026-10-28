@@ -961,12 +961,12 @@ class WaseetApp {
                         <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
                             <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">كلمة المرور:</span>
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                <span id="deck-pw-${acc.id}" style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
+                                <span id="deck-pw-${acc.id}" data-revealed="false" style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
                                 <div style="display: flex; gap: 0.3rem;">
-                                    <button class="btn-3d btn-outline" onclick="const el=document.getElementById('deck-pw-${acc.id}'); if(el.innerText==='••••••••••'){ el.innerText='${(acc.credentials && acc.credentials.password) || ''}'; el.style.letterSpacing='normal'; this.innerHTML='<i class=\\'fas fa-eye-slash\\'></i>'; } else { el.innerText='••••••••••'; el.style.letterSpacing='2px'; this.innerHTML='<i class=\\'fas fa-eye\\'></i>'; }" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
+                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.revealDeckPassword('${acc.id}', this)" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.password) || ''}', 'تم نسخ كلمة المرور')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckPassword('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -992,12 +992,12 @@ class WaseetApp {
                             <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">كلمة المرور لحساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                    <span id="deck-rec-pw-${acc.id}" style="color: var(--orange-bright); font-size: 0.92rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
+                                    <span id="deck-rec-pw-${acc.id}" data-revealed="false" style="color: var(--orange-bright); font-size: 0.92rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
                                     <div style="display: flex; gap: 0.3rem;">
-                                        <button class="btn-3d btn-outline" onclick="const el=document.getElementById('deck-rec-pw-${acc.id}'); if(el.innerText==='••••••••••'){ el.innerText='${(acc.credentials && acc.credentials.recovery_password) || 'غير مضاف'}'; el.style.letterSpacing='normal'; this.innerHTML='<i class=\\'fas fa-eye-slash\\'></i>'; } else { el.innerText='••••••••••'; el.style.letterSpacing='2px'; this.innerHTML='<i class=\\'fas fa-eye\\'></i>'; }" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
+                                        <button class="btn-3d btn-outline" onclick="window.waseetApp.revealDeckRecoveryPassword('${acc.id}', this)" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.recovery_password) || ''}', 'تم نسخ كلمة مرور الاسترداد')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                        <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckRecoveryPassword('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                             <i class="fas fa-copy"></i>
                                         </button>
                                     </div>

@@ -505,7 +505,11 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             badge: account.badge || '',
             reviewStatus: account.reviewStatus || (dbStatus === 'available' ? 'approved' : 'pending'),
             rejectionReason: account.rejectionReason || '',
-            credentials: credsObj
+            // أمني: حماية بيانات الدخول وعدم تخزين كلمة المرور داخل details لمنع تسريبها في السوق العام
+            credentials: {
+                email_or_phone: credsObj.email_or_phone || '',
+                has_password: !!(credsObj.password && credsObj.password !== '••••••••')
+            }
         };
 
         // 1. إرفاق معرف البائع إجبارياً في الـ Payload ليطابق سياسة الإدخال (RLS)
@@ -581,6 +585,22 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             account.sellerId = sellerUuid;
             account.accountNumber = resultRow.account_number || account.accountNumber;
             account.syncedToSupabase = true;
+
+            // أمني: حفظ بيانات الدخول الحساسة في الجدول المنعزل والمحمي حصراً عبر RPC الآمن
+            if (credsObj && (credsObj.password || credsObj.email_or_phone)) {
+                try {
+                    await client.rpc('save_account_credentials_secure', {
+                        p_account_id: resultRow.id,
+                        p_email_or_phone: credsObj.email_or_phone || '',
+                        p_password: credsObj.password || '',
+                        p_recovery_email: credsObj.recovery_email || '',
+                        p_recovery_password: credsObj.recovery_password || '',
+                        p_notes: detailsObj.accountNotes || ''
+                    });
+                } catch (rpcErr) {
+                    console.warn('[Credentials Secure Save] تنبيه:', rpcErr);
+                }
+            }
 
             // تحديث المعرف في localStorage حتى لا يتكرر الرفع
             try {
@@ -760,6 +780,28 @@ window.waseetMapRemoteAccountRow = waseetMapRemoteAccountRow;
 window.waseetSafeParseCredentials = waseetSafeParseCredentials;
 
 /**
+ * جلب بيانات الدخول الحساسة وكلمة المرور المشفرة حصرياً عبر Secure RPC للمصرح لهم (الوسيط / البائع / المشتري)
+ */
+async function waseetGetAccountCredentialsSecure(accountId) {
+    const client = initWaseetSupabase();
+    if (!client || !accountId) return null;
+    try {
+        const { data, error } = await client.rpc('get_account_credentials_secure', {
+            p_account_id: accountId
+        });
+        if (error) {
+            console.warn('[Secure Credentials RPC] تنبيه:', error.message);
+            return null;
+        }
+        return data;
+    } catch (e) {
+        console.warn('[Secure Credentials RPC] استثناء:', e);
+        return null;
+    }
+}
+window.waseetGetAccountCredentialsSecure = waseetGetAccountCredentialsSecure;
+
+/**
  * جلب الحسابات المعتمدة للمتجر العام من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
  * بحيث لا يظهر في السوق العام أي حساب معلق (قيد الفحص) أو محجوز (in_deal) أو مباع (sold) أو مرفوض.
  */
@@ -773,11 +815,12 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
         // فحص تلقائي لإلغاء الحجوزات التي مر عليها أكثر من 48 ساعة وإرجاع الحسابات للسوق
         await waseetExpireStaleEscrowDeals();
 
-        // جلب الحسابات الفعلية فقط من Supabase (دون إعادة رفع أي بيانات محلية قديمة)
+        // جلب الحسابات الفعلية فقط من Supabase مع انتقاء الأعمدة العامة لحماية البيانات الحساسة
+        const publicColumns = 'id, account_number, seller_id, buyer_id, game, title, level, prime_level, login_type, bind_status, server, seller_price, images, details, status, created_at, updated_at';
         let rows = null;
         let joinQuery = client
             .from('marketplace_accounts')
-            .select('*, profiles(id, name, email, avatar_url)');
+            .select(`${publicColumns}, profiles(id, name, email, avatar_url)`);
         if (!includeAllStatuses) {
             joinQuery = joinQuery.in('status', ['available', 'approved']);
         }
@@ -788,7 +831,7 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
         } else {
             let plainQuery = client
                 .from('marketplace_accounts')
-                .select('*');
+                .select(publicColumns);
             if (!includeAllStatuses) {
                 plainQuery = plainQuery.in('status', ['available', 'approved']);
             }
