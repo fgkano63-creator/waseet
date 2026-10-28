@@ -2201,7 +2201,7 @@ body::before {
     background: rgba(4, 5, 8, 0.88);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    z-index: 9999;
+    z-index: 10020 !important;
     display: none;
     align-items: center;
     justify-content: center;
@@ -4201,7 +4201,7 @@ html, body {
     top: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(-20px);
-    z-index: 9999;
+    z-index: 10030 !important;
     max-width: 480px;
     width: 90%;
     background: rgba(12, 16, 26, 0.96);
@@ -6562,11 +6562,19 @@ body.chat-page-body .chat-input-bar {
 
 @media (max-width: 868px) {
     body.chat-page-body .chat-main-container {
-        padding: 0.2rem 0.35rem 64px !important;
+        padding: 0.2rem 0.35rem 0.35rem !important;
     }
     body.chat-page-body .escrow-room-card {
         border-radius: 12px !important;
     }
+}
+
+/* Lightbox overlays elevated above all modals */
+#admin-receipt-lightbox,
+#receipt-lightbox,
+.receipt-lightbox,
+.lightbox-modal {
+    z-index: 10050 !important;
 }
 
 /* إخفاء زر العودة للمتجر النصي من الترويسة العلوية نهائياً وتنسيق عناصر الشريط العلوي */
@@ -6934,7 +6942,7 @@ img.drawer-logo[src*="logo.png"] {
     position: fixed;
     top: 80px;
     left: 20px;
-    z-index: 10000;
+    z-index: 10030 !important;
     display: flex;
     flex-direction: column;
     gap: 0.65rem;

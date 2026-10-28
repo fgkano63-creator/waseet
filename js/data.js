@@ -326,3 +326,23 @@ function loadWaseetData() {
 }
 
 loadWaseetData();
+
+/**
+ * Universal Debounce Helper for Live Search & Throttling
+ * @param {Function} func The function to debounce
+ * @param {number} wait Milliseconds to wait (default 300ms)
+ * @returns {Function}
+ */
+function waseetDebounce(func, wait = 300) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func.apply(this, args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+window.waseetDebounce = waseetDebounce;
+

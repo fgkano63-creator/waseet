@@ -29,6 +29,18 @@ class WaseetApp {
 
 
     init() {
+        window.waseetShowGameUnavailable = function () {
+            if (window.waseetApp && typeof window.waseetApp.showAutoDismissToast === 'function') {
+                window.waseetApp.showAutoDismissToast(
+                    'تنبيه توفر الخدمة',
+                    'غير متوفر الآن بسبب عدم وجود وسيط',
+                    3000
+                );
+            } else {
+                alert('غير متوفر الآن بسبب عدم وجود وسيط');
+            }
+        };
+
         this.renderUserProfile();
         this.renderMarketplace();
         this.bindCalculator();
@@ -538,7 +550,7 @@ class WaseetApp {
         const lockedEl = document.getElementById('wallet-locked-pts');
         const modalAvailEl = document.getElementById('modal-wallet-avail');
         const modalLockEl = document.getElementById('modal-wallet-lock');
-        const chatsBadge = document.getElementById('nav-chats-badge');
+        const chatsBadge = document.getElementById('deals-badge-count') || document.getElementById('nav-chats-badge');
 
         const adminTotalEl = document.getElementById('admin-wallet-total-pts');
         if (totalEl) totalEl.innerText = `${wallet.available} نقطة`;
@@ -742,7 +754,7 @@ class WaseetApp {
 
             // Status Badge for pending review or rejected
             let statusTagHtml = '';
-            if (acc.status === 'pending_review' || acc.status === 'pending_verification') {
+            if (acc.status === 'pending' || acc.status === 'pending_review' || acc.status === 'pending_verification') {
                 statusTagHtml = `<div class="pending-review-banner" style="position: absolute; top: 8px; right: 8px; z-index: 6; background: rgba(245, 158, 11, 0.95); color: #000; font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 6px; box-shadow: 0 0 10px rgba(245,158,11,0.5);"><i class="fas fa-clock"></i> قيد الفحص</div>`;
             } else if (acc.status === 'rejected') {
                 statusTagHtml = `<div class="rejected-banner" style="position: absolute; top: 8px; right: 8px; z-index: 6; background: rgba(239, 68, 68, 0.95); color: #fff; font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 6px;"><i class="fas fa-ban"></i> مرفوض</div>`;
@@ -2128,9 +2140,15 @@ class WaseetApp {
 
         let statusText = 'قيد الفحص (أقل من 24 ساعة)';
         let statusColor = '#f59e0b';
-        if (acc.status === 'available') {
+        if (acc.status === 'available' || acc.status === 'approved') {
             statusText = 'معروض في السوق ومفحوص';
             statusColor = '#10b981';
+        } else if (acc.status === 'sold' || acc.status === 'completed') {
+            statusText = 'تم البيع والتسليم';
+            statusColor = '#10b981';
+        } else if (acc.status === 'in_deal') {
+            statusText = 'جارية في صفقة وساطة';
+            statusColor = 'var(--orange-primary)';
         } else if (acc.status === 'rejected') {
             statusText = 'مرفوض ومحذوف';
             statusColor = '#ef4444';

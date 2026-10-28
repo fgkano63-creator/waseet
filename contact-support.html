@@ -862,7 +862,7 @@
             }
             const adminPendingBadge = document.getElementById('admin-nav-pending-badge');
             if (adminPendingBadge && typeof WASEET_STATE !== 'undefined') {
-                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review').length;
+                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending' || a.status === 'pending_verification' || a.status === 'pending_review').length;
                 adminPendingBadge.innerText = pCount > 0 ? String(pCount) : '';
                 adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-flex' : 'none';
             }

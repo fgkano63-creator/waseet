@@ -2030,11 +2030,298 @@ async function waseetSendNotification(userId, title, message, link = '') {
         return false;
     }
 }
+/**
+ * إنشاء صفقة وساطة مباشرة وحجز النقاط من متجر الملف الشخصي للبائع أو السوق
+ */
+async function waseetCreateEscrowDealOnSupabase(params) {
+    if (!params || !params.account_id) return null;
+
+    let dealCounter = parseInt(localStorage.getItem('WASEET_DEAL_COUNTER') || '0') + 1;
+    const existingDeals = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.deals) ? WASEET_STATE.deals : [];
+    const completedDeals = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.completedDeals) ? WASEET_STATE.completedDeals : [];
+    const maxExistingNum = Math.max(
+        1,
+        ...existingDeals.map(d => Number(d.dealNumber) || 0),
+        ...completedDeals.map(d => Number(d.dealNumber) || 0)
+    );
+    if (dealCounter <= maxExistingNum) dealCounter = maxExistingNum + 1;
+    localStorage.setItem('WASEET_DEAL_COUNTER', String(dealCounter));
+
+    const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+    const buyerName = currentUser?.name || 'مشتري معتمد';
+
+    const newDeal = {
+        id: 'deal_' + Date.now(),
+        dealNumber: dealCounter,
+        title: `صفقة رقم ${dealCounter} • ${params.account_title || 'حساب مميز'}`,
+        accountId: params.account_id,
+        accountTitle: params.account_title || 'حساب مميز',
+        buyer: { id: params.buyer_id || currentUser?.id, name: buyerName, phone: '+212 60 *** ***' },
+        seller: { id: params.seller_id || ('seller_' + params.account_id), name: 'بائع معتمد', phone: '+213 55 *** ***' },
+        mediator: { id: 'admin_waseet', name: 'الوسيط المعتمد' },
+        sellerPrice: Number(params.seller_amount || 0),
+        fee: Number(params.fee_amount || 0),
+        totalPoints: Number(params.total_amount || 0),
+        currentStep: 2,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        stageText: 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب (الحساب مفحوص ومعتمد)',
+        credentials: {
+            email: 'buyer_' + Date.now() + '@gmail.com',
+            password: '•••••••••••• (محمية ومطابقة)',
+            rawPassword: '••••••••••••',
+            loginType: 'جوجل Gmail',
+            backupCodes: 'لا توجد أكواد إضافية'
+        },
+        sellerMessages: [
+            { sender: 'system', text: `قام المشتري ${buyerName} بحجز ${params.total_amount} نقطة لشراء الحساب المفحوص والمعتمد.`, time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) },
+            { sender: 'mediator', name: 'الوسيط المعتمد', text: 'مرحباً بك في غرفة الوساطة الآمنة. هل ترغب في البيع؟', quickReplyRole: 'seller', quickReplies: ['نعم', 'لا', 'غير متأكد'], time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) }
+        ],
+        buyerMessages: [
+            { sender: 'system', text: `تم حجز ${params.total_amount} نقطة بنجاح في خزينة الوساطة الآمنة.`, time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) },
+            { sender: 'mediator', name: 'الوسيط المعتمد', text: 'مرحباً بك في غرفة الوساطة الآمنة. نقاطك مؤمنة بالكامل في الخزينة، هل تريد الشراء؟', quickReplyRole: 'buyer', quickReplies: ['نعم', 'لا', 'غير متأكد'], time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) }
+        ]
+    };
+
+    let dbLocked = false;
+    if (typeof waseetLockEscrowPointsInDb === 'function') {
+        const lockRes = await waseetLockEscrowPointsInDb(newDeal);
+        if (lockRes && lockRes.ok && lockRes.data && !lockRes.data.local) {
+            dbLocked = true;
+            if (lockRes.data.deal_id) {
+                newDeal.id = String(lockRes.data.deal_id);
+            }
+        }
+    }
+
+    if (!dbLocked && currentUser && currentUser.wallet) {
+        currentUser.wallet.available = Math.max(0, (Number(currentUser.wallet.available) || 0) - Number(params.total_amount || 0));
+        currentUser.wallet.locked = (Number(currentUser.wallet.locked) || 0) + Number(params.total_amount || 0);
+        currentUser.wallet.total = currentUser.wallet.available + currentUser.wallet.locked;
+    }
+
+    if (typeof WASEET_STATE !== 'undefined') {
+        if (!WASEET_STATE.deals) WASEET_STATE.deals = [];
+        WASEET_STATE.deals.unshift(newDeal);
+        WASEET_STATE.activeDeal = newDeal;
+        if (typeof saveWaseetData === 'function') saveWaseetData();
+    }
+
+    try {
+        const storedActive = JSON.parse(localStorage.getItem('WASEET_DEALS_ACTIVE') || '[]');
+        storedActive.unshift(newDeal);
+        localStorage.setItem('WASEET_DEALS_ACTIVE', JSON.stringify(storedActive));
+    } catch (e) {}
+
+    if (typeof waseetSaveDealToSupabase === 'function') {
+        try {
+            await waseetSaveDealToSupabase(newDeal);
+        } catch (e) {
+            console.warn('[Profile Escrow Deal] خطأ حفظ في Supabase:', e);
+        }
+    }
+
+    return newDeal;
+}
+window.waseetCreateEscrowDealOnSupabase = waseetCreateEscrowDealOnSupabase;
+
 window.waseetSendNotification = waseetSendNotification;
+
+/**
+ * ============================================================================
+ * إدارة طرق وحسابات الدفع (Payment Methods Management)
+ * ============================================================================
+ */
+
+function getLocalPaymentMethodsFallback() {
+    try {
+        const cached = localStorage.getItem('WASEET_PAYMENT_METHODS_CACHE');
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch (e) {}
+    if (typeof window.WASEET_PAYMENT_GATEWAYS !== 'undefined' && Array.isArray(window.WASEET_PAYMENT_GATEWAYS) && window.WASEET_PAYMENT_GATEWAYS.length > 0) {
+        return window.WASEET_PAYMENT_GATEWAYS;
+    }
+    return typeof FALLBACK_PAYMENT_GATEWAYS !== 'undefined' ? FALLBACK_PAYMENT_GATEWAYS : [];
+}
+
+/**
+ * جلب قائمة طرق وحسابات الدفع من Supabase مع مزامنة الكاش المحلي
+ */
+async function waseetFetchPaymentMethods(onlyActive = false) {
+    const client = initWaseetSupabase();
+    if (!client) {
+        return getLocalPaymentMethodsFallback();
+    }
+    try {
+        let query = client.from('payment_methods').select('*').order('display_order', { ascending: true });
+        if (onlyActive) {
+            query = query.eq('is_active', true);
+        }
+        const { data, error } = await query;
+        if (error || !Array.isArray(data) || data.length === 0) {
+            console.warn('[Payment Methods] استرجاع القائمة الاحتياطية:', error ? error.message : 'لا توجد بيانات');
+            return getLocalPaymentMethodsFallback();
+        }
+
+        const formatted = data.map(row => ({
+            id: row.id,
+            category: row.category || 'local',
+            countryName: row.country_name || '',
+            countryCode: row.country_code || '',
+            countryFlag: row.country_flag || '💳',
+            iconSvg: row.icon_svg || '',
+            iconClass: row.icon_class || 'fas fa-credit-card',
+            methodName: row.method_name || '',
+            shortLabel: row.short_label || row.method_name || '',
+            beneficiaryLabel: row.beneficiary_label || 'اسم المستفيد',
+            beneficiaryName: row.beneficiary_name || '',
+            accountLabel: row.account_label || 'رقم الحساب / المحفظة',
+            accountNumber: row.account_number || '',
+            secondaryLabel: row.secondary_label || '',
+            secondaryValue: row.secondary_value || '',
+            currencyHint: row.currency_hint || '',
+            instructions: row.instructions || '',
+            isActive: row.is_active !== false,
+            displayOrder: Number(row.display_order) || 0,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
+        }));
+
+        try {
+            localStorage.setItem('WASEET_PAYMENT_METHODS_CACHE', JSON.stringify(formatted));
+        } catch (e) {}
+
+        if (typeof window !== 'undefined') {
+            window.WASEET_PAYMENT_GATEWAYS = formatted.filter(m => m.isActive);
+        }
+
+        return formatted;
+    } catch (err) {
+        console.warn('[Payment Methods] خطأ جلب طرق الدفع:', err);
+        return getLocalPaymentMethodsFallback();
+    }
+}
+
+/**
+ * [للمدير] إضافة أو تعديل طريقة دفع في جدول payment_methods
+ */
+async function waseetAdminSavePaymentMethod(methodData) {
+    const client = initWaseetSupabase();
+    const id = methodData.id || ('pm_' + Date.now());
+    const payload = {
+        id: id,
+        category: methodData.category || 'local',
+        country_name: methodData.countryName || '',
+        country_code: methodData.countryCode || '',
+        country_flag: methodData.countryFlag || '💳',
+        icon_svg: methodData.iconSvg || '',
+        icon_class: methodData.iconClass || 'fas fa-credit-card',
+        method_name: methodData.methodName,
+        short_label: methodData.shortLabel || methodData.methodName,
+        beneficiary_label: methodData.beneficiaryLabel || 'اسم المستفيد',
+        beneficiary_name: methodData.beneficiaryName,
+        account_label: methodData.accountLabel || 'رقم الحساب / المحفظة',
+        account_number: methodData.accountNumber,
+        secondary_label: methodData.secondaryLabel || '',
+        secondary_value: methodData.secondaryValue || '',
+        currency_hint: methodData.currencyHint || '',
+        instructions: methodData.instructions || '',
+        is_active: methodData.isActive !== false,
+        display_order: Number(methodData.displayOrder) || 0,
+        updated_at: new Date().toISOString()
+    };
+
+    if (client) {
+        try {
+            const { error } = await client
+                .from('payment_methods')
+                .upsert(payload);
+            if (error) {
+                console.warn('[Payment Methods Save Supabase Error]', error);
+            }
+        } catch (err) {
+            console.warn('[Payment Methods Save Exception]', err);
+        }
+    }
+
+    let localList = getLocalPaymentMethodsFallback();
+    const existingIndex = localList.findIndex(m => m.id === id);
+    const formattedObj = {
+        id,
+        category: payload.category,
+        countryName: payload.country_name,
+        countryCode: payload.country_code,
+        countryFlag: payload.country_flag,
+        iconSvg: payload.icon_svg,
+        iconClass: payload.icon_class,
+        methodName: payload.method_name,
+        shortLabel: payload.short_label,
+        beneficiaryLabel: payload.beneficiary_label,
+        beneficiaryName: payload.beneficiary_name,
+        accountLabel: payload.account_label,
+        accountNumber: payload.account_number,
+        secondaryLabel: payload.secondary_label,
+        secondaryValue: payload.secondary_value,
+        currencyHint: payload.currency_hint,
+        instructions: payload.instructions,
+        isActive: payload.is_active,
+        displayOrder: payload.display_order
+    };
+
+    if (existingIndex >= 0) {
+        localList[existingIndex] = formattedObj;
+    } else {
+        localList.push(formattedObj);
+    }
+
+    try {
+        localStorage.setItem('WASEET_PAYMENT_METHODS_CACHE', JSON.stringify(localList));
+    } catch (e) {}
+
+    window.WASEET_PAYMENT_GATEWAYS = localList.filter(m => m.isActive);
+
+    return { ok: true, data: formattedObj };
+}
+
+/**
+ * [للمدير] حذف طريقة دفع
+ */
+async function waseetAdminDeletePaymentMethod(methodId) {
+    const client = initWaseetSupabase();
+    if (client) {
+        try {
+            const { error } = await client
+                .from('payment_methods')
+                .delete()
+                .eq('id', methodId);
+            if (error) {
+                console.warn('[Payment Methods Delete Supabase Error]', error);
+            }
+        } catch (err) {
+            console.warn('[Payment Methods Delete Exception]', err);
+        }
+    }
+
+    let localList = getLocalPaymentMethodsFallback().filter(m => m.id !== methodId);
+    try {
+        localStorage.setItem('WASEET_PAYMENT_METHODS_CACHE', JSON.stringify(localList));
+    } catch (e) {}
+    window.WASEET_PAYMENT_GATEWAYS = localList.filter(m => m.isActive);
+
+    return { ok: true };
+}
+
+window.waseetFetchPaymentMethods = waseetFetchPaymentMethods;
+window.waseetAdminSavePaymentMethod = waseetAdminSavePaymentMethod;
+window.waseetAdminDeletePaymentMethod = waseetAdminDeletePaymentMethod;
 
 /**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
  */
+
 function initWaseetAuthListener() {
     const client = initWaseetSupabase();
     if (!client) return;
