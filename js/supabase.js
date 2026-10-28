@@ -296,7 +296,12 @@ async function waseetSyncAuthState() {
     window._waseetSyncAuthInFlight = (async () => {
     try {
         const { data: { session }, error } = await client.auth.getSession();
-        if (error || !session || !session.user) return;
+        if (error || !session || !session.user) {
+            WASEET_STATE.user = null;
+            try { localStorage.removeItem('WASEET_SAVED_USER_PERMANENT'); } catch (e) {}
+            if (typeof renderNavbarUser === 'function') renderNavbarUser();
+            return;
+        }
 
         const authUser = session.user;
         let profile = await waseetFetchUserProfile(authUser.id);
@@ -462,13 +467,15 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             return options.returnFullResult ? { data: null, error: authErr } : null;
         }
 
-        // توحيد حالة الفحص للحسابات المعلقة
-        let dbStatus = 'pending_verification';
-        if (account.status === 'available') dbStatus = 'available';
+        // توحيد دورة حياة الحساب: pending -> available -> sold -> completed
+        let dbStatus = 'pending';
+        if (account.status === 'available' || account.status === 'approved') dbStatus = 'available';
         else if (account.status === 'rejected') dbStatus = 'rejected';
         else if (account.status === 'sold') dbStatus = 'sold';
+        else if (account.status === 'completed') dbStatus = 'completed';
         else if (account.status === 'in_deal') dbStatus = 'in_deal';
         else if (account.status === 'hidden') dbStatus = 'hidden';
+        else dbStatus = 'pending';
 
         // توافق اسم اللعبة مع قيود قاعدة البيانات مع حفظ اللعبة الأصلية داخل details
         const allowedGames = ['free_fire', 'pubg', 'other'];
@@ -739,7 +746,7 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         images: imgs,
         badge: details.badge || ((details.originalGame || acc.game) === 'free_fire' ? `برايم ${acc.prime_level || 1}` : 'مميز'),
         featured: false,
-        status: acc.status || 'pending_verification',
+        status: (acc.status === 'approved') ? 'available' : ((acc.status === 'pending_verification' || acc.status === 'pending_review' || !acc.status) ? 'pending' : acc.status),
         credentials: parsedCreds,
         createdAt: acc.created_at,
         submittedAt: acc.created_at,

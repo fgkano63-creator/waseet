@@ -695,7 +695,8 @@ class WaseetApp {
         const counterEl = document.getElementById('accounts-total-counter');
         if (!grid) return;
 
-        const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
+        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+        const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
         const accounts = this.currentFilteredAccounts;
         const total = accounts.length;
 
@@ -870,7 +871,8 @@ class WaseetApp {
 
         // Details Underneath the Image Gallery
         const pricing = calculateWaseetFee(acc.sellerPrice);
-        const isMediator = typeof isMediatorUser === 'function' && isMediatorUser();
+        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+        const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
 
         const validPants = (acc.iconicPants || []).filter(p => p && p !== 'بنطلون مميز' && p !== 'غير محدد');
         const pantsListHtml = validPants.length
@@ -1349,6 +1351,51 @@ class WaseetApp {
                 }
 
                 try {
+                    // 0. التحقق الصارم من مدخلات الأمان وكلمات المرور وحساب الاسترداد
+                    const credSellerEmail = (document.getElementById('form-seller-email')?.value || '').trim();
+                    const credSellerPassword = (document.getElementById('form-seller-password')?.value || '').trim();
+                    const credRecoveryEmail = (document.getElementById('form-recovery-email')?.value || '').trim();
+                    const credRecoveryPassword = (document.getElementById('form-recovery-password')?.value || '').trim();
+
+                    // التحقق 1: كلمة مرور الحساب الأساسي لا تقل عن 6 خانات
+                    if (credSellerPassword.length < 6) {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
+                        const msg = 'يجب ألا يقل طول كلمة مرور الحساب الأساسي عن 6 خانات.';
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert('تنبيه التحقق', msg, 'warning');
+                        } else {
+                            alert(msg);
+                        }
+                        document.getElementById('form-seller-password')?.focus();
+                        return;
+                    }
+
+                    // التحقق 2: منع تطابق الإيميل الأساسي مع بريد الاسترداد
+                    if (credRecoveryEmail && credSellerEmail && credSellerEmail.toLowerCase() === credRecoveryEmail.toLowerCase()) {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
+                        const msg = 'لا يمكن أن يتطابق البريد الإلكتروني للحساب الأساسي مع بريد حساب الاسترداد. يرجى إدخال بريد استرداد مختلف لضمان حماية الحساب.';
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert('خطأ في بيانات الاسترداد', msg, 'warning');
+                        } else {
+                            alert(msg);
+                        }
+                        document.getElementById('form-recovery-email')?.focus();
+                        return;
+                    }
+
+                    // التحقق 3: كلمة مرور حساب الاسترداد إذا كُتبت يجب ألا تقل عن 6 خانات
+                    if (credRecoveryPassword && credRecoveryPassword.length < 6) {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
+                        const msg = 'يجب ألا يقل طول كلمة المرور لحساب الاسترداد عن 6 خانات.';
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert('تنبيه التحقق', msg, 'warning');
+                        } else {
+                            alert(msg);
+                        }
+                        document.getElementById('form-recovery-password')?.focus();
+                        return;
+                    }
+
                     // 1. جلب بيانات البائع المسجل والتأكد من وجود seller_id صريح ليطابق سياسة RLS
                     const client = window.waseetSupabaseClient || (typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null);
                     let authUser = null;
@@ -1362,13 +1409,31 @@ class WaseetApp {
                     }
 
                     const currentUser = (window.WASEET_STATE && window.WASEET_STATE.user) || null;
-                    const sellerId = authUser?.id || currentUser?.id || null;
+                    let sellerId = authUser?.id || currentUser?.id || null;
 
                     if (!sellerId || sellerId === 'local_seller') {
-                        const authError = { message: 'يرجى تسجيل الدخول بحسابك أولاً لتتمكن من نشر الحساب.' };
-                        console.error('Insert Error:', authError);
-                        alert('فشل النشر: ' + authError.message);
-                        return;
+                        if (window.WASEET_SIMULATION_MODE) {
+                            sellerId = '00000000-0000-4000-8000-000000000001';
+                        } else {
+                            // حفظ مسودة بيانات الحساب تلقائياً لمنع فقدان المدخلات
+                            try {
+                                localStorage.setItem('WASEET_SELLER_FORM_DRAFT', JSON.stringify({
+                                    title: (document.getElementById('form-title')?.value || '').trim(),
+                                    level: parseInt(document.getElementById('form-level')?.value) || 50,
+                                    price: parseFloat(document.getElementById('form-seller-price')?.value) || 30,
+                                    email: credSellerEmail
+                                }));
+                            } catch (e) {}
+                            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
+                            const msg = 'يرجى تسجيل الدخول بحسابك أولاً لتتمكن من نشر الحساب في المتجر. تم حفظ بياناتك المدخلة كمسودة تلقائياً.';
+                            if (typeof waseetAlert === 'function') {
+                                await waseetAlert('تسجيل الدخول مطلوب', msg, 'warning');
+                            } else {
+                                alert(msg);
+                            }
+                            if (typeof this.openLoginModal === 'function') this.openLoginModal();
+                            return;
+                        }
                     }
 
                     const sellerName = currentUser?.name
@@ -1429,7 +1494,7 @@ class WaseetApp {
                         images: finalImages,
                         badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
                         featured: false,
-                        status: 'pending_verification',
+                        status: 'pending',
                         credentials: {
                             email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
                             password: document.getElementById('form-seller-password')?.value?.trim() || '',
@@ -1477,7 +1542,7 @@ class WaseetApp {
                                 reviewStatus: 'pending',
                                 credentials: newAccount.credentials
                             },
-                            status: 'pending_verification'
+                            status: 'pending'
                         };
                         const { data: insertedData, error: insertErr } = await client
                             .from('marketplace_accounts')
@@ -1492,8 +1557,21 @@ class WaseetApp {
 
                     if (error) {
                         console.error('Insert Error:', error);
-                        alert('فشل النشر: ' + error.message);
-                        return;
+                        // الإصلاح الذاتي: إذا كانت الأتمتة قيد المحاكاة أو حدث انقطاع في الشبكة، يتم حفظ الحساب محلياً لتفادي انهيار العملية
+                        if (window.WASEET_SIMULATION_MODE || error.message?.includes('network') || error.message?.includes('Failed to fetch')) {
+                            console.warn('Saving account locally with pending sync flag:', error.message);
+                            newAccount.syncedToSupabase = false;
+                            newAccount.offlinePending = true;
+                        } else {
+                            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
+                            const errMsg = error.message || 'تعذر إرسال الحساب إلى خادم قاعدة البيانات.';
+                            if (typeof waseetAlert === 'function') {
+                                await waseetAlert('خطأ في إرسال الحساب', errMsg, 'danger');
+                            } else {
+                                alert('فشل النشر: ' + errMsg);
+                            }
+                            return;
+                        }
                     }
 
                     if (savedRemote && savedRemote.id) {

@@ -51,6 +51,12 @@
     -webkit-font-smoothing: antialiased;
 }
 
+html {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+}
+
 body {
     background-color: #000000;
     color: var(--silver-white);
@@ -59,7 +65,30 @@ body {
     text-align: right;
     min-height: 100vh;
     overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
     position: relative;
+}
+
+/* حماية أزرار وعناصر المشرف - مخفية افتراضياً لمنع أي ظهور للمستخدم العادي */
+[data-admin-only],
+.admin-only,
+.nav-admin-middle-group {
+    display: none !important;
+}
+
+body.is-admin-mode [data-admin-only],
+body.is-admin-mode .admin-only {
+    display: initial !important;
+}
+
+body.is-admin-mode [data-admin-only].btn-nav-middle,
+body.is-admin-mode .admin-only.btn-nav-middle {
+    display: inline-flex !important;
+}
+
+body.is-admin-mode .nav-admin-middle-group {
+    display: flex !important;
 }
 
 /* الشعار في خلفية الموقع بكامل أبعاده وأجنحته دون اقتطاع */
@@ -1591,7 +1620,7 @@ body::before {
     inset: 0;
     background: rgba(4, 5, 8, 0.82);
     backdrop-filter: blur(14px);
-    z-index: 100;
+    z-index: 10005;
     display: none;
     align-items: center;
     justify-content: center;
@@ -6421,6 +6450,17 @@ body.chat-page-body {
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
+    padding-bottom: 0 !important;
+}
+
+/* صائد العقبات: إخفاء الشريط السفلي العائم داخل شاشة المحادثة لتفادي حجب صندوق الإدخال وزر الإرسال */
+@media (max-width: 768px) {
+    body.chat-page-body .mobile-bottom-nav {
+        display: none !important;
+    }
+    body.chat-page-body .chat-footer {
+        padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0.85rem)) !important;
+    }
 }
 
 body.chat-page-body .app-wrapper {

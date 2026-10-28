@@ -449,6 +449,22 @@
                 editForm.onsubmit = handleSaveAccountEdit;
             }
 
+            // الاستماع لتغير حالة الجلسة من Supabase لضمان جلب الحسابات فور توثيق الدخول
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;
+            if (client && client.auth && typeof client.auth.onAuthStateChange === 'function') {
+                client.auth.onAuthStateChange(async (event, session) => {
+                    if (session && session.user) {
+                        if (!WASEET_STATE.user || WASEET_STATE.user.id !== session.user.id) {
+                            if (typeof window.waseetSyncAuthState === 'function') {
+                                await window.waseetSyncAuthState();
+                            }
+                            renderMyAccountsNavbarUser();
+                            await loadMyAccountsData();
+                        }
+                    }
+                });
+            }
+
             await loadMyAccountsData();
         }
 
@@ -506,7 +522,7 @@
             }
             const adminPendingBadge = document.getElementById('admin-nav-pending-badge');
             if (adminPendingBadge) {
-                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending_verification' || a.status === 'pending_review').length;
+                const pCount = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending' || a.status === 'pending_verification' || a.status === 'pending_review').length;
                 adminPendingBadge.innerText = pCount;
                 adminPendingBadge.style.display = (isAdmin && pCount > 0) ? 'inline-block' : 'none';
             }
@@ -655,12 +671,23 @@
                                     sellerPrice: Number(acc.seller_price) || 0,
                                     images: imgs,
                                     image: imgs[0],
-                                    status: acc.status || 'pending_verification',
+                                    status: acc.status || 'pending',
                                     accountNotes: details.notes || details.accountNotes || '',
                                     details: details
                                 };
                             }
                             if (mapped && mapped.id) {
+                                // توحيد وتطبيع حالة الحساب
+                                const rawSt = mapped.status || acc.status;
+                                if (rawSt === 'available' || rawSt === 'approved') {
+                                    mapped.status = 'available';
+                                } else if (rawSt === 'rejected') {
+                                    mapped.status = 'rejected';
+                                } else if (rawSt === 'sold' || rawSt === 'completed') {
+                                    mapped.status = 'sold';
+                                } else {
+                                    mapped.status = 'pending';
+                                }
                                 mergedMap.set(String(mapped.id), mapped);
                             }
                         });
@@ -685,6 +712,17 @@
                     (currentUser.name && localAcc.sellerName && localAcc.sellerName === currentUser.name);
 
                 if (isMine) {
+                    const rawSt = localAcc.status;
+                    if (rawSt === 'available' || rawSt === 'approved') {
+                        localAcc.status = 'available';
+                    } else if (rawSt === 'rejected') {
+                        localAcc.status = 'rejected';
+                    } else if (rawSt === 'sold' || rawSt === 'completed') {
+                        localAcc.status = 'sold';
+                    } else {
+                        localAcc.status = 'pending';
+                    }
+
                     const alreadyExists = Array.from(mergedMap.values()).some(a =>
                         String(a.id) === String(localAcc.id) ||
                         (a.localId && String(a.localId) === String(localAcc.id)) ||
@@ -851,14 +889,16 @@
                 if (totalEl) totalEl.innerText = total;
                 if (availEl) availEl.innerText = completed;
                 if (pendEl) pendEl.innerText = inProgress;
-                if (rejEl) rejEl.innerText = completed;
+                if (rejEl) rejEl.innerText = 0;
                 return;
             }
 
+            // عداد 'قيد الفحص والمراجعة' يحسب فقط الحسابات التي حالتها pending حصراً
+            // عداد 'معتمدة في المتجر' يحسب الحسابات التي حالتها available
             const total = accounts.length;
-            const avail = accounts.filter(a => a.status === 'available' || a.status === 'approved').length;
-            const pend = accounts.filter(a => a.status === 'pending' || a.status === 'pending_verification' || a.status === 'pending_review' || !a.status).length;
-            const rej = accounts.filter(a => a.status === 'rejected' || a.status === 'sold' || a.status === 'hidden').length;
+            const avail = accounts.filter(a => a.status === 'available').length;
+            const pend = accounts.filter(a => a.status === 'pending').length;
+            const rej = accounts.filter(a => a.status === 'rejected').length;
 
             if (totalEl) totalEl.innerText = total;
             if (availEl) availEl.innerText = avail;
@@ -961,12 +1001,14 @@
                             : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
                         
                         let statusTag = '';
-                        if (acc.status === 'available' || acc.status === 'approved') {
+                        if (acc.status === 'available') {
                             statusTag = `<span style="background: rgba(16, 185, 129, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-check-circle"></i> معتمد في المتجر</span>`;
                         } else if (acc.status === 'rejected') {
                             statusTag = `<span style="background: rgba(239, 68, 68, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                        } else if (acc.status === 'sold' || acc.status === 'completed') {
+                            statusTag = `<span style="background: rgba(59, 130, 246, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-handshake"></i> تم البيع بنجاح</span>`;
                         } else {
-                            statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد فحص الوسيط</span>`;
+                            statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد الفحص والمراجعة</span>`;
                         }
 
                         const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'assets/logo.png';
@@ -1139,62 +1181,6 @@
         async function copyAllPurchasedCredentials(loginType, email, pwd, backup) {
             const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):\n-----------------------------------\nنوع الربط: ${loginType}\nالبريد / اسم المستخدم: ${email}\nكلمة المرور: ${pwd}\nأكواد الاسترداد / الملاحظات: ${backup}\n-----------------------------------\nالحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة.`;
             await copyPurchasedText(fullText, 'تم نسخ كافة بيانات تسجيل الدخول بنجاح!');
-        }
-                        const pricing = typeof calculateWaseetFee === 'function' 
-                            ? calculateWaseetFee(acc.sellerPrice) 
-                            : { sellerPrice: acc.sellerPrice, fee: 3, buyerPrice: acc.sellerPrice + 3 };
-                        
-                        let statusTag = '';
-                        if (acc.status === 'available' || acc.status === 'approved') {
-                            statusTag = `<span style="background: rgba(16, 185, 129, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-check-circle"></i> معتمد في المتجر</span>`;
-                        } else if (acc.status === 'rejected') {
-                            statusTag = `<span style="background: rgba(239, 68, 68, 0.9); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
-                        } else {
-                            statusTag = `<span style="background: rgba(245, 158, 11, 0.95); color: #000; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-clock"></i> قيد فحص الوسيط</span>`;
-                        }
-
-                        const imgUrl = (Array.isArray(acc.images) && acc.images[0]) || acc.image || 'assets/logo.png';
-
-                        return `
-                            <div class="account-card-3d card-3d" id="card-${acc.id}">
-                                <div class="card-media">
-                                    <img src="${imgUrl}" alt="${acc.title}" class="card-img">
-                                    <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
-                                        ${statusTag}
-                                    </div>
-                                    <div class="account-num-tag" style="position: absolute; top: 8px; left: 8px;">
-                                        #${acc.accountNumber || acc.id.toString().substring(0, 5)}
-                                    </div>
-                                    <div class="level-tag" style="position: absolute; bottom: 8px; right: 8px;">
-                                        Lv. ${acc.level || 50}
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
-                                    <div class="card-specs">
-                                        <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
-                                        <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
-                                    </div>
-                                    <div class="card-footer" style="padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto;">
-                                        <div class="price-col" style="margin-bottom: 0.4rem;">
-                                            <span class="price-sub">صافي ربحك: ${pricing.sellerPrice} نقطة (يظهر للمشتري: ${pricing.buyerPrice} نقطة)</span>
-                                            <span class="price-main">${pricing.sellerPrice} نقطة</span>
-                                        </div>
-                                        <div class="my-account-card-actions">
-                                            <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">
-                                                <i class="fas fa-edit"></i> تعديل الحساب
-                                            </button>
-                                            <button type="button" class="btn-account-delete" onclick="handleDeleteAccount('${acc.id}')">
-                                                <i class="fas fa-trash-alt"></i> حذف الحساب
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
         }
 
         function openEditAccountModal(accId) {

@@ -252,13 +252,19 @@ const WASEET_STATE = {
     accounts: []
 };
 
-function isMediatorUser(user = WASEET_STATE.user) {
+function isMediatorUser(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
     if (!user) return false;
-    if (user.role === 'mediator' || user.role === 'admin' || user.isAdmin === true) return true;
-    if (user.email) {
-        const em = String(user.email).toLowerCase().trim();
-        if (em === 'fgkano63@gmail.com' || em === 'saadani2009@gmail.com' || em === 'mediator@waseet.com') return true;
-    }
+    if (!user.id || user.id === 'local_seller') return false;
+    
+    // التحقق المعتمد من بريد المدير والوسيط
+    const email = user.email ? String(user.email).toLowerCase().trim() : '';
+    const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+    if (email && adminEmails.includes(email)) return true;
+
+    // التحقق من صلاحية الدور
+    if (user.role === 'mediator' || user.role === 'admin') return true;
+    if (user.isAdmin === true) return true;
+
     return false;
 }
 
