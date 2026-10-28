@@ -742,6 +742,97 @@
                 padding: 0.52rem;
             }
         }
+
+        /* ================= Admin Payment Methods Manager Styles ================= */
+        .admin-pm-card {
+            background: rgba(14, 19, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            transition: all 0.22s ease;
+            position: relative;
+        }
+
+        .admin-pm-card:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+            background: rgba(18, 24, 38, 0.98);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .admin-pm-card.is-inactive {
+            opacity: 0.55;
+            border-style: dashed;
+            background: rgba(10, 13, 20, 0.7);
+        }
+
+        .admin-pm-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            padding-bottom: 0.65rem;
+            margin-bottom: 0.7rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-wrap: wrap;
+        }
+
+        .admin-pm-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+
+        .admin-pm-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-pm-action {
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            font-family: var(--font-ar);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-pm-edit {
+            background: rgba(197, 160, 89, 0.16);
+            border-color: rgba(197, 160, 89, 0.45);
+            color: var(--gold-light);
+        }
+        .btn-pm-edit:hover {
+            background: var(--gold-primary);
+            color: #000;
+        }
+
+        .btn-pm-delete {
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+        .btn-pm-delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-pm-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: var(--silver-light);
+        }
+        .btn-pm-toggle:hover {
+            border-color: var(--gold-primary);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -891,8 +982,8 @@
             <!-- 2. الشبكة الرئيسية: نموذج طلب شحن الرصيد + سجل العمليات -->
             <section class="wallet-main-layout">
 
-                <!-- العمود الأيمن: بوابة الدفع الإقليمية الذكية وشحن النقاط -->
-                <div class="wallet-panel-card">
+                <!-- العمود الأيمن: بوابة الدفع الإقليمية الذكية وشحن النقاط للمستخدم العادي -->
+                <div class="wallet-panel-card" id="user-deposit-panel">
                     <div class="wallet-panel-title">
                         <h3><i class="fas fa-globe-africa text-gold"></i> بوابة شحن النقاط الإقليمية</h3>
                         <span class="status-pill approved" style="font-size: 0.72rem;"><i class="fas fa-shield-alt"></i> كافة الدول العربية + Crypto</span>
@@ -1002,6 +1093,32 @@
                     </form>
                 </div>
 
+                <!-- العمود الأيمن البديل للمدير: لوحة إدارة حسابات وطرق الدفع -->
+                <div class="wallet-panel-card" id="admin-payment-manager-panel" style="display: none;">
+                    <div class="wallet-panel-title">
+                        <h3><i class="fas fa-money-check-alt text-gold"></i> إدارة حسابات الدفع (للمدير)</h3>
+                        <button type="button" class="btn-3d btn-gold" onclick="openAddPaymentMethodModal()" style="padding: 0.45rem 0.95rem; font-size: 0.82rem; white-space: nowrap;">
+                            <i class="fas fa-plus-circle"></i> إضافة حساب/بطاقة جديدة
+                        </button>
+                    </div>
+
+                    <div style="background: rgba(197, 160, 89, 0.08); border: 1px dashed rgba(197, 160, 89, 0.35); border-radius: 12px; padding: 0.75rem 0.95rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+                        <div style="font-size: 0.82rem; color: var(--silver-light); line-height: 1.5;">
+                            <strong style="color: var(--gold-light); display: block;"><i class="fas fa-info-circle"></i> تحكم كامل في حسابات الاستقبال:</strong>
+                            الحسابات المعروضة هنا تظهر للمستخدمين مباشرة عند شحن النقاط. يمكنك تعديل أرقام الحسابات، إضافة بطاقات جديدة، أو حذفها.
+                        </div>
+                        <span id="admin-pm-count-badge" class="status-pill approved" style="font-size: 0.74rem;">0 وسيلة دفع</span>
+                    </div>
+
+                    <!-- قائمة بطاقات طرق الدفع المخصصة للمدير -->
+                    <div id="admin-methods-list" class="admin-methods-list" style="display: flex; flex-direction: column; gap: 0.85rem; max-height: 580px; overflow-y: auto; padding-left: 0.2rem;">
+                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                            <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
+                            <div>جاري تحميل حسابات الدفع...</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- العمود الأيسر: طلبات الشحن وسجل الحركات المالية -->
                 <div class="wallet-panel-card">
                     <div class="wallet-tabs-header">
@@ -1108,6 +1225,92 @@
             </a>
         </nav>
 
+    </div>
+
+    <!-- ================= Modal: إضافة / تعديل طريقة دفع (للمدير) ================= -->
+    <div class="modal-backdrop" id="modal-payment-method" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10040; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(5px);">
+        <div class="card-3d modal-dialog" style="max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; position: relative; border: 1.5px solid var(--gold-primary); box-shadow: 0 20px 60px rgba(0,0,0,0.9);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <h3 style="margin: 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fas fa-credit-card text-gold"></i>
+                    <span id="modal-payment-title">إضافة وسيلة دفع جديدة</span>
+                </h3>
+                <button type="button" onclick="closePaymentMethodModal()" style="background: none; border: none; color: var(--silver-muted); font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <form id="form-payment-method" onsubmit="handleSavePaymentMethod(event)">
+                <input type="hidden" id="pm-id" value="">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                            اسم وسيلة الدفع / البنك <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="pm-method-name" required placeholder="مثال: مصرف الجمهورية (موبي كاش)" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                            التصنيف
+                        </label>
+                        <select id="pm-category" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                            <option value="local">محافظ وبنوك محلية (عربية)</option>
+                            <option value="crypto">عملات رقمية (Crypto / Binance / USDT)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                            الدولة أو الرمز
+                        </label>
+                        <input type="text" id="pm-country-name" placeholder="مثال: ليبيا 🇱🇾" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                            اسم المستفيد / المستلم <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="pm-beneficiary-name" required placeholder="مثال: عمر السنوسي" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                        رقم الحساب / المحفظة / IBAN / Pay ID <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="text" id="pm-account-number" required placeholder="مثال: 0911234567 أو LY00000000..." style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: monospace; font-size: 0.92rem; font-weight: 800; direction: ltr; text-align: right; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                        حساب بديل / رقم هاتف إضافي (اختياري)
+                    </label>
+                    <input type="text" id="pm-secondary-value" placeholder="مثال: رقم هاتف خدمة سداد أو عنوان BEP20" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label style="display: block; color: var(--silver-light); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem;">
+                        تعليمات التحويل للمستخدم
+                    </label>
+                    <textarea id="pm-instructions" rows="2" placeholder="اكتب توجيهات التحويل مثل: حوّل ثم أدخل رقم العملية وأرفق صورة الإشعار..." style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; background: rgba(12,16,26,0.92); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; resize: vertical; box-sizing: border-box;"></textarea>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; background: rgba(255,255,255,0.03); padding: 0.65rem 0.85rem; border-radius: 10px;">
+                    <span style="color: #fff; font-size: 0.85rem; font-weight: 700;">حالة الظهور للمستخدمين:</span>
+                    <label style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; color: var(--gold-light); font-size: 0.85rem; font-weight: 700;">
+                        <input type="checkbox" id="pm-is-active" checked style="accent-color: var(--gold-primary); transform: scale(1.15);">
+                        مفعّل ونشط في المتجر
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 0.6rem; justify-content: flex-end;">
+                    <button type="button" class="btn-3d btn-outline" onclick="closePaymentMethodModal()" style="padding: 0.6rem 1.1rem;">إلغاء</button>
+                    <button type="submit" id="btn-save-pm" class="btn-3d btn-gold" style="padding: 0.6rem 1.4rem;">
+                        <i class="fas fa-save"></i> حفظ الحساب
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- عارض الصور المكبرة للإيصال -->
@@ -1357,7 +1560,12 @@
             if (btnEl) btnEl.classList.add('active');
         }
 
-        function initPaymentGatewaysUI() {
+        async function initPaymentGatewaysUI() {
+            if (typeof waseetFetchPaymentMethods === 'function') {
+                try {
+                    await waseetFetchPaymentMethods(true);
+                } catch (e) {}
+            }
             const list = getGatewaysList();
             const selectEl = document.getElementById('gateway-dropdown-select');
             if (selectEl) {
@@ -1382,7 +1590,9 @@
                 `;
             }
 
-            switchGatewayCategory('local', 'syria_shamcash');
+            const initialId = (list && list[0]) ? list[0].id : 'syria_shamcash';
+            const initialCat = (list && list[0] && list[0].category) ? list[0].category : 'local';
+            switchGatewayCategory(initialCat, initialId);
         }
 
         function switchGatewayCategory(category, preferredId) {
@@ -1674,15 +1884,28 @@
             const navPts = document.getElementById('wallet-total-pts');
             if (navPts) navPts.innerText = `${available} نقطة`;
 
-            const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user))));
+            const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
             const userNav = document.getElementById('nav-user-middle-group');
             const adminNav = document.getElementById('nav-admin-middle-group');
             const drawerAdminLink = document.getElementById('drawer-admin-deposits-link');
+            const userDepositPanel = document.getElementById('user-deposit-panel');
+            const adminManagerPanel = document.getElementById('admin-payment-manager-panel');
 
             if (isAdmin) {
                 if (userNav) userNav.style.display = 'none';
                 if (adminNav) adminNav.style.display = 'flex';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'flex';
+                if (userDepositPanel) userDepositPanel.style.display = 'none';
+                if (adminManagerPanel) {
+                    adminManagerPanel.style.display = 'block';
+                    loadAdminPaymentMethods();
+                }
+            } else {
+                if (userNav) userNav.style.display = '';
+                if (adminNav) adminNav.style.display = 'none';
+                if (drawerAdminLink) drawerAdminLink.style.display = 'none';
+                if (userDepositPanel) userDepositPanel.style.display = 'block';
+                if (adminManagerPanel) adminManagerPanel.style.display = 'none';
             }
 
             const navUserContainer = document.getElementById('nav-user-container');
@@ -1702,6 +1925,234 @@
                     `;
                 }
             }
+        }
+
+        /* ==========================================================================
+           لوحة إدارة طرق وحسابات الدفع (خاصة بالمدير)
+           ========================================================================== */
+        let currentAdminMethods = [];
+
+        async function loadAdminPaymentMethods() {
+            const listEl = document.getElementById('admin-methods-list');
+            const countBadge = document.getElementById('admin-pm-count-badge');
+            if (!listEl) return;
+
+            try {
+                const methods = (typeof waseetFetchPaymentMethods === 'function')
+                    ? await waseetFetchPaymentMethods(false)
+                    : getGatewaysList();
+
+                currentAdminMethods = Array.isArray(methods) ? methods : [];
+
+                if (countBadge) {
+                    countBadge.innerText = `${currentAdminMethods.length} وسيلة دفع`;
+                }
+
+                if (!currentAdminMethods.length) {
+                    listEl.innerHTML = `
+                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted); background: rgba(12,16,26,0.5); border: 1px dashed var(--border-metal); border-radius: 12px;">
+                            <i class="fas fa-wallet" style="font-size: 2rem; color: var(--gold-primary); margin-bottom: 0.5rem; opacity: 0.7;"></i>
+                            <h4 style="color: #fff; margin: 0 0 0.3rem;">لا توجد حسابات دفع مضافة بعد</h4>
+                            <p style="margin: 0; font-size: 0.8rem;">اضغط على "إضافة حساب/بطاقة جديدة" لإضافة أول وسيلة دفع واستقبال.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = currentAdminMethods.map(pm => {
+                    const isActive = pm.isActive !== false;
+                    const flagOrIcon = pm.countryFlag || (pm.category === 'crypto' ? '💎' : '💳');
+                    const catLabel = pm.category === 'crypto' ? 'عملة رقمية' : (pm.countryName || 'محفظة محلية');
+
+                    const secondaryHtml = pm.secondaryValue ? `
+                        <div style="font-size: 0.78rem; color: var(--silver-muted); margin-top: 0.35rem;">
+                            <i class="fas fa-link text-gold" style="font-size: 0.75rem;"></i> <strong>حساب إضافي:</strong> <span dir="ltr" style="color: #fff;">${escapeSafe(pm.secondaryValue)}</span>
+                        </div>
+                    ` : '';
+
+                    const instructionsHtml = pm.instructions ? `
+                        <div style="font-size: 0.76rem; color: var(--silver-muted); background: rgba(0,0,0,0.3); border-radius: 8px; padding: 0.45rem 0.65rem; margin-top: 0.5rem; line-height: 1.45;">
+                            <i class="fas fa-info-circle text-orange"></i> ${escapeSafe(pm.instructions)}
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="admin-pm-card ${isActive ? '' : 'is-inactive'}" id="admin-pm-card-${escapeSafe(pm.id)}">
+                            <div class="admin-pm-header">
+                                <div class="admin-pm-title-group">
+                                    <span style="font-size: 1.25rem; line-height: 1;">${flagOrIcon}</span>
+                                    <div>
+                                        <div style="color: #fff; font-weight: 800; font-size: 0.94rem;">
+                                            ${escapeSafe(pm.methodName)}
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;">
+                                            <span style="font-size: 0.72rem; color: var(--gold-light); background: rgba(197,160,89,0.12); border: 1px solid rgba(197,160,89,0.3); padding: 1px 7px; border-radius: 999px;">
+                                                ${escapeSafe(catLabel)}
+                                            </span>
+                                            <span class="status-pill ${isActive ? 'approved' : 'rejected'}" style="font-size: 0.68rem; padding: 1px 7px;">
+                                                ${isActive ? 'مفعّل ونشط' : 'معطّل'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="admin-pm-actions">
+                                    <button type="button" class="btn-pm-action btn-pm-edit" onclick="openEditPaymentMethodModal('${escapeSafe(pm.id)}')">
+                                        <i class="fas fa-edit"></i> تعديل
+                                    </button>
+                                    <button type="button" class="btn-pm-action btn-pm-toggle" onclick="handleTogglePaymentMethodActive('${escapeSafe(pm.id)}')">
+                                        <i class="fas ${isActive ? 'fa-eye-slash' : 'fa-eye'}"></i> ${isActive ? 'تعطيل' : 'تفعيل'}
+                                    </button>
+                                    <button type="button" class="btn-pm-action btn-pm-delete" onclick="handleDeletePaymentMethod('${escapeSafe(pm.id)}')">
+                                        <i class="fas fa-trash-alt"></i> حذف
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; background: rgba(8, 12, 20, 0.65); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.65rem 0.8rem;">
+                                <div>
+                                    <div style="font-size: 0.72rem; color: var(--silver-muted);"><i class="fas fa-user-check text-gold"></i> اسم المستفيد / المستلم:</div>
+                                    <div style="font-size: 0.86rem; color: #fff; font-weight: 800; margin-top: 2px;">${escapeSafe(pm.beneficiaryName)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.72rem; color: var(--silver-muted);"><i class="fas fa-key text-gold"></i> رقم الحساب / المحفظة:</div>
+                                    <div style="font-size: 0.9rem; color: var(--gold-light); font-weight: 900; font-family: monospace; direction: ltr; text-align: right; margin-top: 2px;">
+                                        ${escapeSafe(pm.accountNumber)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${secondaryHtml}
+                            ${instructionsHtml}
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Error rendering admin payment methods', err);
+            }
+        }
+
+        function openAddPaymentMethodModal() {
+            const form = document.getElementById('form-payment-method');
+            if (form) form.reset();
+            document.getElementById('pm-id').value = '';
+            document.getElementById('modal-payment-title').innerText = 'إضافة وسيلة دفع جديدة';
+            document.getElementById('pm-is-active').checked = true;
+            document.getElementById('modal-payment-method').style.display = 'flex';
+        }
+
+        function openEditPaymentMethodModal(pmId) {
+            const pm = currentAdminMethods.find(m => m.id === pmId);
+            if (!pm) return;
+
+            document.getElementById('pm-id').value = pm.id || '';
+            document.getElementById('modal-payment-title').innerText = `تعديل: ${pm.methodName}`;
+            document.getElementById('pm-method-name').value = pm.methodName || '';
+            document.getElementById('pm-category').value = pm.category || 'local';
+            document.getElementById('pm-country-name').value = pm.countryName || '';
+            document.getElementById('pm-beneficiary-name').value = pm.beneficiaryName || '';
+            document.getElementById('pm-account-number').value = pm.accountNumber || '';
+            document.getElementById('pm-secondary-value').value = pm.secondaryValue || '';
+            document.getElementById('pm-instructions').value = pm.instructions || '';
+            document.getElementById('pm-is-active').checked = pm.isActive !== false;
+
+            document.getElementById('modal-payment-method').style.display = 'flex';
+        }
+
+        function closePaymentMethodModal() {
+            const modal = document.getElementById('modal-payment-method');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handleSavePaymentMethod(event) {
+            event.preventDefault();
+            const id = document.getElementById('pm-id').value.trim();
+            const methodName = document.getElementById('pm-method-name').value.trim();
+            const category = document.getElementById('pm-category').value;
+            const countryName = document.getElementById('pm-country-name').value.trim();
+            const beneficiaryName = document.getElementById('pm-beneficiary-name').value.trim();
+            const accountNumber = document.getElementById('pm-account-number').value.trim();
+            const secondaryValue = document.getElementById('pm-secondary-value').value.trim();
+            const instructions = document.getElementById('pm-instructions').value.trim();
+            const isActive = document.getElementById('pm-is-active').checked;
+
+            if (!methodName || !beneficiaryName || !accountNumber) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('حقول ناقصة', 'يرجى إدخال اسم الطريقة، اسم المستفيد، ورقم الحساب/المحفظة.', 'warning');
+                }
+                return;
+            }
+
+            const btn = document.getElementById('btn-save-pm');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+            try {
+                const payload = {
+                    id: id || ('pm_' + Date.now()),
+                    category,
+                    countryName,
+                    beneficiaryName,
+                    accountNumber,
+                    secondaryValue,
+                    instructions,
+                    isActive,
+                    methodName,
+                    shortLabel: methodName
+                };
+
+                if (typeof waseetAdminSavePaymentMethod === 'function') {
+                    await waseetAdminSavePaymentMethod(payload);
+                }
+
+                closePaymentMethodModal();
+                await loadAdminPaymentMethods();
+                await initPaymentGatewaysUI();
+
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تم الحفظ بنجاح', `تم حفظ وتحديث بيانات حساب الدفع (${methodName}) بنجاح وستظهر للمستخدمين.`, 'success');
+                }
+            } catch (err) {
+                console.error('Save error', err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+
+        async function handleDeletePaymentMethod(pmId) {
+            const pm = currentAdminMethods.find(m => m.id === pmId);
+            const name = pm ? pm.methodName : 'وسيلة الدفع';
+
+            const confirmed = (typeof waseetConfirm === 'function')
+                ? await waseetConfirm('تأكيد الحذف', `هل أنت متأكد من حذف حساب (${name}) نهائياً؟ لن يتمكن المستخدمون من الشحن عبره.`, { confirmText: 'نعم، احذف', cancelText: 'إلغاء' })
+                : confirm(`هل أنت متأكد من حذف ${name}؟`);
+
+            if (!confirmed) return;
+
+            if (typeof waseetAdminDeletePaymentMethod === 'function') {
+                await waseetAdminDeletePaymentMethod(pmId);
+            }
+
+            await loadAdminPaymentMethods();
+            await initPaymentGatewaysUI();
+
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('تم الحذف', `تم حذف حساب الدفع (${name}) بنجاح.`, 'info');
+            }
+        }
+
+        async function handleTogglePaymentMethodActive(pmId) {
+            const pm = currentAdminMethods.find(m => m.id === pmId);
+            if (!pm) return;
+            pm.isActive = !pm.isActive;
+
+            if (typeof waseetAdminSavePaymentMethod === 'function') {
+                await waseetAdminSavePaymentMethod(pm);
+            }
+
+            await loadAdminPaymentMethods();
+            await initPaymentGatewaysUI();
         }
 
         async function loadAndRenderHistory() {
@@ -1973,6 +2424,7 @@
             renderWalletSummaryUI();
             setTimeout(async () => {
                 await refreshAllWalletData();
+                renderWalletSummaryUI();
                 setupWalletRealtime();
             }, 600);
         });

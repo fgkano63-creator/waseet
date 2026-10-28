@@ -615,6 +615,13 @@
             updateDrawerProfile();
         }
 
+        const debouncedRenderDealsView = (typeof waseetDebounce === 'function')
+            ? waseetDebounce((q) => renderDealsView(q), 300)
+            : (() => {
+                let t;
+                return (q) => { clearTimeout(t); t = setTimeout(() => renderDealsView(q), 300); };
+            })();
+
         function renderDealsView(searchQuery = '') {
             const container = document.getElementById('deals-table-container');
             if (!container) return;
@@ -801,8 +808,18 @@
                 const dealNum = String(d.dealNumber || '');
                 const title = (d.accountTitle || '').toLowerCase();
                 const buyer = (d.buyer && d.buyer.name ? d.buyer.name.toLowerCase() : '');
+                const buyerEmail = (d.buyer && d.buyer.email ? d.buyer.email.toLowerCase() : '');
                 const seller = (d.seller && d.seller.name ? d.seller.name.toLowerCase() : '');
-                return accNum.includes(q) || dealNum.includes(q) || title.includes(q) || buyer.includes(q) || seller.includes(q);
+                const sellerEmail = (d.seller && d.seller.email ? d.seller.email.toLowerCase() : '');
+                const dId = String(d.id || '').toLowerCase();
+                return accNum.includes(q) ||
+                       dealNum.includes(q) ||
+                       title.includes(q) ||
+                       buyer.includes(q) ||
+                       buyerEmail.includes(q) ||
+                       seller.includes(q) ||
+                       sellerEmail.includes(q) ||
+                       dId.includes(q);
             };
 
             const filteredActive = activeDeals.filter(filterFn);
@@ -816,10 +833,10 @@
                     <div style="position: relative; max-width: 550px; margin: 0 auto;">
                         <i class="fas fa-search" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
                         <input type="text" id="deals-search-input" class="input-3d" 
-                               placeholder="ابحث برقم الحساب (#1001) أو رقم الصفقة (#1) أو اسم الحساب..." 
+                               placeholder="ابحث برقم الحساب (#1001) أو رقم الصفقة (#1) أو اسم الحساب أو البريد..." 
                                value="${searchQuery}"
                                style="padding-right: 46px; width: 100%; font-size: 0.95rem; border-radius: 14px;"
-                               oninput="renderDealsView(this.value)">
+                               oninput="debouncedRenderDealsView(this.value)">
                     </div>
                 </div>
             `;

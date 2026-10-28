@@ -241,7 +241,7 @@
                 </div>
 
                 <div style="display: flex; gap: 0.6rem; align-items: center;">
-                    <input type="text" id="pending-search-input" class="pending-search-input" placeholder="ابحث برقم الحساب أو اسم البائع..." oninput="handlePendingSearch(this.value)">
+                    <input type="text" id="pending-search-input" class="pending-search-input" placeholder="ابحث برقم الحساب، اسم البائع أو البريد..." oninput="debouncedPendingSearch(this.value)">
                     <button class="btn-3d btn-outline" style="padding: 0.55rem 0.9rem;" onclick="loadPendingAccounts()" title="تحديث القائمة">
                         <i class="fas fa-sync-alt"></i>
                     </button>
@@ -730,6 +730,13 @@
             applyPendingFilters();
         }
 
+        const debouncedPendingSearch = (typeof waseetDebounce === 'function')
+            ? waseetDebounce(handlePendingSearch, 300)
+            : (() => {
+                let t;
+                return (term) => { clearTimeout(t); t = setTimeout(() => handlePendingSearch(term), 300); };
+            })();
+
         function handlePendingSearch(term) {
             currentSearchQuery = (term || '').trim().toLowerCase();
             applyPendingFilters();
@@ -744,10 +751,18 @@
 
             if (currentSearchQuery) {
                 filtered = filtered.filter(a => {
-                    const num = String(a.accountNumber || a.id || '').toLowerCase();
+                    const num = String(a.accountNumber || a.account_number || a.id || '').toLowerCase();
                     const title = String(a.title || '').toLowerCase();
-                    const seller = String(a.sellerName || '').toLowerCase();
-                    return num.includes(currentSearchQuery) || title.includes(currentSearchQuery) || seller.includes(currentSearchQuery);
+                    const seller = String(a.sellerName || a.seller_name || (a.seller && a.seller.name) || '').toLowerCase();
+                    const email = String(a.sellerEmail || a.email || (a.seller && a.seller.email) || '').toLowerCase();
+                    const game = String(a.game || '').toLowerCase();
+                    const desc = String(a.description || '').toLowerCase();
+                    return num.includes(currentSearchQuery) ||
+                           title.includes(currentSearchQuery) ||
+                           seller.includes(currentSearchQuery) ||
+                           email.includes(currentSearchQuery) ||
+                           game.includes(currentSearchQuery) ||
+                           desc.includes(currentSearchQuery);
                 });
             }
 

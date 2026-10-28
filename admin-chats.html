@@ -185,7 +185,7 @@
                     </button>
                 </div>
                 <div class="whatsapp-search-wrap">
-                    <input type="text" id="wa-search" class="whatsapp-search-input" placeholder="ابحث باسم المستخدم أو البريد...">
+                    <input type="text" id="wa-search" class="whatsapp-search-input" placeholder="ابحث باسم المستخدم، البريد، أو رقم الحساب...">
                 </div>
                 <div class="whatsapp-contacts-list" id="wa-contacts-list">
                     <div class="wa-empty-state"><i class="fas fa-spinner fa-spin"></i>جاري تحميل المحادثات...</div>
@@ -438,7 +438,18 @@
             if (term) {
                 contacts = contacts.filter(c => {
                     const p = getProfile(c.userId);
-                    return p.name.toLowerCase().includes(term) || p.email.toLowerCase().includes(term);
+                    const pName = (p.name || '').toLowerCase();
+                    const pEmail = (p.email || '').toLowerCase();
+                    const pAcc = String(p.account_number || p.accountNumber || '').toLowerCase();
+                    const pPhone = (p.phone || '').toLowerCase();
+                    const uId = (c.userId || '').toLowerCase();
+                    const lastMsg = (c.lastMsg || '').toLowerCase();
+                    return pName.includes(term) ||
+                           pEmail.includes(term) ||
+                           pAcc.includes(term) ||
+                           pPhone.includes(term) ||
+                           uId.includes(term) ||
+                           lastMsg.includes(term);
                 });
             }
 
@@ -705,7 +716,13 @@
             }
 
             document.getElementById('wa-reply-form').addEventListener('submit', sendReply);
-            document.getElementById('wa-search').addEventListener('input', renderContacts);
+            const debouncedRenderContacts = (typeof waseetDebounce === 'function')
+                ? waseetDebounce(renderContacts, 300)
+                : (() => {
+                    let t;
+                    return () => { clearTimeout(t); t = setTimeout(renderContacts, 300); };
+                })();
+            document.getElementById('wa-search').addEventListener('input', debouncedRenderContacts);
             const input = document.getElementById('wa-reply-input');
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {

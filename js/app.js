@@ -605,20 +605,42 @@ class WaseetApp {
     }
 
     /* ==========================================================================
-       SEARCH FUNCTIONALITY (البحث بالرقم أو الاسم)
+       SEARCH FUNCTIONALITY (البحث بالرقم أو الاسم أو البريد - لحظي مع Debounce)
        ========================================================================== */
 
     handleSearch(query) {
-        this.searchQuery = query.trim().toLowerCase();
-        let list = [...WASEET_STATE.accounts];
+        if (!this._debouncedSearch) {
+            const debounceFn = (typeof waseetDebounce === 'function')
+                ? waseetDebounce
+                : (fn, wait = 300) => {
+                    let t;
+                    return (...args) => {
+                        clearTimeout(t);
+                        t = setTimeout(() => fn(...args), wait);
+                    };
+                };
+            this._debouncedSearch = debounceFn((q) => this._executeSearch(q), 300);
+        }
+        this._debouncedSearch(query);
+    }
+
+    _executeSearch(query) {
+        this.searchQuery = (query || '').trim().toLowerCase();
+        let list = [...(WASEET_STATE.accounts || [])];
 
         if (this.searchQuery) {
             list = list.filter(acc => {
-                const numMatch = acc.accountNumber && String(acc.accountNumber).includes(this.searchQuery);
+                const numMatch = (acc.accountNumber && String(acc.accountNumber).includes(this.searchQuery)) ||
+                                 (acc.id && String(acc.id).toLowerCase().includes(this.searchQuery));
                 const titleMatch = acc.title && acc.title.toLowerCase().includes(this.searchQuery);
-                const idMatch = acc.id && acc.id.toLowerCase().includes(this.searchQuery);
-                const sellerMatch = acc.sellerName && acc.sellerName.toLowerCase().includes(this.searchQuery);
-                return numMatch || titleMatch || idMatch || sellerMatch;
+                const sellerMatch = (acc.sellerName && acc.sellerName.toLowerCase().includes(this.searchQuery)) ||
+                                    (acc.seller && acc.seller.name && acc.seller.name.toLowerCase().includes(this.searchQuery));
+                const emailMatch = (acc.sellerEmail && acc.sellerEmail.toLowerCase().includes(this.searchQuery)) ||
+                                   (acc.email && acc.email.toLowerCase().includes(this.searchQuery)) ||
+                                   (acc.seller && acc.seller.email && acc.seller.email.toLowerCase().includes(this.searchQuery));
+                const gameMatch = acc.game && acc.game.toLowerCase().includes(this.searchQuery);
+                const descMatch = acc.description && acc.description.toLowerCase().includes(this.searchQuery);
+                return numMatch || titleMatch || sellerMatch || emailMatch || gameMatch || descMatch;
             });
         }
 

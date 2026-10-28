@@ -380,7 +380,7 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; max-width: 420px;">
-                    <input type="text" id="admin-deposit-search" placeholder="ابحث باسم المستخدم أو البريد..." oninput="renderAdminDepositCards()" style="flex: 1; padding: 0.55rem 0.9rem; border-radius: 10px; background: rgba(22, 28, 44, 0.9); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; outline: none;">
+                    <input type="text" id="admin-deposit-search" placeholder="ابحث باسم المستخدم، البريد، رقم الحساب أو العملية..." oninput="debouncedRenderAdminDepositCards()" style="flex: 1; padding: 0.55rem 0.9rem; border-radius: 10px; background: rgba(22, 28, 44, 0.9); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; outline: none;">
                     <button type="button" class="btn-3d btn-outline" onclick="loadAdminDeposits()" title="تحديث القائمة" style="padding: 0.55rem 0.85rem;">
                         <i class="fas fa-sync-alt" id="admin-deposits-refresh-icon"></i>
                     </button>
@@ -546,6 +546,13 @@
             document.getElementById('pill-count-rejected').innerText = rejectedList.length;
         }
 
+        const debouncedRenderAdminDepositCards = (typeof waseetDebounce === 'function')
+            ? waseetDebounce(renderAdminDepositCards, 300)
+            : (() => {
+                let t;
+                return () => { clearTimeout(t); t = setTimeout(renderAdminDepositCards, 300); };
+            })();
+
         function renderAdminDepositCards() {
             const grid = document.getElementById('admin-deposits-grid');
             if (!grid) return;
@@ -557,8 +564,20 @@
                 if (query) {
                     const uName = (r.userProfile?.name || '').toLowerCase();
                     const uEmail = (r.userProfile?.email || '').toLowerCase();
+                    const uAcc = String(r.userProfile?.account_number || r.userProfile?.accountNumber || '').toLowerCase();
+                    const uId = (r.user_id || '').toLowerCase();
                     const method = (r.payment_method || '').toLowerCase();
-                    return uName.includes(query) || uEmail.includes(query) || method.includes(query);
+                    const notes = (r.notes || '').toLowerCase();
+                    const reqId = (r.id || '').toLowerCase();
+                    const amount = String(r.amount_requested || '');
+                    return uName.includes(query) ||
+                           uEmail.includes(query) ||
+                           uAcc.includes(query) ||
+                           uId.includes(query) ||
+                           method.includes(query) ||
+                           notes.includes(query) ||
+                           reqId.includes(query) ||
+                           amount.includes(query);
                 }
                 return true;
             });
