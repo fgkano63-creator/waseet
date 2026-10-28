@@ -77,7 +77,11 @@
             row.title = 'محفظتي وشحن النقاط';
             row.innerHTML = '<span class="dw-label"><i class="fas fa-wallet"></i> رصيد المحفظة</span>' +
                             '<span class="dw-amount">0 نقطة</span>';
-            anchor.insertAdjacentElement('afterend', row);
+            if (anchor.parentElement && anchor.parentElement.classList.contains('drawer-header')) {
+                anchor.parentElement.insertAdjacentElement('afterend', row);
+            } else {
+                anchor.insertAdjacentElement('afterend', row);
+            }
         }
         return row;
     }
@@ -163,7 +167,8 @@
                     '<img src="' + esc(userAvatar(user)) + '" class="drawer-avatar" alt="' + esc(user.name) + '" referrerpolicy="no-referrer" ' +
                     'onerror="this.onerror=null;this.src=\'' + DEFAULT_AVATAR + '\'">' +
                     '<div class="drawer-user-meta"><span class="drawer-user-name">' + esc(user.name) + '</span>' +
-                    '<span class="drawer-user-role">' + role + '</span></div>';
+                    '<span class="drawer-user-role">' + role + '</span>' +
+                    '<span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ' + pts + ' نقطة متاحة</span></div>';
             } else {
                 card.innerHTML =
                     '<div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">' +

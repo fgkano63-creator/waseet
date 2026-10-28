@@ -300,10 +300,15 @@
     <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeDealsDrawer()"></div>
     <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
         <div class="drawer-header">
-            <div class="drawer-user-card" id="drawer-user-card">
-                <!-- Populated dynamically -->
+            <div class="drawer-brand">
+                <img src="assets/icons/icon-192.png" alt="منصة وسيط" class="drawer-logo" onerror="this.src='assets/logo.png'">
+                <span class="drawer-title">منصة وسيط</span>
             </div>
             <button class="drawer-close-btn" onclick="closeDealsDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card">
+            <!-- Populated dynamically -->
         </div>
 
         <div class="drawer-section">
@@ -461,12 +466,14 @@
                     const avatar = user.avatar || (isMediatorUser(user) 
                         ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
                         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
-                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
+                    const pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
                     userCard.innerHTML = `
                         <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
                         <div class="drawer-user-meta">
                             <span class="drawer-user-name">${user.name}</span>
                             <span class="drawer-user-role">${roleLabel}</span>
+                            <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
                     `;
                 } else {

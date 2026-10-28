@@ -1101,10 +1101,15 @@
     <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()"></div>
     <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
         <div class="drawer-header">
-            <div class="drawer-user-card" id="drawer-user-card">
-                <!-- Injected dynamically: User Avatar, Name, Role, Balance -->
+            <div class="drawer-brand">
+                <img src="assets/icons/icon-192.png" alt="منصة وسيط" class="drawer-logo" onerror="this.src='assets/logo.png'">
+                <span class="drawer-title">منصة وسيط</span>
             </div>
             <button class="drawer-close-btn" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card">
+            <!-- Injected dynamically: User Avatar, Name, Role, Balance -->
         </div>
 
         <div class="drawer-section">

@@ -890,12 +890,13 @@
             if (drawerCard) {
                 const avatar = (currentUser && currentUser.avatar) || 'assets/logo.png';
                 const name = (currentUser && currentUser.name) || 'زائر';
-                const roleLabel = (currentUser && currentUser.role === 'admin') ? '👑 الوسيط المعتمد' : 'مستخدم موثق';
+                const roleLabel = (currentUser && currentUser.role === 'admin') ? '👑 الوسيط المعتمد (المدير)' : '🏷️ مستخدم موثق';
                 drawerCard.innerHTML = `
-                    <img src="${avatar}" class="drawer-avatar" alt="${name}" onerror="this.src='assets/logo.png'" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--gold-primary); object-fit: cover;">
+                    <img src="${avatar}" class="drawer-avatar" alt="${name}" onerror="this.src='assets/logo.png'">
                     <div class="drawer-user-meta">
-                        <span class="drawer-user-name" style="color: #fff; font-weight: 800;">${name}</span>
-                        <span class="drawer-user-role" style="color: var(--gold-light); font-size: 0.78rem;">${roleLabel}</span>
+                        <span class="drawer-user-name">${name}</span>
+                        <span class="drawer-user-role">${roleLabel}</span>
+                        ${(currentUser && !currentUser.isGuest) ? `<span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>` : ''}
                     </div>
                 `;
             }

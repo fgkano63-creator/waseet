@@ -247,10 +247,10 @@ class WaseetApp {
                 const pts = user.wallet ? user.wallet.available : 0;
                 userCard.innerHTML = `
                     <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
-                    <div class="drawer-user-meta" style="flex: 1;">
+                    <div class="drawer-user-meta">
                         <span class="drawer-user-name">${user.name}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
-                        <span style="font-size: 0.72rem; color: var(--gold-light); margin-top: 2px;"><i class="fas fa-coins"></i> ${pts} نقطة متاحة</span>
+                        <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                     </div>
                     <i class="fas fa-user-cog text-gold" style="font-size: 1.05rem; opacity: 0.85;" title="إدارة الحساب"></i>
                 `;
@@ -2389,6 +2389,102 @@ class WaseetApp {
         } else {
             prompt('انسخ النص يدوياً:', text);
         }
+    }
+
+    async revealDeckPassword(accountId, btnEl) {
+        const el = document.getElementById(`deck-pw-${accountId}`);
+        if (!el) return;
+        if (el.getAttribute('data-revealed') === 'true') {
+            el.innerText = '••••••••••';
+            el.style.letterSpacing = '2px';
+            el.setAttribute('data-revealed', 'false');
+            if (btnEl) btnEl.innerHTML = '<i class="fas fa-eye"></i>';
+            return;
+        }
+
+        if (btnEl) btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        let pwd = '';
+        if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
+            try {
+                const sec = await window.waseetGetAccountCredentialsSecure(accountId);
+                if (sec && sec.password) pwd = sec.password;
+            } catch (e) {}
+        }
+        if (!pwd || pwd === '••••••••') {
+            const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
+            pwd = (acc && acc.credentials && acc.credentials.password) || 'غير متوفر';
+        }
+
+        el.innerText = pwd;
+        el.style.letterSpacing = 'normal';
+        el.setAttribute('data-revealed', 'true');
+        if (btnEl) btnEl.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    }
+
+    async copyDeckPassword(accountId) {
+        let pwd = '';
+        const el = document.getElementById(`deck-pw-${accountId}`);
+        if (el && el.getAttribute('data-revealed') === 'true' && el.innerText !== '••••••••••') {
+            pwd = el.innerText;
+        } else if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
+            try {
+                const sec = await window.waseetGetAccountCredentialsSecure(accountId);
+                if (sec && sec.password) pwd = sec.password;
+            } catch (e) {}
+        }
+        if (!pwd) {
+            const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
+            pwd = (acc && acc.credentials && acc.credentials.password) || '';
+        }
+        this.copyToClipboard(pwd, 'تم نسخ كلمة المرور');
+    }
+
+    async revealDeckRecoveryPassword(accountId, btnEl) {
+        const el = document.getElementById(`deck-rec-pw-${accountId}`);
+        if (!el) return;
+        if (el.getAttribute('data-revealed') === 'true') {
+            el.innerText = '••••••••••';
+            el.style.letterSpacing = '2px';
+            el.setAttribute('data-revealed', 'false');
+            if (btnEl) btnEl.innerHTML = '<i class="fas fa-eye"></i>';
+            return;
+        }
+
+        if (btnEl) btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        let recPwd = '';
+        if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
+            try {
+                const sec = await window.waseetGetAccountCredentialsSecure(accountId);
+                if (sec && sec.recovery_password) recPwd = sec.recovery_password;
+            } catch (e) {}
+        }
+        if (!recPwd || recPwd === '••••••••') {
+            const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
+            recPwd = (acc && acc.credentials && acc.credentials.recovery_password) || 'غير مضاف';
+        }
+
+        el.innerText = recPwd;
+        el.style.letterSpacing = 'normal';
+        el.setAttribute('data-revealed', 'true');
+        if (btnEl) btnEl.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    }
+
+    async copyDeckRecoveryPassword(accountId) {
+        let recPwd = '';
+        const el = document.getElementById(`deck-rec-pw-${accountId}`);
+        if (el && el.getAttribute('data-revealed') === 'true' && el.innerText !== '••••••••••') {
+            recPwd = el.innerText;
+        } else if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
+            try {
+                const sec = await window.waseetGetAccountCredentialsSecure(accountId);
+                if (sec && sec.recovery_password) recPwd = sec.recovery_password;
+            } catch (e) {}
+        }
+        if (!recPwd) {
+            const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
+            recPwd = (acc && acc.credentials && acc.credentials.recovery_password) || '';
+        }
+        this.copyToClipboard(recPwd, 'تم نسخ كلمة مرور الاسترداد');
     }
 
     async approveAccount(accId) {

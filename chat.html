@@ -182,10 +182,15 @@
     <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeChatDrawer()"></div>
     <aside class="mobile-drawer-sidebar" id="mobile-drawer-sidebar">
         <div class="drawer-header">
-            <div class="drawer-user-card" id="drawer-user-card">
-                <!-- Populated dynamically -->
+            <div class="drawer-brand">
+                <img src="assets/icons/icon-192.png" alt="منصة وسيط" class="drawer-logo" onerror="this.src='assets/logo.png'">
+                <span class="drawer-title">منصة وسيط</span>
             </div>
             <button class="drawer-close-btn" onclick="closeChatDrawer()">&times;</button>
+        </div>
+
+        <div class="drawer-user-card" id="drawer-user-card">
+            <!-- Populated dynamically -->
         </div>
 
         <div class="drawer-section">
@@ -332,12 +337,14 @@
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
-                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع');
+                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
+                    const pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
                     userCard.innerHTML = `
                         <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
                             <span class="drawer-user-name">${user.name}</span>
                             <span class="drawer-user-role">${roleLabel}</span>
+                            <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
                     `;
                 } else {
