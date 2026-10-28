@@ -1,0 +1,16 @@
+# WASEET Platform - Netlify Redirects Configuration
+# Root route & index mapping with 200 OK
+/                   /index.html             200
+/index              /index.html             200
+/index.html         /index.html             200
+
+# Pretty URLs for platform pages
+/deals              /deals.html             200
+/chat               /chat.html              200
+/wallet             /wallet.html            200
+/my-accounts        /my-accounts.html       200
+/profile            /profile.html           200
+/pending-accounts   /pending-accounts.html  200
+/admin-chats        /admin-chats.html       200
+/admin-deposits     /admin-deposits.html    200
+/contact-support    /contact-support.html   200
