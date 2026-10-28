@@ -33,42 +33,189 @@
     <link rel="stylesheet" href="css/style.css?v=20261026_v1">
 
     <style>
-        /* أنماط مخصصة لصفحة المحادثة المستقلة مع ثبات كامل للشاشة */
+        /* أنماط مخصصة لصفحة المحادثة والدعم مع ثبات كامل للشاشة ومنع أشرطة التمرير المزدوجة */
+        :root {
+            --support-navbar-height: 85px;
+        }
+
+        @media (max-width: 900px) {
+            :root {
+                --support-navbar-height: 68px;
+            }
+        }
+
+        /* 2. إصلاح أشرطة التمرير المزدوجة (Fix Double Scrollbars) */
         html, body {
             height: 100% !important;
-            overflow: hidden !important;
+            height: 100dvh !important;
+            max-height: 100% !important;
+            max-height: 100dvh !important;
+            overflow: hidden !important; /* قفل التمرير على مستوى الصفحة نهائياً */
             width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
+            position: fixed !important; /* منع أي اهتزاز أو تحرك للصفحة */
         }
 
         .app-wrapper {
             height: 100% !important;
             height: 100dvh !important;
+            max-height: 100% !important;
+            max-height: 100dvh !important;
             display: flex !important;
             flex-direction: column !important;
             overflow: hidden !important;
             width: 100% !important;
             box-sizing: border-box !important;
+            position: relative !important;
         }
 
+        /* 3. ترتيب الطبقات (Z-Index Fix) */
+        .header-navbar {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important; /* يمتلك z-index مرتفع ليغطي صندوق المحادثة تماماً */
+            flex-shrink: 0 !important;
+            height: var(--support-navbar-height) !important;
+            box-sizing: border-box !important;
+            background: rgba(10, 12, 18, 0.95) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        /* 1. منع اهتزاز الواجهة (Fix Layout Shift on Hover) */
+        .btn-nav-middle,
+        .btn-nav-admin,
+        .btn-3d,
+        .wallet-pill,
+        .support-chip,
+        .mobile-hamburger-btn,
+        .user-profile-pill {
+            border: 1px solid transparent;
+            box-sizing: border-box !important;
+            font-weight: 700 !important;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+            transform: none !important; /* منع أي transform يسبب قفز الأزرار */
+        }
+
+        .btn-nav-middle {
+            border: 1px solid var(--border-metal) !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-nav-middle:hover,
+        .btn-nav-middle.active {
+            border-color: var(--gold-primary) !important;
+            font-weight: 700 !important; /* لا يتغير سمك الخط */
+            transform: none !important;
+        }
+
+        .btn-nav-middle-sell {
+            border: 1px solid var(--orange-bright) !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-nav-middle-sell:hover {
+            border-color: var(--orange-bright) !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .btn-nav-admin {
+            border: 1px solid var(--border-metal) !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-nav-admin:hover,
+        .btn-nav-admin.active {
+            border-color: var(--gold-primary) !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .wallet-pill {
+            border: 1px solid var(--gold-primary) !important;
+            font-weight: 700 !important;
+        }
+
+        .wallet-pill:hover {
+            border-color: #ffffff !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .btn-3d.btn-outline {
+            border: 1px solid var(--border-metal) !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-3d.btn-outline:hover {
+            border-color: var(--gold-primary) !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .btn-3d.btn-gold {
+            border: 1px solid rgba(255, 225, 150, 0.7) !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-3d.btn-gold:hover {
+            border-color: #ffffff !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .support-chip {
+            border: 1px solid rgba(197, 160, 89, 0.3) !important;
+            font-weight: 700 !important;
+        }
+
+        .support-chip:hover {
+            border-color: var(--gold-primary) !important;
+            font-weight: 700 !important;
+            transform: none !important;
+        }
+
+        .mobile-hamburger-btn {
+            border: 1px solid var(--border-metal) !important;
+            box-sizing: border-box !important;
+        }
+
+        .mobile-hamburger-btn:hover,
+        .mobile-hamburger-btn:active {
+            border-color: var(--gold-primary) !important;
+            transform: none !important;
+        }
+
+        /* الحاوية الرئيسية للمحادثة وضبط الارتفاع مع استبعاد شريط التنقل لمنع التمرير الإضافي */
         .support-page-container {
-            flex: 1 1 0% !important;
+            height: calc(100vh - var(--support-navbar-height, 85px)) !important;
+            height: calc(100dvh - var(--support-navbar-height, 85px)) !important;
+            max-height: calc(100vh - var(--support-navbar-height, 85px)) !important;
+            max-height: calc(100dvh - var(--support-navbar-height, 85px)) !important;
+            flex: 1 1 auto !important;
             min-height: 0 !important;
-            height: 100% !important;
             max-width: 960px !important;
             width: 100% !important;
             margin: 0 auto !important;
-            padding: 0.4rem 0.6rem 4.5rem !important;
+            padding: 0.6rem 1rem 0.8rem !important;
             box-sizing: border-box !important;
             display: flex !important;
             flex-direction: column !important;
-            overflow: hidden !important;
+            overflow: hidden !important; /* لا يوجد تمرير في الحاوية */
+            position: relative !important;
+            z-index: 10 !important;
         }
 
-        @media (min-width: 869px) {
+        @media (max-width: 768px) {
             .support-page-container {
-                padding: 0.8rem 1rem 1rem !important;
+                height: calc(100vh - var(--support-navbar-height, 68px) - 62px) !important;
+                height: calc(100dvh - var(--support-navbar-height, 68px) - 62px) !important;
+                max-height: calc(100vh - var(--support-navbar-height, 68px) - 62px) !important;
+                max-height: calc(100dvh - var(--support-navbar-height, 68px) - 62px) !important;
+                padding: 0.25rem 0.4rem 0.25rem !important;
             }
         }
 
@@ -76,7 +223,7 @@
             flex: 1 1 0% !important;
             min-height: 0 !important;
             height: 100% !important;
-            max-height: none !important;
+            max-height: 100% !important;
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
@@ -84,6 +231,8 @@
             flex-direction: column !important;
             border-radius: 18px !important;
             overflow: hidden !important;
+            position: relative !important;
+            z-index: 10 !important;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(197, 160, 89, 0.2);
             border: 1px solid var(--gold-primary);
             background: linear-gradient(145deg, rgba(20, 26, 40, 0.98), rgba(10, 13, 22, 0.99));
@@ -156,10 +305,12 @@
             display: none;
         }
 
+        /* التمرير مقتصر فقط وحصرياً على صندوق الرسائل */
         .support-chat-messages {
             flex: 1 1 0% !important;
             min-height: 0 !important;
             overflow-y: auto !important;
+            overflow-x: hidden !important;
             overscroll-behavior: contain !important;
             -webkit-overflow-scrolling: touch !important;
             box-sizing: border-box !important;
@@ -249,9 +400,6 @@
         }
 
         @media (max-width: 600px) {
-            .support-page-container {
-                padding: 0.25rem 0.35rem 68px !important;
-            }
             .support-fullpage-card {
                 border-radius: 14px !important;
             }
