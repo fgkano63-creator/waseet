@@ -2898,15 +2898,17 @@ html, body {
     -webkit-tap-highlight-color: transparent;
 }
 
+@media (max-width: 900px) {
+    /* Safe space for mobile bottom navigation on mobile and tablet */
+    body {
+        padding-bottom: 70px !important;
+    }
+}
+
 @media (max-width: 768px) {
     /* 1. Global Scale Down for Mobile to reduce long scrolling */
     html {
         font-size: 14.5px !important;
-    }
-
-    /* Safe space for mobile bottom navigation */
-    body {
-        padding-bottom: 70px !important;
     }
 
     /* Container Spacing */
@@ -3806,7 +3808,7 @@ html, body {
     padding: 0 0.5rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .mobile-bottom-nav {
         display: flex;
     }
