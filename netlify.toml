@@ -71,3 +71,8 @@
   from = "/contact-support"
   to = "/contact-support.html"
   status = 200
+
+[[redirects]]
+  from = "/auth/callback"
+  to = "/auth/callback.html"
+  status = 200

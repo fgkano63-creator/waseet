@@ -14,3 +14,4 @@
 /admin-chats        /admin-chats.html       200
 /admin-deposits     /admin-deposits.html    200
 /contact-support    /contact-support.html   200
+/auth/callback      /auth/callback.html     200

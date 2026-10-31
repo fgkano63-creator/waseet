@@ -17,7 +17,10 @@
         'my-accounts.html',
         'profile.html',
         'chat.html',
-        'admin-chats.html'
+        'admin-chats.html',
+        'pending-accounts.html',
+        'admin-deposits.html',
+        'contact-support.html'
     ];
 
     /**
@@ -27,7 +30,10 @@
         if (!url || prefetchCache.has(url)) return;
         try {
             const cleanUrl = url.split('#')[0].split('?')[0];
-            if (!cleanUrl.endsWith('.html') && cleanUrl !== '/') return;
+            const isHtml = cleanUrl.endsWith('.html');
+            const isRoot = cleanUrl === '/' || cleanUrl === '';
+            const isPretty = /^\/(deals|chat|wallet|my-accounts|profile|pending-accounts|admin-chats|admin-deposits|contact-support|auth\/callback|index)$/.test(cleanUrl);
+            if (!isHtml && !isRoot && !isPretty) return;
             if (cleanUrl.startsWith('http') && !cleanUrl.startsWith(window.location.origin)) return;
 
             prefetchCache.add(url);

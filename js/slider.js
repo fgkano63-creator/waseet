@@ -27,6 +27,17 @@ class WaseetHeroSlider {
         this.wrap.addEventListener('mouseenter', () => this.stopAutoPlay());
         this.wrap.addEventListener('mouseleave', () => this.startAutoPlay());
 
+        // Setup dot indicators click handlers
+        if (this.dotsContainer) {
+            const dots = this.dotsContainer.querySelectorAll('.waseet-slider-dot');
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    this.goToSlide(idx);
+                    this.startAutoPlay();
+                });
+            });
+        }
+
         // Touch swipe support for mobile
         this.wrap.addEventListener('touchstart', (e) => {
             this.stopAutoPlay();
