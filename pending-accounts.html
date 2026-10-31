@@ -258,7 +258,7 @@
         </main>
 
         <!-- ================= Modal: Detailed Account Inspection (Large Slider & Plain Credentials) ================= -->
-        <div class="modal-overlay" id="modal-inspect-account-detail" style="z-index: 9999;" onclick="if(event.target === this) closeInspectionModal();">
+        <div class="modal-overlay" id="modal-inspect-account-detail" style="z-index: 10005;" onclick="if(event.target === this) closeInspectionModal();">
             <div class="modal-inspect-box">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-metal); padding-bottom: 0.8rem;">
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
@@ -279,7 +279,7 @@
         </div>
 
         <!-- ================= Modal: Image Fullscreen Zoom Lightbox ================= -->
-        <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 10005;" onclick="this.classList.remove('active')">
+        <div class="modal-overlay lightbox-modal" id="modal-image-lightbox" style="z-index: 10050;" onclick="this.classList.remove('active')">
             <div class="lightbox-box" onclick="event.stopPropagation()">
                 <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
                 <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.onerror=null; this.src='assets/logo.png';">

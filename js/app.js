@@ -1710,16 +1710,26 @@ class WaseetApp {
 
         grid.innerHTML = this.uploadedImages.map((src, index) => {
             const isMain = index === 0;
+            const safeSrc = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(src) : src;
+            const safeIdx = parseInt(index, 10) || 0;
             return `
                 <div class="preview-thumb-card">
-                    <img src="${src}" alt="Preview ${index + 1}" class="preview-thumb-img">
+                    <img src="${safeSrc}" alt="Preview ${safeIdx + 1}" class="preview-thumb-img">
                     ${isMain ? '<span class="preview-main-badge">الغلاف الرئيسي</span>' : ''}
-                    <button type="button" class="btn-remove-thumb" onclick="window.waseetApp.removeUploadedImage(${index})" title="حذف الصورة">
+                    <button type="button" class="btn-remove-thumb" data-action="remove-thumb" data-idx="${safeIdx}" title="حذف الصورة">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             `;
         }).join('');
+
+        grid.querySelectorAll('button[data-action="remove-thumb"]').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                const idx = parseInt(btn.getAttribute('data-idx'), 10);
+                this.removeUploadedImage(idx);
+            };
+        });
     }
 
     removeUploadedImage(index) {

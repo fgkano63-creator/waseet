@@ -52,8 +52,12 @@ class WaseetDialogManager {
 
             if (titleEl) titleEl.innerText = title;
             if (bodyEl) {
-                // If message has newlines, convert to br
-                bodyEl.innerHTML = message.replace(/\n/g, '<br>');
+                // If message has newlines, convert to br and sanitize against XSS
+                const formatted = String(message).replace(/\n/g, '<br>');
+                const safeHtml = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                    ? DOMPurify.sanitize(formatted, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'span', 'p', 'code', 'ul', 'li'], ALLOWED_ATTR: ['class', 'style'] })
+                    : formatted.replace(/[<>'"]/g, c => ({'<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c] || c)).replace(/\n/g, '<br>');
+                bodyEl.innerHTML = safeHtml;
             }
 
             // Set Icon and Theme Glow
@@ -135,9 +139,14 @@ class WaseetDialogManager {
 
             if (titleEl) titleEl.innerText = title;
             if (bodyEl) {
+                const formatted = String(message).replace(/\n/g, '<br>');
+                const safeMsg = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                    ? DOMPurify.sanitize(formatted, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'span', 'p', 'code'], ALLOWED_ATTR: ['class', 'style'] })
+                    : formatted.replace(/[<>'"]/g, c => ({'<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c] || c));
+                const safeDefault = String(defaultValue || '').replace(/[<>'"]/g, c => ({'<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c] || c));
                 bodyEl.innerHTML = `
-                    <div style="margin-bottom: 0.8rem; font-size: 0.92rem; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>
-                    <textarea id="waseet-prompt-input" class="input-3d" style="width: 100%; min-height: 85px; padding: 0.75rem; border-radius: 10px; font-family: var(--font-ar); font-size: 0.9rem; resize: vertical;" placeholder="اكتب هنا...">${defaultValue}</textarea>
+                    <div style="margin-bottom: 0.8rem; font-size: 0.92rem; line-height: 1.6;">${safeMsg}</div>
+                    <textarea id="waseet-prompt-input" class="input-3d" style="width: 100%; min-height: 85px; padding: 0.75rem; border-radius: 10px; font-family: var(--font-ar); font-size: 0.9rem; resize: vertical;" placeholder="اكتب هنا...">${safeDefault}</textarea>
                 `;
             }
 

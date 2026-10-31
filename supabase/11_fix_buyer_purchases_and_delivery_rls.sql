@@ -87,6 +87,7 @@ CREATE OR REPLACE FUNCTION public.handle_deal_status_notification()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
     -- عند إنشاء صفقة جديدة

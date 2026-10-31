@@ -106,7 +106,13 @@ class WaseetEscrowRoom {
             toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(220,38,38,0.95);color:#fff;padding:0.65rem 1.2rem;border-radius:12px;font-family:var(--font-ar);font-size:0.86rem;font-weight:800;box-shadow:0 10px 25px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;gap:0.5rem;pointer-events:none;transition:opacity 0.25s ease;';
             document.body.appendChild(toast);
         }
-        toast.innerHTML = `<i class="fas fa-hourglass-half"></i> <span>${message}</span>`;
+        const safeMsg = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+            ? DOMPurify.sanitize(String(message))
+            : String(message).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c] || c));
+        const html = `<i class="fas fa-hourglass-half"></i> <span>${safeMsg}</span>`;
+        toast.innerHTML = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+            ? DOMPurify.sanitize(html)
+            : html;
         toast.style.opacity = '1';
         clearTimeout(this._spamToastTimer);
         this._spamToastTimer = setTimeout(() => {

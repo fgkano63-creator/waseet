@@ -40,6 +40,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
+    <!-- Instant Preloading for 0-Lag Navigation (Mobile & Desktop) -->
+    <link rel="prefetch" href="deals.html" as="document">
+    <link rel="prefetch" href="wallet.html" as="document">
+    <link rel="prefetch" href="my-accounts.html" as="document">
+    <link rel="prefetch" href="profile.html" as="document">
+
     <!-- Custom 3D Design Styles -->
     <link rel="stylesheet" href="css/style.css?v=20261026_v1">
 
@@ -230,46 +236,119 @@
             </div>
         </header>
 
-        <!-- ================= Hero Section ================= -->
-        <section class="hero-section">
+        <!-- ================= Luxury Hero Auto-Slider (Auto 2000ms Carousel) ================= -->
+        <section class="waseet-hero-slider-section">
             <div class="container">
-                <div class="hero-badge">
-                    <i class="fas fa-shield-check text-gold"></i>
-                    <span>نظام وساطة مشفر 100% • خالٍ من الاحتيال</span>
+                <div class="waseet-hero-slider-wrap" id="waseet-hero-slider">
+                    <div class="waseet-slider-track" id="hero-slider-track">
+                        <!-- Slide 1: Escrow & Security -->
+                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(234, 88, 12, 0.22), transparent 70%), linear-gradient(135deg, #181b28 0%, #0d0f17 100%);">
+                            <div class="waseet-slide-content">
+                                <span class="waseet-slide-badge">
+                                    <i class="fas fa-shield-check text-gold"></i> وساطة مشفرة 100%
+                                </span>
+                                <h2 class="waseet-slide-title">
+                                    منصة الوساطة الأولى <span class="highlight-gold">لحسابات الألعاب</span>
+                                </h2>
+                                <p class="waseet-slide-desc">
+                                    بيع وشراء حسابات فري فاير وببجي بأمان مطلق وإشراف مباشر من وسيط معتمد.
+                                </p>
+                                <div class="waseet-slide-tags">
+                                    <span class="waseet-slide-tag"><i class="fas fa-lock text-gold"></i> تجميد آمن للنقاط</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-clock text-orange"></i> ضمان 48 ساعة</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-bolt text-gold"></i> تسليم فوري</span>
+                                </div>
+                            </div>
+                            <div class="waseet-slide-visual">
+                                <div class="waseet-slide-graphic">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Rare Accounts & Prime 1-8 -->
+                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(197, 160, 89, 0.25), transparent 70%), linear-gradient(135deg, #1f1b2c 0%, #0d0e18 100%);">
+                            <div class="waseet-slide-content">
+                                <span class="waseet-slide-badge">
+                                    <i class="fas fa-crown text-gold"></i> سوق الحسابات النادرة
+                                </span>
+                                <h2 class="waseet-slide-title">
+                                    حسابات فري فاير وببجي <span class="highlight-gold">المفحوصة بعناية</span>
+                                </h2>
+                                <p class="waseet-slide-desc">
+                                    تصنيف دقيق من برايم 1 إلى 8 مع أسلحة متطورة ورقصات نادرة بأفضل الأسعار.
+                                </p>
+                                <div class="waseet-slide-tags">
+                                    <span class="waseet-slide-tag"><i class="fas fa-gem text-gold"></i> برايم 1-8</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-fire-alt text-orange"></i> أسلحة ماكس</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-check-double text-gold"></i> فحص الروابط</span>
+                                </div>
+                            </div>
+                            <div class="waseet-slide-visual">
+                                <div class="waseet-slide-graphic">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Safe Wallet & Instant Delivery -->
+                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(34, 197, 94, 0.18), transparent 70%), linear-gradient(135deg, #152220 0%, #0c1214 100%);">
+                            <div class="waseet-slide-content">
+                                <span class="waseet-slide-badge">
+                                    <i class="fas fa-wallet text-gold"></i> المحفظة ونقاط وسيط
+                                </span>
+                                <h2 class="waseet-slide-title">
+                                    شحن وسحب فوري <span class="highlight-gold">بدون أي عمولات خفية</span>
+                                </h2>
+                                <p class="waseet-slide-desc">
+                                    إيداع وسحب عبر وسائل الدفع المحلية والعالمية مع حماية كاملة لأرصدتك.
+                                </p>
+                                <div class="waseet-slide-tags">
+                                    <span class="waseet-slide-tag"><i class="fas fa-credit-card text-gold"></i> طرق دفع متعددة</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-exchange-alt text-orange"></i> سحب مباشر</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-user-shield text-gold"></i> تشفير العمليات</span>
+                                </div>
+                            </div>
+                            <div class="waseet-slide-visual">
+                                <div class="waseet-slide-graphic">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Instant Tri-Party Escrow Chat -->
+                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.2), transparent 70%), linear-gradient(135deg, #161e32 0%, #0d111d 100%);">
+                            <div class="waseet-slide-content">
+                                <span class="waseet-slide-badge">
+                                    <i class="fas fa-comments text-gold"></i> غرف الوساطة المباشرة
+                                </span>
+                                <h2 class="waseet-slide-title">
+                                    دردشة ثلاثية مشفرة <span class="highlight-gold">بين المشتري والبائع والوسيط</span>
+                                </h2>
+                                <p class="waseet-slide-desc">
+                                    نقل بيانات الحساب وفحص التأمين لحظة بلحظة تحت إشراف الوسيط حتى إتمام الصفقة.
+                                </p>
+                                <div class="waseet-slide-tags">
+                                    <span class="waseet-slide-tag"><i class="fas fa-user-tie text-gold"></i> إشراف وسيط معتمد</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-shield-virus text-orange"></i> حماية من السرقة</span>
+                                    <span class="waseet-slide-tag"><i class="fas fa-headset text-gold"></i> دعم فني متواصل</span>
+                                </div>
+                            </div>
+                            <div class="waseet-slide-visual">
+                                <div class="waseet-slide-graphic">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <h1 class="hero-title">
-                    بيع وشراء حسابات الألعاب عبر <br>
-                    <span class="text-gradient-gold">وساطة معتمدة وأمان مطلق</span>
-                </h1>
-
-                <p class="hero-description">
-                    أول منصة عربية تضمن صفقات حسابات فري فاير وببجي. لا يحصل البائع على أموالك حتى تفحص الحساب وتغير الروابط بإشراف وسيط معتمد.
-                </p>
-
-                <div class="hero-cta-group">
-                    <a href="#marketplace" class="btn-3d btn-gold">
-                        <i class="fas fa-gamepad"></i> تصفح الحسابات المضمونة
-                    </a>
-                    <a href="#fee-calculator" class="btn-3d btn-outline">
-                        <i class="fas fa-coins text-gold"></i> تجربة حاسبة الأرباح
-                    </a>
-                </div>
-
-                <!-- 3D Stat Counters -->
-                <div class="hero-stats-grid">
-                    <div class="stat-card-3d card-3d">
-                        <div class="stat-num text-gold">100%</div>
-                        <div class="stat-label">ضمان استرجاع النقاط عند الخلل</div>
-                    </div>
-                    <div class="stat-card-3d card-3d">
-                        <div class="stat-num text-orange">3 - 5 نقاط</div>
-                        <div class="stat-label">عمولة ثابتة متدرجة تبدأ من 3 نقاط</div>
-                    </div>
-                    <div class="stat-card-3d card-3d">
-                        <div class="stat-num text-gold">برايم 1-8</div>
-                        <div class="stat-label">تصنيف دقيق لحسابات فري فاير النادرة</div>
-                    </div>
+                <!-- Slider Pagination Dots Indicator -->
+                <div class="waseet-slider-dots" id="hero-slider-dots">
+                    <button class="waseet-slider-dot active" aria-label="الشريحة 1" onclick="window.waseetHeroSlider && window.waseetHeroSlider.goToSlide(0)"></button>
+                    <button class="waseet-slider-dot" aria-label="الشريحة 2" onclick="window.waseetHeroSlider && window.waseetHeroSlider.goToSlide(1)"></button>
+                    <button class="waseet-slider-dot" aria-label="الشريحة 3" onclick="window.waseetHeroSlider && window.waseetHeroSlider.goToSlide(2)"></button>
+                    <button class="waseet-slider-dot" aria-label="الشريحة 4" onclick="window.waseetHeroSlider && window.waseetHeroSlider.goToSlide(3)"></button>
                 </div>
             </div>
         </section>
@@ -629,7 +708,7 @@
     </div>
 
     <!-- ================= Modal: Image Fullscreen Zoom Lightbox (Requirement 3) ================= -->
-    <div class="modal-overlay" id="modal-image-lightbox" style="z-index: 9999;" onclick="this.classList.remove('active')">
+    <div class="modal-overlay lightbox-modal" id="modal-image-lightbox" style="z-index: 10050;" onclick="this.classList.remove('active')">
         <div class="lightbox-box" onclick="event.stopPropagation()">
             <button class="btn-close-modal lightbox-close" onclick="document.getElementById('modal-image-lightbox').classList.remove('active')">&times;</button>
             <img id="lightbox-enlarged-img" src="" alt="Enlarged Account Image" class="lightbox-img" onerror="this.onerror=null; this.src='assets/logo.png';">
@@ -1191,6 +1270,8 @@
     <script src="js/auth.js" defer></script>
     <script src="js/notifications.js?v=20261026_w2" defer></script>
     <script src="js/navbar.js" defer></script>
+    <script src="js/slider.js" defer></script>
+    <script src="js/instant-nav.js" defer></script>
     <script src="js/app.js?v=20261017_v1" defer></script>
     <script src="js/support.js?v=20261017" defer></script>
     <script src="js/pwa-register.js" defer></script>
