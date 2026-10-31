@@ -7634,6 +7634,53 @@ img.drawer-logo[src*="logo.png"] {
     }
 }
 
+/* ==========================================================================
+   إخفاء شعار وشارة Netlify الإعلانية نهائياً (Netlify Badge Strict Removal)
+   ========================================================================== */
+#netlify-badge,
+.netlify-badge,
+#netlify-banner,
+.netlify-banner,
+#netlify-drawer,
+.netlify-drawer,
+netlify-drawer,
+[data-netlify-badge],
+[data-netlify-drawer],
+[data-netlify-deploy-id],
+[id*="netlify"],
+[class*="netlify"],
+[aria-label*="Netlify" i],
+[aria-label*="netlify" i],
+[title*="Netlify" i],
+[title*="netlify" i],
+a[href*="netlify.com"],
+a[href*="netlify.app"],
+a[href*="netlify"],
+iframe[src*="netlify"],
+iframe[id*="netlify"],
+iframe[class*="netlify"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    height: 0 !important;
+    width: 0 !important;
+    max-height: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    z-index: -99999 !important;
+    transform: scale(0) !important;
+}
+
+
 
 
 

@@ -85,9 +85,54 @@
         document.addEventListener('DOMContentLoaded', () => {
             initLinkPrefetching();
             prefetchCorePages();
+            purgeNetlifyBadge();
         });
     } else {
         initLinkPrefetching();
         prefetchCorePages();
+        purgeNetlifyBadge();
+    }
+
+    /**
+     * Purge injected Netlify badges and floating advertisements from DOM
+     */
+    function purgeNetlifyBadge() {
+        const cleanup = () => {
+            try {
+                const selectors = [
+                    '#netlify-badge',
+                    '.netlify-badge',
+                    '#netlify-banner',
+                    '.netlify-banner',
+                    '#netlify-drawer',
+                    '.netlify-drawer',
+                    'netlify-drawer',
+                    '[data-netlify-badge]',
+                    '[data-netlify-drawer]',
+                    '[data-netlify-deploy-id]',
+                    'a[href*="netlify.com"]',
+                    'a[href*="netlify.app"]',
+                    'a[href*="netlify"]',
+                    'iframe[src*="netlify"]'
+                ];
+                selectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => el.remove());
+                });
+
+                // Deep scan for floating text badge
+                document.querySelectorAll('a, div, span, button').forEach(el => {
+                    if (el.textContent && el.textContent.includes('Powered by Netlify')) {
+                        const target = el.closest('a') || el.closest('div') || el;
+                        target.remove();
+                    }
+                });
+            } catch (e) {}
+        };
+
+        cleanup();
+        window.addEventListener('load', cleanup);
+        setTimeout(cleanup, 400);
+        setTimeout(cleanup, 1200);
+        setTimeout(cleanup, 2500);
     }
 })();
