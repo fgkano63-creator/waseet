@@ -256,16 +256,62 @@ function isMediatorUser(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STA
     if (!user) return false;
     if (!user.id || user.id === 'local_seller') return false;
     
-    // التحقق المعتمد من بريد المدير والوسيط
+    // التحقق المعتمد من بريد المدير العام والوسيط
     const email = user.email ? String(user.email).toLowerCase().trim() : '';
     const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
     if (email && adminEmails.includes(email)) return true;
 
-    // التحقق من صلاحية الدور
-    if (user.role === 'mediator' || user.role === 'admin') return true;
+    // التحقق من صلاحية الدور (مدير، وسيط عام، أو وسيط إقليمي)
+    if (user.role === 'mediator' || user.role === 'admin' || user.role === 'regional_broker') return true;
     if (user.isAdmin === true) return true;
 
     return false;
+}
+
+function isSuperAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
+    if (!user) return false;
+    const email = user.email ? String(user.email).toLowerCase().trim() : '';
+    const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+    if (email && adminEmails.includes(email)) return true;
+    return user.role === 'admin' || user.isAdmin === true;
+}
+
+function isRegionalBroker(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
+    if (!user) return false;
+    return user.role === 'regional_broker';
+}
+
+const WASEET_SUPPORTED_COUNTRIES = {
+    'DZ': { code: 'DZ', name: 'الجزائر', flag: '🇩🇿', currency: 'DZD' },
+    'EG': { code: 'EG', name: 'مصر', flag: '🇪🇬', currency: 'EGP' },
+    'SA': { code: 'SA', name: 'السعودية', flag: '🇸🇦', currency: 'SAR' },
+    'MA': { code: 'MA', name: 'المغرب', flag: '🇲🇦', currency: 'MAD' },
+    'IQ': { code: 'IQ', name: 'العراق', flag: '🇮🇶', currency: 'IQD' },
+    'AE': { code: 'AE', name: 'الإمارات', flag: '🇦🇪', currency: 'AED' },
+    'TN': { code: 'TN', name: 'تونس', flag: '🇹🇳', currency: 'TND' },
+    'LY': { code: 'LY', name: 'ليبيا', flag: '🇱🇾', currency: 'LYD' },
+    'JO': { code: 'JO', name: 'الأردن', flag: '🇯🇴', currency: 'JOD' },
+    'OM': { code: 'OM', name: 'عمان', flag: '🇴🇲', currency: 'OMR' },
+    'KW': { code: 'KW', name: 'الكويت', flag: '🇰🇼', currency: 'KWD' },
+    'QA': { code: 'QA', name: 'قطر', flag: '🇶🇦', currency: 'QAR' },
+    'BH': { code: 'BH', name: 'البحرين', flag: '🇧🇭', currency: 'BHD' },
+    'YE': { code: 'YE', name: 'اليمن', flag: '🇾🇪', currency: 'YER' },
+    'SD': { code: 'SD', name: 'السودان', flag: '🇸🇩', currency: 'SDG' },
+    'PS': { code: 'PS', name: 'فلسطين', flag: '🇵🇸', currency: 'ILS' }
+};
+
+function getWaseetCountryInfo(code) {
+    if (!code) return WASEET_SUPPORTED_COUNTRIES['DZ'];
+    const upper = String(code).toUpperCase().trim();
+    return WASEET_SUPPORTED_COUNTRIES[upper] || { code: upper, name: upper, flag: '🌍', currency: 'USD' };
+}
+
+if (typeof window !== 'undefined') {
+    window.isMediatorUser = isMediatorUser;
+    window.isSuperAdmin = isSuperAdmin;
+    window.isRegionalBroker = isRegionalBroker;
+    window.WASEET_SUPPORTED_COUNTRIES = WASEET_SUPPORTED_COUNTRIES;
+    window.getWaseetCountryInfo = getWaseetCountryInfo;
 }
 
 // Local storage persistent helper (Permanent login & deals persistence)

@@ -1609,6 +1609,19 @@ async function waseetLockEscrowPointsInDb(dealObj) {
             return { ok: false, data: null, error };
         }
 
+        if (data && data.assigned_broker_id) {
+            dealObj.assigned_broker_id = data.assigned_broker_id;
+            dealObj.assignedBrokerId = data.assigned_broker_id;
+            if (data.broker_info && data.broker_info.found) {
+                dealObj.assignedBroker = data.broker_info;
+                dealObj.mediator = {
+                    id: data.broker_info.id,
+                    name: `${data.broker_info.name || 'الوسيط الإقليمي'} (${data.broker_info.country || 'معتمد'})`,
+                    country: data.broker_info.country
+                };
+            }
+        }
+
         // تأكيد تحويل حالة الحساب إلى in_deal لإخفائه تماماً من السوق العام
         if (accountUuid) {
             try {
@@ -1697,12 +1710,52 @@ async function waseetReleaseEscrowPointsInDb(dealId, accountIdHint = null, dealO
                 } catch (sErr) { console.warn('[Escrow Release Fallback] خطأ إيداع البائع:', sErr); }
             }
 
-            // 3. إيداع عمولة المنصة لحساب الوسيط / الإدارة
+            // 3. التوزيع المالي الذكي للعمولة (Commission Splitting)
             if (fee > 0) {
                 try {
+                    let brokerId = (dealObjHint && (dealObjHint.assigned_broker_id || dealObjHint.assignedBrokerId)) || null;
+                    if (!brokerId && typeof dbDeal !== 'undefined' && dbDeal) brokerId = dbDeal.assigned_broker_id;
+
                     const { data: admins } = await client.from('profiles').select('id, points_balance').in('role', ['admin', 'mediator']).limit(1);
                     const adminRow = (admins && admins.length) ? admins[0] : null;
-                    if (adminRow) {
+
+                    if (brokerId && waseetIsValidUuid(brokerId) && (!adminRow || String(brokerId) !== String(adminRow.id))) {
+                        // تقسيم 66% للوسيط الإقليمي و 34% لأرباح المنصة
+                        const brokerFee = Math.floor(fee * (2 / 3));
+                        const adminFee = fee - brokerFee;
+
+                        // 1. إيداع حصة الوسيط الإقليمي
+                        if (brokerFee > 0) {
+                            const { data: bProf } = await client.from('profiles').select('points_balance').eq('id', brokerId).maybeSingle();
+                            const newBrokBal = ((bProf && Number(bProf.points_balance)) || 0) + brokerFee;
+                            await client.from('profiles').update({ points_balance: newBrokBal, wallet_balance: newBrokBal, updated_at: new Date().toISOString() }).eq('id', brokerId);
+                            await client.from('wallet_transactions').insert({
+                                user_id: brokerId,
+                                deal_id: String(dealId),
+                                amount: brokerFee,
+                                balance_after: newBrokBal,
+                                type: 'broker_commission',
+                                status: 'completed',
+                                description: `عمولة وساطة إقليمية من الصفقة #${dealId} (نسبة 66%)`
+                            });
+                        }
+
+                        // 2. إيداع حصة المدير العام / المنصة
+                        if (adminRow && adminFee > 0) {
+                            const newAdminBal = (Number(adminRow.points_balance) || 0) + adminFee;
+                            await client.from('profiles').update({ points_balance: newAdminBal, wallet_balance: newAdminBal, updated_at: new Date().toISOString() }).eq('id', adminRow.id);
+                            await client.from('wallet_transactions').insert({
+                                user_id: adminRow.id,
+                                deal_id: String(dealId),
+                                amount: adminFee,
+                                balance_after: newAdminBal,
+                                type: 'admin_commission',
+                                status: 'completed',
+                                description: `أرباح المنصة / عمولة الإدارة من الصفقة #${dealId} (نسبة 34%)`
+                            });
+                        }
+                    } else if (adminRow) {
+                        // لا يوجد وسيط إقليمي منفصل، تحصيل كامل العمولة للمنصة
                         const newAdminBal = (Number(adminRow.points_balance) || 0) + fee;
                         await client.from('profiles').update({ points_balance: newAdminBal, wallet_balance: newAdminBal, updated_at: new Date().toISOString() }).eq('id', adminRow.id);
                         await client.from('wallet_transactions').insert({
@@ -1710,12 +1763,12 @@ async function waseetReleaseEscrowPointsInDb(dealId, accountIdHint = null, dealO
                             deal_id: String(dealId),
                             amount: fee,
                             balance_after: newAdminBal,
-                            type: 'fee',
+                            type: 'admin_commission',
                             status: 'completed',
                             description: `عمولة وساطة من صفقة #${dealId}`
                         });
                     }
-                } catch (aErr) { console.warn('[Escrow Release Fallback] خطأ إيداع الإدارة:', aErr); }
+                } catch (aErr) { console.warn('[Escrow Release Fallback] خطأ توزيع العمولة:', aErr); }
             }
 
             // 4. تحديث حالة الصفقة إلى مكتملة
@@ -2189,6 +2242,28 @@ async function waseetCreateEscrowDealOnSupabase(params) {
 
     const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
     const buyerName = currentUser?.name || 'مشتري معتمد';
+    const buyerCountry = currentUser?.country || 'DZ';
+
+    // التوجيه الذكي للوسيط الإقليمي (Smart Routing)
+    let assignedBroker = null;
+    if (client) {
+        try {
+            const { data: brokerRpc } = await client.rpc('get_regional_broker_for_country', {
+                p_country: buyerCountry
+            });
+            if (brokerRpc && brokerRpc.found) {
+                assignedBroker = brokerRpc;
+            }
+        } catch (e) {}
+    }
+    if (!assignedBroker && typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
+        assignedBroker = WASEET_STATE.brokers.find(b => b.country === buyerCountry) || WASEET_STATE.brokers[0] || null;
+    }
+
+    const assignedBrokerId = assignedBroker ? assignedBroker.id : null;
+    const mediatorTitle = assignedBroker
+        ? `${assignedBroker.name || 'الوسيط الإقليمي'} (${assignedBroker.country || buyerCountry})`
+        : 'الوسيط المعتمد';
 
     const newDeal = {
         id: 'deal_' + Date.now(),
@@ -2196,9 +2271,12 @@ async function waseetCreateEscrowDealOnSupabase(params) {
         title: `صفقة رقم ${dealCounter} • ${params.account_title || 'حساب مميز'}`,
         accountId: params.account_id,
         accountTitle: params.account_title || 'حساب مميز',
-        buyer: { id: params.buyer_id || currentUser?.id, name: buyerName, phone: '+212 60 *** ***' },
+        assigned_broker_id: assignedBrokerId,
+        assignedBrokerId: assignedBrokerId,
+        assignedBroker: assignedBroker,
+        buyer: { id: params.buyer_id || currentUser?.id, name: buyerName, phone: '+212 60 *** ***', country: buyerCountry },
         seller: { id: params.seller_id || ('seller_' + params.account_id), name: 'بائع معتمد', phone: '+213 55 *** ***' },
-        mediator: { id: 'admin_waseet', name: 'الوسيط المعتمد' },
+        mediator: { id: assignedBrokerId || 'admin_waseet', name: mediatorTitle, country: assignedBroker?.country || 'DZ' },
         sellerPrice: Number(params.seller_amount || 0),
         fee: Number(params.fee_amount || 0),
         totalPoints: Number(params.total_amount || 0),
@@ -2454,9 +2532,195 @@ async function waseetAdminDeletePaymentMethod(methodId) {
     return { ok: true };
 }
 
+/**
+ * [للمدير] ترقية مستخدم إلى وسيط إقليمي معتمد وتحديد دولته
+ */
+async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
+    const client = initWaseetSupabase();
+    const cleanCountry = String(country || 'DZ').toUpperCase().trim();
+    const cleanTarget = String(targetUser || '').trim();
+
+    if (!cleanTarget) return { ok: false, error: { message: 'يرجى إدخال البريد الإلكتروني أو معرف المستخدم' } };
+
+    if (client) {
+        try {
+            const { data, error } = await client.rpc('promote_to_regional_broker', {
+                p_target_user: cleanTarget,
+                p_country: cleanCountry
+            });
+            if (!error && data) {
+                return { ok: true, data };
+            }
+            console.warn('[Promote Broker RPC Warn]', error);
+        } catch (rpcErr) {
+            console.warn('[Promote Broker RPC Exception]', rpcErr);
+        }
+
+        // Direct database fallback if admin
+        try {
+            const isUuid = waseetIsValidUuid(cleanTarget);
+            const query = isUuid
+                ? client.from('profiles').update({ role: 'regional_broker', country: cleanCountry, updated_at: new Date().toISOString() }).eq('id', cleanTarget)
+                : client.from('profiles').update({ role: 'regional_broker', country: cleanCountry, updated_at: new Date().toISOString() }).ilike('email', cleanTarget);
+            
+            const { data: fbData, error: fbError } = await query.select().maybeSingle();
+            if (!fbError && fbData) {
+                return { ok: true, data: fbData };
+            }
+        } catch (fbErr) {}
+    }
+
+    // Local state fallback for simulation/offline resilience
+    if (typeof WASEET_STATE !== 'undefined') {
+        if (!WASEET_STATE.brokers) WASEET_STATE.brokers = [];
+        const localBroker = {
+            id: waseetIsValidUuid(cleanTarget) ? cleanTarget : ('broker_' + Date.now()),
+            name: cleanTarget.split('@')[0] || 'وسيط إقليمي',
+            email: cleanTarget.includes('@') ? cleanTarget : `${cleanTarget}@waseet.com`,
+            role: 'regional_broker',
+            country: cleanCountry,
+            wallet_balance: 0,
+            points_balance: 0,
+            created_at: new Date().toISOString()
+        };
+        const existingIdx = WASEET_STATE.brokers.findIndex(b => b.email === localBroker.email || b.id === localBroker.id);
+        if (existingIdx >= 0) {
+            WASEET_STATE.brokers[existingIdx] = localBroker;
+        } else {
+            WASEET_STATE.brokers.push(localBroker);
+        }
+        try {
+            localStorage.setItem('WASEET_REGIONAL_BROKERS_CACHE', JSON.stringify(WASEET_STATE.brokers));
+        } catch (e) {}
+        return { ok: true, data: localBroker };
+    }
+
+    return { ok: false, error: { message: 'تعذر ترقية المستخدم' } };
+}
+
+/**
+ * [للمدير] إلغاء ترقية وسيط إقليمي وإعادته لمستخدم عادي
+ */
+async function waseetDemoteBroker(targetId) {
+    const client = initWaseetSupabase();
+    if (!targetId) return { ok: false, error: { message: 'معرف الوسيط غير صالح' } };
+
+    if (client) {
+        try {
+            const { data, error } = await client.rpc('demote_regional_broker', {
+                p_target_id: targetId
+            });
+            if (!error && data) return { ok: true, data };
+        } catch (e) {}
+
+        try {
+            const { data: fbData, error: fbError } = await client
+                .from('profiles')
+                .update({ role: 'user', updated_at: new Date().toISOString() })
+                .eq('id', targetId)
+                .select()
+                .maybeSingle();
+            if (!fbError && fbData) return { ok: true, data: fbData };
+        } catch (e) {}
+    }
+
+    if (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
+        WASEET_STATE.brokers = WASEET_STATE.brokers.filter(b => String(b.id) !== String(targetId));
+        try {
+            localStorage.setItem('WASEET_REGIONAL_BROKERS_CACHE', JSON.stringify(WASEET_STATE.brokers));
+        } catch (e) {}
+        return { ok: true, data: { success: true } };
+    }
+
+    return { ok: true };
+}
+
+/**
+ * جلب قائمة كافة الوسطاء الإقليميين
+ */
+async function waseetFetchRegionalBrokers() {
+    const client = initWaseetSupabase();
+    if (client) {
+        try {
+            const { data, error } = await client
+                .from('profiles')
+                .select('id, name, email, avatar_url, role, country, wallet_balance, points_balance, created_at')
+                .eq('role', 'regional_broker')
+                .order('created_at', { ascending: false });
+
+            if (!error && data && data.length > 0) {
+                if (typeof WASEET_STATE !== 'undefined') {
+                    WASEET_STATE.brokers = data;
+                }
+                try {
+                    localStorage.setItem('WASEET_REGIONAL_BROKERS_CACHE', JSON.stringify(data));
+                } catch (e) {}
+                return { ok: true, data };
+            }
+        } catch (err) {
+            console.warn('[Fetch Brokers Supabase Exception]', err);
+        }
+    }
+
+    // Fallback to local storage or defaults
+    let localBrokers = [];
+    try {
+        localBrokers = JSON.parse(localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE') || '[]');
+    } catch (e) {}
+
+    if (localBrokers.length === 0 && typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
+        localBrokers = WASEET_STATE.brokers;
+    }
+
+    return { ok: true, data: localBrokers };
+}
+
+/**
+ * البحث عن وسيط إقليمي لدولة معينة (Smart Routing)
+ */
+async function waseetGetBrokerForCountry(countryCode) {
+    const client = initWaseetSupabase();
+    const cleanCountry = String(countryCode || 'DZ').toUpperCase().trim();
+
+    if (client) {
+        try {
+            const { data, error } = await client.rpc('get_regional_broker_for_country', {
+                p_country: cleanCountry
+            });
+            if (!error && data && data.found) return data;
+        } catch (e) {}
+
+        try {
+            const { data: dbBrokers } = await client
+                .from('profiles')
+                .select('id, name, email, avatar_url, country, role')
+                .eq('role', 'regional_broker')
+                .ilike('country', cleanCountry)
+                .limit(1);
+            if (dbBrokers && dbBrokers.length > 0) {
+                const b = dbBrokers[0];
+                return { found: true, id: b.id, name: b.name, email: b.email, country: b.country, avatar_url: b.avatar_url };
+            }
+        } catch (e) {}
+    }
+
+    const { data: allBrokers } = await waseetFetchRegionalBrokers();
+    const match = (allBrokers || []).find(b => String(b.country).toUpperCase() === cleanCountry) || (allBrokers && allBrokers[0]) || null;
+    if (match) {
+        return { found: true, id: match.id, name: match.name, email: match.email, country: match.country, avatar_url: match.avatar_url };
+    }
+
+    return null;
+}
+
 window.waseetFetchPaymentMethods = waseetFetchPaymentMethods;
 window.waseetAdminSavePaymentMethod = waseetAdminSavePaymentMethod;
 window.waseetAdminDeletePaymentMethod = waseetAdminDeletePaymentMethod;
+
+window.waseetPromoteUserToBroker = waseetPromoteUserToBroker;
+window.waseetDemoteBroker = waseetDemoteBroker;
+window.waseetFetchRegionalBrokers = waseetFetchRegionalBrokers;
+window.waseetGetBrokerForCountry = waseetGetBrokerForCountry;
 
 /**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً

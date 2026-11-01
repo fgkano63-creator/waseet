@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="مكتب فحص ومراجعة حسابات الألعاب المعروضة للبيع للمدير والوسطاء المعتمدين في منصة وسيط.">
     <title>WASEET | الحسابات قيد الفحص والمراجعة (Verification Desk)</title>
 
@@ -94,6 +94,9 @@
                     <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
                         <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
+                    </a>
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                        <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
@@ -554,6 +557,19 @@
             };
         }
 
+        function escPendingHtml(str) {
+            if (!str) return '';
+            if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+                return DOMPurify.sanitize(String(str));
+            }
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         async function loadPendingAccounts() {
             const container = document.getElementById('pending-accounts-list-container');
             if (!container) return;
@@ -813,9 +829,9 @@
                             <div class="pending-card-header">
                                 <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
                                     <span style="background: rgba(197, 160, 89, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.85rem; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--gold-primary);">
-                                        #${acc.accountNumber || String(acc.id || '').slice(0, 6)}
+                                        #${escPendingHtml(acc.accountNumber || String(acc.id || '').slice(0, 6))}
                                     </span>
-                                    <h3 class="pending-card-title">${acc.title || 'حساب قيد الفحص'}</h3>
+                                    <h3 class="pending-card-title">${escPendingHtml(acc.title || 'حساب قيد الفحص')}</h3>
                                 </div>
                                 <span class="pending-status-pill">
                                     <i class="fas fa-clock"></i> قيد الفحص (أقل من 24 ساعة)
@@ -826,7 +842,7 @@
                             <div class="pending-card-body-grid">
                                 <!-- Thumbnail -->
                                 <div class="pending-card-thumb" onclick="openInspectionModal('${safeId}')" title="انقر لتكبير وفحص صور الحساب">
-                                    <img src="${mainImg}" alt="${acc.title || ''}" onerror="this.onerror=null; this.src='assets/favicon-512.png';">
+                                    <img src="${mainImg}" alt="${escPendingHtml(acc.title || '')}" onerror="this.onerror=null; this.src='assets/favicon-512.png';">
                                     <span class="pending-thumb-badge">
                                         <i class="fas fa-camera"></i> ${imgCount} صور
                                     </span>
@@ -835,9 +851,9 @@
                                 <!-- Meta & Pricing -->
                                 <div class="pending-card-details">
                                     <div class="pending-meta-row">
-                                        <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName || 'بائع موثق'}</strong></span>
+                                        <span><i class="fas fa-user text-gold"></i> البائع: <strong style="color: #fff;">${escPendingHtml(acc.sellerName || 'بائع موثق')}</strong></span>
                                         <span><i class="fas fa-gamepad text-orange"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></span>
-                                        <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${dateStr}</span>
+                                        <span><i class="fas fa-calendar-alt text-silver"></i> نُشر: ${escPendingHtml(dateStr)}</span>
                                     </div>
 
                                     <div class="pending-prices-row">
@@ -948,7 +964,23 @@
             }
 
             const feeCalc = typeof calculateWaseetFee === 'function' ? calculateWaseetFee(acc.sellerPrice) : { sellerPrice: acc.sellerPrice, fee: 0, buyerPrice: acc.sellerPrice };
-            const creds = safeExtractPendingCreds(acc, acc.details || {});
+            let creds = safeExtractPendingCreds(acc, acc.details || {});
+            if (typeof window.waseetGetAccountCredentialsSecure === 'function' && acc.id) {
+                try {
+                    const sec = await window.waseetGetAccountCredentialsSecure(acc.id);
+                    if (sec && (sec.password || sec.email_or_phone)) {
+                        creds = {
+                            email_or_phone: sec.email_or_phone || creds.email_or_phone,
+                            password: sec.password || creds.password,
+                            recovery_email: sec.recovery_email || creds.recovery_email,
+                            recovery_password: sec.recovery_password || creds.recovery_password,
+                            notes: sec.notes || creds.notes
+                        };
+                    }
+                } catch (secErr) {
+                    console.warn('[Inspection Modal] Error fetching secure credentials:', secErr);
+                }
+            }
             acc.credentials = creds;
             const safeId = String(acc.id || '').replace(/'/g, "\\'");
 
@@ -996,14 +1028,14 @@
                         <div><span style="color: var(--silver-muted);">مستوى البرايم:</span> <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong></div>
                         <div><span style="color: var(--silver-muted);">نوع الربط:</span> <strong style="color: #fff;">${acc.bindStatus === 'single' ? 'ربط أحادي آمن' : 'ربط ثنائي'}</strong></div>
                         <div><span style="color: var(--silver-muted);">نوع الحساب:</span> <strong style="color: #fff;">${acc.loginType === 'google' ? 'Google Gmail' : 'Facebook'}</strong></div>
-                        <div><span style="color: var(--silver-muted);">السراويل النادرة:</span> <strong style="color: #fff;">${acc.iconicPants || 'مثال: بنطلون الجاز، بنطلون الملاك'}</strong></div>
-                        <div><span style="color: var(--silver-muted);">السكنات المميزة:</span> <strong style="color: #fff;">${acc.rareSkins || 'مثال: سكن الساكورا، حزمة الهيب هوب'}</strong></div>
+                        <div><span style="color: var(--silver-muted);">السراويل النادرة:</span> <strong style="color: #fff;">${escPendingHtml(acc.iconicPants || 'مثال: بنطلون الجاز، بنطلون الملاك')}</strong></div>
+                        <div><span style="color: var(--silver-muted);">السكنات المميزة:</span> <strong style="color: #fff;">${escPendingHtml(acc.rareSkins || 'مثال: سكن الساكورا، حزمة الهيب هوب')}</strong></div>
                     </div>
 
                     ${acc.accountNotes ? `
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.06);">
                             <span style="color: var(--gold-light); font-weight: 700; display: block; margin-bottom: 0.2rem;">ملاحظات البائع:</span>
-                            <p style="color: var(--silver-light); margin: 0; line-height: 1.5; font-size: 0.88rem;">${acc.accountNotes}</p>
+                            <p style="color: var(--silver-light); margin: 0; line-height: 1.5; font-size: 0.88rem;">${escPendingHtml(acc.accountNotes)}</p>
                         </div>
                     ` : ''}
                 </div>

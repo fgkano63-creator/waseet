@@ -51,9 +51,24 @@ class WaseetEscrowRoom {
         const forcedRole = urlParams.get('role');
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
 
-        if (typeof isMediatorUser === 'function' && isMediatorUser(currentUser)) {
+        const myId = String(currentUser?.id || '');
+        const buyerId = String((this.deal && this.deal.buyer && this.deal.buyer.id) || this.deal?.buyer_id || '');
+        const sellerId = String((this.deal && this.deal.seller && this.deal.seller.id) || this.deal?.seller_id || '');
+        const brokerId = String(this.deal?.assigned_broker_id || this.deal?.assignedBrokerId || (this.deal?.assignedBroker && this.deal?.assignedBroker.id) || '');
+
+        const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(currentUser) : (currentUser && (currentUser.role === 'admin' || currentUser.isAdmin === true));
+        const isAssignedBroker = myId && brokerId && myId === brokerId;
+
+        // 1. صلاحية الإشراف: مسموح للمدير العام أو الوسيط الإقليمي المعين لهذه الصفقة
+        if (isSuper || isAssignedBroker) {
             return 'mediator';
         }
+
+        // 2. إذا كان وسيطاً إقليمياً ولكن غير معين لهذه الصفقة ولم يكن مشترياً أو بائعاً
+        if (currentUser && currentUser.role === 'regional_broker' && !isSuper && myId !== buyerId && myId !== sellerId) {
+            return 'unauthorized';
+        }
+
         if (forcedRole === 'buyer' || forcedRole === 'seller') {
             return forcedRole;
         }
@@ -61,11 +76,7 @@ class WaseetEscrowRoom {
             return 'buyer';
         }
 
-        const myId = String(currentUser.id || '');
-        const buyerId = String((this.deal.buyer && this.deal.buyer.id) || this.deal.buyer_id || '');
-        const sellerId = String((this.deal.seller && this.deal.seller.id) || this.deal.seller_id || '');
-
-        // إذا كان المشتري والبائع لهما نفس المعرف (تجربة شراء حساب خاص)، نعطي الأولوية لدور المشتري لأنه من بدأ طلب الشراء
+        // إذا كان المشتري والبائع لهما نفس المعرف (تجربة شراء حساب خاص)
         if (myId && buyerId && sellerId && buyerId === sellerId && myId === buyerId) {
             return 'buyer';
         }
@@ -81,6 +92,12 @@ class WaseetEscrowRoom {
         if (this.deal.seller && this.deal.seller.name && this.deal.seller.name === currentUser.name) {
             return 'seller';
         }
+
+        // مستخدم مسجل ولكن ليس مشترياً أو بائعاً أو وسيطاً معيناً أو مديراً
+        if (myId && buyerId && sellerId && myId !== buyerId && myId !== sellerId && !isSuper) {
+            return 'unauthorized';
+        }
+
         return 'buyer';
     }
 
@@ -770,12 +787,59 @@ class WaseetEscrowRoom {
             this.renderEmptyState();
             return;
         }
+        if (this.viewerRole === 'unauthorized') {
+            this.renderUnauthorizedState();
+            return;
+        }
         // Banner hidden for all roles (removed by design)
         const banner = document.getElementById('role-notice-banner');
         if (banner) banner.innerHTML = '';
         this.renderTopAmountPill();
         this.renderPipeline();
         this.renderWorkspace();
+    }
+
+    renderUnauthorizedState() {
+        const topPill = document.querySelector('.locked-amount-pill');
+        const metaTitle = document.querySelector('.deal-meta-title');
+        const metaDesc = document.querySelector('.deal-meta-id');
+        const banner = document.getElementById('role-notice-banner');
+        const pipeline = document.getElementById('escrow-pipeline');
+        const container = document.getElementById('escrow-workspace-container');
+
+        if (metaTitle) metaTitle.innerText = 'غرفة وساطة خاصة ومحمية';
+        if (metaDesc) metaDesc.innerText = 'هذه الغرفة مخصصة فقط لأطراف الصفقة الأربعة (المشتري، البائع، الوسيط الإقليمي، والمدير العام)';
+        if (topPill) {
+            topPill.innerHTML = `<span style="color: #ef4444;"><i class="fas fa-lock"></i> الوصول مقيد:</span> <strong style="color: #ef4444;">غير مصرح</strong>`;
+            topPill.style.borderColor = '#ef4444';
+        }
+        if (banner) banner.innerHTML = '';
+        if (pipeline) pipeline.innerHTML = '';
+
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-deals-box" style="padding: 3.5rem 1.5rem; text-align: center; max-width: 650px; margin: 1.5rem auto; border: 1px solid rgba(239, 68, 68, 0.45); background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(13, 17, 26, 0.98) 100%); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 2.2rem; color: #ef4444;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h2 style="color: #fff; font-size: 1.4rem; margin-bottom: 0.6rem; font-weight: 800;">غرفة وساطة خاصة ومحمية (4 أطراف فقط)</h2>
+                    <p style="font-size: 0.95rem; line-height: 1.8; color: var(--silver-muted); margin-bottom: 2rem;">
+                        عذراً، هذه الغرفة مشفرة ومخصصة فقط لأطراف الصفقة الأربعة المعتمدين:
+                        <br><strong style="color: #facc15;">المشتري، البائع، الوسيط الإقليمي المعين، والمدير العام المشرف.</strong>
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="deals.html" class="btn-3d btn-orange" style="text-decoration: none; padding: 0.75rem 1.4rem;">
+                            <i class="fas fa-shield-alt"></i> الانتقال إلى صفقاتي
+                        </a>
+                        <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none; padding: 0.75rem 1.4rem;">
+                            <i class="fas fa-store"></i> العودة للمتجر
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        const inputBar = document.querySelector('.chat-input-bar');
+        if (inputBar) inputBar.style.display = 'none';
     }
 
     renderEmptyState() {
@@ -850,7 +914,10 @@ class WaseetEscrowRoom {
         if (metaDesc) {
             const buyerName = (this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
             const sellerName = (this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
-            metaDesc.innerText = `${this.deal.accountTitle} • المشتري: ${buyerName} • البائع: ${sellerName} • الوسيط: إدارة المنصة`;
+            const brokerName = (this.deal.assignedBroker && this.deal.assignedBroker.name)
+                ? `الوسيط الإقليمي ${this.deal.assignedBroker.name} (${(typeof getWaseetCountryInfo === 'function' ? getWaseetCountryInfo(this.deal.assignedBroker.country).flag : '')} ${this.deal.assignedBroker.country || ''})`
+                : (this.deal.mediator?.name || 'إدارة الوساطة المعتمدة');
+            metaDesc.innerText = `${this.deal.accountTitle} • المشتري: ${buyerName} • البائع: ${sellerName} • ${brokerName}`;
         }
 
         if (!topPill) return;
@@ -1904,11 +1971,21 @@ class WaseetEscrowRoom {
             } catch (e) {}
         }
 
-        // 2. تحديث محافظ الأطراف الثلاثة في الحالة المحلية بدقة تامة
+        // 2. تحديث محافظ الأطراف في الحالة المحلية بدقة تامة (بما يشمل التوزيع المالي للوسيط الإقليمي)
         const currentUser = WASEET_STATE.user;
         const isBuyerCurrent = currentUser && buyerId && String(currentUser.id) === String(buyerId);
         const isSellerCurrent = currentUser && sellerId && String(currentUser.id) === String(sellerId);
-        const isMediatorCurrent = currentUser && (currentUser.role === 'admin' || currentUser.role === 'mediator');
+        const brokerId = this.deal.assigned_broker_id || this.deal.assignedBrokerId || (this.deal.assignedBroker && this.deal.assignedBroker.id);
+        const isBrokerCurrent = currentUser && brokerId && String(currentUser.id) === String(brokerId);
+        const isMediatorCurrent = currentUser && (currentUser.role === 'admin' || currentUser.role === 'mediator' || (typeof isSuperAdmin === 'function' && isSuperAdmin(currentUser)));
+        const isAdminCurrent = isMediatorCurrent;
+
+        let brokerCommission = 0;
+        let adminCommission = platformFee;
+        if (brokerId && platformFee > 0) {
+            brokerCommission = Math.floor(platformFee * (2 / 3));
+            adminCommission = platformFee - brokerCommission;
+        }
 
         if (currentUser && currentUser.wallet) {
             if (isBuyerCurrent) {
@@ -1917,9 +1994,12 @@ class WaseetEscrowRoom {
             } else if (isSellerCurrent) {
                 currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + sellerPayout;
                 currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + sellerPayout;
-            } else if (isMediatorCurrent) {
-                currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + platformFee;
-                currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + platformFee;
+            } else if (isBrokerCurrent) {
+                currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + brokerCommission;
+                currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + brokerCommission;
+            } else if (isAdminCurrent) {
+                currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + adminCommission;
+                currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + adminCommission;
             } else {
                 if (currentUser.wallet.locked >= totalPts) {
                     currentUser.wallet.locked -= totalPts;

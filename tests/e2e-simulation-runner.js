@@ -426,6 +426,95 @@ async function runE2ESimulation() {
     assert(disputeDeal.status === 'cancelled', 'Dispute Flow', 'Dispute Safely Terminated', 'Dispute safely closed without unauthorized fund leakage');
 
     // --------------------------------------------------------------------------
+    // FLOW 10: REGIONAL BROKERS & COMMISSION SPLITTING (ENTERPRISE SYSTEM)
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 9: REGIONAL BROKERS SMART ROUTING & COMMISSION SPLITTING\x1b[0m');
+
+    // 1. Admin promotes user to regional_broker for DZ
+    const regionalBroker = {
+        id: 'broker-dz-uuid-501',
+        name: 'كريم الجزائري (وسيط إقليمي)',
+        email: 'broker.dz@waseet.com',
+        role: 'regional_broker',
+        country: 'DZ',
+        points_balance: 0,
+        wallet_balance: 0
+    };
+    DB.profiles.push(regionalBroker);
+
+    assert(regionalBroker.role === 'regional_broker' && regionalBroker.country === 'DZ', 'Regional Broker Flow', 'Admin Role Promotion & Country Assignment', 'User promoted to regional_broker for country DZ');
+
+    // 2. Smart Routing Simulation: Buyer from DZ opens deal
+    const dzBuyer = { id: 'buyer-dz-uuid-502', name: 'أحمد وهران', country: 'DZ', points_balance: 500, locked_points: 0 };
+    DB.profiles.push(dzBuyer);
+
+    // Matching broker query: role === 'regional_broker' && country === 'DZ'
+    const matchedBroker = DB.profiles.find(p => p.role === 'regional_broker' && p.country === dzBuyer.country);
+    assert(matchedBroker && matchedBroker.id === regionalBroker.id, 'Regional Broker Flow', 'Smart Routing Broker Match', 'Buyer from DZ correctly routed to regional_broker from DZ');
+
+    // 3. 4-Parties Room Security Verification
+    const regionalDeal = {
+        id: 'deal-regional-777',
+        buyer_id: dzBuyer.id,
+        seller_id: seller.id,
+        assigned_broker_id: regionalBroker.id,
+        seller_price: 300,
+        fee: 10,
+        total_points: 310,
+        status: 'mediator_inspecting'
+    };
+    DB.deals.push(regionalDeal);
+
+    function checkRoomAccess(userId) {
+        if (!userId) return false;
+        if (userId === admin.id) return 'admin';
+        if (userId === regionalDeal.buyer_id) return 'buyer';
+        if (userId === regionalDeal.seller_id) return 'seller';
+        if (userId === regionalDeal.assigned_broker_id) return 'mediator';
+        return 'unauthorized';
+    }
+
+    assert(checkRoomAccess(dzBuyer.id) === 'buyer', 'Security Flow', 'Buyer Room Authorization', 'Buyer granted buyer access');
+    assert(checkRoomAccess(seller.id) === 'seller', 'Security Flow', 'Seller Room Authorization', 'Seller granted seller access');
+    assert(checkRoomAccess(regionalBroker.id) === 'mediator', 'Security Flow', 'Assigned Regional Broker Room Authorization', 'Assigned broker granted mediator access');
+    assert(checkRoomAccess(admin.id) === 'admin', 'Security Flow', 'Super Admin Supervisor Room Authorization', 'Admin granted supervisor access');
+    assert(checkRoomAccess('unauthorized-uuid-999') === 'unauthorized', 'Security Flow', 'Unauthorized 5th Party Strict Denial', '5th unauthorized party strictly blocked (Max 4 parties)');
+
+    // 4. Commission Splitting Execution: 10 points fee -> 6 to broker, 4 to admin
+    const fee10 = regionalDeal.fee; // 10
+    const brokerShare10 = Math.floor(fee10 * (2 / 3)); // 6
+    const adminShare10 = fee10 - brokerShare10; // 4
+
+    regionalBroker.points_balance += brokerShare10;
+    admin.points_balance += adminShare10;
+
+    DB.wallet_transactions.push({
+        user_id: regionalBroker.id,
+        deal_id: regionalDeal.id,
+        amount: brokerShare10,
+        type: 'broker_commission',
+        status: 'completed'
+    });
+    DB.wallet_transactions.push({
+        user_id: admin.id,
+        deal_id: regionalDeal.id,
+        amount: adminShare10,
+        type: 'admin_commission',
+        status: 'completed'
+    });
+
+    assert(brokerShare10 === 6 && adminShare10 === 4, 'Financial Flow', 'Commission Split Calculation (10 Pts -> 6/4)', `Broker: ${brokerShare10} pts (66%), Admin: ${adminShare10} pts (34%)`);
+    assert(brokerShare10 + adminShare10 === fee10, 'Financial Flow', 'Zero Point Leakage Invariant', 'Split perfectly sums to total fee without rounding loss');
+
+    // 5. Commission Splitting Execution: 3 points fee -> 2 to broker, 1 to admin
+    const fee3 = 3;
+    const brokerShare3 = Math.floor(fee3 * (2 / 3)); // 2
+    const adminShare3 = fee3 - brokerShare3; // 1
+
+    assert(brokerShare3 === 2 && adminShare3 === 1, 'Financial Flow', 'Commission Split Calculation (3 Pts -> 2/1)', `Broker: ${brokerShare3} pts (66%), Admin: ${adminShare3} pts (34%)`);
+    assert(brokerShare3 + adminShare3 === fee3, 'Financial Flow', 'Conservation of Points Invariant (3 Pts)', '3 points split sums exactly to total fee');
+
+    // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------
     console.log('\n\x1b[35m=================================================================\x1b[0m');

@@ -263,11 +263,24 @@ Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Supabase Migration 16 Deal Compl
 $post10 = $supabaseJs.Contains('waseetReleaseEscrowPointsInDb') -and $supabaseJs.Contains('updatePayload.buyer_id = buyerId')
 Check-Result -Flow 'Post-Deal Lifecycle' -Name 'RPC Fallback Engine with Direct Table Sync' -Success $post10 -Detail 'Direct resilient fallback guarantees balances & ownership transfer if RPC unavailable'
 
+# Regional Brokers & Commission Splitting Checks
+$mig18 = (Test-Path 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql') -and ((Get-Content 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql' -Raw).Contains('assigned_broker_id'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 18 Regional Brokers & Smart Routing' -Success $mig18 -Detail 'Database migration adds assigned_broker_id, regional_broker role, and 4-party RLS'
+
+$mig18Split = (Test-Path 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql') -and ((Get-Content 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql' -Raw).Contains('broker_commission'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Atomic 66/34 Commission Splitting Stored Procedure' -Success $mig18Split -Detail 'release_escrow_deal_points splits 66% broker and 34% admin commissions'
+
+$adminBrokersHtml = (Test-Path 'D:\waseet-app\admin-brokers.html') -and ((Get-Content 'D:\waseet-app\admin-brokers.html' -Raw).Contains('promote-broker-form'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Regional Brokers Admin Control Center (admin-brokers.html)' -Success $adminBrokersHtml -Detail 'Dedicated admin control room for regional broker promotion and commission simulator'
+
+$jsBrokers = $supabaseJs.Contains('waseetPromoteUserToBroker') -and $escrowJs.Contains('brokerCommission')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Full Client JS Regional Broker Parity' -Success $jsBrokers -Detail 'JavaScript runtime parity for broker smart routing, 4-party rooms, and commission calculations'
+
 Write-Host ""
 Write-Host ">>> 10. FLOW 10: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (25/25)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, and dispute journeys in Node runtime'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, and regional broker journeys in Node runtime'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

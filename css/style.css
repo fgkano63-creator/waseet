@@ -4322,6 +4322,7 @@ html, body {
     display: none;
     position: fixed;
     bottom: 20px;
+    bottom: max(20px, calc(10px + env(safe-area-inset-bottom, 0px)));
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -4345,7 +4346,7 @@ html, body {
         display: flex;
     }
     body:not(.chat-page-body) {
-        padding-bottom: 105px;
+        padding-bottom: max(105px, calc(95px + env(safe-area-inset-bottom, 0px)));
     }
 }
 

@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="إدارة حسابات الألعاب المعروضة للبيع للبائعين في منصة وسيط - تعديل الأسعار، متابعة حالة المراجعة، وحذف أو تعديل العروض.">
     <title>WASEET | حساباتي المعروضة للبيع وإدارتها</title>
     
@@ -400,6 +400,19 @@
     <!-- My Accounts Page Script -->
     <script>
         let myAccountsList = [];
+
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+                return DOMPurify.sanitize(String(str));
+            }
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
         function toggleMyAccountsDrawer(force) {
             if (window.waseetApp && typeof window.waseetApp.toggleMobileDrawer === 'function') {
@@ -1026,7 +1039,7 @@
                             return `
                                 <div class="account-card-3d card-3d" id="purchased-card-${acc.id}" style="border: 1px solid rgba(16, 185, 129, 0.45); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
                                     <div class="card-media">
-                                        <img src="${imgUrl}" alt="${acc.title}" class="card-img">
+                                        <img src="${imgUrl}" alt="${esc(acc.title)}" class="card-img">
                                         <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
                                             <span style="background: rgba(16, 185, 129, 0.95); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800;"><i class="fas fa-shield-alt"></i> ضمان وسيط 48h</span>
                                         </div>
@@ -1035,7 +1048,7 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
+                                        <h3 class="card-title" title="${esc(acc.title)}">${esc(acc.title)}</h3>
                                         <div class="card-specs">
                                             <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
                                             <span class="spec-chip" style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> تم الاستلام بنجاح</span>
@@ -1105,7 +1118,7 @@
                         return `
                             <div class="account-card-3d card-3d" id="card-${acc.id}">
                                 <div class="card-media">
-                                    <img src="${imgUrl}" alt="${acc.title}" class="card-img">
+                                    <img src="${imgUrl}" alt="${esc(acc.title)}" class="card-img">
                                     <div style="position: absolute; top: 8px; right: 8px; z-index: 5;">
                                         ${statusTag}
                                     </div>
@@ -1117,7 +1130,7 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <h3 class="card-title" title="${acc.title}">${acc.title}</h3>
+                                    <h3 class="card-title" title="${esc(acc.title)}">${esc(acc.title)}</h3>
                                     <div class="card-specs">
                                         <span class="spec-chip"><i class="fas fa-gamepad text-gold"></i> ${acc.game === 'pubg' ? 'ببجي موبايل' : 'فري فاير'}</span>
                                         <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
@@ -1160,8 +1173,16 @@
             if (typeof window.waseetGetAccountCredentialsSecure === 'function' && acc && acc.id) {
                 try {
                     const secRes = await window.waseetGetAccountCredentialsSecure(acc.id);
-                    if (secRes && secRes.credentials) {
-                        acc.credentials = Object.assign({}, acc.credentials || {}, secRes.credentials);
+                    if (secRes && (secRes.password || secRes.email_or_phone || secRes.credentials)) {
+                        acc.credentials = {
+                            ...(acc.credentials || {}),
+                            ...(secRes.credentials || {}),
+                            email: secRes.email_or_phone || (secRes.credentials && secRes.credentials.email) || acc.credentials?.email,
+                            password: secRes.password || (secRes.credentials && secRes.credentials.password) || acc.credentials?.password,
+                            rawPassword: secRes.password || (secRes.credentials && secRes.credentials.password) || acc.credentials?.rawPassword,
+                            recoveryEmail: secRes.recovery_email || (secRes.credentials && secRes.credentials.recoveryEmail) || acc.credentials?.recoveryEmail,
+                            notes: secRes.notes || (secRes.credentials && secRes.credentials.notes) || acc.credentials?.notes
+                        };
                     }
                 } catch (secErr) {
                     console.warn('[Purchased Creds] Secure credentials fetch warning:', secErr);
@@ -1169,17 +1190,17 @@
             }
 
             const creds = acc.credentials || {};
-            const safeLoginType = creds.loginType || 'جوجل Gmail';
-            const safeEmail = creds.email || 'لم يتم تحديد بريد';
+            const safeLoginType = esc(creds.loginType || 'جوجل Gmail');
+            const safeEmail = esc(creds.email || 'لم يتم تحديد بريد');
             const rawPwd = creds.rawPassword || creds.password || '••••••••';
-            const safeBackup = creds.backupCodes || creds.notes || creds.recoveryEmail || 'لا توجد أكواد إضافية';
+            const safeBackup = esc(creds.backupCodes || creds.notes || creds.recoveryEmail || 'لا توجد أكواد إضافية');
 
             const body = document.getElementById('purchased-creds-modal-body');
             if (body) {
                 body.innerHTML = `
                     <div class="success-card-highlight" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem; text-align: center;">
                         <i class="fas fa-crown text-gold" style="font-size: 2.2rem; margin-bottom: 0.4rem; display: block;"></i>
-                        <h4 style="color: #fff; font-size: 1.15rem; margin: 0 0 0.3rem;">🎉 ${acc.title}</h4>
+                        <h4 style="color: #fff; font-size: 1.15rem; margin: 0 0 0.3rem;">🎉 ${esc(acc.title)}</h4>
                         <p style="color: var(--silver-muted); font-size: 0.84rem; margin: 0; line-height: 1.6;">
                             تم تسليم الحساب إليك بنجاح مع سريان ضمان منصة WASEET الذهبي لمدة 48 ساعة ضد الاسترجاع.
                         </p>

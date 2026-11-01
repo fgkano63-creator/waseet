@@ -762,19 +762,22 @@ class WaseetApp {
             const loginName = acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك';
             const imagesList = acc.images && acc.images.length > 0 ? acc.images : [acc.image];
 
-            const pantsTag = (acc.iconicPants && acc.iconicPants.length > 0 && acc.iconicPants[0] !== 'بنطلون مميز')
-                ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${acc.iconicPants[0]}</span>`
+            const safeTitle = this.escapeHtml(acc.title || 'حساب بدون عنوان');
+            const safeSellerName = this.escapeHtml(acc.sellerName || 'متجر البائع');
+            const safeBadge = this.escapeHtml(acc.badge || '');
+            const safePants = (acc.iconicPants && acc.iconicPants.length > 0 && acc.iconicPants[0] !== 'بنطلون مميز')
+                ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${this.escapeHtml(acc.iconicPants[0])}</span>`
                 : '';
 
             const accNum = acc.accountNumber || (index + 1001);
             let primeBadgeHtml = '';
             if (acc.game === 'free_fire') {
-                primeBadgeHtml = `<div class="prime-badge-3d"><i class="fas fa-crown"></i> برايم ${acc.primeLevel}</div>`;
-            } else if (acc.badge) {
-                primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff; border: 1px solid var(--gold-light);"><i class="fas fa-award"></i> ${acc.badge}</div>`;
+                primeBadgeHtml = `<div class="prime-badge-3d"><i class="fas fa-crown"></i> برايم ${parseInt(acc.primeLevel, 10) || 1}</div>`;
+            } else if (safeBadge) {
+                primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff; border: 1px solid var(--gold-light);"><i class="fas fa-award"></i> ${safeBadge}</div>`;
             }
 
-            const accountNumBadgeHtml = `<div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${accNum}</div>`;
+            const accountNumBadgeHtml = `<div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${this.escapeHtml(String(accNum))}</div>`;
 
             // Status Badge for pending review or rejected
             let statusTagHtml = '';
@@ -784,27 +787,29 @@ class WaseetApp {
                 statusTagHtml = `<div class="rejected-banner" style="position: absolute; top: 8px; right: 8px; z-index: 6; background: rgba(239, 68, 68, 0.95); color: #fff; font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 6px;"><i class="fas fa-ban"></i> مرفوض</div>`;
             }
 
+            const safeId = this.escapeHtml(String(acc.id || ''));
+
             return `
                 <div class="account-card-3d card-3d">
-                    <div class="card-media" onclick="window.waseetApp.openCardDeck('${acc.id}')" style="cursor: pointer;" title="انقر لعرض صور الحساب مع كامل التفاصيل">
-                        <img src="${imagesList[0] || 'assets/favicon-512.png'}" alt="${acc.title}" class="card-img" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain'; this.style.padding='24px'; this.style.background='#0d121c';">
+                    <div class="card-media" onclick="window.waseetApp.openCardDeck('${safeId}')" style="cursor: pointer;" title="انقر لعرض صور الحساب مع كامل التفاصيل">
+                        <img src="${imagesList[0] || 'assets/favicon-512.png'}" alt="${safeTitle}" class="card-img" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain'; this.style.padding='24px'; this.style.background='#0d121c';">
                         ${statusTagHtml}
                         ${primeBadgeHtml}
                         ${accountNumBadgeHtml}
                         <div class="level-tag">
-                            Lv. ${acc.level}
+                            Lv. ${parseInt(acc.level, 10) || 50}
                         </div>
-                        <button class="btn-gallery-badge" onclick="event.stopPropagation(); window.waseetApp.openCardDeck('${acc.id}')">
+                        <button class="btn-gallery-badge" onclick="event.stopPropagation(); window.waseetApp.openCardDeck('${safeId}')">
                             <i class="fas fa-layer-group"></i> ${imagesList.length} صور
                         </button>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title" onclick="window.waseetApp.openCardDeck('${acc.id}')" style="cursor: pointer;">${acc.title}</h3>
+                        <h3 class="card-title" onclick="window.waseetApp.openCardDeck('${safeId}')" style="cursor: pointer;">${safeTitle}</h3>
                         <div class="card-specs">
                             <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
                             <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
-                            ${(acc.seller_id || acc.sellerId) ? `<a href="profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}" class="spec-chip card-seller-chip" onclick="event.stopPropagation()" title="زيارة متجر البائع ومبيعاته">${this.renderSellerMiniAvatarHtml(acc.sellerName, acc.sellerAvatar || acc.seller_avatar)} <span>${acc.sellerName || 'متجر البائع'}</span></a>` : ''}
-                            ${pantsTag}
+                            ${(acc.seller_id || acc.sellerId) ? `<a href="profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}" class="spec-chip card-seller-chip" onclick="event.stopPropagation()" title="زيارة متجر البائع ومبيعاته">${this.renderSellerMiniAvatarHtml(acc.sellerName, acc.sellerAvatar || acc.seller_avatar)} <span>${safeSellerName}</span></a>` : ''}
+                            ${safePants}
                         </div>
                         <div class="card-footer">
                             <div class="price-col">
@@ -815,7 +820,7 @@ class WaseetApp {
                                 <span class="account-verified-static-badge" title="تم فحص هذا الحساب وتدقيقه واعتماده وهو جاهز للنقل">
                                     <i class="fas fa-check-circle"></i> الحساب مفحوص
                                 </span>
-                                <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
+                                <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${safeId}')">
                                     <i class="fas fa-shield-alt"></i> طلب وساطة
                                 </button>
                             </div>
@@ -908,8 +913,9 @@ class WaseetApp {
 
     renderSellerMiniAvatarHtml(sellerName, sellerAvatar) {
         const meta = this.getSellerAvatarMeta(sellerName, sellerAvatar);
+        const safeName = this.escapeHtml(meta.cleanName);
         if (meta.hasValidImage) {
-            return `<span class="card-seller-mini-avatar-wrap"><img src="${meta.rawUrl}" alt="${meta.cleanName}" class="card-seller-mini-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';"><span class="card-seller-mini-initial" style="display:none; background:${meta.bgGradient};">${meta.initial}</span><span class="card-seller-mini-verified"><i class="fas fa-check"></i></span></span>`;
+            return `<span class="card-seller-mini-avatar-wrap"><img src="${meta.rawUrl}" alt="${safeName}" class="card-seller-mini-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';"><span class="card-seller-mini-initial" style="display:none; background:${meta.bgGradient};">${meta.initial}</span><span class="card-seller-mini-verified"><i class="fas fa-check"></i></span></span>`;
         }
         return `<span class="card-seller-mini-avatar-wrap"><span class="card-seller-mini-initial" style="background:${meta.bgGradient};">${meta.initial}</span><span class="card-seller-mini-verified"><i class="fas fa-check"></i></span></span>`;
     }
@@ -964,23 +970,25 @@ class WaseetApp {
 
         const validPants = (acc.iconicPants || []).filter(p => p && p !== 'بنطلون مميز' && p !== 'غير محدد');
         const pantsListHtml = validPants.length
-            ? validPants.map(p => `<span class="pants-chip"><i class="fas fa-tshirt text-gold"></i> ${p}</span>`).join('')
+            ? validPants.map(p => `<span class="pants-chip"><i class="fas fa-tshirt text-gold"></i> ${this.escapeHtml(p)}</span>`).join('')
             : '<span style="color: var(--silver-muted); font-size: 0.84rem; opacity: 0.72;">مثال توضيحي: بنطلون الجاز، بنطلون الملاك</span>';
 
         const validSkins = (acc.rareSkins || []).filter(s => s && s !== 'سكنات نادرة' && s !== 'غير محدد');
         const skinsListHtml = validSkins.length
-            ? validSkins.map(s => `<span class="spec-chip">${s}</span>`).join('')
+            ? validSkins.map(s => `<span class="spec-chip">${this.escapeHtml(s)}</span>`).join('')
             : '<span style="color: var(--silver-muted); font-size: 0.84rem; opacity: 0.72;">مثال توضيحي: سكن الساكورا، حزمة الهيب هوب، كريمنال</span>';
+
+        const safeDeckSellerName = this.escapeHtml(avatarMeta.cleanName);
 
         detailsPanel.innerHTML = `
             <div class="details-specs-grid">
                 <div class="spec-box">
                     <div class="spec-box-label"><i class="fas fa-crown text-gold"></i> مستوى البرايم (Prime)</div>
-                    <div class="spec-box-value text-gold">برايم ${acc.primeLevel} أسطوري</div>
+                    <div class="spec-box-value text-gold">برايم ${parseInt(acc.primeLevel, 10) || 1} أسطوري</div>
                 </div>
                 <div class="spec-box">
                     <div class="spec-box-label"><i class="fas fa-bolt text-orange"></i> ليفل الحساب (Level)</div>
-                    <div class="spec-box-value">Level ${acc.level}</div>
+                    <div class="spec-box-value">Level ${parseInt(acc.level, 10) || 50}</div>
                 </div>
                 <div class="spec-box">
                     <div class="spec-box-label"><i class="fas fa-link text-silver"></i> نوع وحالة الربط</div>
@@ -989,11 +997,11 @@ class WaseetApp {
             </div>
 
             <!-- بطاقة متجر وملف البائع المعتمد (Seller Store & Profile Card with Dynamic Initial Fallback) -->
-            <div class="deck-seller-card" id="deck-seller-card-${acc.id}">
+            <div class="deck-seller-card" id="deck-seller-card-${encodeURIComponent(acc.id)}">
                 <div class="seller-card-main" ${hasStore ? `style="cursor: pointer;" onclick="window.location.href='${storeUrl}'"` : ''}>
                     <div class="seller-avatar-wrapper">
                         ${avatarMeta.hasValidImage ? `
-                            <img src="${avatarMeta.rawUrl}" alt="${avatarMeta.cleanName}" class="seller-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <img src="${avatarMeta.rawUrl}" alt="${safeDeckSellerName}" class="seller-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
                             <div class="seller-avatar-initial" style="display: none; background: ${avatarMeta.bgGradient};">${avatarMeta.initial}</div>
                         ` : `
                             <div class="seller-avatar-initial" style="display: flex; background: ${avatarMeta.bgGradient};">${avatarMeta.initial}</div>
@@ -1002,7 +1010,7 @@ class WaseetApp {
                     </div>
                     <div class="seller-details-meta">
                         <span class="seller-label"><i class="fas fa-store text-gold"></i> متجر وملف البائع المعتمد</span>
-                        <h4 class="seller-name">${avatarMeta.cleanName}</h4>
+                        <h4 class="seller-name">${safeDeckSellerName}</h4>
                         <span class="seller-trust-note">
                             <i class="fas fa-shield-alt text-emerald"></i> عضوية موثقة • صفقات مضمونة بالوساطة 100%
                         </span>
@@ -1902,15 +1910,34 @@ class WaseetApp {
             }
             localStorage.setItem('WASEET_DEAL_COUNTER', String(dealCounter));
 
+            const buyerCountry = WASEET_STATE.user?.country || 'DZ';
+            let assignedBroker = null;
+            if (typeof window.waseetGetBrokerForCountry === 'function') {
+                try {
+                    assignedBroker = await window.waseetGetBrokerForCountry(buyerCountry);
+                } catch (e) {}
+            }
+            if (!assignedBroker && WASEET_STATE.brokers && Array.isArray(WASEET_STATE.brokers)) {
+                assignedBroker = WASEET_STATE.brokers.find(b => String(b.country).toUpperCase() === buyerCountry.toUpperCase()) || WASEET_STATE.brokers[0];
+            }
+
+            const assignedBrokerId = assignedBroker ? assignedBroker.id : null;
+            const mediatorName = assignedBroker
+                ? `${assignedBroker.name || 'الوسيط الإقليمي'} (${assignedBroker.country || buyerCountry})`
+                : 'الوسيط المعتمد';
+
             const newDeal = {
                 id: 'deal_' + Date.now(),
                 dealNumber: dealCounter,
                 title: `صفقة رقم ${dealCounter} • ${acc.title}`,
                 accountId: acc.id,
                 accountTitle: acc.title,
-                buyer: { id: WASEET_STATE.user.id, name: WASEET_STATE.user.name, phone: '+212 60 *** ***' },
+                assigned_broker_id: assignedBrokerId,
+                assignedBrokerId: assignedBrokerId,
+                assignedBroker: assignedBroker,
+                buyer: { id: WASEET_STATE.user.id, name: WASEET_STATE.user.name, phone: '+212 60 *** ***', country: buyerCountry },
                 seller: { id: acc.sellerId || acc.seller_id || ('seller_' + acc.id), name: acc.sellerName, phone: '+213 55 *** ***' },
-                mediator: { id: 'admin_waseet', name: 'الوسيط المعتمد' },
+                mediator: { id: assignedBrokerId || 'admin_waseet', name: mediatorName, country: assignedBroker?.country || buyerCountry },
                 sellerPrice: acc.sellerPrice,
                 fee: pricing.fee,
                 totalPoints: pricing.buyerPrice,
@@ -1953,6 +1980,18 @@ class WaseetApp {
                     dbLocked = true;
                     if (lockRes.data.deal_id) {
                         newDeal.id = String(lockRes.data.deal_id);
+                    }
+                    if (lockRes.data.assigned_broker_id) {
+                        newDeal.assigned_broker_id = lockRes.data.assigned_broker_id;
+                        newDeal.assignedBrokerId = lockRes.data.assigned_broker_id;
+                    }
+                    if (lockRes.data.broker_info && lockRes.data.broker_info.found) {
+                        newDeal.assignedBroker = lockRes.data.broker_info;
+                        newDeal.mediator = {
+                            id: lockRes.data.broker_info.id,
+                            name: `${lockRes.data.broker_info.name || 'الوسيط الإقليمي'} (${lockRes.data.broker_info.country || 'معتمد'})`,
+                            country: lockRes.data.broker_info.country
+                        };
                     }
                 }
             }

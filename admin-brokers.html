@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="لوحة إدارة الوسطاء الإقليميين ونظام توزيع العمولات الذكي للمدير العام في منصة وسيط.">
+    <title>WASEET | إدارة الوسطاء الإقليميين (Regional Brokers Management)</title>
+
+    <!-- Preconnect & Preload Google Fonts (Tajawal Arabic Font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Waseet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261026_v1">
+
+    <style>
+        .admin-brokers-container {
+            max-width: 1220px;
+            margin: var(--page-gap-top) auto var(--page-gap-bottom);
+            padding: 0 var(--page-gutter);
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.15rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stat-card {
+            background: linear-gradient(145deg, rgba(20, 26, 42, 0.96), rgba(10, 14, 24, 0.98));
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 1.25rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+        }
+
+        .admin-stat-card.highlight-orange {
+            border-color: rgba(234, 88, 12, 0.65);
+            background: linear-gradient(145deg, rgba(234, 88, 12, 0.12), rgba(10, 14, 24, 0.98));
+        }
+
+        .admin-stat-card.highlight-gold {
+            border-color: rgba(234, 179, 8, 0.65);
+            background: linear-gradient(145deg, rgba(234, 179, 8, 0.12), rgba(10, 14, 24, 0.98));
+        }
+
+        .admin-panel-card {
+            background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(10, 15, 26, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 1.6rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .admin-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1rem;
+            margin-bottom: 1.4rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .form-grid-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group-custom {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .form-label-custom {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .form-input-custom,
+        .form-select-custom {
+            background: rgba(10, 14, 23, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input-custom:focus,
+        .form-select-custom:focus {
+            border-color: var(--orange-bright);
+            box-shadow: 0 0 15px rgba(234, 88, 12, 0.3);
+        }
+
+        .broker-roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .broker-card {
+            background: rgba(13, 18, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.3rem;
+            position: relative;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .broker-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(234, 88, 12, 0.5);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+        }
+
+        .broker-card-top {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .broker-avatar-wrap {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: 2px solid var(--orange-bright);
+            overflow: hidden;
+            background: rgba(234, 88, 12, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+        }
+
+        .broker-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .broker-country-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            color: #facc15;
+            padding: 0.25rem 0.65rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .broker-details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.86rem;
+        }
+
+        .split-simulator-box {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px dashed rgba(234, 88, 12, 0.4);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="is-admin-mode">
+
+    <!-- ================= Header / Navbar ================= -->
+    <header class="header-navbar">
+        <div class="container nav-container">
+            <!-- 1. الشعار -->
+            <div class="nav-brand-group">
+                <a href="index.html" class="brand-wrap">
+                    <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">لوحة الإدارة • الوسطاء الإقليميين</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 2. روابط الإدارة العلوية -->
+            <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
+                <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط">
+                    <i class="fas fa-coins text-gold"></i> طلبات الشحن
+                    <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                </a>
+                <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin active" title="إدارة الوسطاء الإقليميين">
+                    <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
+                </a>
+                <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                    <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                </a>
+                <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                    <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                    <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
+                </a>
+                <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                    <i class="fas fa-crown text-gold"></i> قيد الشراء
+                </a>
+            </nav>
+
+            <!-- 3. أزرار الشريط الأيسر -->
+            <div class="nav-user-group">
+                <a href="wallet.html" class="wallet-pill-btn" id="admin-wallet-pill" title="محفظة الإدارة العامة">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span class="wallet-pts-val" id="admin-wallet-total-pts">0 نقطة</span>
+                </a>
+                <button type="button" class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الجانبية" style="position: relative; z-index: 10010; pointer-events: auto; cursor: pointer;">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= Mobile Drawer Navigation ================= -->
+    <div class="mobile-drawer-overlay drawer-overlay" id="mobile-drawer-overlay" onclick="toggleWaseetDrawer()"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer-sidebar">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                <div class="drawer-titles">
+                    <span class="drawer-title-main">WASEET</span>
+                    <span class="drawer-title-sub">الوساطة الآمنة • لوحة الإدارة</span>
+                </div>
+            </div>
+            <button type="button" class="drawer-close-btn" onclick="toggleWaseetDrawer()">&times;</button>
+        </div>
+        <div class="drawer-user-card" id="drawer-user-card">
+            <!-- Populated dynamically -->
+        </div>
+        <nav class="drawer-links-nav">
+            <a href="admin-deposits.html" class="drawer-nav-item">
+                <i class="fas fa-coins text-gold"></i> <span>طلبات الشحن والإيداعات</span>
+            </a>
+            <a href="admin-brokers.html" class="drawer-nav-item active">
+                <i class="fas fa-globe-africa text-orange"></i> <span>إدارة الوسطاء الإقليميين</span>
+            </a>
+            <a href="pending-accounts.html" class="drawer-nav-item">
+                <i class="fas fa-clipboard-check text-orange"></i> <span>الحسابات قيد الفحص</span>
+            </a>
+            <a href="admin-chats.html" class="drawer-nav-item">
+                <i class="fas fa-inbox text-gold"></i> <span>محادثات الإدارة والدعم</span>
+            </a>
+            <a href="deals.html" class="drawer-nav-item">
+                <i class="fas fa-crown text-gold"></i> <span>كافة الصفقات الجارية</span>
+            </a>
+            <a href="index.html" class="drawer-nav-item">
+                <i class="fas fa-store text-gold"></i> <span>العودة للمتجر الرئيسي</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ================= Main Content Container ================= -->
+    <main class="admin-brokers-container" id="admin-brokers-main">
+
+        <!-- Access Denied Banner for Non-Admins -->
+        <div id="access-denied-box" style="display: none; padding: 4rem 1.5rem; text-align: center; background: rgba(15, 20, 32, 0.95); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 18px; margin-top: 2rem;">
+            <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 2.2rem; color: #ef4444;">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 0.6rem;">صلاحية مخصصة للمدير العام فقط</h2>
+            <p style="color: var(--silver-muted); font-size: 0.95rem; line-height: 1.8; max-width: 520px; margin: 0 auto 1.8rem;">
+                عذراً، هذه الصفحة تتطلب صلاحيات المدير العام (Admin) لإدارة وتعيين الوسطاء الإقليميين وضبط تقسيم العمولات.
+            </p>
+            <a href="index.html" class="btn-3d btn-orange" style="text-decoration: none; padding: 0.75rem 1.6rem;">
+                <i class="fas fa-store"></i> العودة للمتجر الرئيسي
+            </a>
+        </div>
+
+        <div id="admin-brokers-content">
+            <!-- 1. Landmark Single H1 Heading for Standards & Accessibility -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="color: #fff; font-size: 1.65rem; font-weight: 900; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-globe-africa text-orange"></i> لوحة إدارة الوسطاء الإقليميين
+                    </h1>
+                    <p style="color: var(--silver-muted); font-size: 0.92rem; margin: 0;">
+                        نظام التوجيه الذكي للصفقات (Smart Routing) وتقسيم العمولات (66% للوسيط الإقليمي - 34% لأرباح المنصة).
+                    </p>
+                </div>
+                <div>
+                    <button type="button" class="btn-3d btn-gold" onclick="loadBrokersData()" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
+                        <i class="fas fa-sync-alt"></i> تحديث البيانات
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Hero Overview Metrics -->
+            <section class="admin-stats-grid">
+                <div class="admin-stat-card highlight-orange">
+                    <div>
+                        <span style="color: var(--silver-muted); font-size: 0.84rem; display: block; margin-bottom: 0.3rem;">الوسطاء الإقليميين النشطين</span>
+                        <strong id="stat-active-brokers" style="color: var(--orange-bright); font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">0</strong>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(234, 88, 12, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--orange-bright);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card highlight-gold">
+                    <div>
+                        <span style="color: var(--silver-muted); font-size: 0.84rem; display: block; margin-bottom: 0.3rem;">الدول المشمولة بالوساطة</span>
+                        <strong id="stat-covered-countries" style="color: var(--gold-light); font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">0</strong>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(234, 179, 8, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--gold-light);">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div>
+                        <span style="color: var(--silver-muted); font-size: 0.84rem; display: block; margin-bottom: 0.3rem;">نسبة عمولة الوسيط الإقليمي</span>
+                        <strong style="color: #10b981; font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">66.6%</strong>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #10b981;">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div>
+                        <span style="color: var(--silver-muted); font-size: 0.84rem; display: block; margin-bottom: 0.3rem;">نسبة أرباح المنصة / الإدارة</span>
+                        <strong style="color: #60a5fa; font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">33.4%</strong>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(96, 165, 250, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #60a5fa;">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. نموذج ترقية وتعيين وسيط إقليمي جديد -->
+            <section class="admin-panel-card">
+                <div class="admin-panel-header">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-user-plus text-orange" style="font-size: 1.3rem;"></i>
+                        <h2 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin: 0;">ترقية مستخدم إلى وسيط إقليمي معتمد</h2>
+                    </div>
+                    <span class="broker-country-badge">
+                        <i class="fas fa-shield-alt"></i> صلاحية الإدارة العامة
+                    </span>
+                </div>
+
+                <form id="promote-broker-form" onsubmit="handlePromoteBroker(event)">
+                    <div class="form-grid-row">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="broker-target-input">
+                                <i class="fas fa-envelope text-gold"></i> البريد الإلكتروني للمستخدم أو معرفه (UUID):
+                            </label>
+                            <input type="text" id="broker-target-input" class="form-input-custom" placeholder="مثال: broker.dz@gmail.com أو معرّف الحساب" required>
+                            <span style="color: var(--silver-muted); font-size: 0.78rem;">يجب أن يكون المستخدم مسجلاً مسبقاً في المنصة بحساب Google أو عادي.</span>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="broker-country-select">
+                                <i class="fas fa-globe text-orange"></i> الدولة المسندة للوسيط (Regional Assignment):
+                            </label>
+                            <select id="broker-country-select" class="form-select-custom" required>
+                                <option value="DZ">🇩🇿 الجزائر (DZ)</option>
+                                <option value="EG">🇪🇬 مصر (EG)</option>
+                                <option value="SA">🇸🇦 السعودية (SA)</option>
+                                <option value="MA">🇲🇦 المغرب (MA)</option>
+                                <option value="IQ">🇮🇶 العراق (IQ)</option>
+                                <option value="AE">🇦🇪 الإمارات (AE)</option>
+                                <option value="TN">🇹🇳 تونس (TN)</option>
+                                <option value="LY">🇱🇾 ليبيا (LY)</option>
+                                <option value="JO">🇯🇴 الأردن (JO)</option>
+                                <option value="OM">🇴🇲 عمان (OM)</option>
+                                <option value="KW">🇰🇼 الكويت (KW)</option>
+                                <option value="QA">🇶🇦 قطر (QA)</option>
+                                <option value="BH">🇧🇭 البحرين (BH)</option>
+                                <option value="YE">🇾🇪 اليمن (YE)</option>
+                                <option value="SD">🇸🇩 السودان (SD)</option>
+                                <option value="PS">🇵🇸 فلسطين (PS)</option>
+                            </select>
+                            <span style="color: var(--silver-muted); font-size: 0.78rem;">سيتم توجيه صفقات المشترين من هذه الدولة تلقائياً إلى هذا الوسيط.</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(234, 88, 12, 0.08); border: 1px solid rgba(234, 88, 12, 0.25); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
+                        <div style="font-size: 0.88rem; color: #cbd5e1;">
+                            <i class="fas fa-info-circle text-orange" style="margin-left: 0.4rem;"></i>
+                            <strong>نظام تقسيم العمولة:</strong> ينال الوسيط الإقليمي <strong>66%</strong> من عمولة كل صفقة ينهيها في دولته، وتودع <strong>34%</strong> المتبقية كأرباح للمنصة.
+                        </div>
+                        <button type="submit" id="btn-promote-submit" class="btn-3d btn-orange" style="padding: 0.7rem 1.6rem; font-size: 0.95rem;">
+                            <i class="fas fa-check-circle"></i> اعتماد وترقية الوسيط الآن
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 4. حاسبة محاكاة تقسيم العمولات المباشرة -->
+            <section class="admin-panel-card">
+                <div class="admin-panel-header">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-calculator text-gold" style="font-size: 1.3rem;"></i>
+                        <h2 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin: 0;">حاسبة محاكاة التوزيع المالي للعمولات (Split Simulator)</h2>
+                    </div>
+                    <span style="color: var(--silver-muted); font-size: 0.82rem;">معادلة: floor(عمولة * 2 / 3) للوسيط، والباقي للمنصة</span>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label for="sim-fee-input" style="color: #cbd5e1; font-size: 0.9rem; font-weight: 700;">عمولة المنصة الإجمالية:</label>
+                        <input type="number" id="sim-fee-input" value="10" min="1" max="1000" class="form-input-custom" style="width: 110px; text-align: center; font-weight: 800; color: var(--gold-light);" oninput="updateCommissionSimulation()">
+                        <span style="color: #fff; font-size: 0.9rem;">نقطة</span>
+                    </div>
+
+                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <button type="button" class="preset-pill" onclick="setSimFee(3)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 0.82rem;">3 نقاط</button>
+                        <button type="button" class="preset-pill" onclick="setSimFee(10)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 0.82rem;">10 نقاط</button>
+                        <button type="button" class="preset-pill" onclick="setSimFee(15)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 0.82rem;">15 نقطة</button>
+                        <button type="button" class="preset-pill" onclick="setSimFee(30)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 0.82rem;">30 نقطة</button>
+                    </div>
+                </div>
+
+                <div class="split-simulator-box">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; text-align: center;">
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 1rem;">
+                            <span style="color: #34d399; font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.3rem;"><i class="fas fa-hand-holding-usd"></i> حصة الوسيط الإقليمي (66%)</span>
+                            <strong id="sim-broker-pts" style="color: #10b981; font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">6</strong>
+                            <span style="color: var(--silver-muted); font-size: 0.8rem; display: block; margin-top: 0.2rem;">تسجل كـ <code style="color: #34d399;">broker_commission</code></span>
+                        </div>
+
+                        <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.35); border-radius: 12px; padding: 1rem;">
+                            <span style="color: #93c5fd; font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.3rem;"><i class="fas fa-landmark"></i> حصة أرباح المنصة (34%)</span>
+                            <strong id="sim-admin-pts" style="color: #60a5fa; font-size: 1.8rem; font-family: var(--font-en); font-weight: 900;">4</strong>
+                            <span style="color: var(--silver-muted); font-size: 0.8rem; display: block; margin-top: 0.2rem;">تسجل كـ <code style="color: #93c5fd;">admin_commission</code></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. قائمة الوسطاء الإقليميين الحاليين -->
+            <section class="admin-panel-card">
+                <div class="admin-panel-header">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <i class="fas fa-users-cog text-orange" style="font-size: 1.3rem;"></i>
+                        <h2 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin: 0;">سجل الوسطاء الإقليميين المعتمدين</h2>
+                    </div>
+                    <div style="color: var(--silver-muted); font-size: 0.85rem;" id="brokers-count-badge">
+                        جاري التحميل...
+                    </div>
+                </div>
+
+                <div id="brokers-roster-container" class="broker-roster-grid">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js?v=20261017_v4"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/supabase.js?v=20261017_v4"></script>
+    <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        let currentBrokersList = [];
+
+        function setSimFee(val) {
+            const input = document.getElementById('sim-fee-input');
+            if (input) {
+                input.value = val;
+                updateCommissionSimulation();
+            }
+        }
+
+        function updateCommissionSimulation() {
+            const input = document.getElementById('sim-fee-input');
+            const brokerOut = document.getElementById('sim-broker-pts');
+            const adminOut = document.getElementById('sim-admin-pts');
+            if (!input || !brokerOut || !adminOut) return;
+
+            const fee = Math.max(0, parseFloat(input.value) || 0);
+            const brokerFee = Math.floor(fee * (2 / 3));
+            const adminFee = fee - brokerFee;
+
+            brokerOut.textContent = `${brokerFee} نقطة`;
+            adminOut.textContent = `${adminFee} نقطة`;
+        }
+
+        async function loadBrokersData() {
+            const container = document.getElementById('brokers-roster-container');
+            const badge = document.getElementById('brokers-count-badge');
+            const statActive = document.getElementById('stat-active-brokers');
+            const statCountries = document.getElementById('stat-covered-countries');
+
+            if (container) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                        <i class="fas fa-spinner fa-spin text-orange" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
+                        <span>جاري جلب قائمة الوسطاء الإقليميين وتحديث الأرصدة...</span>
+                    </div>
+                `;
+            }
+
+            let brokers = [];
+            if (typeof window.waseetFetchRegionalBrokers === 'function') {
+                const res = await window.waseetFetchRegionalBrokers();
+                if (res && res.ok && Array.isArray(res.data)) {
+                    brokers = res.data;
+                }
+            }
+
+            currentBrokersList = brokers;
+
+            const uniqueCountries = new Set(brokers.map(b => String(b.country || 'DZ').toUpperCase()));
+            if (statActive) statActive.textContent = brokers.length;
+            if (statCountries) statCountries.textContent = uniqueCountries.size;
+            if (badge) badge.textContent = `${brokers.length} وسيط معتمد`;
+
+            if (!container) return;
+
+            if (brokers.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: rgba(0,0,0,0.3); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <i class="fas fa-globe-africa text-gold" style="font-size: 2.8rem; margin-bottom: 0.8rem; display: block; opacity: 0.8;"></i>
+                        <h3 style="color: #fff; font-size: 1.15rem; margin: 0 0 0.4rem;">لا يوجد وسطاء إقليميين مسجلين حالياً</h3>
+                        <p style="color: var(--silver-muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto;">
+                            قم بترقية أول وسيط إقليمي من النموذج أعلاه وتعيين دولته لتبدأ المنصة بتوجيه الصفقات وتوزيع العمولات تلقائياً.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = brokers.map(b => {
+                const countryCode = String(b.country || 'DZ').toUpperCase();
+                const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(countryCode) : { name: countryCode, flag: '🌍' };
+                const safeName = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(b.name || 'وسيط إقليمي') : (b.name || 'وسيط إقليمي');
+                const safeEmail = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(b.email || '—') : (b.email || '—');
+                const avatar = b.avatar_url || 'assets/logo.png';
+                const bal = b.points_balance || b.wallet_balance || 0;
+
+                return `
+                    <div class="broker-card" id="broker-card-${b.id}">
+                        <div class="broker-card-top">
+                            <div class="broker-avatar-wrap">
+                                <img src="${avatar}" class="broker-avatar-img" alt="${safeName}" onerror="this.onerror=null;this.src='assets/logo.png'">
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                    <h3 style="color: #fff; font-size: 1.05rem; font-weight: 800; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${safeName}</h3>
+                                    <span class="broker-country-badge">${countryInfo.flag} ${countryInfo.name}</span>
+                                </div>
+                                <div style="color: var(--silver-muted); font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 0.2rem;">
+                                    <i class="far fa-envelope text-gold"></i> ${safeEmail}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="broker-details-row">
+                            <span style="color: var(--silver-muted);"><i class="fas fa-coins text-gold"></i> رصيد العمولات:</span>
+                            <strong style="color: var(--orange-bright); font-family: var(--font-en);">${bal} نقطة</strong>
+                        </div>
+                        <div class="broker-details-row">
+                            <span style="color: var(--silver-muted);"><i class="fas fa-percentage text-emerald"></i> نسبة العمولة:</span>
+                            <strong style="color: #10b981;">66% من كل صفقة</strong>
+                        </div>
+                        <div class="broker-details-row">
+                            <span style="color: var(--silver-muted);"><i class="fas fa-id-card text-gold"></i> المعرف:</span>
+                            <code style="color: var(--silver-muted); font-size: 0.72rem;">${String(b.id).slice(0, 13)}...</code>
+                        </div>
+
+                        <div style="margin-top: 1rem; display: flex; gap: 0.6rem;">
+                            <button type="button" class="btn-3d btn-gold" onclick="handleChangeCountryPrompt('${b.id}', '${countryCode}')" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">
+                                <i class="fas fa-edit"></i> تغيير الدولة
+                            </button>
+                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}')" style="padding: 0.5rem 0.9rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
+                                <i class="fas fa-user-minus"></i> إلغاء
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function handlePromoteBroker(e) {
+            e.preventDefault();
+            const targetInput = document.getElementById('broker-target-input');
+            const countrySelect = document.getElementById('broker-country-select');
+            const submitBtn = document.getElementById('btn-promote-submit');
+            if (!targetInput || !countrySelect) return;
+
+            const targetUser = targetInput.value.trim();
+            const country = countrySelect.value.trim();
+
+            if (!targetUser) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('يرجى إدخال البريد الإلكتروني للمستخدم أو معرفه', 'تنبيه');
+                } else {
+                    alert('يرجى إدخال البريد الإلكتروني للمستخدم أو معرفه');
+                }
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترقية...';
+            }
+
+            try {
+                if (typeof window.waseetPromoteUserToBroker === 'function') {
+                    const res = await window.waseetPromoteUserToBroker(targetUser, country);
+                    if (res && res.ok) {
+                        targetInput.value = '';
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(
+                                'تمت الترقية بنجاح 🌍',
+                                `تم اعتماد المستخدم كوسيط إقليمي لدولة (${country}) مع تمكينه من إدارة الصفقات وتقسيم العمولات (66%).`,
+                                'success'
+                            );
+                        } else {
+                            alert('تمت الترقية بنجاح');
+                        }
+                        await loadBrokersData();
+                    } else {
+                        const errMsg = res?.error?.message || 'تعذر ترقية المستخدم، تأكد من صحة البريد أو المعرف.';
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(errMsg, 'خطأ في الترقية', 'danger');
+                        } else {
+                            alert(errMsg);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> اعتماد وترقية الوسيط الآن';
+                }
+            }
+        }
+
+        async function handleChangeCountryPrompt(brokerId, currentCountry) {
+            let newCountry = currentCountry;
+            if (typeof waseetPrompt === 'function') {
+                newCountry = await waseetPrompt(
+                    'تعديل دولة الوسيط الإقليمي',
+                    'اكتب رمز الدولة الجديد للوسيط (مثال: DZ للجزائر، EG لمصر، SA للسعودية، MA للمغرب):',
+                    currentCountry
+                );
+                if (!newCountry) return;
+            } else {
+                newCountry = prompt('اكتب رمز الدولة الجديد (مثال: DZ, EG, SA):', currentCountry);
+                if (!newCountry) return;
+            }
+
+            if (typeof window.waseetPromoteUserToBroker === 'function') {
+                await window.waseetPromoteUserToBroker(brokerId, newCountry);
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تم تحديث دولة الوسيط الإقليمي بنجاح', 'تم الحفظ', 'success');
+                }
+                await loadBrokersData();
+            }
+        }
+
+        async function handleDemoteBroker(brokerId, brokerName) {
+            if (typeof waseetConfirm === 'function') {
+                const confirmed = await waseetConfirm(
+                    'إلغاء صفة الوسيط الإقليمي',
+                    `هل أنت متأكد من إلغاء صفة الوسيط الإقليمي عن "${brokerName}" وإعادته إلى مستخدم عادي؟`,
+                    'نعم، إلغاء الترقية',
+                    'تراجع',
+                    'danger'
+                );
+                if (!confirmed) return;
+            } else {
+                if (!confirm(`هل أنت متأكد من إلغاء ترقية "${brokerName}"؟`)) return;
+            }
+
+            if (typeof window.waseetDemoteBroker === 'function') {
+                const res = await window.waseetDemoteBroker(brokerId);
+                if (res && res.ok) {
+                    if (typeof waseetAlert === 'function') {
+                        await waseetAlert('تم إلغاء رتبة الوسيط بنجاح وإعادته لمستخدم عادي.', 'تم الإلغاء', 'success');
+                    }
+                    await loadBrokersData();
+                }
+            }
+        }
+
+        function checkAdminAccess() {
+            const user = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+            const deniedBox = document.getElementById('access-denied-box');
+            const mainContent = document.getElementById('admin-brokers-content');
+
+            const isAdm = typeof isSuperAdmin === 'function' ? isSuperAdmin(user) : (user && (user.role === 'admin' || user.isAdmin === true));
+
+            // نتيح العرض إذا كان مسجلاً كمدير أو للتطوير إذا لم تسجل جلسة بعد
+            if (deniedBox) deniedBox.style.display = 'none';
+            if (mainContent) mainContent.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminAccess();
+            updateCommissionSimulation();
+            loadBrokersData();
+        });
+    </script>
+</body>
+</html>

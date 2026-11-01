@@ -162,7 +162,9 @@
         var card = byId('drawer-user-card');
         if (card) {
             if (user) {
-                var role = admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق';
+                var role = (user.role === 'regional_broker')
+                    ? '🌍 وسيط إقليمي (' + (user.country || 'معتمد') + ')'
+                    : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
                 card.innerHTML =
                     '<img src="' + esc(userAvatar(user)) + '" class="drawer-avatar" alt="' + esc(user.name) + '" referrerpolicy="no-referrer" ' +
                     'onerror="this.onerror=null;this.src=\'' + DEFAULT_AVATAR + '\'">' +
