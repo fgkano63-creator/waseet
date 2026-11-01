@@ -1,15 +1,16 @@
 /**
  * WASEET (وسيط) - Modern Luxury Hero Auto-Slider
- * Automatically rotates every 2000ms (2 seconds)
+ * Automatically rotates every 3000ms (3 seconds) using GPU-accelerated opacity layers
  */
 class WaseetHeroSlider {
     constructor() {
         this.track = document.getElementById('hero-slider-track');
         this.wrap = document.getElementById('waseet-hero-slider');
         this.dotsContainer = document.getElementById('hero-slider-dots');
+        this.slides = [];
         this.currentSlide = 0;
         this.totalSlides = 4;
-        this.intervalMs = 2000; // exactly 2 seconds
+        this.intervalMs = 3000; // 3 seconds (3000ms)
         this.timer = null;
         this.startX = 0;
         this.currentX = 0;
@@ -20,7 +21,9 @@ class WaseetHeroSlider {
 
     init() {
         if (!this.track || !this.wrap) return;
-        this.totalSlides = this.track.children.length || 4;
+        this.slides = Array.from(this.track.querySelectorAll('.waseet-slide'));
+        this.totalSlides = this.slides.length || this.track.children.length || 4;
+        this.updateView();
         this.startAutoPlay();
 
         // Pause on mouse hover / touch hold
@@ -99,10 +102,20 @@ class WaseetHeroSlider {
 
     updateView() {
         if (!this.track) return;
-        // In Arabic RTL, moving to subsequent slides translates by +100% or -100% depending on direction
         const isRtl = document.documentElement.dir === 'rtl';
-        const offset = (isRtl ? 1 : -1) * this.currentSlide * 100;
-        this.track.style.transform = `translateX(${offset}%)`;
+        const rtlDir = isRtl ? 1 : -1;
+        this.track.setAttribute('data-active-slide', String(this.currentSlide));
+        this.track.setAttribute('data-rtl-dir', String(rtlDir));
+
+        // GPU-accelerated opacity layer transition (0 -> 1) without repainting background-image
+        if (!this.slides || !this.slides.length) {
+            this.slides = Array.from(this.track.querySelectorAll('.waseet-slide'));
+        }
+        this.slides.forEach((slide, idx) => {
+            const isActive = idx === this.currentSlide;
+            slide.classList.toggle('active', isActive);
+            slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
 
         // Update dots indicator
         if (this.dotsContainer) {

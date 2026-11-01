@@ -715,14 +715,17 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         || (profileObj && profileObj.email ? profileObj.email.split('@')[0] : 'بائع موثق');
 
     const sellerEmail = (profileObj && profileObj.email) || details.sellerEmail || null;
-    const fallbackSellerAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
-    const sellerAvatar = (profileObj && (profileObj.avatar_url || profileObj.avatar))
+    const fallbackSellerAvatar = '';
+    const rawSellerAvatar = (profileObj && (profileObj.avatar_url || profileObj.avatar))
         || details.sellerAvatar
         || details.seller_avatar
         || acc.seller_avatar
         || acc.sellerAvatar
         || (acc.seller && (acc.seller.avatar_url || acc.seller.avatar))
         || fallbackSellerAvatar;
+    const sellerAvatar = (rawSellerAvatar && !String(rawSellerAvatar).includes('photo-1535713875002-d1d0cf377fde'))
+        ? rawSellerAvatar
+        : '';
     const parsedCreds = waseetSafeParseCredentials(acc, details);
 
     const parsedImagesField = Array.isArray(acc.images)

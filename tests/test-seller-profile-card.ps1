@@ -33,10 +33,12 @@ function Assert-Contains($haystack, $needle, $label) {
 Assert-Regex $css '\.deck-seller-card\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between' "CSS -> .deck-seller-card: Flexbox layout with space-between"
 Assert-Regex $css '\.seller-card-main\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center' "CSS -> .seller-card-main: Flexbox alignment"
 
-# 2. CSS Avatar Styling Tests (64x64, circular, border)
-Assert-Regex $css '\.seller-avatar-img\s*\{[^}]*width:\s*64px[^}]*height:\s*64px[^}]*border-radius:\s*50%' "CSS -> .seller-avatar-img: 64x64px circular avatar"
+# 2. CSS Avatar Styling Tests (54x54 circular, initial fallback, border, floating bottom nav)
+Assert-Regex $css '\.seller-avatar-img\s*\{[^}]*width:\s*54px[^}]*height:\s*54px[^}]*border-radius:\s*50%' "CSS -> .seller-avatar-img: 54x54px circular avatar"
+Assert-Regex $css '\.seller-avatar-initial\s*\{[^}]*border-radius:\s*50%' "CSS -> .seller-avatar-initial: circular colored initial fallback"
 Assert-Regex $css '\.seller-avatar-img\s*\{[^}]*border:\s*2px\s+solid' "CSS -> .seller-avatar-img: border styling"
 Assert-Regex $css '\.seller-verified-badge\s*\{[^}]*border-radius:\s*50%' "CSS -> .seller-verified-badge: verified badge styling"
+Assert-Regex $css '\.mobile-bottom-nav\s*\{[^}]*bottom:\s*20px;[^}]*transform:\s*translateX\(-50%\);[^}]*width:\s*90%;[^}]*max-width:\s*400px;[^}]*border-radius:\s*25px;[^}]*box-shadow:\s*0\s+10px\s+30px\s+rgba\(0,\s*0,\s*0,\s*0\.5\);' "CSS -> .mobile-bottom-nav: floating bottom pill navigation"
 
 # 3. CSS Visit Store Button & Responsive Styling
 Assert-Regex $css '\.btn-visit-store\s*\{[^}]*display:\s*inline-flex[^}]*align-items:\s*center' "CSS -> .btn-visit-store: button styling"

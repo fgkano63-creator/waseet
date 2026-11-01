@@ -801,7 +801,7 @@ class WaseetApp {
                         <div class="card-specs">
                             <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
                             <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
-                            ${(acc.seller_id || acc.sellerId) ? `<a href="profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}" class="spec-chip" onclick="event.stopPropagation()" style="text-decoration:none; color: var(--gold-light);" title="زيارة متجر البائع ومبيعاته"><i class="fas fa-store text-gold"></i> ${acc.sellerName || 'متجر البائع'}</a>` : ''}
+                            ${(acc.seller_id || acc.sellerId) ? `<a href="profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}" class="spec-chip card-seller-chip" onclick="event.stopPropagation()" title="زيارة متجر البائع ومبيعاته">${this.renderSellerMiniAvatarHtml(acc.sellerName, acc.sellerAvatar || acc.seller_avatar)} <span>${acc.sellerName || 'متجر البائع'}</span></a>` : ''}
                             ${pantsTag}
                         </div>
                         <div class="card-footer">
@@ -870,6 +870,42 @@ class WaseetApp {
     }
 
     /* ==========================================================================
+       SELLER AVATAR HELPER (Dynamic Initial Letter inside Colored Circle + Verified Badge)
+       ========================================================================== */
+
+    getSellerAvatarMeta(sellerName, sellerAvatar) {
+        const cleanName = String(sellerName || 'بائع موثق').trim();
+        const initial = (cleanName.charAt(0) || 'ب').toUpperCase();
+        const palettes = [
+            'linear-gradient(135deg, #c5a059 0%, #ea580c 100%)',
+            'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
+            'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+            'linear-gradient(135deg, #db2777 0%, #e11d48 100%)',
+            'linear-gradient(135deg, #2563eb 0%, #0284c7 100%)'
+        ];
+        let hash = 0;
+        for (let i = 0; i < cleanName.length; i++) {
+            hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const bgGradient = palettes[Math.abs(hash) % palettes.length];
+        const rawUrl = String(sellerAvatar || '').trim();
+        const hasValidImage = Boolean(
+            rawUrl &&
+            !rawUrl.includes('photo-1535713875002-d1d0cf377fde') &&
+            (rawUrl.startsWith('http') || rawUrl.startsWith('data:image/') || rawUrl.startsWith('assets/'))
+        );
+        return { cleanName, initial, bgGradient, rawUrl, hasValidImage };
+    }
+
+    renderSellerMiniAvatarHtml(sellerName, sellerAvatar) {
+        const meta = this.getSellerAvatarMeta(sellerName, sellerAvatar);
+        if (meta.hasValidImage) {
+            return `<span class="card-seller-mini-avatar-wrap"><img src="${meta.rawUrl}" alt="${meta.cleanName}" class="card-seller-mini-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';"><span class="card-seller-mini-initial" style="display:none; background:${meta.bgGradient};">${meta.initial}</span><span class="card-seller-mini-verified"><i class="fas fa-check"></i></span></span>`;
+        }
+        return `<span class="card-seller-mini-avatar-wrap"><span class="card-seller-mini-initial" style="background:${meta.bgGradient};">${meta.initial}</span><span class="card-seller-mini-verified"><i class="fas fa-check"></i></span></span>`;
+    }
+
+    /* ==========================================================================
        FEATURE 3: INTERACTIVE IMAGE GALLERY WITH RIGHT/LEFT ARROWS & ZOOM (Requirement 3)
        ========================================================================== */
 
@@ -908,8 +944,9 @@ class WaseetApp {
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
         const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
 
-        const fallbackSellerAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+        const fallbackSellerAvatar = '';
         const sellerAvatar = acc.sellerAvatar || acc.seller_avatar || (acc.seller && (acc.seller.avatar || acc.seller.avatar_url)) || fallbackSellerAvatar;
+        const avatarMeta = this.getSellerAvatarMeta(acc.sellerName, sellerAvatar);
         const sellerId = acc.seller_id || acc.sellerId;
         const storeUrl = sellerId ? `profile.html?id=${encodeURIComponent(sellerId)}` : '#';
         const hasStore = Boolean(sellerId);
@@ -940,16 +977,21 @@ class WaseetApp {
                 </div>
             </div>
 
-            <!-- بطاقة متجر وملف البائع المعتمد (Seller Store & Profile Card) -->
+            <!-- بطاقة متجر وملف البائع المعتمد (Seller Store & Profile Card with Dynamic Initial Fallback) -->
             <div class="deck-seller-card" id="deck-seller-card-${acc.id}">
                 <div class="seller-card-main" ${hasStore ? `style="cursor: pointer;" onclick="window.location.href='${storeUrl}'"` : ''}>
                     <div class="seller-avatar-wrapper">
-                        <img src="${sellerAvatar}" alt="${acc.sellerName || 'بائع موثق'}" class="seller-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='${fallbackSellerAvatar}';">
+                        ${avatarMeta.hasValidImage ? `
+                            <img src="${avatarMeta.rawUrl}" alt="${avatarMeta.cleanName}" class="seller-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <div class="seller-avatar-initial" style="display: none; background: ${avatarMeta.bgGradient};">${avatarMeta.initial}</div>
+                        ` : `
+                            <div class="seller-avatar-initial" style="display: flex; background: ${avatarMeta.bgGradient};">${avatarMeta.initial}</div>
+                        `}
                         <span class="seller-verified-badge" title="بائع معتمد بالوساطة"><i class="fas fa-check"></i></span>
                     </div>
                     <div class="seller-details-meta">
                         <span class="seller-label"><i class="fas fa-store text-gold"></i> متجر وملف البائع المعتمد</span>
-                        <h4 class="seller-name">${acc.sellerName || 'بائع موثق'}</h4>
+                        <h4 class="seller-name">${avatarMeta.cleanName}</h4>
                         <span class="seller-trust-note">
                             <i class="fas fa-shield-alt text-emerald"></i> عضوية موثقة • صفقات مضمونة بالوساطة 100%
                         </span>

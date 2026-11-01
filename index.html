@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="منصة وسيط (WASEET) - منصة الوساطة الآمنة الأولى لحسابات الألعاب الإلكترونية. بيع وشراء موثوق مع حجز النقاط وضمان ذهبي حقيقي 48 ساعة.">
     <meta name="google-site-verification" content="eAmgd9eToPrk97vEPfAN94_30PHI6FiVyp9g3cdkRLw" />
     <title>وسيط | WASEET - منصة الوساطة الآمنة لحسابات الألعاب</title>
     
@@ -22,8 +23,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </noscript>
 
-    <!-- Preload Critical Logo for Fast LCP -->
+    <!-- Preload Critical Logo & First Slider Banner Image for Fast LCP -->
     <link rel="preload" as="image" href="assets/logo.png?v=20261027_orig" fetchpriority="high">
+    <link rel="preload" as="image" href="assets/slider/slide-1.svg" fetchpriority="high">
     
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
@@ -237,20 +239,22 @@
             </div>
         </header>
 
-        <!-- ================= Luxury Hero Auto-Slider (Auto 2000ms Carousel) ================= -->
+        <!-- ================= Luxury Hero Auto-Slider (GPU-Accelerated 3000ms Opacity Carousel) ================= -->
         <section class="waseet-hero-slider-section">
             <div class="container">
                 <div class="waseet-hero-slider-wrap" id="waseet-hero-slider">
                     <div class="waseet-slider-track" id="hero-slider-track">
-                        <!-- Slide 1: Escrow & Security -->
-                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(234, 88, 12, 0.22), transparent 70%), linear-gradient(135deg, #181b28 0%, #0d0f17 100%);">
+                        <!-- Slide 1: Escrow & Security (Preloaded in <head> for fast LCP) -->
+                        <div class="waseet-slide active" data-slide-index="0">
+                            <img src="assets/slider/slide-1.svg" alt="وساطة الألعاب المشفرة" class="waseet-slide-bg" fetchpriority="high" decoding="async">
+                            <div class="waseet-slide-overlay"></div>
                             <div class="waseet-slide-content">
                                 <span class="waseet-slide-badge">
                                     <i class="fas fa-shield-check text-gold"></i> وساطة مشفرة 100%
                                 </span>
-                                <h2 class="waseet-slide-title">
+                                <h1 class="waseet-slide-title">
                                     منصة الوساطة الأولى <span class="highlight-gold">لحسابات الألعاب</span>
-                                </h2>
+                                </h1>
                                 <p class="waseet-slide-desc">
                                     بيع وشراء حسابات فري فاير وببجي بأمان مطلق وإشراف مباشر من وسيط معتمد.
                                 </p>
@@ -267,8 +271,10 @@
                             </div>
                         </div>
 
-                        <!-- Slide 2: Rare Accounts & Prime 1-8 -->
-                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(197, 160, 89, 0.25), transparent 70%), linear-gradient(135deg, #1f1b2c 0%, #0d0e18 100%);">
+                        <!-- Slide 2: Rare Accounts & Prime 1-8 (Lazy-loaded to save bandwidth & RAM) -->
+                        <div class="waseet-slide" data-slide-index="1">
+                            <img src="assets/slider/slide-2.svg" alt="سوق الحسابات النادرة" class="waseet-slide-bg" loading="lazy" decoding="async">
+                            <div class="waseet-slide-overlay"></div>
                             <div class="waseet-slide-content">
                                 <span class="waseet-slide-badge">
                                     <i class="fas fa-crown text-gold"></i> سوق الحسابات النادرة
@@ -292,8 +298,10 @@
                             </div>
                         </div>
 
-                        <!-- Slide 3: Safe Wallet & Instant Delivery -->
-                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(34, 197, 94, 0.18), transparent 70%), linear-gradient(135deg, #152220 0%, #0c1214 100%);">
+                        <!-- Slide 3: Safe Wallet & Instant Delivery (Lazy-loaded) -->
+                        <div class="waseet-slide" data-slide-index="2">
+                            <img src="assets/slider/slide-3.svg" alt="المحفظة ونقاط وسيط" class="waseet-slide-bg" loading="lazy" decoding="async">
+                            <div class="waseet-slide-overlay"></div>
                             <div class="waseet-slide-content">
                                 <span class="waseet-slide-badge">
                                     <i class="fas fa-wallet text-gold"></i> المحفظة ونقاط وسيط
@@ -317,8 +325,10 @@
                             </div>
                         </div>
 
-                        <!-- Slide 4: Instant Tri-Party Escrow Chat -->
-                        <div class="waseet-slide" style="background: radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.2), transparent 70%), linear-gradient(135deg, #161e32 0%, #0d111d 100%);">
+                        <!-- Slide 4: Instant Tri-Party Escrow Chat (Lazy-loaded) -->
+                        <div class="waseet-slide" data-slide-index="3">
+                            <img src="assets/slider/slide-4.svg" alt="غرف الوساطة المباشرة" class="waseet-slide-bg" loading="lazy" decoding="async">
+                            <div class="waseet-slide-overlay"></div>
                             <div class="waseet-slide-content">
                                 <span class="waseet-slide-badge">
                                     <i class="fas fa-comments text-gold"></i> غرف الوساطة المباشرة
