@@ -143,10 +143,11 @@ class WaseetApp {
                 ? '<i class="fas fa-crown text-gold" style="font-size: 0.8rem; margin-right: 0.25rem;" title="الوسيط المعتمد (المدير)"></i>'
                 : '';
 
+            const safeName = this.escapeHtml(user.name);
             // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي فقط بدون الاسم بجانبها
             container.innerHTML = `
-                <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${user.name} - انقر لإدارة الحساب أو تسجيل الخروج">
-                    <img src="${avatarUrl}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${safeName} - انقر لإدارة الحساب أو تسجيل الخروج">
+                    <img src="${avatarUrl}" alt="${safeName}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                 </div>
             `;
         } else {
@@ -245,10 +246,11 @@ class WaseetApp {
                         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
                 const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
                 const pts = user.wallet ? user.wallet.available : 0;
+                const safeName = this.escapeHtml(user.name);
                 userCard.innerHTML = `
-                    <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                    <img src="${avatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                     <div class="drawer-user-meta">
-                        <span class="drawer-user-name">${user.name}</span>
+                        <span class="drawer-user-name">${safeName}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
                         <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                     </div>
@@ -867,6 +869,19 @@ class WaseetApp {
                 الصفحة التالية <i class="fas fa-arrow-left"></i>
             </button>
         `;
+    }
+
+    escapeHtml(str) {
+        if (!str) return '';
+        if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+            return DOMPurify.sanitize(String(str));
+        }
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     /* ==========================================================================

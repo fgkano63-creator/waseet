@@ -885,8 +885,8 @@ class WaseetEscrowRoom {
 
         const isCancelled = this.deal.status === 'cancelled';
         const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
-        const buyerName = (this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
-        const sellerName = (this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
+        const buyerName = this.sanitizeText((this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري');
+        const sellerName = this.sanitizeText((this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع');
         const pts = this.deal.totalPoints || 0;
         const sellerPayout = this.deal.sellerPrice || 0;
         const fee = this.deal.fee || 0;
@@ -984,8 +984,8 @@ class WaseetEscrowRoom {
         const container = document.getElementById('escrow-workspace-container');
         if (!container) return;
 
-        const sellerName = (this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع';
-        const buyerName = (this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري';
+        const sellerName = this.sanitizeText((this.deal && this.deal.seller && this.deal.seller.name) ? this.deal.seller.name : 'البائع');
+        const buyerName = this.sanitizeText((this.deal && this.deal.buyer && this.deal.buyer.name) ? this.deal.buyer.name : 'المشتري');
 
         // ==========================================
         // 1. MEDIATOR VIEW (3 SCREENS / 3 COLUMNS)
@@ -1002,7 +1002,7 @@ class WaseetEscrowRoom {
                         <div class="chat-header">
                             <div class="chat-title chat-card-title-seller">
                                 <i class="fas fa-store text-silver"></i>
-                                <span>شات مع البائع (${sellerName})</span>
+                                <span>شات مع البائع (${this.sanitizeText(sellerName)})</span>
                             </div>
                             <span class="badge-role seller-badge">قناة البائع</span>
                         </div>
@@ -1121,7 +1121,7 @@ class WaseetEscrowRoom {
                         <div class="chat-header">
                             <div class="chat-title">
                                 <i class="fas fa-shield-alt text-silver"></i>
-                                <span>محادثة البائع (${sellerName}) مع الوسيط المعتمد</span>
+                                <span>محادثة البائع (${this.sanitizeText(sellerName)}) مع الوسيط المعتمد</span>
                             </div>
                             <span class="badge-role seller-badge"><i class="fas fa-circle" style="font-size:0.5rem;color:#10b981;margin-left:4px;"></i> متصل الآن</span>
                         </div>
