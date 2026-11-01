@@ -1055,6 +1055,75 @@ class WaseetEscrowRoom {
         // ==========================================
         if (this.viewerRole === 'buyer') {
             const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
+            const creds = this.deal.credentials || {
+                loginType: 'جوجل Gmail',
+                email: 'buyer@gmail.com',
+                password: '••••••••••••',
+                rawPassword: '••••••••••••',
+                backupCodes: 'لا يوجد'
+            };
+            const rawPwd = creds.rawPassword || creds.password || '••••••••';
+            const safeEmail = creds.email || 'حساب غير محدد';
+            const safeLoginType = creds.loginType || 'جوجل Gmail';
+            const safeBackup = creds.backupCodes || creds.recoveryEmail || creds.notes || 'لا توجد أكواد إضافية';
+
+            const completedHeroHtml = isCompleted ? `
+                <div class="buyer-completed-hero-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(10, 15, 24, 0.95)); border: 2px solid #10b981; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(16, 185, 129, 0.22);">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(16, 185, 129, 0.35); padding-bottom: 0.75rem;">
+                        <div style="width: 46px; height: 46px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #10b981; flex-shrink: 0;">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0;">🎉 شكراً لتعاملك مع منصة وسيط!</h3>
+                            <p style="color: #34d399; font-size: 0.85rem; margin: 0.2rem 0 0; font-weight: 600;">تم إتمام الصفقة بنجاح والحساب أصبح ملكك رسمياً مع ضمان وسيط الذهبي لمدة 48 ساعة.</p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.9rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.65rem;">
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-link text-gold"></i> نوع الربط:</span>
+                                <strong style="color: #fff; font-size: 0.9rem;">${safeLoginType}</strong>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرّف:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                    <code style="color: #facc15; font-size: 0.88rem; font-weight: 700; word-break: break-all;">${safeEmail}</code>
+                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeEmail}', 'تم نسخ البريد')" title="نسخ البريد"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                    <code id="hero-buyer-pwd" style="color: #34d399; font-size: 0.92rem; font-weight: 800; letter-spacing: 1px;">••••••••••••</code>
+                                    <div style="display: flex; gap: 0.25rem;">
+                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('${rawPwd}', 'hero-buyer-pwd', 'hero-buyer-eye')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-eye"></i></button>
+                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور"><i class="far fa-copy"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                    <span style="color: #fff; font-size: 0.82rem; word-break: break-all;">${safeBackup}</span>
+                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeBackup}', 'تم نسخ الملاحظات')" title="نسخ"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+                        <button type="button" class="btn-3d btn-gold glow-gold" style="flex: 2; min-width: 190px; padding: 0.7rem 1.1rem; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="window.escrowRoom.copyAllCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeBackup}')">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>نسخ كافة بيانات الدخول</span>
+                        </button>
+                        <a href="my-accounts.html?tab=purchases" class="btn-3d btn-outline" style="flex: 1; min-width: 150px; padding: 0.7rem 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 700;">
+                            <i class="fas fa-boxes text-orange"></i>
+                            <span>حساباتي المشتراة</span>
+                        </a>
+                    </div>
+                </div>
+            ` : '';
 
             container.innerHTML = `
                 <div class="escrow-buyer-grid">
@@ -1087,6 +1156,8 @@ class WaseetEscrowRoom {
                                 ${isCompleted ? 'استلام الآن' : 'عرض التفاصيل'} <i class="fas fa-arrow-left"></i>
                             </button>
                         </div>
+
+                        ${completedHeroHtml}
 
                         <div class="chat-messages" id="chat-messages-buyer">
                             ${this.renderMessageList(this.deal.buyerMessages, 'buyer_mediator')}
@@ -1813,10 +1884,16 @@ class WaseetEscrowRoom {
             time: timeStr
         });
 
-        // Release points in Supabase DB via atomic RPC & mark account as sold
+        const totalPts = Number(this.deal.totalPoints || (Number(this.deal.sellerPrice || 0) + Number(this.deal.fee || 0)));
+        const sellerPayout = Number(this.deal.sellerPrice || 0);
+        const platformFee = Number(this.deal.fee || 0);
+        const buyerId = this.deal.buyer?.id || this.deal.buyerId;
+        const sellerId = this.deal.seller?.id || this.deal.sellerId;
+
+        // 1. إجراء المعاملة المالية في Supabase (خصم المحجوز للمشتري، إيداع البائع، إيداع عمولة الوسيط، ونقل الملكية)
         if (typeof window.waseetReleaseEscrowPointsInDb === 'function') {
             try {
-                await window.waseetReleaseEscrowPointsInDb(this.deal.id, this.deal.accountId);
+                await window.waseetReleaseEscrowPointsInDb(this.deal.id, this.deal.accountId, this.deal);
             } catch (e) {
                 console.warn('Could not release escrow points in DB:', e);
             }
@@ -1827,13 +1904,68 @@ class WaseetEscrowRoom {
             } catch (e) {}
         }
 
-        // Deduct from locked points in local state
-        if (WASEET_STATE.user && WASEET_STATE.user.wallet) {
-            if (WASEET_STATE.user.wallet.locked >= this.deal.totalPoints) {
-                WASEET_STATE.user.wallet.locked -= this.deal.totalPoints;
-                WASEET_STATE.user.wallet.total -= this.deal.totalPoints;
+        // 2. تحديث محافظ الأطراف الثلاثة في الحالة المحلية بدقة تامة
+        const currentUser = WASEET_STATE.user;
+        const isBuyerCurrent = currentUser && buyerId && String(currentUser.id) === String(buyerId);
+        const isSellerCurrent = currentUser && sellerId && String(currentUser.id) === String(sellerId);
+        const isMediatorCurrent = currentUser && (currentUser.role === 'admin' || currentUser.role === 'mediator');
+
+        if (currentUser && currentUser.wallet) {
+            if (isBuyerCurrent) {
+                currentUser.wallet.locked = Math.max(0, (Number(currentUser.wallet.locked) || 0) - totalPts);
+                currentUser.wallet.total = Math.max(0, (Number(currentUser.wallet.total) || 0) - totalPts);
+            } else if (isSellerCurrent) {
+                currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + sellerPayout;
+                currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + sellerPayout;
+            } else if (isMediatorCurrent) {
+                currentUser.wallet.available = (Number(currentUser.wallet.available) || 0) + platformFee;
+                currentUser.wallet.total = (Number(currentUser.wallet.total) || 0) + platformFee;
+            } else {
+                if (currentUser.wallet.locked >= totalPts) {
+                    currentUser.wallet.locked -= totalPts;
+                    currentUser.wallet.total -= totalPts;
+                }
             }
         }
+
+        // 3. نقل ملكية الحساب رسمياً إلى معرّف المشتري (Buyer_ID / Owner_ID) وحالته إلى sold
+        if (this.deal.accountId && WASEET_STATE.accounts) {
+            const acc = WASEET_STATE.accounts.find(a => String(a.id) === String(this.deal.accountId));
+            if (acc) {
+                acc.status = 'sold';
+                acc.buyer_id = buyerId;
+                acc.owner_id = buyerId;
+                acc.buyerId = buyerId;
+                acc.ownerId = buyerId;
+            }
+        }
+
+        // 4. حفظ الحساب في قائمة مشتريات المشتري (WASEET_USER_PURCHASES) ليظهر فوراً في "حساباتي المشتراة"
+        try {
+            const purchases = JSON.parse(localStorage.getItem('WASEET_USER_PURCHASES') || '[]');
+            const existingIdx = purchases.findIndex(p => String(p.id) === String(this.deal.accountId));
+            const purchasedRecord = {
+                id: this.deal.accountId,
+                dealId: this.deal.id,
+                accountNumber: this.deal.accountNumber || this.deal.accountId,
+                title: this.deal.accountTitle || this.deal.title || 'حساب وسيط مكتمل',
+                game: this.deal.game || 'free_fire',
+                status: 'sold',
+                buyer_id: buyerId,
+                owner_id: buyerId,
+                buyerPrice: totalPts,
+                sellerPrice: sellerPayout,
+                credentials: this.deal.credentials || {},
+                completedAt: new Date().toISOString(),
+                isPurchased: true
+            };
+            if (existingIdx >= 0) {
+                purchases[existingIdx] = purchasedRecord;
+            } else {
+                purchases.unshift(purchasedRecord);
+            }
+            localStorage.setItem('WASEET_USER_PURCHASES', JSON.stringify(purchases));
+        } catch (e) {}
 
         if (typeof window.waseetRefreshMyWalletBalance === 'function') {
             try {
@@ -1856,6 +1988,10 @@ class WaseetEscrowRoom {
         }
         this.broadcastUpdate();
         this.renderAll();
+
+        if (this.viewerRole === 'buyer' && typeof this.openBuyerDeliveryModal === 'function') {
+            this.openBuyerDeliveryModal();
+        }
         if (typeof waseetAlert === 'function') {
             await waseetAlert(
                 'مبروك! اكتملت الصفقة بنجاح 100%',

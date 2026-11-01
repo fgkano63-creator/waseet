@@ -706,6 +706,31 @@
                     userHtml += `
                         <div style="margin-bottom: 1.2rem;">
                             <h3 style="font-size: 1.2rem; color: #fff; font-weight: 800;">
+                        <div class="escrow-transparency-card" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.12), rgba(13, 17, 26, 0.95)); border: 1px solid rgba(234, 88, 12, 0.45); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; border-bottom: 1px solid rgba(234, 88, 12, 0.25); padding-bottom: 0.75rem; margin-bottom: 0.85rem;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <i class="fas fa-lock text-orange" style="font-size: 1.3rem;"></i>
+                                    <h4 style="color: #fff; margin: 0; font-size: 1.05rem; font-weight: 800;">النقاط المحجوزة في الصفقات (Escrow)</h4>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.4rem; color: var(--gold-light); font-size: 0.82rem; font-weight: 700;">
+                                    <i class="fas fa-shield-alt text-emerald"></i>
+                                    <span>محمية في خزينة الوساطة الآمنة 100%</span>
+                                </div>
+                            </div>
+                            <p style="color: var(--silver-muted); font-size: 0.84rem; line-height: 1.6; margin: 0 0 0.85rem;">
+                                يتم حجز نقاطك تلقائياً لضمان حقك وحق البائع. لن يتسلم البائع أي نقطة إلا بعد قيام الوسيط المعتمد بفحص بيانات الدخول وتأمين الربط وتسليم الحساب لك رسمياً.
+                            </p>
+                            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.82rem;">
+                                    <span style="color: var(--silver-muted);">إجمالي الصفقات الجارية:</span>
+                                    <strong style="color: #fff; margin-right: 0.3rem;">${myDeals.length} صفقات</strong>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.82rem;">
+                                    <span style="color: var(--silver-muted);">إجمالي النقاط المحجوزة:</span>
+                                    <strong style="color: var(--orange-bright); margin-right: 0.3rem; font-family: var(--font-en); font-size: 0.95rem;">${myDeals.reduce((sum, d) => sum + Number(d.totalPoints || d.total_points || (Number(d.sellerPrice || 0) + Number(d.fee || 0))), 0)} نقطة</strong>
+                                </div>
+                            </div>
+                        </div>
                                 <i class="fas fa-tasks text-orange"></i> صفقاتك النشطة (${myDeals.length})
                             </h3>
                         </div>

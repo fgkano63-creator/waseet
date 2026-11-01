@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -124,7 +124,7 @@
                     </div>
 
                     <!-- 3. أيقونة القائمة الجانبية (☰) في أقصى اليسار -->
-                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleMyAccountsDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية" style="position: relative; z-index: 10010; pointer-events: auto; cursor: pointer;">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
@@ -297,8 +297,8 @@
     </div>
 
     <!-- ================= Mobile Drawer Navigation ================= -->
-    <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleMyAccountsDrawer()"></div>
-    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-overlay drawer-overlay" id="mobile-drawer-overlay" onclick="toggleMyAccountsDrawer()"></div>
+    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer-sidebar">
         <div class="drawer-header">
             <div class="drawer-brand">
                 <img src="assets/logo.png?v=20261025_v7" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
@@ -393,6 +393,7 @@
     <script src="js/support.js"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
     <script src="js/navbar.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
 
@@ -400,12 +401,23 @@
     <script>
         let myAccountsList = [];
 
-        function toggleMyAccountsDrawer() {
-            const drawer = document.getElementById('mobile-drawer');
-            const overlay = document.getElementById('drawer-overlay');
-            if (drawer) drawer.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
+        function toggleMyAccountsDrawer(force) {
+            if (window.waseetApp && typeof window.waseetApp.toggleMobileDrawer === 'function') {
+                window.waseetApp.toggleMobileDrawer();
+                return;
+            }
+            if (typeof window.toggleWaseetDrawer === 'function') {
+                window.toggleWaseetDrawer(force);
+                return;
+            }
+            const drawer = document.getElementById('mobile-drawer-sidebar') || document.getElementById('mobile-drawer');
+            const overlay = document.getElementById('mobile-drawer-overlay') || document.getElementById('drawer-overlay');
+            if (!drawer) return;
+            const shouldOpen = (typeof force === 'boolean') ? force : !drawer.classList.contains('active');
+            drawer.classList.toggle('active', shouldOpen);
+            if (overlay) overlay.classList.toggle('active', shouldOpen);
         }
+        window.toggleMyAccountsDrawer = toggleMyAccountsDrawer;
 
         function openWalletQuickAlert() {
             window.location.href = 'wallet.html';
@@ -416,6 +428,15 @@
                 await window.waseetSyncAuthState();
             }
             renderMyAccountsNavbarUser();
+
+            const hamburgerBtn = document.getElementById('mobile-hamburger-btn');
+            if (hamburgerBtn) {
+                hamburgerBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMyAccountsDrawer();
+                };
+            }
 
             // Setup edit modal close listeners
             const editModal = document.getElementById('modal-edit-account');
@@ -746,12 +767,24 @@
 
             if (client && currentUser.id && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(currentUser.id))) {
                 try {
-                    // أ) الحسابات التي حالتها sold أو completed وتعود لهذا المشتري (buyer_id = currentUser.id)
-                    const { data: boughtAccs } = await client
-                        .from('marketplace_accounts')
-                        .select('*')
-                        .eq('buyer_id', currentUser.id)
-                        .order('updated_at', { ascending: false });
+                    // أ) الحسابات التي حالتها sold أو completed وتعود لهذا المشتري (buyer_id أو owner_id = currentUser.id)
+                    let boughtAccs = null;
+                    try {
+                        const { data } = await client
+                            .from('marketplace_accounts')
+                            .select('*')
+                            .or(`buyer_id.eq.${currentUser.id},owner_id.eq.${currentUser.id}`)
+                            .in('status', ['sold', 'completed'])
+                            .order('updated_at', { ascending: false });
+                        boughtAccs = data;
+                    } catch (e1) {
+                        const { data } = await client
+                            .from('marketplace_accounts')
+                            .select('*')
+                            .eq('buyer_id', currentUser.id)
+                            .order('updated_at', { ascending: false });
+                        boughtAccs = data;
+                    }
 
                     if (Array.isArray(boughtAccs)) {
                         boughtAccs.forEach(acc => {
@@ -816,6 +849,59 @@
                 } catch (e) {
                     console.warn('[My Accounts] خطأ جلب المشتريات من Supabase:', e);
                 }
+            }
+
+            // ج1) فحص مشتريات localStorage الموثقة (WASEET_USER_PURCHASES)
+            try {
+                const storedPurchases = JSON.parse(localStorage.getItem('WASEET_USER_PURCHASES') || '[]');
+                storedPurchases.forEach(p => {
+                    const accKey = String(p.id);
+                    if (!purchasesMap.has(accKey)) {
+                        purchasesMap.set(accKey, {
+                            id: p.id,
+                            dealId: p.dealId,
+                            accountNumber: p.accountNumber || p.id,
+                            game: p.game || 'free_fire',
+                            title: p.title || 'حساب وسيط مكتمل',
+                            level: p.level || 50,
+                            bindStatus: p.bindStatus || 'single',
+                            server: p.server || 'mena',
+                            buyerPrice: Number(p.buyerPrice || p.sellerPrice || 0),
+                            images: (Array.isArray(p.images) && p.images.length) ? p.images : ['assets/logo.png'],
+                            image: (Array.isArray(p.images) && p.images[0]) || 'assets/logo.png',
+                            status: p.status || 'sold',
+                            credentials: p.credentials || {},
+                            isPurchased: true
+                        });
+                    }
+                });
+            } catch (e) {}
+
+            // ج2) فحص الحسابات في WASEET_STATE.accounts المملوكة للمشتري بحالة sold
+            if (WASEET_STATE.accounts && currentUser && currentUser.id) {
+                WASEET_STATE.accounts.forEach(acc => {
+                    const isOwnerOrBuyer = String(acc.buyer_id || acc.buyerId || acc.owner_id || acc.ownerId) === String(currentUser.id);
+                    if (isOwnerOrBuyer && (acc.status === 'sold' || acc.status === 'completed')) {
+                        const accKey = String(acc.id);
+                        if (!purchasesMap.has(accKey)) {
+                            purchasesMap.set(accKey, {
+                                id: acc.id,
+                                accountNumber: acc.accountNumber || acc.account_number || acc.id,
+                                game: acc.game || 'free_fire',
+                                title: acc.title || 'حساب وسيط مكتمل',
+                                level: acc.level || 50,
+                                bindStatus: acc.bindStatus || 'single',
+                                server: acc.server || 'mena',
+                                buyerPrice: Number(acc.buyerPrice || acc.sellerPrice || 0),
+                                images: (Array.isArray(acc.images) && acc.images.length) ? acc.images : [acc.image || 'assets/logo.png'],
+                                image: acc.image || 'assets/logo.png',
+                                status: 'sold',
+                                credentials: acc.credentials || {},
+                                isPurchased: true
+                            });
+                        }
+                    }
+                });
             }
 
             // ج) فحص الصفقات المحلية المكتملة في WASEET_STATE
@@ -1042,9 +1128,15 @@
                                             <span class="price-main">${pricing.sellerPrice} نقطة</span>
                                         </div>
                                         <div class="my-account-card-actions">
-                                            <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">
-                                                <i class="fas fa-edit"></i> تعديل الحساب
-                                            </button>
+                                            ${['under_review', 'in_escrow', 'in_deal', 'pending', 'pending_review', 'pending_verification', 'sold', 'completed'].includes(acc.status) ? `
+                                                <button type="button" class="btn-account-edit disabled-btn" disabled style="opacity: 0.48; cursor: not-allowed; background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.12); pointer-events: auto;" onclick="waseetAlert('لا يمكن تعديل بيانات الحساب أثناء فترة الفحص والمراجعة أو سريان صفقة نشطة لحماية الشفافية والوساطة.', 'تنبيه الأمان')" title="لا يمكن تعديل الحساب أثناء الفحص أو سريان صفقة">
+                                                    <i class="fas fa-lock"></i> تعديل (مغلق)
+                                                </button>
+                                            ` : `
+                                                <button type="button" class="btn-account-edit" onclick="openEditAccountModal('${acc.id}')">
+                                                    <i class="fas fa-edit"></i> تعديل الحساب
+                                                </button>
+                                            `}
                                             <button type="button" class="btn-account-delete" onclick="handleDeleteAccount('${acc.id}')">
                                                 <i class="fas fa-trash-alt"></i> حذف الحساب
                                             </button>
@@ -1061,9 +1153,20 @@
         // ==========================================
         // نوافذ بيانات الاستلام للمشتري (Purchased Creds Modal)
         // ==========================================
-        function openPurchasedCredsModal(accId) {
+        async function openPurchasedCredsModal(accId) {
             const acc = myPurchasesList.find(a => String(a.id) === String(accId));
             if (!acc) return;
+
+            if (typeof window.waseetGetAccountCredentialsSecure === 'function' && acc && acc.id) {
+                try {
+                    const secRes = await window.waseetGetAccountCredentialsSecure(acc.id);
+                    if (secRes && secRes.credentials) {
+                        acc.credentials = Object.assign({}, acc.credentials || {}, secRes.credentials);
+                    }
+                } catch (secErr) {
+                    console.warn('[Purchased Creds] Secure credentials fetch warning:', secErr);
+                }
+            }
 
             const creds = acc.credentials || {};
             const safeLoginType = creds.loginType || 'جوجل Gmail';
@@ -1189,6 +1292,15 @@
         function openEditAccountModal(accId) {
             const acc = myAccountsList.find(a => a.id.toString() === accId.toString());
             if (!acc) return;
+
+            if (['under_review', 'in_escrow', 'in_deal', 'pending', 'pending_review', 'pending_verification', 'sold', 'completed'].includes(acc.status)) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('لا يمكن تعديل بيانات الحساب أثناء فترة الفحص والمراجعة أو سريان صفقة نشطة لحماية الشفافية والوساطة.', 'تنبيه الأمان');
+                } else {
+                    alert('لا يمكن تعديل بيانات الحساب أثناء فترة الفحص والمراجعة أو سريان صفقة نشطة.');
+                }
+                return;
+            }
 
             document.getElementById('edit-account-id').value = acc.id;
             document.getElementById('edit-account-title').value = acc.title || '';

@@ -1107,6 +1107,29 @@
                 </div>
             </section>
 
+            <!-- قسم شفافية النقاط المحجوزة في صفقات الوساطة (Escrow Transparency) -->
+            <section class="escrow-locked-details-section" id="escrow-locked-details-section" style="margin-bottom: 2rem;">
+                <div class="wallet-panel-card" style="border: 1px solid rgba(234, 88, 12, 0.45); background: linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(13, 17, 26, 0.95) 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+                    <div class="wallet-panel-title" style="border-bottom: 1px solid rgba(234, 88, 12, 0.3); padding-bottom: 0.8rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <i class="fas fa-shield-alt text-orange" style="font-size: 1.4rem;"></i>
+                            <h3 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0;">النقاط المحجوزة في الصفقات (Escrow)</h3>
+                        </div>
+                        <span class="status-pill pending" style="background: rgba(234, 88, 12, 0.2); color: #f97316; border: 1px solid #f97316; font-size: 0.76rem; font-weight: 800;">
+                            <i class="fas fa-lock"></i> حماية الوساطة الآمنة
+                        </span>
+                    </div>
+
+                    <p style="color: var(--silver-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.2rem;">
+                        عند طلب شراء حساب، يتم حجز نقاط الصفقة مؤقتاً في خزينة الوساطة الآمنة دون تسليمها للبائع لحين قيام الوسيط المعتمد بفحص الحساب وتأمينه ونقله إليك بالكامل مع ضمان 48 ساعة ضد الاسترجاع.
+                    </p>
+
+                    <div id="escrow-locked-deals-container">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+            </section>
+
             <!-- 2. الشبكة الرئيسية: نموذج طلب شحن الرصيد + سجل العمليات -->
             <section class="wallet-main-layout">
 
@@ -1995,6 +2018,67 @@
                 .replace(/"/g, '&quot;');
         }
 
+        function renderEscrowLockedDeals(user) {
+            const container = document.getElementById('escrow-locked-deals-container');
+            if (!container) return;
+
+            const allDeals = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.deals) ? WASEET_STATE.deals : [];
+            const userDeals = allDeals.filter(d => {
+                if (!d || d.status === 'completed' || d.status === 'cancelled') return false;
+                const buyerMatches = (user && user.id && (String(d.buyer_id) === String(user.id) || (d.buyer && String(d.buyer.id) === String(user.id)))) ||
+                                     (user && user.name && d.buyer && d.buyer.name === user.name) ||
+                                     (!user || user.isGuest);
+                return buyerMatches;
+            });
+
+            const lockedPts = user && user.wallet ? Number(user.wallet.locked || 0) : 0;
+
+            if (userDeals.length === 0 && lockedPts <= 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem 1rem; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <i class="fas fa-check-circle" style="color: #10b981; font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                        <h4 style="color: #fff; margin: 0 0 0.3rem; font-size: 1rem;">لا توجد نقاط محجوزة حالياً</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.82rem; margin: 0;">كافة نقاط محفظتك متاحة للاستخدام الفوري في شراء الحسابات أو السحب.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                    ${userDeals.map(d => {
+                        const dealPts = Number(d.totalPoints || d.total_points || (Number(d.sellerPrice || 0) + Number(d.fee || 0)));
+                        const accTitle = d.accountTitle || d.title || 'حساب وسيط معتمد';
+                        const stage = d.stageText || 'المرحلة 2: جاري فحص الحساب وتأمينه من الوسيط';
+                        return `
+                            <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                                        <span class="badge-role buyer-badge" style="background: rgba(234, 88, 12, 0.2); color: var(--orange-bright); font-size: 0.72rem; padding: 2px 7px; border-radius: 6px;">
+                                            <i class="fas fa-hashtag"></i> #${d.id}
+                                        </span>
+                                        <strong style="color: #fff; font-size: 0.95rem;">${escapeSafe(accTitle)}</strong>
+                                    </div>
+                                    <div style="color: var(--silver-muted); font-size: 0.8rem;">
+                                        <i class="fas fa-clock text-gold"></i> ${escapeSafe(stage)}
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                    <div style="text-align: left;">
+                                        <div style="font-size: 0.74rem; color: var(--silver-muted);">النقاط المحجوزة:</div>
+                                        <strong style="color: var(--orange-bright); font-size: 1.15rem; font-family: var(--font-en);">${dealPts} نقطة</strong>
+                                    </div>
+                                    <a href="chat.html?dealId=${encodeURIComponent(d.id)}" class="btn-3d btn-orange" style="padding: 0.45rem 0.9rem; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                        <i class="fas fa-comments"></i> غرفة الوساطة
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         function renderWalletSummaryUI() {
             const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
             const guestBanner = document.getElementById('wallet-guest-banner');
@@ -2012,6 +2096,7 @@
             document.getElementById('ui-available-pts').innerText = available;
             document.getElementById('ui-locked-pts').innerText = locked;
             document.getElementById('ui-total-pts').innerText = total;
+            renderEscrowLockedDeals(user);
 
             const navPts = document.getElementById('wallet-total-pts');
             if (navPts) navPts.innerText = `${available} نقطة`;

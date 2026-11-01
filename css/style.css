@@ -36,8 +36,12 @@
     --page-gap-bottom: 5rem;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, span, div {
+body, h1, h2, h3, h4, h5, h6, p, a {
     font-family: var(--font-ar);
+}
+
+button, input, select, textarea {
+    font-family: inherit;
 }
 
 @media (max-width: 768px) {
@@ -1904,12 +1908,18 @@ body::before {
 }
 
 .btn-close-modal {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
     background: none;
     border: none;
     color: var(--silver-muted);
     font-size: 1.4rem;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: all 0.2s;
 }
 
 .btn-close-modal:hover {
@@ -7221,6 +7231,51 @@ body.chat-page-body .chat-input-bar {
     body.chat-page-body .escrow-room-card {
         border-radius: 12px !important;
     }
+}
+
+/* ==========================================================================
+   إيقاف التأثيرات الحركية والأنيميشن في صفحة المحادثة (Chat Page Static & Stable)
+   ========================================================================== */
+body.chat-page-body .brand-logo-img {
+    animation: none !important;
+    transform: none !important;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8)) !important;
+}
+
+body.chat-page-body .brand-title {
+    animation: none !important;
+    background-position: 0% 50% !important;
+}
+
+body.chat-page-body #ambient-canvas {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+body.chat-page-body::before,
+body.chat-page-body::after {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+body.chat-page-body img,
+body.chat-page-body .card-img,
+body.chat-page-body .chat-main-container,
+body.chat-page-body .escrow-room-card,
+body.chat-page-body .chat-pane,
+body.chat-page-body .chat-messages {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+}
+
+body.chat-page-body .highlight-pulse,
+body.chat-page-body .glow-gold,
+body.chat-page-body .glow-green,
+body.chat-page-body .badge-pulse-anim {
+    animation: none !important;
 }
 
 /* Lightbox overlays elevated above all modals */

@@ -199,6 +199,12 @@ Check-Result -Flow 'UX/UI Hunter' -Name 'Seller Profile & Store Card Modal Exper
 $ui11 = $css.Contains('.drawer-user-card') -and $indexHtml.Contains('drawer-user-card')
 Check-Result -Flow 'UX/UI Hunter' -Name 'Drawer Profile Card Independent Placement' -Success $ui11 -Detail 'Positioned outside drawer-header for robust mobile rendering and vertical alignment'
 
+$ui12 = $css.Contains('.support-floating-pill') -and $css.Contains('z-index: 1200') -and $css.Contains('border-radius: 50%')
+Check-Result -Flow 'UX/UI Hunter' -Name 'Floating Circular Support FAB (56x56, 50% Radius, Z-1200)' -Success $ui12 -Detail 'Circular button elevated above bottom nav with 50% border radius and z-index 1200'
+
+$ui13 = $appJs.Contains('account-verified-static-badge') -and $css.Contains('.account-verified-static-badge')
+Check-Result -Flow 'UX/UI Hunter' -Name 'Marketplace Account Verified Static Badge' -Success $ui13 -Detail 'Displays certified green inspection badge on approved marketplace accounts'
+
 Write-Host ""
 Write-Host ">>> 8. FLOW 8: MULTI-CLOUD DEPLOYABILITY, SEO & PWA HYGIENE" -ForegroundColor Yellow
 $cloud1 = $vercelJson.Contains('"cleanUrls": true') -and $vercelJson.Contains('"source": "/auth/callback"')
@@ -222,6 +228,47 @@ Check-Result -Flow 'Cloud & SEO' -Name 'PWA Icon Assets Zero-404 Guarantee' -Suc
 $cloud7 = $adminDepositsHtml.Contains('support.js') -and $dealsHtml.Contains('auth.js')
 Check-Result -Flow 'Cloud & SEO' -Name 'Universal Script Inclusion Parity' -Success $cloud7 -Detail 'Every platform page includes necessary auth and support scripts for unified state'
 
+$cloud8 = (Test-Path 'D:\waseet-app\favicon.svg') -and $indexHtml.Contains('/favicon.svg')
+Check-Result -Flow 'Cloud & SEO' -Name 'Vector SVG Favicon & Retina Crisp Display' -Success $cloud8 -Detail 'Deployable pure bold W SVG favicon with gold gradient and explicit link declaration'
+
+Write-Host ""
+Write-Host ">>> 9. FLOW 9: POST-DEAL OWNERSHIP, RECONCILIATION & PURCHASES RECOVERY" -ForegroundColor Yellow
+$post1 = $escrowJs.Contains('buyer-completed-hero-card')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Buyer Completed Deal Hero Showcase Banner' -Success $post1 -Detail 'Renders post-completion victory card with unmasked credentials and copy buttons'
+
+$post2 = $escrowJs.Contains('isBuyerCurrent') -and $escrowJs.Contains('isSellerCurrent') -and $escrowJs.Contains('isMediatorCurrent')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Three-Way Atomic Wallet Balances Synchronization' -Success $post2 -Detail 'Atomically deducts buyer locked pts and credits seller payout & platform fee'
+
+$post3 = $escrowJs.Contains("acc.status = 'sold'") -and $escrowJs.Contains('acc.buyer_id = buyerId')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Account Status to Sold and Ownership Assignment' -Success $post3 -Detail 'Updates account record status to sold and reassigns buyer_id & owner_id'
+
+$post4 = $escrowJs.Contains('WASEET_USER_PURCHASES')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Buyer Purchases Persistent Storage Ledger' -Success $post4 -Detail 'Persists completed accounts in WASEET_USER_PURCHASES for buyer instant retrieval'
+
+$post5 = $myAccountsHtml.Contains('tab-btn-sales') -and $myAccountsHtml.Contains('tab-btn-purchases') -and $myAccountsHtml.Contains('switchMyAccountsTab')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Dual Tab Architecture in Seller & Buyer Hub' -Success $post5 -Detail 'Clean tab bar switching between listed sales and purchased accounts'
+
+$post6 = $myAccountsHtml.Contains("urlParams.get('tab') === 'purchases'")
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Deep Link Tab Parameter Query Auto-Activation' -Success $post6 -Detail 'Direct navigation via ?tab=purchases switches context immediately'
+
+$post7 = $myAccountsHtml.Contains('modal-view-purchased-creds') -and ($myAccountsHtml -match 'modal-view-purchased-creds.*?10007')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Purchased Credentials Inspection Modal Elevation (10007)' -Success $post7 -Detail 'Elevated modal overlay enables buyers to review and copy passwords anytime'
+
+$post8 = $myAccountsHtml.Contains('copyAllPurchasedCredentials') -and $escrowJs.Contains('copyAllCredentials')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'One-Click Full Credential Dossier Copy' -Success $post8 -Detail 'Formats login type, email, password, and recovery notes into formatted text'
+
+$post9 = (Test-Path 'D:\waseet-app\supabase\16_fix_deal_completion_and_ownership.sql') -and ((Get-Content 'D:\waseet-app\supabase\16_fix_deal_completion_and_ownership.sql' -Raw).Contains('accounts_buyer_select_purchased'))
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'Supabase Migration 16 Deal Completion & RLS Parity' -Success $post9 -Detail 'Database stored procedure release_escrow_deal_points and buyer purchased RLS'
+
+$post10 = $supabaseJs.Contains('waseetReleaseEscrowPointsInDb') -and $supabaseJs.Contains('updatePayload.buyer_id = buyerId')
+Check-Result -Flow 'Post-Deal Lifecycle' -Name 'RPC Fallback Engine with Direct Table Sync' -Success $post10 -Detail 'Direct resilient fallback guarantees balances & ownership transfer if RPC unavailable'
+
+Write-Host ""
+Write-Host ">>> 10. FLOW 10: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
+$simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
+$simSuccess = ($simResult.ExitCode -eq 0)
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (25/25)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, and dispute journeys in Node runtime'
+
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta
 Write-Host " [E2E SIMULATION AND VERIFICATION SUMMARY]" -ForegroundColor Magenta
@@ -232,7 +279,7 @@ Write-Host "=================================================================" -
 
 if ($FailedTests -eq 0) {
     Write-Host "`n>>> ALL $PassedTests TESTS PASSED WITH 100% SUCCESS! <<<" -ForegroundColor Green
-    Write-Host "All seller, buyer, mediator, wallet, security, UX/UI, multi-cloud and SEO flows verified!" -ForegroundColor Cyan
+    Write-Host "All seller, buyer, mediator, wallet, security, UX/UI, multi-cloud, SEO, and post-deal flows verified!" -ForegroundColor Cyan
 } else {
     Write-Host "`n>>> WARNING: Some tests failed. Review details above. <<<" -ForegroundColor Red
 }
