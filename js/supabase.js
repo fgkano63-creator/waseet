@@ -496,6 +496,7 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             originalGame: account.game || 'free_fire',
             sellerName: account.sellerName || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.name : 'بائع موثق'),
             sellerEmail: account.sellerEmail || sessionUser?.email || '',
+            sellerAvatar: account.sellerAvatar || (sessionUser && (sessionUser.avatar || sessionUser.avatar_url)) || '',
             evoGunsCount: Number(account.evoGunsCount || 0),
             evoGuns: account.evoGuns || [],
             rareSkins: account.rareSkins || [],
@@ -714,6 +715,14 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         || (profileObj && profileObj.email ? profileObj.email.split('@')[0] : 'بائع موثق');
 
     const sellerEmail = (profileObj && profileObj.email) || details.sellerEmail || null;
+    const fallbackSellerAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+    const sellerAvatar = (profileObj && (profileObj.avatar_url || profileObj.avatar))
+        || details.sellerAvatar
+        || details.seller_avatar
+        || acc.seller_avatar
+        || acc.sellerAvatar
+        || (acc.seller && (acc.seller.avatar_url || acc.seller.avatar))
+        || fallbackSellerAvatar;
     const parsedCreds = waseetSafeParseCredentials(acc, details);
 
     const parsedImagesField = Array.isArray(acc.images)
@@ -751,7 +760,7 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         server: acc.server || 'mena',
         sellerName: sellerName,
         sellerEmail: sellerEmail,
-        sellerAvatar: (profileObj && profileObj.avatar_url) || null,
+        sellerAvatar: sellerAvatar,
         sellerId: acc.seller_id,
         seller_id: acc.seller_id,
         sellerRating: 5.0,

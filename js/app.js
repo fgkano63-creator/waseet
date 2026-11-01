@@ -908,6 +908,12 @@ class WaseetApp {
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
         const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
 
+        const fallbackSellerAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+        const sellerAvatar = acc.sellerAvatar || acc.seller_avatar || (acc.seller && (acc.seller.avatar || acc.seller.avatar_url)) || fallbackSellerAvatar;
+        const sellerId = acc.seller_id || acc.sellerId;
+        const storeUrl = sellerId ? `profile.html?id=${encodeURIComponent(sellerId)}` : '#';
+        const hasStore = Boolean(sellerId);
+
         const validPants = (acc.iconicPants || []).filter(p => p && p !== 'بنطلون مميز' && p !== 'غير محدد');
         const pantsListHtml = validPants.length
             ? validPants.map(p => `<span class="pants-chip"><i class="fas fa-tshirt text-gold"></i> ${p}</span>`).join('')
@@ -932,9 +938,36 @@ class WaseetApp {
                     <div class="spec-box-label"><i class="fas fa-link text-silver"></i> نوع وحالة الربط</div>
                     <div class="spec-box-value">${acc.loginType === 'google' ? 'جوجل Gmail' : 'فيسبوك'} (${acc.bindStatus === 'single' ? 'ربط أحادي آمن' : 'ربط ثنائي'})</div>
                 </div>
-                <div class="spec-box" style="${(acc.seller_id || acc.sellerId) ? 'cursor: pointer;' : ''}" onclick="${(acc.seller_id || acc.sellerId) ? `window.location.href='profile.html?id=${encodeURIComponent(acc.seller_id || acc.sellerId)}'` : ''}">
-                    <div class="spec-box-label"><i class="fas fa-store text-gold"></i> متجر وملف البائع</div>
-                    <div class="spec-box-value" style="color: var(--gold-light);">${acc.sellerName} ${(acc.seller_id || acc.sellerId) ? '<span style="font-size: 0.78rem; text-decoration: underline;">(زيارة المتجر ↗)</span>' : ''}</div>
+            </div>
+
+            <!-- بطاقة متجر وملف البائع المعتمد (Seller Store & Profile Card) -->
+            <div class="deck-seller-card" id="deck-seller-card-${acc.id}">
+                <div class="seller-card-main" ${hasStore ? `style="cursor: pointer;" onclick="window.location.href='${storeUrl}'"` : ''}>
+                    <div class="seller-avatar-wrapper">
+                        <img src="${sellerAvatar}" alt="${acc.sellerName || 'بائع موثق'}" class="seller-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='${fallbackSellerAvatar}';">
+                        <span class="seller-verified-badge" title="بائع معتمد بالوساطة"><i class="fas fa-check"></i></span>
+                    </div>
+                    <div class="seller-details-meta">
+                        <span class="seller-label"><i class="fas fa-store text-gold"></i> متجر وملف البائع المعتمد</span>
+                        <h4 class="seller-name">${acc.sellerName || 'بائع موثق'}</h4>
+                        <span class="seller-trust-note">
+                            <i class="fas fa-shield-alt text-emerald"></i> عضوية موثقة • صفقات مضمونة بالوساطة 100%
+                        </span>
+                    </div>
+                </div>
+                <div class="seller-card-action">
+                    ${hasStore ? `
+                        <a href="${storeUrl}" class="btn-visit-store" title="الانتقال لمتجر البائع وتصفح حساباته وتقييماته">
+                            <i class="fas fa-store-alt text-gold"></i>
+                            <span>زيارة المتجر</span>
+                            <i class="fas fa-chevron-left arrow-icon"></i>
+                        </a>
+                    ` : `
+                        <span class="btn-visit-store" style="opacity: 0.6; cursor: default;">
+                            <i class="fas fa-store text-gold"></i>
+                            <span>متجر البائع</span>
+                        </span>
+                    `}
                 </div>
             </div>
 
@@ -1516,6 +1549,7 @@ class WaseetApp {
                         sellerId: sellerId,
                         sellerName: sellerName,
                         sellerEmail: sellerEmail,
+                        sellerAvatar: (currentUser && (currentUser.avatar || currentUser.avatar_url || (currentUser.user_metadata && currentUser.user_metadata.avatar_url))) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
                         sellerRating: 5.0,
                         sellerDeals: 1,
                         sellerPrice: sellerPrice,
