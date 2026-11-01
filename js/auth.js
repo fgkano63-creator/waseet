@@ -363,14 +363,16 @@ class WaseetAuthManager {
      * Initiates Google OAuth Login.
      * Uses Supabase Auth built-in provider if configured, or direct Google OAuth 2.0 PKCE flow.
      */
-    async initiateGoogleLogin() {
+    async initiateGoogleLogin(options = {}) {
+        const shouldRedirect = !options || options.redirect !== false;
+
         // 1. Prioritize official Supabase Google OAuth
-        if (typeof waseetSignInWithGoogle === 'function') {
+        if (shouldRedirect && typeof waseetSignInWithGoogle === 'function') {
             return await waseetSignInWithGoogle();
         }
 
         // 2. Direct Supabase Client if available
-        if (this.supabase) {
+        if (shouldRedirect && this.supabase) {
             try {
                 const { data, error } = await this.supabase.auth.signInWithOAuth({
                     provider: 'google',
@@ -419,8 +421,8 @@ class WaseetAuthManager {
         authUrl.searchParams.set('prompt', 'select_account');
         authUrl.searchParams.set('access_type', 'offline');
 
-        // Redirect to Google authorization screen
-        if (typeof window !== 'undefined') {
+        // Redirect to Google authorization screen if not running in dry-run mode
+        if (shouldRedirect && typeof window !== 'undefined') {
             window.location.href = authUrl.toString();
         }
 

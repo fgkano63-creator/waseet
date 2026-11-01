@@ -1,5 +1,19 @@
 {
   "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://vjhcvvewbqeiigrjtydu.supabase.co wss://vjhcvvewbqeiigrjtydu.supabase.co https://connect.facebook.net https://graph.facebook.com https://oauth2.googleapis.com https://www.googleapis.com;" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/deals", "destination": "/deals.html" },
     { "source": "/chat", "destination": "/chat.html" },
@@ -9,6 +23,8 @@
     { "source": "/pending-accounts", "destination": "/pending-accounts.html" },
     { "source": "/admin-chats", "destination": "/admin-chats.html" },
     { "source": "/admin-deposits", "destination": "/admin-deposits.html" },
-    { "source": "/contact-support", "destination": "/contact-support.html" }
+    { "source": "/contact-support", "destination": "/contact-support.html" },
+    { "source": "/auth/callback", "destination": "/auth/callback.html" },
+    { "source": "/auth/callback/", "destination": "/auth/callback.html" }
   ]
 }

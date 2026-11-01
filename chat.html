@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="غرفة الوساطة المباشرة الآمنة ثلاثية الأطراف في منصة وسيط - محادثة مشفرة وفورية بين المشتري والبائع والوسيط المعتمد مع ضمان تسليم الحسابات.">
     <title>WASEET | غرفة الوساطة المباشرة والمحادثات</title>
     
     <!-- Google Fonts -->
@@ -147,7 +148,7 @@
                         <div class="deal-header-info">
                             <i class="fas fa-shield-alt deal-icon-shield"></i>
                             <div>
-                                <div class="deal-meta-title">غرفة الوساطة المباشرة</div>
+                                <h1 class="deal-meta-title" style="margin: 0; font-size: inherit; font-weight: inherit; line-height: inherit;">غرفة الوساطة المباشرة</h1>
                                 <div class="deal-meta-id">جاري تجهيز بيانات الصفقة والوساطة...</div>
                             </div>
                         </div>
@@ -456,6 +457,30 @@
                         </button>
                     `;
                 }
+            }
+        }
+
+        async function loginWithGoogle() {
+            if (window.waseetAuth && typeof window.waseetAuth.initiateGoogleLogin === 'function') {
+                await window.waseetAuth.initiateGoogleLogin();
+                return;
+            }
+            const client = window.waseetSupabaseClient || (typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null);
+            if (client && client.auth) {
+                await client.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin + '/auth/callback.html' }
+                });
+            }
+        }
+
+        async function loginWithFacebook() {
+            const client = window.waseetSupabaseClient || (typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null);
+            if (client && client.auth) {
+                await client.auth.signInWithOAuth({
+                    provider: 'facebook',
+                    options: { redirectTo: window.location.origin + '/auth/callback.html' }
+                });
             }
         }
 

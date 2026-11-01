@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الصيانة | وسيط - WASEET</title>
+    <meta name="description" content="عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها - منصة وسيط (WASEET) للوساطة الآمنة.">
+    <title>404 - الصفحة غير موجودة | وسيط - WASEET</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
@@ -49,16 +53,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
-        /* إضاءة محيطية خفيفة جداً بهوية وسيط الذهبية والبرتقالية */
+        /* إضاءة محيطية خفيفة بدون تجاوز حدود العرض على الهواتف */
         body::before {
             content: "";
             position: absolute;
             width: 520px;
+            max-width: 90vw;
             height: 520px;
+            max-height: 90vw;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(234, 88, 12, 0.08) 0%, rgba(197, 160, 89, 0.05) 40%, rgba(0, 0, 0, 0) 72%);
             top: 50%;
@@ -68,7 +74,7 @@
             z-index: 0;
         }
 
-        .maintenance-wrapper {
+        .notfound-wrapper {
             position: relative;
             z-index: 1;
             max-width: 620px;
@@ -80,17 +86,17 @@
             text-align: center;
         }
 
-        .maintenance-logo-box {
+        .notfound-logo-box {
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .maintenance-logo {
-            height: 175px;
+        .notfound-logo {
+            height: 140px;
             width: auto;
-            max-width: 90vw;
+            max-width: 85vw;
             object-fit: contain;
             background: transparent;
             filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.95))
@@ -100,78 +106,96 @@
         }
 
         @keyframes logoFloat {
-            0% {
-                transform: translateY(0px) scale(1);
-            }
-            100% {
-                transform: translateY(-7px) scale(1.02);
-            }
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-7px) scale(1.02); }
         }
 
-        .maintenance-title {
-            font-size: clamp(2.1rem, 5vw, 3rem);
+        .error-code {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(3rem, 8vw, 4.5rem);
             font-weight: 900;
-            line-height: 1.3;
-            margin-bottom: 1.25rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 45%, var(--orange-bright) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(234, 88, 12, 0.22);
-            letter-spacing: -0.3px;
+            text-shadow: 0 0 30px rgba(234, 88, 12, 0.3);
+            letter-spacing: 2px;
         }
 
-        .maintenance-description {
-            font-size: clamp(1rem, 2.5vw, 1.18rem);
-            font-weight: 600;
-            color: var(--text-white);
-            line-height: 1.85;
-            margin-bottom: 0.65rem;
-            opacity: 0.95;
+        .notfound-title {
+            font-size: clamp(1.4rem, 4vw, 1.85rem);
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 0.8rem;
+            color: #fff;
         }
 
-        .maintenance-thanks {
-            font-size: clamp(0.98rem, 2.3vw, 1.12rem);
+        .notfound-description {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            font-weight: 500;
+            color: var(--text-muted);
+            line-height: 1.75;
+            margin-bottom: 1.8rem;
+            max-width: 480px;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.75rem 1.6rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--gold-light);
-            line-height: 1.7;
-            margin-top: 0.25rem;
+            color: #000;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 100%);
+            border: 1px solid var(--gold-light);
+            border-radius: 999px;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(197, 160, 89, 0.35);
+            transition: all 0.25s ease;
         }
 
-        .maintenance-divider {
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(197, 160, 89, 0.55);
+            background: linear-gradient(135deg, #fff 0%, var(--gold-light) 100%);
+        }
+
+        .notfound-divider {
             width: 72px;
             height: 3px;
             border-radius: 999px;
             background: linear-gradient(90deg, transparent, var(--gold-primary), var(--orange-bright), transparent);
-            margin: 1.4rem auto 0;
+            margin: 2rem auto 0;
             opacity: 0.75;
         }
 
         @media (max-width: 560px) {
-            .maintenance-logo {
-                height: 145px;
-            }
-            .maintenance-wrapper {
-                padding: 1.5rem 1.15rem;
-            }
+            .notfound-logo { height: 115px; }
+            .notfound-wrapper { padding: 1.5rem 1.15rem; }
         }
     </style>
 </head>
 <body>
-    <main class="maintenance-wrapper" role="main">
-        <div class="maintenance-logo-box">
-            <img src="/assets/logo.png" alt="شعار وسيط - WASEET" class="maintenance-logo" onerror="this.onerror=null;this.src='assets/logo.png';">
+    <main class="notfound-wrapper" role="main">
+        <div class="notfound-logo-box">
+            <img src="/assets/logo.png" alt="شعار وسيط - WASEET" class="notfound-logo" onerror="this.onerror=null;this.src='assets/logo.png';">
         </div>
 
-        <h1 class="maintenance-title">سنعود قريباً.</h1>
+        <div class="error-code">404</div>
+        <h1 class="notfound-title">الصفحة غير موجودة</h1>
 
-        <p class="maintenance-description">
-            موقع وسيط متوقف مؤقتاً للصيانة. يرجى معاودة الزيارة قريباً.
-        </p>
-        <p class="maintenance-thanks">
-            شكراً لصبركم.
+        <p class="notfound-description">
+            عذراً، الصفحة التي تحاول الوصول إليها قد تكون حُذفت، أو تغيّر اسمها، أو غير متاحة مؤقتاً.
         </p>
 
-        <div class="maintenance-divider" aria-hidden="true"></div>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home"></i>
+            العودة إلى الصفحة الرئيسية
+        </a>
+
+        <div class="notfound-divider" aria-hidden="true"></div>
     </main>
 </body>
 </html>

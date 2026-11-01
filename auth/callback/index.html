@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="صفحة التحقق ومعالجة تسجيل الدخول الآمن عبر Google OAuth 2.0 لمنصة وسيط.">
     <title>WASEET | التحقق من تسجيل الدخول الآمن عبر Google</title>
     
     <!-- Google Fonts -->
@@ -95,9 +96,9 @@
             <!-- Loading State -->
             <div id="callback-loading">
                 <div class="callback-spinner"></div>
-                <h2 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem;">
+                <h1 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem;">
                     جاري التحقق من تسجيل الدخول...
-                </h2>
+                </h1>
                 <p style="color: var(--silver-muted); font-size: 0.9rem; line-height: 1.6;">
                     يتم الآن التحقق من رموز الحماية (State & PKCE Code Verifier) وتأكيد حساب Google الخاص بك بأمان.
                 </p>
@@ -114,7 +115,7 @@
                 <p style="color: var(--silver-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;" id="success-welcome-text">
                     مرحباً بك مجدداً في منصة WASEET. جاري نقلك تلقائياً إلى المتجر...
                 </p>
-                <a href="../../index.html" class="btn-3d btn-gold">
+                <a href="/index.html" class="btn-3d btn-gold">
                     <i class="fas fa-store"></i> الانتقال للمتجر فوراً
                 </a>
             </div>
@@ -138,7 +139,7 @@
                 </div>
 
                 <div style="margin-top: 1.8rem; display: flex; gap: 0.8rem; justify-content: center;">
-                    <a href="../../index.html" class="btn-3d btn-outline">
+                    <a href="/index.html" class="btn-3d btn-outline">
                         <i class="fas fa-arrow-right"></i> العودة للرئيسية
                     </a>
                     <button class="btn-3d btn-orange" onclick="window.waseetAuth.initiateGoogleLogin()">

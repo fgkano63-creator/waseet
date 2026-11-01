@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin-chats
+Disallow: /admin-deposits
+Disallow: /pending-accounts
+Disallow: /auth/
 
 Sitemap: https://waseetar.vercel.app/sitemap.xml

@@ -81,7 +81,7 @@ class AuthTestSuite {
 
         // Test constructed URL contains only email and profile
         this.authManager.config.GOOGLE_CLIENT_ID = 'test-client-id-12345.apps.googleusercontent.com';
-        const initResult = await this.authManager.initiateGoogleLogin();
+        const initResult = await this.authManager.initiateGoogleLogin({ redirect: false });
         if (initResult && initResult.authUrl) {
             const url = new URL(initResult.authUrl);
             const urlScope = url.searchParams.get('scope');
