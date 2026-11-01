@@ -46,21 +46,19 @@
             : (currentUser.role === 'admin' || currentUser.email === 'fgkano63@gmail.com'));
 
         const floatingBtnHtml = isAdminViewer ? `
-        <a href="admin-chats.html" class="support-floating-pill" id="support-floating-btn" title="صندوق محادثات الدعم (الإدارة)" style="text-decoration: none;">
+        <a href="admin-chats.html" class="support-floating-pill" id="support-floating-btn" title="صندوق محادثات الدعم (الإدارة)" aria-label="محادثات الدعم والإدارة" style="text-decoration: none;">
             <div class="support-floating-icon">
                 <i class="fas fa-headset"></i>
                 <span class="support-badge-pulse" id="support-unread-dot" style="display: none;"></span>
             </div>
-            <span class="support-floating-label">محادثات الإدارة</span>
             <span class="deals-badge-count chats-unread-badge support-floating-badge" id="support-floating-badge" style="display: none;"></span>
         </a>
         ` : `
-        <a href="contact-support.html" class="support-floating-pill" id="support-floating-btn" title="محادثة مباشرة مع الوسيط المعتمد" style="text-decoration: none;">
+        <a href="contact-support.html" class="support-floating-pill" id="support-floating-btn" title="محادثة مباشرة مع الوسيط المعتمد" aria-label="تواصل مع الوسيط" style="text-decoration: none;">
             <div class="support-floating-icon">
                 <i class="fas fa-headset"></i>
                 <span class="support-badge-pulse" id="support-unread-dot" style="display: none;"></span>
             </div>
-            <span class="support-floating-label">تواصل مع الوسيط</span>
             <span class="deals-badge-count chats-unread-badge support-floating-badge" id="support-floating-badge" style="display: none;"></span>
         </a>
         `;
