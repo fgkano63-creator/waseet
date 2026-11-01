@@ -27,13 +27,17 @@
     --border-metal: rgba(197, 160, 89, 0.22);
     --border-highlight: rgba(255, 255, 255, 0.12);
 
-    --font-ar: 'Tajawal', 'Cairo', system-ui, -apple-system, sans-serif;
-    --font-en: 'Rajdhani', 'Orbitron', 'Cairo', system-ui, -apple-system, sans-serif;
+    --font-ar: 'Tajawal', sans-serif;
+    --font-en: 'Rajdhani', 'Orbitron', 'Tajawal', system-ui, -apple-system, sans-serif;
 
     /* مسافات موحدة لحاويات الصفحات في كل الموقع (Global Spacing) */
     --page-gutter: 1.25rem;
     --page-gap-top: 1.75rem;
     --page-gap-bottom: 5rem;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, span, div {
+    font-family: var(--font-ar);
 }
 
 @media (max-width: 768px) {
@@ -68,6 +72,8 @@ body {
     max-width: 100vw;
     width: 100%;
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* حماية أزرار وعناصر المشرف - مخفية افتراضياً لمنع أي ظهور للمستخدم العادي */
@@ -1256,6 +1262,32 @@ body::before {
     font-weight: 800;
     font-family: var(--font-en);
     color: var(--orange-bright);
+}
+
+/* شارة "الحساب مفحوص" الثابتة وغير القابلة للنقر في سوق الحسابات المفحوصة */
+.account-verified-static-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: #34d399;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: default;
+    user-select: none;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+    white-space: nowrap;
+    font-family: var(--font-ar);
+    pointer-events: none;
+}
+
+.account-verified-static-badge i {
+    color: #10b981;
+    font-size: 0.85rem;
 }
 
 /* ==========================================================================
@@ -4005,12 +4037,21 @@ html, body {
     }
 
     .card-footer > div:last-child,
-    .mediator-actions-wrap {
+    .mediator-actions-wrap,
+    .marketplace-card-actions {
         width: 100% !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 0.25rem !important;
         align-items: stretch !important;
+    }
+
+    .card-footer .account-verified-static-badge {
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 0.68rem !important;
+        padding: 0.25rem 0.5rem !important;
+        box-sizing: border-box !important;
     }
 
     .card-footer button.btn-3d,

@@ -811,20 +811,14 @@ class WaseetApp {
                                 <span class="price-sub">صافي البائع: ${pricing.sellerPrice} نقطة + عمولة ${pricing.fee} نقطة</span>
                                 <span class="price-main">${pricing.buyerPrice} <small style="font-size: 0.72em;">نقطة</small></span>
                             </div>
-                            ${isMediator ? `
-                                <div class="mediator-actions-wrap" style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
-                                    <button class="btn-3d btn-inspect-acc" onclick="window.waseetApp.inspectAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.45rem 0.75rem; font-size: 0.82rem;" title="فحص بيانات ومواصفات الحساب">
-                                        <i class="fas fa-search-plus"></i> فحص الحساب
-                                    </button>
-                                    <button class="btn-3d btn-outline btn-reject-acc" onclick="window.waseetApp.rejectAccountDirect('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.45rem 0.65rem; font-size: 0.8rem;" title="حذف هذا الحساب للاشتباه في احتيال أو بيانات غير صحيحة">
-                                        <i class="fas fa-trash-alt"></i> حذف هذا الحساب
-                                    </button>
-                                </div>
-                            ` : `
+                            <div class="marketplace-card-actions" style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                                <span class="account-verified-static-badge" title="تم فحص هذا الحساب وتدقيقه واعتماده وهو جاهز للنقل">
+                                    <i class="fas fa-check-circle"></i> الحساب مفحوص
+                                </span>
                                 <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
                                     <i class="fas fa-shield-alt"></i> طلب وساطة
                                 </button>
-                            `}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -958,6 +952,8 @@ class WaseetApp {
         const pricing = calculateWaseetFee(acc.sellerPrice);
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
         const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
+        const isPendingPage = window.location.pathname.includes('pending-accounts.html') ||
+                              Boolean(document.getElementById('pending-accounts-list-container'));
 
         const fallbackSellerAvatar = '';
         const sellerAvatar = acc.sellerAvatar || acc.seller_avatar || (acc.seller && (acc.seller.avatar || acc.seller.avatar_url)) || fallbackSellerAvatar;
@@ -1140,7 +1136,7 @@ class WaseetApp {
                     <a href="${WASEET_STATE.activeDeal ? 'chat.html?dealId=' + WASEET_STATE.activeDeal.id : 'chat.html'}" class="btn-3d btn-outline" style="text-decoration: none;">
                         <i class="fas fa-comments"></i> استفسار بالشات
                     </a>
-                    ${isMediator ? `
+                    ${(isPendingPage && isMediator) ? `
                         <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}'); document.getElementById('modal-card-deck').classList.remove('active');" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.1rem; font-size: 0.95rem;">
                             <i class="fas fa-search-plus"></i> فحص الحساب
                         </button>
@@ -1148,6 +1144,9 @@ class WaseetApp {
                             <i class="fas fa-trash-alt"></i> حذف هذا الحساب
                         </button>
                     ` : `
+                        <span class="account-verified-static-badge" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;" title="تم فحص هذا الحساب وتدقيقه واعتماده وهو جاهز للنقل">
+                            <i class="fas fa-check-circle"></i> الحساب مفحوص
+                        </span>
                         <button class="btn-3d btn-orange" onclick="window.waseetApp.requestEscrow('${acc.id}')">
                             <i class="fas fa-shield-alt"></i> طلب وساطة فوري للشراء
                         </button>
