@@ -1,0 +1,14 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/deals", "destination": "/deals.html" },
+    { "source": "/chat", "destination": "/chat.html" },
+    { "source": "/wallet", "destination": "/wallet.html" },
+    { "source": "/my-accounts", "destination": "/my-accounts.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/pending-accounts", "destination": "/pending-accounts.html" },
+    { "source": "/admin-chats", "destination": "/admin-chats.html" },
+    { "source": "/admin-deposits", "destination": "/admin-deposits.html" },
+    { "source": "/contact-support", "destination": "/contact-support.html" }
+  ]
+}
