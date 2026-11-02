@@ -83,11 +83,11 @@
                     <a href="index.html" class="btn-nav-middle btn-nav-admin" title="العودة للمتجر">
                         <i class="fas fa-store text-gold"></i> العودة للمتجر
                     </a>
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
                         <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
@@ -389,7 +389,10 @@
             }
 
             // Sync Admin Mode & Desktop Nav Groups
-            const isAdmin = !!(user && isMediatorUser(user));
+            const isAdmin = !!(user && (
+                user.role === 'admin' ||
+                (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+            ) && user.role !== 'regional_broker' && user.role !== 'user');
             if (isAdmin) {
                 document.body.classList.add('is-admin-mode');
             } else {

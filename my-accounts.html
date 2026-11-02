@@ -79,29 +79,29 @@
 
                 <!-- المجموعة 2 المخصصة للمدير (أزرار التحكم الأساسية) -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
                         <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
-                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة" style="display: none;">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
                         <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
                     </a>
-                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص" style="display: none;">
                         <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
                         <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;">0</span>
                     </a>
-                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء" style="display: none;">
                         <i class="fas fa-crown text-gold"></i> قيد الشراء
                         <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;">0</span>
                     </a>
-                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
+                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات" style="display: none;">
                         <i class="fas fa-comments text-orange"></i> المحادثات
                     </a>
-                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط">
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="محفظة النقاط" style="display: none;">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">محفظة النقاط</span>
@@ -341,11 +341,19 @@
                     <i class="fas fa-headset text-orange"></i>
                     <span>تواصل مع الوسيط</span>
                 </a>
-                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-accounts-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
+                    <i class="fas fa-globe-africa text-orange"></i>
+                    <span>الوسطاء الإقليميين</span>
+                </a>
+                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-accounts-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
                     <i class="fas fa-clipboard-check text-orange"></i>
                     <span>حسابات قيد الفحص</span>
                 </a>
-                <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
+                <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
                     <i class="fas fa-crown text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
@@ -523,7 +531,11 @@
                 walletPtsEl.innerText = `${pts} نقطة`;
             }
 
-            const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
+            const isAdmin = !!(user && (
+                user.role === 'admin' ||
+                (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+            ) && user.role !== 'regional_broker' && user.role !== 'user');
+
             if (isAdmin) {
                 document.body.classList.add('is-admin-mode');
             } else {
@@ -540,11 +552,27 @@
                 if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
                 if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
                 if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
+                });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.display = 'flex';
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.display = 'flex';
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
                 if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
                 if (adminWalletPill) adminWalletPill.style.display = 'none';
+
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.display = 'none';
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.display = 'none';
             }
 
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
