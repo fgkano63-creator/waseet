@@ -45,6 +45,7 @@ $myAccountsHtml = Get-Content 'D:\waseet-app\my-accounts.html' -Raw -Encoding UT
 $pendingAccountsHtml = Get-Content 'D:\waseet-app\pending-accounts.html' -Raw -Encoding UTF8
 $adminDepositsHtml = Get-Content 'D:\waseet-app\admin-deposits.html' -Raw -Encoding UTF8
 $adminChatsHtml = Get-Content 'D:\waseet-app\admin-chats.html' -Raw -Encoding UTF8
+$adminBrokersHtml = Get-Content 'D:\waseet-app\admin-brokers.html' -Raw -Encoding UTF8
 $contactSupportHtml = Get-Content 'D:\waseet-app\contact-support.html' -Raw -Encoding UTF8
 $profileHtml = Get-Content 'D:\waseet-app\profile.html' -Raw -Encoding UTF8
 $netlifyToml = Get-Content 'D:\waseet-app\netlify.toml' -Raw -Encoding UTF8
@@ -225,8 +226,8 @@ Check-Result -Flow 'Cloud & SEO' -Name 'Google Search Console Verification Tag' 
 $cloud6 = (Test-Path 'D:\waseet-app\assets\icons\icon-192.png') -and (Test-Path 'D:\waseet-app\assets\icons\icon-512.png')
 Check-Result -Flow 'Cloud & SEO' -Name 'PWA Icon Assets Zero-404 Guarantee' -Success $cloud6 -Detail 'Direct assets/icons folder deployed with high-res 192px and 512px application icons'
 
-$cloud7 = $adminDepositsHtml.Contains('support.js') -and $dealsHtml.Contains('auth.js')
-Check-Result -Flow 'Cloud & SEO' -Name 'Universal Script Inclusion Parity' -Success $cloud7 -Detail 'Every platform page includes necessary auth and support scripts for unified state'
+$cloud7 = $adminDepositsHtml.Contains('support.js') -and $dealsHtml.Contains('auth.js') -and $adminBrokersHtml.Contains('auth.js') -and $adminBrokersHtml.Contains('support.js') -and $adminBrokersHtml.Contains('instant-nav.js')
+Check-Result -Flow 'Cloud & SEO' -Name 'Universal Script Inclusion Parity' -Success $cloud7 -Detail 'Every platform page includes necessary auth, support, and instant-nav scripts for unified state'
 
 $cloud8 = (Test-Path 'D:\waseet-app\favicon.svg') -and $indexHtml.Contains('/favicon.svg')
 Check-Result -Flow 'Cloud & SEO' -Name 'Vector SVG Favicon & Retina Crisp Display' -Success $cloud8 -Detail 'Deployable pure bold W SVG favicon with gold gradient and explicit link declaration'
@@ -270,8 +271,14 @@ Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 18 Region
 $mig18Split = (Test-Path 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql') -and ((Get-Content 'D:\waseet-app\supabase\18_regional_brokers_and_commission_split.sql' -Raw).Contains('broker_commission'))
 Check-Result -Flow 'Enterprise Architecture' -Name 'Atomic 66/34 Commission Splitting Stored Procedure' -Success $mig18Split -Detail 'release_escrow_deal_points splits 66% broker and 34% admin commissions'
 
-$adminBrokersHtml = (Test-Path 'D:\waseet-app\admin-brokers.html') -and ((Get-Content 'D:\waseet-app\admin-brokers.html' -Raw).Contains('promote-broker-form'))
-Check-Result -Flow 'Enterprise Architecture' -Name 'Regional Brokers Admin Control Center (admin-brokers.html)' -Success $adminBrokersHtml -Detail 'Dedicated admin control room for regional broker promotion and commission simulator'
+$adminBrokersCheck = (Test-Path 'D:\waseet-app\admin-brokers.html') -and ($adminBrokersHtml.Contains('promote-broker-form'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Regional Brokers Admin Control Center (admin-brokers.html)' -Success $adminBrokersCheck -Detail 'Dedicated admin control room for regional broker promotion and commission simulator'
+
+$emailJsCheck = $adminBrokersHtml.Contains('email.min.js') -and $adminBrokersHtml.Contains('sendBrokerWelcomeEmail') -and $adminBrokersHtml.Contains('modal-emailjs-config')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Automated EmailJS Welcome Notifications Integration' -Success $emailJsCheck -Detail 'Automated broker welcome email dispatch with config modal and template payload'
+
+$watermarkCheck = $adminBrokersHtml.Contains('display: none !important') -and $adminBrokersHtml.Contains('#promote-broker-panel-card')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Clean Promotion Form & Watermark Suppression' -Success $watermarkCheck -Detail 'Strict watermark eradication and crystal clean dark theme inputs on broker form'
 
 $jsBrokers = $supabaseJs.Contains('waseetPromoteUserToBroker') -and $escrowJs.Contains('brokerCommission')
 Check-Result -Flow 'Enterprise Architecture' -Name 'Full Client JS Regional Broker Parity' -Success $jsBrokers -Detail 'JavaScript runtime parity for broker smart routing, 4-party rooms, and commission calculations'

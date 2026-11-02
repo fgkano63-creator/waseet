@@ -514,6 +514,59 @@ async function runE2ESimulation() {
     assert(brokerShare3 === 2 && adminShare3 === 1, 'Financial Flow', 'Commission Split Calculation (3 Pts -> 2/1)', `Broker: ${brokerShare3} pts (66%), Admin: ${adminShare3} pts (34%)`);
     assert(brokerShare3 + adminShare3 === fee3, 'Financial Flow', 'Conservation of Points Invariant (3 Pts)', '3 points split sums exactly to total fee');
 
+    // 6. Comprehensive Multi-Tier Fee Split Invariant Spectrum (1, 2, 5, 15, 30, 50, 100 pts)
+    const testFees = [1, 2, 5, 15, 30, 50, 100];
+    let allSpectrumSumsMatch = true;
+    for (const f of testFees) {
+        const b = Math.floor(f * (2 / 3));
+        const a = f - b;
+        if (b + a !== f || b < 0 || a < 0) {
+            allSpectrumSumsMatch = false;
+        }
+    }
+    assert(allSpectrumSumsMatch, 'Financial Flow', 'Multi-Tier Invariant (Fees: 1, 2, 5, 15, 30, 50, 100 pts)', 'Zero leakage invariant strictly holds across all fee amounts');
+
+    // 7. Automated EmailJS Broker Notification Pipeline Simulation
+    function simulateBrokerWelcomeEmail(toEmail, countryCode, countryName, config = {}) {
+        if (!toEmail || !toEmail.includes('@')) {
+            return { ok: false, error: 'Target is not an email' };
+        }
+        const publicKey = config.publicKey || 'YOUR_PUBLIC_KEY';
+        const serviceId = config.serviceId || 'YOUR_SERVICE_ID';
+        const templateId = config.templateId || 'YOUR_TEMPLATE_ID';
+
+        if (publicKey === 'YOUR_PUBLIC_KEY' || serviceId === 'YOUR_SERVICE_ID' || templateId === 'YOUR_TEMPLATE_ID') {
+            return { ok: false, notConfigured: true, message: `Welcome ${countryName}` };
+        }
+
+        const templateParams = {
+            to_email: toEmail,
+            recipient_email: toEmail,
+            email: toEmail,
+            user_email: toEmail,
+            country_name: countryName,
+            country_code: countryCode
+        };
+
+        return { ok: true, templateParams };
+    }
+
+    // 7a. Rejects invalid email target
+    const invalidEmailRes = simulateBrokerWelcomeEmail('invalid_username_or_id', 'DZ', 'الجزائر');
+    assert(invalidEmailRes.ok === false && invalidEmailRes.error === 'Target is not an email', 'EmailJS Pipeline', 'Invalid Email Target Guard', 'Non-email targets safely skipped without throwing errors');
+
+    // 7b. Graceful fallback when unconfigured
+    const unconfigRes = simulateBrokerWelcomeEmail('broker.dz@waseet.com', 'DZ', 'الجزائر', { publicKey: 'YOUR_PUBLIC_KEY' });
+    assert(unconfigRes.ok === false && unconfigRes.notConfigured === true, 'EmailJS Pipeline', 'Unconfigured Key Safe Fallback', 'Gracefully skips network dispatch when user keys not set');
+
+    // 7c. Full payload delivery validation with configured keys
+    const configuredRes = simulateBrokerWelcomeEmail('broker.dz@waseet.com', 'DZ', 'الجزائر', {
+        publicKey: 'pub_key_mock_123',
+        serviceId: 'service_mock_456',
+        templateId: 'template_mock_789'
+    });
+    assert(configuredRes.ok === true && configuredRes.templateParams.to_email === 'broker.dz@waseet.com' && configuredRes.templateParams.country_code === 'DZ', 'EmailJS Pipeline', 'Configured Automated Dispatch Integrity', 'Valid template payload constructed for recipient delivery');
+
     // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------

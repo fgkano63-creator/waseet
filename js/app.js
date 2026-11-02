@@ -337,7 +337,7 @@ class WaseetApp {
                     || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
                 currentStatusBox.innerHTML = `
                     <div style="background: rgba(197,160,89,0.12); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 0.8rem; margin-bottom: 1.2rem; text-align: center;">
-                        <img src="${avatar}" referrerpolicy="no-referrer" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin: 0 auto 0.5rem; display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <img src="${avatar}" alt="${WASEET_STATE.user.name || 'الصورة الشخصية'}" referrerpolicy="no-referrer" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin: 0 auto 0.5rem; display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div style="font-size: 0.8rem; color: var(--silver-muted);">أنت مسجل حالياً باسم:</div>
                         <strong style="color: #fff; font-size: 0.95rem;">${WASEET_STATE.user.name}</strong>
                         <div style="font-size: 0.75rem; color: var(--gold-light); margin-top: 2px;">(${roleBadge})</div>
@@ -1148,10 +1148,10 @@ class WaseetApp {
                         <i class="fas fa-comments"></i> استفسار بالشات
                     </a>
                     ${(isPendingPage && isMediator) ? `
-                        <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}'); document.getElementById('modal-card-deck').classList.remove('active');" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.1rem; font-size: 0.95rem;">
+                        <button class="btn-3d" onclick="window.waseetApp.inspectAccount('${acc.id}'); document.getElementById('modal-card-deck')?.classList.remove('active');" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.1rem; font-size: 0.95rem;">
                             <i class="fas fa-search-plus"></i> فحص الحساب
                         </button>
-                        <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}'); document.getElementById('modal-card-deck').classList.remove('active');" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 0.95rem; font-size: 0.95rem;">
+                        <button class="btn-3d btn-outline" onclick="window.waseetApp.rejectAccountDirect('${acc.id}'); document.getElementById('modal-card-deck')?.classList.remove('active');" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 0.95rem; font-size: 0.95rem;">
                             <i class="fas fa-trash-alt"></i> حذف هذا الحساب
                         </button>
                     ` : `
@@ -1322,10 +1322,14 @@ class WaseetApp {
             const val = parseFloat(input.value) || 0;
             const res = calculateWaseetFee(val);
 
-            document.getElementById('calc-res-seller').innerText = `${res.sellerPrice} نقطة`;
-            document.getElementById('calc-res-fee').innerText = `+${res.fee} نقطة`;
-            document.getElementById('calc-res-buyer').innerText = `${res.buyerPrice} نقطة`;
-            document.getElementById('calc-res-tier').innerText = res.tierText;
+            const elSeller = document.getElementById('calc-res-seller');
+            const elFee = document.getElementById('calc-res-fee');
+            const elBuyer = document.getElementById('calc-res-buyer');
+            const elTier = document.getElementById('calc-res-tier');
+            if (elSeller) elSeller.innerText = `${res.sellerPrice} نقطة`;
+            if (elFee) elFee.innerText = `+${res.fee} نقطة`;
+            if (elBuyer) elBuyer.innerText = `${res.buyerPrice} نقطة`;
+            if (elTier) elTier.innerText = res.tierText;
         };
 
         input.addEventListener('input', updateCalc);
@@ -2221,7 +2225,7 @@ class WaseetApp {
                     <p style="font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.5rem;">
                         يمكنك عرض حسابك للبيع عبر المنصة وسيقوم الوسيط المعتمد بفحصه ومراجعته في أقل من 24 ساعة ونشره في السوق.
                     </p>
-                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings').classList.remove('active'); window.waseetApp.openSellModal();">
+                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings')?.classList.remove('active'); window.waseetApp.openSellModal();">
                         <i class="fas fa-plus-circle"></i> عرض حساب جديد للبيع
                     </button>
                 </div>
@@ -2232,7 +2236,7 @@ class WaseetApp {
                     <div style="font-size: 0.95rem; color: var(--silver-muted);">
                         إجمالي حساباتك المسجلة: <strong style="color: #fff;">${myAccounts.length}</strong>
                     </div>
-                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings').classList.remove('active'); window.waseetApp.openSellModal();" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+                    <button class="btn-3d btn-orange" onclick="document.getElementById('modal-seller-listings')?.classList.remove('active'); window.waseetApp.openSellModal();" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
                         <i class="fas fa-plus-circle"></i> إضافة حساب آخر
                     </button>
                 </div>

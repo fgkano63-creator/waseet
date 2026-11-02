@@ -1,0 +1,1246 @@
+{
+  "timestamp": "2026-11-02T16:56:34.551Z",
+  "metrics": {
+    "totalChecks": 175,
+    "passed": 175,
+    "warnings": 0,
+    "failures": 0
+  },
+  "sections": {
+    "codeQuality": [
+      {
+        "id": "JS-Syntax-js\\app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\app.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\app.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\app.js async error-handling coverage verified (1 async, 17 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\auth.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\auth.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\auth.js async error-handling coverage verified (0 async, 9 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\calculator.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\calculator.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\calculator.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\data.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\data.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\data.js async error-handling coverage verified (0 async, 3 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\dialog.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\dialog.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\dialog.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\escrow.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\escrow.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\escrow.js async error-handling coverage verified (0 async, 23 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\instant-nav.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\instant-nav.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\instant-nav.js async error-handling coverage verified (0 async, 2 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\navbar.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\navbar.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\navbar.js async error-handling coverage verified (1 async, 4 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\notifications.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\notifications.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\notifications.js async error-handling coverage verified (0 async, 15 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\particles.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\particles.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\particles.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\pwa-register.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\pwa-register.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\pwa-register.js async error-handling coverage verified (0 async, 6 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\slider.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\slider.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\slider.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\supabase.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\supabase.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\supabase.js async error-handling coverage verified (38 async, 67 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\support.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\support.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\support.js async error-handling coverage verified (2 async, 10 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: service-worker.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in service-worker.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "service-worker.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in 404.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in 404.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in 404.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in auth\\callback.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in auth\\callback.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in auth\\callback.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in chat.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in chat.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in chat.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in deals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in deals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in deals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in profile.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in profile.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in profile.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in wallet.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in wallet.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in wallet.html",
+        "details": null
+      }
+    ],
+    "responsiveness": [
+      {
+        "id": "Viewport-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in 404.html",
+        "details": null
+      },
+      {
+        "id": "RTL-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in 404.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "RTL-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "RTL-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "RTL-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "RTL-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in auth\\callback.html",
+        "details": null
+      },
+      {
+        "id": "RTL-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in auth\\callback.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in chat.html",
+        "details": null
+      },
+      {
+        "id": "RTL-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in chat.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "RTL-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in deals.html",
+        "details": null
+      },
+      {
+        "id": "RTL-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in deals.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in index.html",
+        "details": null
+      },
+      {
+        "id": "RTL-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in index.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "RTL-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "RTL-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "RTL-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in profile.html",
+        "details": null
+      },
+      {
+        "id": "RTL-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in profile.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in wallet.html",
+        "details": null
+      },
+      {
+        "id": "RTL-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in wallet.html",
+        "details": null
+      },
+      {
+        "id": "CSS-Breakpoints",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Comprehensive responsive layout defined with 39 media queries",
+        "details": null
+      },
+      {
+        "id": "CSS-OverflowGuard",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Global overflow-x: hidden enforced on both <html> and <body>",
+        "details": null
+      },
+      {
+        "id": "CSS-TouchTargets",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Dedicated mobile navigation and button touch target styles present",
+        "details": null
+      },
+      {
+        "id": "CSS-FixedWidths",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive layout verified. Large fixed widths are constrained by max-width or media queries.",
+        "details": null
+      }
+    ],
+    "security": [
+      {
+        "id": "Secrets-Scan",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Scanned 76 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in chat.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in contact-support.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in deals.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in index.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in my-accounts.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in profile.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in wallet.html",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\app.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\auth.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\calculator.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\data.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\dialog.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\escrow.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\instant-nav.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\navbar.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\notifications.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\particles.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\pwa-register.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\slider.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\supabase.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\support.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in service-worker.js",
+        "details": null
+      },
+      {
+        "id": "Header-X-Frame-Options",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header X-Frame-Options fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "Header-X-Content-Type-Options",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header X-Content-Type-Options fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "Header-Strict-Transport-Security",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header Strict-Transport-Security fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "Header-Content-Security-Policy",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header Content-Security-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "Header-Referrer-Policy",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header Referrer-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "Header-Permissions-Policy",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Security header Permissions-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      }
+    ],
+    "databaseRLS": [
+      {
+        "id": "RLS-Enabled-profiles",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'profiles'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-deals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'deals'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-marketplace_accounts",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'marketplace_accounts'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-marketplace_account_secrets",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'marketplace_account_secrets'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-wallet_transactions",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'wallet_transactions'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-deposit_requests",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'deposit_requests'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-deal_messages",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'deal_messages'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-support_messages",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'support_messages'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-notifications",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'notifications'",
+        "details": null
+      },
+      {
+        "id": "RLS-Enabled-payment_methods",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'payment_methods'",
+        "details": null
+      },
+      {
+        "id": "DB-SearchPathHygiene",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All SECURITY DEFINER database functions enforce explicit search_path",
+        "details": null
+      },
+      {
+        "id": "DB-ProfileTamperingGuard",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Direct client updates to wallet_balance, is_admin, and role are strictly guarded by triggers/RLS",
+        "details": null
+      },
+      {
+        "id": "DB-SecretsIsolation",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Seller credentials quarantined in marketplace_account_secrets and unmasked only via authenticated RPC during deal",
+        "details": null
+      }
+    ],
+    "performancePWA": [
+      {
+        "id": "PWA-ManifestCompliance",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Valid PWA manifest: name='Waseet - منصة الوساطة الآمنة', 6 icons, display='standalone'",
+        "details": null
+      },
+      {
+        "id": "PWA-IconsExist",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All icons referenced in manifest.json exist on disk",
+        "details": null
+      },
+      {
+        "id": "PWA-ServiceWorker",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Service worker properly implements cache lifecycle management and invalidation",
+        "details": null
+      },
+      {
+        "id": "Assets-Oversized",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All static media assets are optimized under 800KB",
+        "details": null
+      },
+      {
+        "id": "Perf-InstantNavigation",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero-latency instant navigation engine active with idle page prefetching",
+        "details": null
+      }
+    ]
+  }
+}
