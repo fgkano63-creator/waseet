@@ -203,6 +203,8 @@
         if (drawerBrokers) drawerBrokers.style.display = admin ? 'flex' : 'none';
         var drawerDeposits = byId('drawer-admin-deposits-link');
         if (drawerDeposits) drawerDeposits.style.display = admin ? 'flex' : 'none';
+        var drawerWithdrawals = byId('drawer-admin-withdrawals-link');
+        if (drawerWithdrawals) drawerWithdrawals.style.display = admin ? 'flex' : 'none';
 
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             try { window.waseetSyncAllNavBadges(); } catch (e) { /* تجاهل */ }

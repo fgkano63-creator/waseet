@@ -1576,6 +1576,259 @@ async function waseetAdminRejectDepositRequest(requestId, adminNote = '') {
 }
 
 /**
+ * ==============================================================================
+ * نظام سحب الرصيد والنقاط (Withdrawals System)
+ * ==============================================================================
+ */
+
+/**
+ * إرسال طلب سحب رصيد وتجميد النقاط ذرياً عبر Supabase RPC (أو fallback)
+ */
+async function waseetSubmitWithdrawalRequest({ amount, method, details }) {
+    const client = initWaseetSupabase();
+    if (!client) {
+        return { data: null, error: { message: 'تعذر الاتصال بقاعدة بيانات Supabase' } };
+    }
+
+    try {
+        const ensuredProfile = await waseetEnsureUserProfileInDb();
+        if (!ensuredProfile || !ensuredProfile.id) {
+            return { data: null, error: { message: 'يرجى تسجيل الدخول بحسابك أولاً لتقديم طلب السحب' } };
+        }
+
+        const numAmount = Number(amount);
+        if (!numAmount || numAmount <= 0) {
+            return { data: null, error: { message: 'يرجى إدخال مبلغ صحيح أكبر من الصفر' } };
+        }
+
+        const cleanDetails = (details || '').trim();
+        if (!cleanDetails) {
+            return { data: null, error: { message: 'يرجى كتابة بيانات الحساب المالي أو المحفظة للاستلام' } };
+        }
+
+        const cleanMethod = (method || 'تحويل بنكي').trim();
+
+        // فحص محلي أولي للرصيد المتاح لتجربة مستخدم سريعة
+        const totalPts = Number(ensuredProfile.points_balance || ensuredProfile.wallet_balance || 0);
+        const lockedPts = Number(ensuredProfile.locked_points || 0);
+        const availablePts = Math.max(0, totalPts - lockedPts);
+
+        if (availablePts < numAmount) {
+            return {
+                data: null,
+                error: {
+                    message: `عذراً، الرصيد المتاح القابل للسحب (${availablePts} نقطة) غير كافٍ لتغطية المبلغ المطلوب (${numAmount} نقطة).`
+                }
+            };
+        }
+
+        // استدعاء دالة RPC الذرية المؤمّنة (Atomic Request & Freeze)
+        const { data: rpcData, error: rpcError } = await client.rpc('request_withdrawal', {
+            p_amount: numAmount,
+            p_method: cleanMethod,
+            p_details: cleanDetails
+        });
+
+        if (!rpcError && rpcData) {
+            await waseetRefreshMyWalletBalance();
+            return { data: rpcData, error: null };
+        }
+
+        // في حال عدم توفر دالة RPC بعد، استخدام الإدراج المباشر مع Fallback
+        console.warn('[Withdrawal Request] فشل استدعاء RPC، محاولة الإدراج المباشر:', rpcError?.message);
+
+        const payload = {
+            user_id: ensuredProfile.id,
+            amount: numAmount,
+            method: cleanMethod,
+            details: cleanDetails,
+            status: 'pending'
+        };
+
+        const { data: insertData, error: insertError } = await client
+            .from('withdrawals')
+            .insert([payload])
+            .select('*')
+            .single();
+
+        if (insertError) {
+            console.error('[Withdrawal Request] خطأ الإدراج في withdrawals:', insertError.message);
+            return { data: null, error: insertError };
+        }
+
+        // تحديث محلي في الذاكرة لتجميد النقاط
+        if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+            WASEET_STATE.user.locked_points = (WASEET_STATE.user.locked_points || 0) + numAmount;
+            if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+
+        await waseetRefreshMyWalletBalance();
+        return { data: insertData, error: null };
+    } catch (err) {
+        console.error('[Withdrawal Request] استثناء أثناء تقديم طلب السحب:', err);
+        return { data: null, error: { message: err.message || 'حدث خطأ غير متوقع أثناء إرسال طلب السحب' } };
+    }
+}
+
+/**
+ * جلب طلبات السحب الخاصة بالمستخدم الحالي
+ */
+async function waseetFetchMyWithdrawals() {
+    const client = initWaseetSupabase();
+    if (!client) return [];
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const userId = session?.user?.id || (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user ? WASEET_STATE.user.id : null);
+        if (!userId || !waseetIsValidUuid(userId)) return [];
+
+        const { data, error } = await client
+            .from('withdrawals')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (error) {
+            console.warn('[Withdrawals] خطأ جلب طلباتي:', error.message);
+            return [];
+        }
+        return Array.isArray(data) ? data : [];
+    } catch (err) {
+        console.warn('[Withdrawals] استثناء جلب طلباتي:', err);
+        return [];
+    }
+}
+
+/**
+ * [للمدير] جلب كافة طلبات السحب مع بيانات أصحابها
+ */
+async function waseetAdminFetchWithdrawals() {
+    const client = initWaseetSupabase();
+    if (!client) return [];
+
+    try {
+        const { data: requests, error } = await client
+            .from('withdrawals')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(300);
+
+        if (error) {
+            console.error('[Admin Withdrawals] خطأ جلب طلبات السحب:', error.message);
+            return [];
+        }
+
+        if (!Array.isArray(requests) || requests.length === 0) return [];
+
+        const userIds = Array.from(new Set(requests.map(r => r.user_id).filter(id => waseetIsValidUuid(id))));
+        const profilesMap = {};
+
+        if (userIds.length > 0) {
+            const { data: profiles } = await client
+                .from('profiles')
+                .select('id, name, email, avatar_url, points_balance, wallet_balance, locked_points')
+                .in('id', userIds);
+
+            if (Array.isArray(profiles)) {
+                profiles.forEach(p => {
+                    if (p && p.id) profilesMap[p.id] = p;
+                });
+            }
+        }
+
+        return requests.map(r => ({
+            ...r,
+            userProfile: profilesMap[r.user_id] || null
+        }));
+    } catch (err) {
+        console.error('[Admin Withdrawals] استثناء جلب طلبات السحب:', err);
+        return [];
+    }
+}
+
+/**
+ * [للمدير] اعتماد طلب سحب رصيد وخصم النقاط نهائياً
+ */
+async function waseetAdminApproveWithdrawal(requestId, adminNote = '') {
+    const client = initWaseetSupabase();
+    if (!client) return { data: null, error: { message: 'تعذر الاتصال بـ Supabase' } };
+
+    try {
+        const { data, error } = await client.rpc('approve_withdrawal_request', {
+            p_request_id: requestId,
+            p_admin_note: adminNote || 'تم تحويل المبلغ المالي واعتماد السحب بنجاح'
+        });
+
+        if (error) {
+            console.error('[Admin Approve Withdrawal] خطأ RPC:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        await waseetUpdateAdminPendingWithdrawalsBadge();
+        return { data, error: null };
+    } catch (err) {
+        console.error('[Admin Approve Withdrawal] استثناء:', err);
+        return { data: null, error: { message: err.message || 'فشل اعتماد طلب السحب' } };
+    }
+}
+
+/**
+ * [للمدير] رفض طلب سحب رصيد وفك تجميد النقاط لتعود للمستخدم
+ */
+async function waseetAdminRejectWithdrawal(requestId, adminNote = '') {
+    const client = initWaseetSupabase();
+    if (!client) return { data: null, error: { message: 'تعذر الاتصال بـ Supabase' } };
+
+    try {
+        const { data, error } = await client.rpc('reject_withdrawal_request', {
+            p_request_id: requestId,
+            p_admin_note: adminNote || 'تم رفض طلب السحب وإعادة النقاط للمحفظة'
+        });
+
+        if (error) {
+            console.error('[Admin Reject Withdrawal] خطأ RPC:', error.message);
+            return { data: null, error };
+        }
+
+        await waseetRefreshMyWalletBalance();
+        await waseetUpdateAdminPendingWithdrawalsBadge();
+        return { data, error: null };
+    } catch (err) {
+        console.error('[Admin Reject Withdrawal] استثناء:', err);
+        return { data: null, error: { message: err.message || 'فشل رفض طلب السحب' } };
+    }
+}
+
+/**
+ * تحديث شارة عدد طلبات السحب المعلقة في شريط التنقل للمدير
+ */
+async function waseetUpdateAdminPendingWithdrawalsBadge() {
+    const client = initWaseetSupabase();
+    if (!client) return;
+
+    try {
+        const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+        const isAdmin = user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' ? isMediatorUser(user) : false));
+        if (!isAdmin) return;
+
+        const { count, error } = await client
+            .from('withdrawals')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending');
+
+        if (!error && typeof count === 'number') {
+            const badges = document.querySelectorAll('#admin-nav-withdrawals-badge, .admin-withdrawals-badge-count');
+            badges.forEach(el => {
+                el.innerText = count > 0 ? String(count) : '';
+                el.style.display = count > 0 ? 'inline-flex' : 'none';
+            });
+        }
+    } catch (e) {}
+}
+
+/**
  * حجز النقاط في قاعدة البيانات عند طلب شراء حساب (Escrow Lock) وتغيير حالة الحساب إلى in_deal ليختفي من السوق العام
  */
 async function waseetLockEscrowPointsInDb(dealObj) {
@@ -2722,6 +2975,13 @@ window.waseetDemoteBroker = waseetDemoteBroker;
 window.waseetFetchRegionalBrokers = waseetFetchRegionalBrokers;
 window.waseetGetBrokerForCountry = waseetGetBrokerForCountry;
 
+window.waseetSubmitWithdrawalRequest = waseetSubmitWithdrawalRequest;
+window.waseetFetchMyWithdrawals = waseetFetchMyWithdrawals;
+window.waseetAdminFetchWithdrawals = waseetAdminFetchWithdrawals;
+window.waseetAdminApproveWithdrawal = waseetAdminApproveWithdrawal;
+window.waseetAdminRejectWithdrawal = waseetAdminRejectWithdrawal;
+window.waseetUpdateAdminPendingWithdrawalsBadge = waseetUpdateAdminPendingWithdrawalsBadge;
+
 /**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
  */
@@ -2734,6 +2994,7 @@ function initWaseetAuthListener() {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
             await waseetSyncAuthState();
             await waseetUpdateAdminPendingDepositsBadge();
+            await waseetUpdateAdminPendingWithdrawalsBadge();
             waseetSyncAllNavBadges();
         } else if (event === 'SIGNED_OUT') {
             if (typeof WASEET_STATE !== 'undefined') {
@@ -2763,6 +3024,7 @@ if (typeof window !== 'undefined') {
         waseetInitGlobalNavRealtimeBadges();
         waseetSyncAuthState();
         setTimeout(waseetUpdateAdminPendingDepositsBadge, 800);
+        setTimeout(waseetUpdateAdminPendingWithdrawalsBadge, 850);
     }
     if (document.readyState === 'loading') {
         window.addEventListener('DOMContentLoaded', runInitialEnhancements);

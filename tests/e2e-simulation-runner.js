@@ -600,6 +600,90 @@ async function runE2ESimulation() {
     assert(configuredRes.ok === true && configuredRes.templateParams.to_email === 'broker.dz@waseet.com' && configuredRes.templateParams.country_code === 'DZ', 'EmailJS Pipeline', 'Configured Automated Dispatch Integrity', 'Valid template payload constructed for recipient delivery');
 
     // --------------------------------------------------------------------------
+    // PHASE 10: WITHDRAWALS SYSTEM & FINANCIAL INTEGRITY
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 10: WITHDRAWALS SYSTEM & FINANCIAL INTEGRITY\x1b[0m');
+
+    // 10.1 User available balance check before withdrawal request
+    const sellerUser = DB.profiles.find(p => p.id === 'seller-uuid-202');
+    const prevSellerBalance = sellerUser.points_balance;
+    const prevSellerLocked = sellerUser.locked_points || 0;
+    const availableForWithdrawal = prevSellerBalance - prevSellerLocked;
+
+    // Reject withdrawal exceeding available balance
+    function simulateRequestWithdrawal(user, amount, method, details) {
+        if (!user) return { ok: false, error: 'User required' };
+        if (!amount || amount <= 0) return { ok: false, error: 'Positive amount required' };
+        if (!details || !details.trim()) return { ok: false, error: 'Details required' };
+        const available = (user.points_balance || 0) - (user.locked_points || 0);
+        if (amount > available) {
+            return { ok: false, error: 'Insufficient available points', available, requested: amount };
+        }
+        // Atomic freeze
+        user.locked_points = (user.locked_points || 0) + amount;
+        const wReq = {
+            id: 'withdraw_' + Date.now(),
+            user_id: user.id,
+            amount: amount,
+            method: method || 'تحويل بنكي',
+            details: details,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+        return { ok: true, request: wReq, new_locked: user.locked_points };
+    }
+
+    const excessiveWithdrawalRes = simulateRequestWithdrawal(sellerUser, availableForWithdrawal + 50, 'تحويل بنكي', 'IBAN123');
+    assert(excessiveWithdrawalRes.ok === false && excessiveWithdrawalRes.error === 'Insufficient available points', 'Withdrawal Flow', 'Overdraft Withdrawal Strict Rejection', 'Rejects withdrawal exceeding available balance');
+
+    // Valid withdrawal submission freezes points
+    const validAmount = 50;
+    const validWithdrawalRes = simulateRequestWithdrawal(sellerUser, validAmount, 'بريدي موب (BaridiMob)', 'RIP: 00799999000123456789');
+    assert(validWithdrawalRes.ok === true && sellerUser.locked_points === prevSellerLocked + validAmount, 'Withdrawal Flow', 'Withdrawal Request & Points Freeze', `Freezes ${validAmount} pts in locked_points upon submission`);
+
+    // 10.2 Admin Approval: Permanently deducts points and unlocks
+    function simulateAdminApproveWithdrawal(wReq, adminUser, adminNote) {
+        if (!isStrictAdminSim(adminUser)) return { ok: false, error: 'Admin only' };
+        if (wReq.status !== 'pending') return { ok: false, error: 'Already reviewed' };
+        const u = DB.profiles.find(p => p.id === wReq.user_id);
+        u.points_balance -= wReq.amount;
+        u.locked_points = Math.max(0, (u.locked_points || 0) - wReq.amount);
+        wReq.status = 'approved';
+        wReq.admin_note = adminNote;
+        wReq.reviewed_at = new Date().toISOString();
+        DB.wallet_transactions.push({
+            user_id: u.id,
+            amount: -wReq.amount,
+            balance_after: u.points_balance,
+            type: 'withdraw',
+            status: 'completed'
+        });
+        return { ok: true, new_balance: u.points_balance, new_locked: u.locked_points };
+    }
+
+    const approveRes = simulateAdminApproveWithdrawal(validWithdrawalRes.request, admin, 'تم التحويل لحساب بريدي موب');
+    assert(approveRes.ok === true && sellerUser.points_balance === prevSellerBalance - validAmount && sellerUser.locked_points === prevSellerLocked, 'Withdrawal Flow', 'Admin Approval & Permanent Balance Deduction', `Deducts ${validAmount} pts permanently from seller balance and unfreezes`);
+
+    // 10.3 Rejection test: User submits another withdrawal and admin rejects -> points unfrozen
+    const rejectAmount = 30;
+    const secondReqRes = simulateRequestWithdrawal(sellerUser, rejectAmount, 'PayPal', 'seller@paypal.com');
+    assert(secondReqRes.ok === true && sellerUser.locked_points === prevSellerLocked + rejectAmount, 'Withdrawal Flow', 'Second Withdrawal Request Freeze', 'Freezes requested points for second withdrawal');
+
+    function simulateAdminRejectWithdrawal(wReq, adminUser, reason) {
+        if (!isStrictAdminSim(adminUser)) return { ok: false, error: 'Admin only' };
+        if (wReq.status !== 'pending') return { ok: false, error: 'Already reviewed' };
+        const u = DB.profiles.find(p => p.id === wReq.user_id);
+        u.locked_points = Math.max(0, (u.locked_points || 0) - wReq.amount);
+        wReq.status = 'rejected';
+        wReq.admin_note = reason;
+        wReq.reviewed_at = new Date().toISOString();
+        return { ok: true, new_locked: u.locked_points };
+    }
+
+    const rejectRes = simulateAdminRejectWithdrawal(secondReqRes.request, admin, 'حساب باي بال غير مفعل');
+    assert(rejectRes.ok === true && sellerUser.locked_points === prevSellerLocked, 'Withdrawal Flow', 'Admin Rejection & Balance Unfreeze', 'Unfreezes points back to seller available balance on rejection');
+
+    // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------
     console.log('\n\x1b[35m=================================================================\x1b[0m');

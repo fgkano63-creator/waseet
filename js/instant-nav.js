@@ -21,6 +21,7 @@
         'pending-accounts.html',
         'admin-deposits.html',
         'admin-brokers.html',
+        'admin-withdrawals.html',
         'contact-support.html'
     ];
 
@@ -33,7 +34,7 @@
             const cleanUrl = url.split('#')[0].split('?')[0];
             const isHtml = cleanUrl.endsWith('.html');
             const isRoot = cleanUrl === '/' || cleanUrl === '';
-            const isPretty = /^\/(deals|chat|wallet|my-accounts|profile|pending-accounts|admin-chats|admin-deposits|admin-brokers|contact-support|auth\/callback|index)$/.test(cleanUrl);
+            const isPretty = /^\/(deals|chat|wallet|my-accounts|profile|pending-accounts|admin-chats|admin-deposits|admin-brokers|admin-withdrawals|contact-support|auth\/callback|index)$/.test(cleanUrl);
             if (!isHtml && !isRoot && !isPretty) return;
             if (cleanUrl.startsWith('http') && !cleanUrl.startsWith(window.location.origin)) return;
 

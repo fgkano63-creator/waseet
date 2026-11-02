@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="لوحة تحكم إدارة طلبات سحب النقاط والأرباح للبائعين والوسطاء المعتمدين في منصة وسيط.">
+    <title>إدارة طلبات سحب الأرباح | WASEET - لوحة المدير</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png?v=20261027_w_crop">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Waseet">
+
+    <!-- Custom 3D Design Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261026_v1">
+
+    <style>
+        .admin-withdrawals-container {
+            max-width: 1220px;
+            margin: var(--page-gap-top) auto var(--page-gap-bottom);
+            padding: 0 var(--page-gutter);
+        }
+
+        .admin-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-stat-box {
+            background: linear-gradient(145deg, rgba(20, 26, 42, 0.96), rgba(10, 14, 24, 0.98));
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 1.15rem 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+        }
+
+        .admin-stat-box.highlight-pending {
+            border-color: rgba(234, 88, 12, 0.6);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(234, 88, 12, 0.15);
+        }
+
+        .admin-filter-bar {
+            background: rgba(14, 19, 30, 0.92);
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-pills-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-metal);
+            color: var(--silver-muted);
+            padding: 0.48rem 0.95rem;
+            border-radius: 10px;
+            font-family: var(--font-ar);
+            font-size: 0.84rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.25), rgba(234, 88, 12, 0.2));
+            border-color: var(--gold-primary);
+            color: #fff;
+        }
+
+        .withdrawals-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 500px) {
+            .withdrawals-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .withdrawal-admin-card {
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.97), rgba(10, 13, 22, 0.99));
+            border: 1px solid var(--border-metal);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+
+        .withdrawal-admin-card:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-2px);
+        }
+
+        .withdrawal-admin-card.is-pending {
+            border-color: rgba(234, 88, 12, 0.45);
+        }
+
+        .card-top-header {
+            padding: 1.1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .user-meta-group {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            min-width: 0;
+        }
+
+        .user-avatar-small {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1.5px solid var(--gold-primary);
+            flex-shrink: 0;
+        }
+
+        .user-info-text {
+            min-width: 0;
+        }
+
+        .user-name-line {
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.94rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email-line {
+            color: var(--silver-muted);
+            font-size: 0.76rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .card-body-content {
+            padding: 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .financial-details-box {
+            background: rgba(12, 16, 26, 0.85);
+            border: 1px dashed rgba(197, 160, 89, 0.35);
+            border-radius: 12px;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .details-text-val {
+            font-family: monospace, var(--font-ar);
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            word-break: break-all;
+            line-height: 1.45;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .btn-copy-details {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--silver-light);
+            border-radius: 8px;
+            padding: 0.35rem 0.65rem;
+            font-family: var(--font-ar);
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-details:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-light);
+        }
+
+        .card-footer-actions {
+            padding: 1rem 1.2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(8, 12, 20, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        .btn-action-admin {
+            flex: 1;
+            padding: 0.55rem 0.75rem;
+            border-radius: 10px;
+            font-family: var(--font-ar);
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+
+        .btn-reject:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="ambient-canvas"></canvas>
+
+    <div class="app-wrapper">
+
+        <!-- ================= Header / Navbar ================= -->
+        <header class="header-navbar">
+            <div class="container nav-container">
+                <div class="nav-brand-group">
+                    <a href="index.html" class="brand-wrap">
+                        <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
+                        <div class="brand-text-col">
+                            <span class="brand-title">WASEET</span>
+                            <span class="brand-subtitle">لوحة الإدارة • طلبات السحب</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- شريط تنقل المدير -->
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
+                    <a href="admin-withdrawals.html" class="btn-nav-middle btn-nav-admin active" title="طلبات سحب الأرباح">
+                        <i class="fas fa-hand-holding-usd text-orange"></i> طلبات السحب
+                        <span class="deals-badge-count admin-withdrawals-badge-count" id="admin-nav-withdrawals-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط">
+                        <i class="fas fa-coins text-gold"></i> طلبات الشحن
+                        <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                        <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
+                    </a>
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                        <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                    </a>
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                        <i class="fas fa-crown text-gold"></i> قيد الشراء
+                    </a>
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم">
+                        <i class="fas fa-inbox text-gold"></i> محادثات الدعم
+                        <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
+                    </a>
+                    <a href="wallet.html" class="wallet-pill" style="text-decoration: none;" title="محفظة النقاط">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="admin-wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </a>
+                </nav>
+
+                <div class="nav-left-group">
+                    <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
+                        <i class="fas fa-wallet wallet-icon"></i>
+                        <div class="wallet-details">
+                            <span class="wallet-label">محفظة النقاط</span>
+                            <span class="wallet-amount" id="wallet-total-pts">0 نقطة</span>
+                        </div>
+                    </div>
+                    <div id="nav-user-container"></div>
+                    <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الرئيسية" title="القائمة الرئيسية">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- رسالة رفض الوصول لغير المدير -->
+        <div id="admin-access-denied" style="display: none; max-width: 560px; margin: 4rem auto; text-align: center; padding: 2.5rem 1.5rem; background: rgba(14,18,28,0.92); border: 2px dashed rgba(239,68,68,0.5); border-radius: 20px;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
+            <h2 style="color: #fff; margin: 0 0 0.6rem;">صلاحية الإدارة مطلوبة</h2>
+            <p style="color: var(--silver-muted); margin: 0 0 1.4rem; line-height: 1.6;">
+                هذه الصفحة مخصصة لمدير المنصة فقط لمراجعة واعتماد طلبات سحب الأرباح والنقاط للبائعين والوسطاء.
+            </p>
+            <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> العودة للمتجر</a>
+        </div>
+
+        <!-- ================= Main Admin Content ================= -->
+        <main class="admin-withdrawals-container" id="admin-withdrawals-main" style="display: none;">
+
+            <!-- ترويسة الصفحة الرئيسية -->
+            <header class="admin-withdrawals-header" style="margin-bottom: 1.5rem;">
+                <h1 style="color: #fff; font-size: 1.7rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.4rem 0;">
+                    <i class="fas fa-hand-holding-usd text-gold"></i>
+                    إدارة طلبات سحب النقاط والأرباح
+                </h1>
+                <p style="color: var(--silver-muted); font-size: 0.9rem; margin: 0;">
+                    مراجعة وتدقيق طلبات سحب الأرباح المقدمة من البائعين والوسطاء، وتحويل المستحقات المالية، واعتماد أو رفض السحب.
+                </p>
+            </header>
+
+            <!-- 1. شريط الإحصائيات -->
+            <section class="admin-stats-bar">
+                <div class="admin-stat-box highlight-pending">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">طلبات سحب قيد الانتظار</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: #fbbf24;" id="stat-pending-count">0</div>
+                    </div>
+                    <i class="fas fa-hourglass-half" style="font-size: 1.8rem; color: #fbbf24; opacity: 0.85;"></i>
+                </div>
+
+                <div class="admin-stat-box">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">طلبات سحب معتمدة</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: #34d399;" id="stat-approved-count">0</div>
+                    </div>
+                    <i class="fas fa-check-double" style="font-size: 1.8rem; color: #34d399; opacity: 0.85;"></i>
+                </div>
+
+                <div class="admin-stat-box">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">إجمالي النقاط المسحوبة</div>
+                        <div style="font-size: 1.8rem; font-weight: 900; color: var(--gold-light);">
+                            <span id="stat-total-withdrawn">0</span> <small style="font-size: 0.9rem;">نقطة</small>
+                        </div>
+                    </div>
+                    <i class="fas fa-coins" style="font-size: 1.8rem; color: var(--gold-primary); opacity: 0.85;"></i>
+                </div>
+
+                <div class="admin-stat-box">
+                    <div>
+                        <div style="color: var(--silver-muted); font-size: 0.82rem; font-weight: 700;">إجراء سريع</div>
+                        <button type="button" class="btn-3d btn-outline" onclick="loadAdminWithdrawals()" style="padding: 0.35rem 0.8rem; font-size: 0.8rem; margin-top: 4px;">
+                            <i class="fas fa-sync-alt" id="admin-sync-icon"></i> تحديث القائمة
+                        </button>
+                    </div>
+                    <i class="fas fa-tachometer-alt" style="font-size: 1.8rem; color: var(--silver-muted); opacity: 0.5;"></i>
+                </div>
+            </section>
+
+            <!-- 2. شريط الفلترة والبحث -->
+            <section class="admin-filter-bar">
+                <div class="filter-pills-group">
+                    <button type="button" class="filter-pill-btn active" data-filter="pending" onclick="setWithdrawalFilter('pending', this)">
+                        قيد الانتظار (<span id="filter-count-pending">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="all" onclick="setWithdrawalFilter('all', this)">
+                        كافة الطلبات (<span id="filter-count-all">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="approved" onclick="setWithdrawalFilter('approved', this)">
+                        المعتمدة (<span id="filter-count-approved">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill-btn" data-filter="rejected" onclick="setWithdrawalFilter('rejected', this)">
+                        المرفوضة (<span id="filter-count-rejected">0</span>)
+                    </button>
+                </div>
+
+                <div style="position: relative; min-width: 240px; flex: 1; max-width: 360px;">
+                    <input type="text" id="admin-search-input" placeholder="بحث باسم المستخدم أو البريد..." oninput="handleSearchWithdrawals(this.value)" style="width: 100%; padding: 0.55rem 0.85rem 0.55rem 2.2rem; border-radius: 10px; background: rgba(10, 14, 24, 0.85); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.85rem; box-sizing: border-box;">
+                    <i class="fas fa-search" style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--silver-muted); pointer-events: none; font-size: 0.85rem;"></i>
+                </div>
+            </section>
+
+            <!-- 3. شبكة بطاقات طلبات السحب -->
+            <section id="withdrawals-cards-container" class="withdrawals-cards-grid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--silver-muted);">
+                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 0.75rem;"></i>
+                    <div>جاري تحميل طلبات السحب...</div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ================= Sliding Drawer ================= -->
+        <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleWaseetDrawer(false)"></div>
+        <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
+                    <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
+                </div>
+                <button class="drawer-close-btn" onclick="toggleWaseetDrawer(false)">&times;</button>
+            </div>
+
+            <div class="drawer-user-card" id="drawer-user-card"></div>
+            <div class="drawer-auth-actions" id="drawer-auth-actions" style="padding: 0 1.25rem 0.75rem;"></div>
+
+            <div class="drawer-section">
+                <h4 class="drawer-section-title">لوحة الإدارة والتحكم</h4>
+                <div class="drawer-shortcuts-grid">
+                    <a href="admin-withdrawals.html" class="drawer-shortcut-card active" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-hand-holding-usd text-orange"></i>
+                        <span>طلبات السحب</span>
+                    </a>
+                    <a href="admin-deposits.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-coins text-gold"></i>
+                        <span>طلبات الشحن</span>
+                    </a>
+                    <a href="admin-brokers.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-globe-africa text-orange"></i>
+                        <span>الوسطاء الإقليميين</span>
+                    </a>
+                    <a href="pending-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-clipboard-check text-orange"></i>
+                        <span>قيد الفحص</span>
+                    </a>
+                    <a href="deals.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-crown text-gold"></i>
+                        <span>قيد الشراء</span>
+                    </a>
+                    <a href="admin-chats.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-inbox text-gold"></i>
+                        <span>محادثات الدعم</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <h4 class="drawer-section-title">اختصارات الموقع</h4>
+                <div class="drawer-shortcuts-grid">
+                    <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-store text-gold"></i>
+                        <span>سوق الحسابات</span>
+                    </a>
+                    <a href="wallet.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-wallet text-orange"></i>
+                        <span>المحفظة</span>
+                    </a>
+                    <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
+                        <i class="fas fa-boxes text-gold"></i>
+                        <span>حساباتي</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ================= Mobile Bottom Nav ================= -->
+        <nav class="mobile-bottom-nav">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="index.html#marketplace" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>المتجر</span>
+            </a>
+            <a href="admin-withdrawals.html" class="mobile-nav-item mobile-nav-center-action active" title="طلبات السحب">
+                <div class="center-action-circle" style="background: linear-gradient(135deg, var(--gold-primary), var(--orange-bright));">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <span>طلبات السحب</span>
+            </a>
+            <a href="deals.html" class="mobile-nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>قيد الشراء</span>
+            </a>
+            <a href="wallet.html" class="mobile-nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>المحفظة</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js?v=20261025_gw"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js?v=20261025_gw"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/support.js"></script>
+    <script src="js/notifications.js?v=20261026_w2"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/instant-nav.js" defer></script>
+    <script src="js/pwa-register.js"></script>
+
+    <script>
+        let allWithdrawalsList = [];
+        let currentFilterStatus = 'pending';
+        let currentSearchQuery = '';
+        let adminWithdrawalsRealtime = null;
+
+        function toggleWaseetDrawer(force) {
+            const drawer = document.getElementById('mobile-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (!drawer || !overlay) return;
+
+            const isOpen = drawer.classList.contains('active');
+            const shouldOpen = typeof force === 'boolean' ? force : !isOpen;
+
+            if (shouldOpen) {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+            } else {
+                drawer.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function escapeSafe(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        async function copyDetailsText(text, btnEl) {
+            if (!text) return;
+            try {
+                await navigator.clipboard.writeText(text);
+                if (btnEl) {
+                    const origHtml = btnEl.innerHTML;
+                    btnEl.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
+                    setTimeout(() => {
+                        btnEl.innerHTML = origHtml;
+                    }, 1800);
+                }
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (btnEl) {
+                    const origHtml = btnEl.innerHTML;
+                    btnEl.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
+                    setTimeout(() => {
+                        btnEl.innerHTML = origHtml;
+                    }, 1800);
+                }
+            }
+        }
+
+        function setWithdrawalFilter(filter, btnEl) {
+            currentFilterStatus = filter;
+            document.querySelectorAll('.filter-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            renderWithdrawalsCards();
+        }
+
+        function handleSearchWithdrawals(query) {
+            currentSearchQuery = (query || '').toLowerCase().trim();
+            renderWithdrawalsCards();
+        }
+
+        function renderWithdrawalsCards() {
+            const container = document.getElementById('withdrawals-cards-container');
+            if (!container) return;
+
+            let filtered = allWithdrawalsList.filter(item => {
+                if (currentFilterStatus !== 'all' && item.status !== currentFilterStatus) {
+                    return false;
+                }
+                if (currentSearchQuery) {
+                    const userName = (item.userProfile?.name || '').toLowerCase();
+                    const userEmail = (item.userProfile?.email || '').toLowerCase();
+                    const method = (item.method || '').toLowerCase();
+                    const details = (item.details || '').toLowerCase();
+                    return userName.includes(currentSearchQuery) ||
+                           userEmail.includes(currentSearchQuery) ||
+                           method.includes(currentSearchQuery) ||
+                           details.includes(currentSearchQuery);
+                }
+                return true;
+            });
+
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--silver-muted); background: rgba(14,19,30,0.6); border: 1px dashed var(--border-metal); border-radius: 16px;">
+                        <i class="fas fa-inbox" style="font-size: 2.5rem; color: var(--gold-primary); opacity: 0.6; margin-bottom: 0.8rem;"></i>
+                        <h3 style="color: #fff; margin: 0 0 0.4rem;">لا توجد طلبات سحب مطابقة</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">لم يتم العثور على طلبات سحب في هذا القسم حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(req => {
+                const user = req.userProfile || {};
+                const userName = escapeSafe(user.name || 'مستخدم المنصة');
+                const userEmail = escapeSafe(user.email || 'بدون بريد');
+                const userAvatar = escapeSafe(user.avatar_url || 'assets/logo.png');
+                const userTotalPts = Number(user.points_balance || user.wallet_balance || 0);
+                const userLockedPts = Number(user.locked_points || 0);
+                const dt = new Date(req.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+
+                let statusBadge = `<span class="status-pill pending"><i class="fas fa-clock"></i> قيد المراجعة</span>`;
+                if (req.status === 'approved') {
+                    statusBadge = `<span class="status-pill approved"><i class="fas fa-check-circle"></i> معتمد ومصروف</span>`;
+                } else if (req.status === 'rejected') {
+                    statusBadge = `<span class="status-pill rejected"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                }
+
+                const actionsHtml = req.status === 'pending'
+                    ? `
+                        <div class="card-footer-actions">
+                            <button type="button" class="btn-action-admin btn-approve" onclick="handleApproveWithdrawal('${req.id}', '${userName}', ${Number(req.amount)}, '${escapeSafe(req.method)}')">
+                                <i class="fas fa-check"></i> موافقة وصرف (${Number(req.amount)} نقطة)
+                            </button>
+                            <button type="button" class="btn-action-admin btn-reject" onclick="handleRejectWithdrawal('${req.id}', '${userName}', ${Number(req.amount)})">
+                                <i class="fas fa-times"></i> رفض وإلغاء الحجز
+                            </button>
+                        </div>
+                    `
+                    : `
+                        <div class="card-footer-actions" style="font-size: 0.78rem; color: var(--silver-muted);">
+                            <span><i class="fas fa-history"></i> الحالة: ${statusBadge}</span>
+                            ${req.reviewed_at ? `<span>${new Date(req.reviewed_at).toLocaleDateString('ar-EG')}</span>` : ''}
+                        </div>
+                    `;
+
+                const adminNoteBox = req.admin_note
+                    ? `
+                        <div style="background: rgba(255, 255, 255, 0.04); border-right: 3px solid ${req.status === 'approved' ? '#10b981' : '#ef4444'}; border-radius: 6px; padding: 0.5rem 0.7rem; font-size: 0.76rem; color: var(--silver-light);">
+                            <strong style="color: ${req.status === 'approved' ? '#34d399' : '#f87171'};"><i class="fas fa-comment"></i> ملاحظة الإدارة:</strong> ${escapeSafe(req.admin_note)}
+                        </div>
+                    `
+                    : '';
+
+                return `
+                    <div class="withdrawal-admin-card ${req.status === 'pending' ? 'is-pending' : ''}">
+                        <div class="card-top-header">
+                            <div class="user-meta-group">
+                                <img src="${userAvatar}" alt="${userName}" class="user-avatar-small" onerror="this.src='assets/logo.png'">
+                                <div class="user-info-text">
+                                    <div class="user-name-line">${userName}</div>
+                                    <div class="user-email-line">${userEmail}</div>
+                                </div>
+                            </div>
+                            <div>${statusBadge}</div>
+                        </div>
+
+                        <div class="card-body-content">
+                            <!-- المبلغ وطريقة الاستلام -->
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; background: rgba(0,0,0,0.3); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                                <div>
+                                    <div style="font-size: 0.72rem; color: var(--silver-muted);">المبلغ المطلوب:</div>
+                                    <div style="font-size: 1.45rem; font-weight: 900; color: var(--gold-light); font-family: var(--font-en);">${Number(req.amount)} <small style="font-size: 0.85rem;">نقطة</small></div>
+                                </div>
+                                <div style="text-align: left;">
+                                    <span style="display: inline-block; background: rgba(234, 88, 12, 0.16); border: 1px solid rgba(234, 88, 12, 0.4); color: var(--orange-bright); padding: 0.25rem 0.65rem; border-radius: 8px; font-size: 0.76rem; font-weight: 800;">
+                                        <i class="fas fa-wallet"></i> ${escapeSafe(req.method)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- رصيد صاحب الطلب الحالي -->
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--silver-muted); padding: 0 0.2rem;">
+                                <span>إجمالي رصيد المستخدم: <strong style="color: #fff;">${userTotalPts} نقطة</strong></span>
+                                <span>المحجوز: <strong style="color: var(--orange-bright);">${userLockedPts} نقطة</strong></span>
+                            </div>
+
+                            <!-- بيانات الحساب المالي للمستخدم مع زر النسخ -->
+                            <div class="financial-details-box">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.72rem; color: var(--silver-muted); font-weight: 700;">
+                                        <i class="fas fa-money-check-alt text-gold"></i> بيانات الحساب / المحفظة للاستلام:
+                                    </span>
+                                    <button type="button" class="btn-copy-details" onclick="copyDetailsText('${escapeSafe(req.details)}', this)">
+                                        <i class="far fa-copy"></i> نسخ البيانات
+                                    </button>
+                                </div>
+                                <div class="details-text-val">${escapeSafe(req.details)}</div>
+                            </div>
+
+                            ${adminNoteBox}
+
+                            <div style="font-size: 0.72rem; color: var(--silver-muted); text-align: left;">
+                                <i class="far fa-clock"></i> تاريخ التقديم: ${dt}
+                            </div>
+                        </div>
+
+                        ${actionsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadAdminWithdrawals() {
+            const syncIcon = document.getElementById('admin-sync-icon');
+            if (syncIcon) syncIcon.classList.add('fa-spin');
+
+            try {
+                const list = (typeof waseetAdminFetchWithdrawals === 'function')
+                    ? await waseetAdminFetchWithdrawals()
+                    : [];
+
+                allWithdrawalsList = Array.isArray(list) ? list : [];
+
+                const pendingCount = allWithdrawalsList.filter(w => w.status === 'pending').length;
+                const approvedList = allWithdrawalsList.filter(w => w.status === 'approved');
+                const approvedCount = approvedList.length;
+                const rejectedCount = allWithdrawalsList.filter(w => w.status === 'rejected').length;
+                const totalWithdrawn = approvedList.reduce((sum, w) => sum + Number(w.amount || 0), 0);
+
+                const statPending = document.getElementById('stat-pending-count');
+                const statApproved = document.getElementById('stat-approved-count');
+                const statTotal = document.getElementById('stat-total-withdrawn');
+                if (statPending) statPending.innerText = pendingCount;
+                if (statApproved) statApproved.innerText = approvedCount;
+                if (statTotal) statTotal.innerText = totalWithdrawn;
+
+                const fcPending = document.getElementById('filter-count-pending');
+                const fcAll = document.getElementById('filter-count-all');
+                const fcApproved = document.getElementById('filter-count-approved');
+                const fcRejected = document.getElementById('filter-count-rejected');
+                if (fcPending) fcPending.innerText = pendingCount;
+                if (fcAll) fcAll.innerText = allWithdrawalsList.length;
+                if (fcApproved) fcApproved.innerText = approvedCount;
+                if (fcRejected) fcRejected.innerText = rejectedCount;
+
+                // تحديث الشارة في شريط التنقل
+                const navBadge = document.getElementById('admin-nav-withdrawals-badge');
+                if (navBadge) {
+                    navBadge.innerText = pendingCount > 0 ? String(pendingCount) : '';
+                    navBadge.style.display = pendingCount > 0 ? 'inline-flex' : 'none';
+                }
+
+                renderWithdrawalsCards();
+            } finally {
+                if (syncIcon) syncIcon.classList.remove('fa-spin');
+            }
+        }
+
+        async function handleApproveWithdrawal(requestId, userName, amount, method) {
+            let note = 'تم تحويل المبلغ المالي واعتماد السحب بنجاح';
+            if (typeof waseetPrompt === 'function') {
+                const inputNote = await waseetPrompt(
+                    `اعتماد سحب (${amount} نقطة) للمستخدم ${userName}`,
+                    'أدخل رقم الحوالة أو الملاحظة للمستخدم (اختياري):',
+                    note
+                );
+                if (inputNote === null) return;
+                if (inputNote.trim()) note = inputNote.trim();
+            } else {
+                const confirmed = confirm(`هل تم تحويل المستحقات المالية للمستخدم ${userName} وتريد اعتماد سحب (${amount} نقطة) وخصمها نهائياً؟`);
+                if (!confirmed) return;
+            }
+
+            const { error } = await waseetAdminApproveWithdrawal(requestId, note);
+            if (error) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تعذر اعتماد السحب', error.message, 'danger');
+                } else {
+                    alert(error.message);
+                }
+                return;
+            }
+
+            await loadAdminWithdrawals();
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('تم اعتماد السحب بنجاح!', `تم خصم ${amount} نقطة من رصيد ${userName} نهائياً وإشعار المستخدم.`, 'success');
+            }
+        }
+
+        async function handleRejectWithdrawal(requestId, userName, amount) {
+            let reason = 'بيانات الحساب غير صحيحة أو التحويل غير متاح، يرجى مراجعة الدعم';
+            if (typeof waseetPrompt === 'function') {
+                const inputReason = await waseetPrompt(
+                    `رفض طلب سحب (${amount} نقطة) لـ ${userName}`,
+                    'أدخل سبب رفض طلب السحب (سيظهر للمستخدم وسيتم فك حجز النقاط):',
+                    reason
+                );
+                if (inputReason === null) return;
+                if (inputReason.trim()) reason = inputReason.trim();
+            } else {
+                const inputReason = prompt(`سبب رفض طلب السحب للمستخدم ${userName}:`, reason);
+                if (inputReason === null) return;
+                if (inputReason.trim()) reason = inputReason.trim();
+            }
+
+            const { error } = await waseetAdminRejectWithdrawal(requestId, reason);
+            if (error) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تعذر رفض الطلب', error.message, 'danger');
+                } else {
+                    alert(error.message);
+                }
+                return;
+            }
+
+            await loadAdminWithdrawals();
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('تم رفض الطلب وفك تجميد الرصيد', `تمت إعادة ${amount} نقطة إلى رصيد ${userName} المتاح بنجاح.`, 'warning');
+            }
+        }
+
+        function setupAdminWithdrawalsRealtime() {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            if (adminWithdrawalsRealtime) {
+                try { client.removeChannel(adminWithdrawalsRealtime); } catch (e) {}
+            }
+
+            try {
+                adminWithdrawalsRealtime = client
+                    .channel('admin-withdrawals-live')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'withdrawals'
+                    }, () => {
+                        loadAdminWithdrawals();
+                    })
+                    .subscribe();
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(async () => {
+                const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+                const isAdmin = !!(user && (
+                    user.role === 'admin' ||
+                    (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+                ) && user.role !== 'regional_broker' && user.role !== 'user');
+
+                if (!isAdmin) {
+                    document.getElementById('admin-access-denied').style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('admin-withdrawals-main').style.display = 'block';
+                await loadAdminWithdrawals();
+                setupAdminWithdrawalsRealtime();
+            }, 450);
+        });
+    </script>
+</body>
+</html>

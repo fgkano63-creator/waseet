@@ -108,6 +108,8 @@ class WaseetApp {
             if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'flex';
             const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
             if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'flex';
+            const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
+            if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'flex';
         } else {
             if (userNavMiddle) userNavMiddle.style.display = 'flex';
             if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -121,6 +123,8 @@ class WaseetApp {
             if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'none';
             const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
             if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
+            const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
+            if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         }
 
         // شارات المدير في الشريط العلوي (تختفي تماماً إذا كان العدد 0)
@@ -143,9 +147,14 @@ class WaseetApp {
         if (drawerAdminChats) drawerAdminChats.style.display = isAdmin ? '' : 'none';
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
         if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? '' : 'none';
+        const drawerAdminWithdrawalsLink = document.getElementById('drawer-admin-withdrawals-link');
+        if (drawerAdminWithdrawalsLink) drawerAdminWithdrawalsLink.style.display = isAdmin ? '' : 'none';
 
         if (isAdmin && typeof window.waseetUpdateAdminPendingDepositsBadge === 'function') {
             window.waseetUpdateAdminPendingDepositsBadge();
+        }
+        if (isAdmin && typeof window.waseetUpdateAdminPendingWithdrawalsBadge === 'function') {
+            window.waseetUpdateAdminPendingWithdrawalsBadge();
         }
 
         this.updatePendingAccountsCounter();

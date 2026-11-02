@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-02T18:52:09.721Z",
+  "timestamp": "2026-11-02T19:28:54.204Z",
   "metrics": {
-    "totalChecks": 175,
-    "passed": 175,
+    "totalChecks": 180,
+    "passed": 180,
     "warnings": 0,
     "failures": 0
   },
@@ -278,7 +278,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (38 async, 67 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (44 async, 73 catch)",
         "details": null
       },
       {
@@ -405,6 +405,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in admin-withdrawals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in admin-withdrawals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in admin-withdrawals.html",
         "details": null
       },
       {
@@ -697,6 +718,20 @@
         "details": null
       },
       {
+        "id": "Viewport-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in admin-withdrawals.html",
+        "details": null
+      },
+      {
+        "id": "RTL-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in admin-withdrawals.html",
+        "details": null
+      },
+      {
         "id": "Viewport-auth\\callback\\index.html",
         "status": "PASS",
         "severity": "INFO",
@@ -854,7 +889,7 @@
         "id": "CSS-Breakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive layout defined with 39 media queries",
+        "message": "Comprehensive responsive layout defined with 41 media queries",
         "details": null
       },
       {
@@ -884,7 +919,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 76 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 78 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

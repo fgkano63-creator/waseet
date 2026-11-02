@@ -23,8 +23,10 @@
     { "source": "/pending-accounts", "destination": "/pending-accounts.html" },
     { "source": "/admin-chats", "destination": "/admin-chats.html" },
     { "source": "/admin-deposits", "destination": "/admin-deposits.html" },
+    { "source": "/admin-withdrawals", "destination": "/admin-withdrawals.html" },
     { "source": "/admin-brokers", "destination": "/admin-brokers.html" },
     { "source": "/contact-support", "destination": "/contact-support.html" },
+    { "source": "/maintenance", "destination": "/maintenance.html" },
     { "source": "/auth/callback", "destination": "/auth/callback.html" },
     { "source": "/auth/callback/", "destination": "/auth/callback.html" }
   ]

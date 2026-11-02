@@ -45,6 +45,7 @@ $walletHtml = Get-Content 'D:\waseet-app\wallet.html' -Raw -Encoding UTF8
 $myAccountsHtml = Get-Content 'D:\waseet-app\my-accounts.html' -Raw -Encoding UTF8
 $pendingAccountsHtml = Get-Content 'D:\waseet-app\pending-accounts.html' -Raw -Encoding UTF8
 $adminDepositsHtml = Get-Content 'D:\waseet-app\admin-deposits.html' -Raw -Encoding UTF8
+$adminWithdrawalsHtml = Get-Content 'D:\waseet-app\admin-withdrawals.html' -Raw -Encoding UTF8
 $adminChatsHtml = Get-Content 'D:\waseet-app\admin-chats.html' -Raw -Encoding UTF8
 $adminBrokersHtml = Get-Content 'D:\waseet-app\admin-brokers.html' -Raw -Encoding UTF8
 $contactSupportHtml = Get-Content 'D:\waseet-app\contact-support.html' -Raw -Encoding UTF8
@@ -128,6 +129,12 @@ Check-Result -Flow 'Wallet System' -Name 'Payment Methods Responsive CSS Grid Ar
 
 $wallet5 = $supabaseJs.Contains('waseetAdminSavePaymentMethod') -and $supabaseJs.Contains('waseetFetchPaymentMethods') -and $walletHtml.Contains('handleTogglePaymentMethodActive')
 Check-Result -Flow 'Wallet System' -Name 'Dynamic Payment Methods Manager' -Success $wallet5 -Detail 'Admin controls to add, toggle, and manage active payment gateways'
+
+$wallet6 = $walletHtml.Contains('modal-withdrawal-request') -and $walletHtml.Contains('handleWithdrawalFormSubmit') -and $supabaseJs.Contains('waseetSubmitWithdrawalRequest')
+Check-Result -Flow 'Wallet System' -Name 'Withdrawal Request Submission & Balance Shield' -Success $wallet6 -Detail 'Validates available balance, submits withdrawal request and triggers points freeze'
+
+$wallet7 = $adminWithdrawalsHtml.Contains('handleApproveWithdrawal') -and $adminWithdrawalsHtml.Contains('handleRejectWithdrawal') -and $supabaseJs.Contains('waseetAdminApproveWithdrawal') -and $supabaseJs.Contains('waseetAdminRejectWithdrawal')
+Check-Result -Flow 'Wallet System' -Name 'Admin Withdrawal Payout Approval & Unfreeze Rejection' -Success $wallet7 -Detail 'Allows admin to review financial accounts, approve payout deduction or reject with unfreeze'
 
 Write-Host ""
 Write-Host ">>> 5. FLOW 5: ADMIN MEDIATION AND LIFECYCLE PARITY" -ForegroundColor Yellow

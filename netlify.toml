@@ -68,6 +68,11 @@
   status = 200
 
 [[redirects]]
+  from = "/admin-withdrawals"
+  to = "/admin-withdrawals.html"
+  status = 200
+
+[[redirects]]
   from = "/admin-brokers"
   to = "/admin-brokers.html"
   status = 200

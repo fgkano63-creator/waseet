@@ -993,6 +993,10 @@
 
                 <!-- شريط المدير -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-withdrawals.html" class="btn-nav-middle btn-nav-admin" title="طلبات سحب الأرباح" style="display: none;">
+                        <i class="fas fa-hand-holding-usd text-orange"></i> طلبات السحب
+                        <span class="deals-badge-count admin-withdrawals-badge-count" id="admin-nav-withdrawals-badge" style="display: none;">0</span>
+                    </a>
                     <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-coins text-gold"></i> طلبات الشحن
                         <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
@@ -1072,6 +1076,9 @@
                     <div style="margin-top: 0.5rem; font-size: 0.76rem; color: #34d399;">
                         <i class="fas fa-shield-alt"></i> جاهز للاستخدام الفوري في صفقات الوساطة
                     </div>
+                    <button type="button" class="btn-3d btn-primary" id="btn-open-withdrawal" onclick="openWithdrawalModal()" style="margin-top: 0.65rem; width: 100%; padding: 0.5rem 0.85rem; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: linear-gradient(135deg, var(--gold-primary), var(--orange-bright)); color: #090d16; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);">
+                        <i class="fas fa-hand-holding-usd"></i> طلب سحب رصيد
+                    </button>
                 </div>
 
                 <div class="wallet-stat-card">
@@ -1279,6 +1286,9 @@
                         <button type="button" class="wallet-tab-btn active" id="tab-btn-deposits" onclick="switchWalletTab('deposits')">
                             <i class="fas fa-file-invoice"></i> طلبات الشحن (<span id="count-my-deposits">0</span>)
                         </button>
+                        <button type="button" class="wallet-tab-btn" id="tab-btn-withdrawals" onclick="switchWalletTab('withdrawals')">
+                            <i class="fas fa-hand-holding-usd"></i> طلبات السحب (<span id="count-my-withdrawals">0</span>)
+                        </button>
                         <button type="button" class="wallet-tab-btn" id="tab-btn-transactions" onclick="switchWalletTab('transactions')">
                             <i class="fas fa-exchange-alt"></i> سجل العمليات (<span id="count-my-transactions">0</span>)
                         </button>
@@ -1289,6 +1299,14 @@
                         <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
                             <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
                             <div>جاري تحميل طلبات الشحن...</div>
+                        </div>
+                    </div>
+
+                    <!-- قائمة طلبات السحب -->
+                    <div id="tab-panel-withdrawals" class="history-list" style="display: none;">
+                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                            <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
+                            <div>جاري تحميل طلبات السحب...</div>
                         </div>
                     </div>
 
@@ -1337,6 +1355,10 @@
                     <a href="contact-support.html" class="drawer-shortcut-card">
                         <i class="fas fa-headset text-orange"></i>
                         <span>تواصل مع الوسيط</span>
+                    </a>
+                    <a href="admin-withdrawals.html" class="drawer-shortcut-card" id="drawer-admin-withdrawals-link" style="display: none;" data-admin-only>
+                        <i class="fas fa-hand-holding-usd text-orange"></i>
+                        <span>طلبات السحب (إدارة)</span>
                     </a>
                     <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only>
                         <i class="fas fa-coins text-gold"></i>
@@ -1465,6 +1487,85 @@
                     <button type="button" class="btn-3d btn-outline" onclick="closePaymentMethodModal()" style="padding: 0.6rem 1.1rem;">إلغاء</button>
                     <button type="submit" id="btn-save-pm" class="btn-3d btn-gold" style="padding: 0.6rem 1.4rem;">
                         <i class="fas fa-save"></i> حفظ الحساب
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= Modal: طلب سحب رصيد وأرباح للمستخدم ================= -->
+    <div class="modal-backdrop" id="modal-withdrawal-request" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10045; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(5px);">
+        <div class="card-3d modal-dialog" style="max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; position: relative; border: 1.5px solid var(--gold-primary); box-shadow: 0 20px 60px rgba(0,0,0,0.9); border-radius: 18px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <h3 style="margin: 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fas fa-hand-holding-usd text-gold"></i>
+                    <span>طلب سحب رصيد وأرباح</span>
+                </h3>
+                <button type="button" onclick="closeWithdrawalModal()" style="background: none; border: none; color: var(--silver-muted); font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- معلومات الرصيد المتاح -->
+            <div style="background: rgba(197, 160, 89, 0.1); border: 1px solid rgba(197, 160, 89, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                <div>
+                    <span style="color: var(--silver-light); font-size: 0.78rem; display: block;">الرصيد المتاح للسحب الآن:</span>
+                    <strong style="color: var(--gold-light); font-size: 1.35rem; font-family: var(--font-en);"><span id="modal-withdraw-available-pts">0</span> نقطة</strong>
+                </div>
+                <div style="text-align: left; font-size: 0.72rem; color: #34d399;">
+                    <i class="fas fa-shield-alt"></i> جاهز للتحويل المالي
+                </div>
+            </div>
+
+            <form id="form-withdrawal-request" onsubmit="handleWithdrawalFormSubmit(event)">
+                <!-- المبلغ المراد سحبه -->
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; color: #fff; font-size: 0.84rem; font-weight: 700; margin-bottom: 0.4rem;">
+                        المبلغ المطلوب سحبه (بالنقاط) <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="number" id="withdraw-amount-input" required min="1" step="1" placeholder="مثال: 50" style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 10px; background: rgba(12,16,26,0.95); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.95rem; font-weight: 800; box-sizing: border-box;">
+                    
+                    <!-- أزرار الاختيار السريع -->
+                    <div style="display: flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <button type="button" class="quick-pts-btn" onclick="setWithdrawQuickPts(10)">10 نقاط</button>
+                        <button type="button" class="quick-pts-btn" onclick="setWithdrawQuickPts(25)">25 نقطة</button>
+                        <button type="button" class="quick-pts-btn" onclick="setWithdrawQuickPts(50)">50 نقطة</button>
+                        <button type="button" class="quick-pts-btn" onclick="setWithdrawQuickPts(100)">100 نقطة</button>
+                        <button type="button" class="quick-pts-btn" onclick="setWithdrawQuickAll()" style="color: var(--gold-light); border-color: rgba(197, 160, 89, 0.4);">كامل الرصيد المتاح</button>
+                    </div>
+                </div>
+
+                <!-- طريقة استلام الأموال -->
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; color: #fff; font-size: 0.84rem; font-weight: 700; margin-bottom: 0.4rem;">
+                        طريقة الاستلام المفضلة <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select id="withdraw-method-select" required style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 10px; background: rgba(12,16,26,0.95); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.88rem; font-weight: 700; box-sizing: border-box;">
+                        <option value="تحويل بنكي محلي (Bank Transfer / IBAN)">تحويل بنكي محلي (Bank Transfer / IBAN)</option>
+                        <option value="بريدي موب (BaridiMob - الجزائر)">بريدي موب (BaridiMob - الجزائر)</option>
+                        <option value="شام كاش (ShamCash - سوريا)">شام كاش (ShamCash - سوريا)</option>
+                        <option value="فودافون كاش / إنستاباي (مصر)">فودافون كاش / إنستاباي (مصر)</option>
+                        <option value="باي بال (PayPal)">باي بال (PayPal)</option>
+                        <option value="بينانس USDT (Binance Pay / TRC20)">بينانس USDT (Binance Pay / TRC20)</option>
+                        <option value="زين كاش / آسيا حوالة (العراق)">زين كاش / آسيا حوالة (العراق)</option>
+                        <option value="محفظة كليك CliQ (الأردن)">محفظة كليك CliQ (الأردن)</option>
+                        <option value="أخرى (يرجى التوضيح في التفاصيل)">طريقة أخرى (توضيح بالتفاصيل)</option>
+                    </select>
+                </div>
+
+                <!-- تفاصيل الحساب المالي للاستلام -->
+                <div style="margin-bottom: 1.1rem;">
+                    <label style="display: block; color: #fff; font-size: 0.84rem; font-weight: 700; margin-bottom: 0.4rem;">
+                        بيانات الحساب المالي للاستلام <span style="color: #ef4444;">*</span>
+                    </label>
+                    <textarea id="withdraw-details-input" required rows="3" placeholder="اكتب رقم الحساب، اسم صاحب الحساب الثلاثي، رقم الهاتف، أو معرف المحفظة بدقة..." style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 10px; background: rgba(12,16,26,0.95); border: 1px solid var(--border-metal); color: #fff; font-family: var(--font-ar); font-size: 0.86rem; box-sizing: border-box; resize: vertical; line-height: 1.5;"></textarea>
+                    <span style="font-size: 0.73rem; color: var(--silver-muted); display: block; margin-top: 0.3rem;">
+                        <i class="fas fa-info-circle text-gold"></i> سيتم تجميد مبلغ السحب فوراً لحين مراجعة الطلب وتحويله من الإدارة لمنع السحب المزدوج.
+                    </span>
+                </div>
+
+                <div style="display: flex; gap: 0.6rem; justify-content: flex-end;">
+                    <button type="button" class="btn-3d btn-outline" onclick="closeWithdrawalModal()" style="padding: 0.6rem 1.1rem;">إلغاء</button>
+                    <button type="submit" id="btn-submit-withdrawal" class="btn-3d btn-gold" style="padding: 0.6rem 1.4rem;">
+                        <i class="fas fa-paper-plane"></i> إرسال طلب السحب
                     </button>
                 </div>
             </form>
@@ -1956,20 +2057,158 @@
 
         function switchWalletTab(tab) {
             const depBtn = document.getElementById('tab-btn-deposits');
+            const wthBtn = document.getElementById('tab-btn-withdrawals');
             const txBtn = document.getElementById('tab-btn-transactions');
             const depPanel = document.getElementById('tab-panel-deposits');
+            const wthPanel = document.getElementById('tab-panel-withdrawals');
             const txPanel = document.getElementById('tab-panel-transactions');
 
-            if (tab === 'deposits') {
-                depBtn.classList.add('active');
-                txBtn.classList.remove('active');
-                depPanel.style.display = 'flex';
-                txPanel.style.display = 'none';
+            if (depBtn) depBtn.classList.remove('active');
+            if (wthBtn) wthBtn.classList.remove('active');
+            if (txBtn) txBtn.classList.remove('active');
+            if (depPanel) depPanel.style.display = 'none';
+            if (wthPanel) wthPanel.style.display = 'none';
+            if (txPanel) txPanel.style.display = 'none';
+
+            if (tab === 'withdrawals') {
+                if (wthBtn) wthBtn.classList.add('active');
+                if (wthPanel) wthPanel.style.display = 'flex';
+            } else if (tab === 'transactions') {
+                if (txBtn) txBtn.classList.add('active');
+                if (txPanel) txPanel.style.display = 'flex';
             } else {
-                txBtn.classList.add('active');
-                depBtn.classList.remove('active');
-                txPanel.style.display = 'flex';
-                depPanel.style.display = 'none';
+                if (depBtn) depBtn.classList.add('active');
+                if (depPanel) depPanel.style.display = 'flex';
+            }
+        }
+
+        /* ================= Modal: طلب سحب الرصيد ================= */
+        function openWithdrawalModal() {
+            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            if (!user || user.isGuest) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول بحساب Google أولاً لتتمكن من تقديم طلب سحب الرصيد.', 'warning');
+                } else {
+                    alert('يرجى تسجيل الدخول أولاً');
+                }
+                return;
+            }
+
+            const available = user.wallet ? Number(user.wallet.available || 0) : 0;
+            const availEl = document.getElementById('modal-withdraw-available-pts');
+            if (availEl) availEl.innerText = available;
+
+            const input = document.getElementById('withdraw-amount-input');
+            if (input) {
+                input.max = available;
+                input.value = available > 0 ? Math.min(50, available) : '';
+            }
+
+            const modal = document.getElementById('modal-withdrawal-request');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeWithdrawalModal() {
+            const modal = document.getElementById('modal-withdrawal-request');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function setWithdrawQuickPts(pts) {
+            const input = document.getElementById('withdraw-amount-input');
+            if (input) input.value = pts;
+        }
+
+        function setWithdrawQuickAll() {
+            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const available = user && user.wallet ? Number(user.wallet.available || 0) : 0;
+            const input = document.getElementById('withdraw-amount-input');
+            if (input) input.value = available;
+        }
+
+        async function handleWithdrawalFormSubmit(e) {
+            e.preventDefault();
+            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            if (!user || user.isGuest) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول أولاً', 'warning');
+                }
+                return;
+            }
+
+            const available = user.wallet ? Number(user.wallet.available || 0) : 0;
+            const amountInput = document.getElementById('withdraw-amount-input');
+            const methodSelect = document.getElementById('withdraw-method-select');
+            const detailsInput = document.getElementById('withdraw-details-input');
+            const submitBtn = document.getElementById('btn-submit-withdrawal');
+
+            const amount = Number(amountInput?.value);
+            const method = methodSelect?.value || 'تحويل بنكي';
+            const details = (detailsInput?.value || '').trim();
+
+            if (!amount || amount <= 0) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('قيمة غير صحيحة', 'يرجى إدخال عدد نقاط صحيح أكبر من الصفر.', 'danger');
+                }
+                return;
+            }
+
+            if (amount > available) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('الرصيد غير كافٍ', `الرصيد المتاح للسحب حالياً هو (${available} نقطة) فقط، ولا يكفي لسحب (${amount} نقطة).`, 'danger');
+                }
+                return;
+            }
+
+            if (!details) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('بيانات ناقصة', 'يرجى كتابة تفاصيل الحساب المالي أو رقم المحفظة بدقة.', 'danger');
+                }
+                return;
+            }
+
+            const origHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب وتجميد المبلغ...';
+            }
+
+            try {
+                const { data, error } = await waseetSubmitWithdrawalRequest({
+                    amount,
+                    method,
+                    details
+                });
+
+                if (error) {
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تعذر إرسال طلب السحب', error.message || 'حدث خطأ أثناء معالجة الطلب', 'danger');
+                    } else {
+                        alert(error.message);
+                    }
+                    return;
+                }
+
+                closeWithdrawalModal();
+                if (amountInput) amountInput.value = '';
+                if (detailsInput) detailsInput.value = '';
+
+                await refreshAllWalletData();
+                switchWalletTab('withdrawals');
+
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert(
+                        'تم تقديم طلب السحب وتجميد الرصيد بنجاح!',
+                        `تم استلام طلب سحب بمقدار (${amount} نقطة) عبر (${method}).\nتم تجميد المبلغ في محفظتك وسيتم تدقيق الطلب وإرسال المستحقات المالية من قبل إدارة المنصة فوراً.`,
+                        'success'
+                    );
+                }
+            } catch (err) {
+                console.error('Withdrawal submission error:', err);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = origHtml;
+                }
             }
         }
 
@@ -2396,15 +2635,21 @@
 
         async function loadAndRenderHistory() {
             const depContainer = document.getElementById('tab-panel-deposits');
+            const wthContainer = document.getElementById('tab-panel-withdrawals');
             const txContainer = document.getElementById('tab-panel-transactions');
 
-            const [deposits, transactions] = await Promise.all([
+            const [deposits, withdrawals, transactions] = await Promise.all([
                 typeof waseetFetchMyDepositRequests === 'function' ? waseetFetchMyDepositRequests() : [],
+                typeof waseetFetchMyWithdrawals === 'function' ? waseetFetchMyWithdrawals() : [],
                 typeof waseetFetchMyWalletTransactions === 'function' ? waseetFetchMyWalletTransactions() : []
             ]);
 
-            document.getElementById('count-my-deposits').innerText = deposits.length;
-            document.getElementById('count-my-transactions').innerText = transactions.length;
+            const depCountEl = document.getElementById('count-my-deposits');
+            const wthCountEl = document.getElementById('count-my-withdrawals');
+            const txCountEl = document.getElementById('count-my-transactions');
+            if (depCountEl) depCountEl.innerText = deposits.length;
+            if (wthCountEl) wthCountEl.innerText = withdrawals.length;
+            if (txCountEl) txCountEl.innerText = transactions.length;
 
             // 1. رسم طلبات الشحن
             if (!deposits.length) {
@@ -2458,7 +2703,63 @@
                 }).join('');
             }
 
-            // 2. رسم سجل الحركات المالية
+            // 2. رسم طلبات السحب
+            if (wthContainer) {
+                if (!withdrawals.length) {
+                    wthContainer.innerHTML = `
+                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                            <i class="fas fa-hand-holding-usd" style="font-size: 2.2rem; color: var(--gold-primary); opacity: 0.6; margin-bottom: 0.6rem;"></i>
+                            <div style="color: #fff; font-weight: 700;">لا توجد طلبات سحب سابقة</div>
+                            <div style="font-size: 0.82rem; margin-top: 0.25rem;">يمكنك تقديم طلب سحب أرباحك في أي وقت لتظهر حالته هنا.</div>
+                        </div>
+                    `;
+                } else {
+                    wthContainer.innerHTML = withdrawals.map(w => {
+                        const dt = new Date(w.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+                        let statusBadge = `<span class="status-pill pending"><i class="fas fa-clock"></i> قيد المراجعة والتحويل</span>`;
+                        if (w.status === 'approved') {
+                            statusBadge = `<span class="status-pill approved"><i class="fas fa-check-circle"></i> تم التحويل والخصم</span>`;
+                        } else if (w.status === 'rejected') {
+                            statusBadge = `<span class="status-pill rejected"><i class="fas fa-times-circle"></i> مرفوض وتم فك الحجز</span>`;
+                        }
+
+                        const adminNoteHtml = w.admin_note
+                            ? `<div style="width: 100%; font-size: 0.78rem; color: ${w.status === 'rejected' ? '#f87171' : 'var(--gold-light)'}; margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px dashed rgba(255,255,255,0.08);">
+                                <i class="fas fa-comment-dots"></i> ملاحظة الإدارة: ${escapeSafe(w.admin_note)}
+                               </div>`
+                            : '';
+
+                        const detailsHtml = w.details
+                            ? `<div style="color: var(--silver-light); font-size: 0.76rem; margin-top: 3px; font-family: monospace; direction: ltr; text-align: right;">
+                                <i class="fas fa-wallet text-gold"></i> ${escapeSafe(w.details)}
+                               </div>`
+                            : '';
+
+                        return `
+                            <div class="history-item-card">
+                                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                    <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(234, 88, 12, 0.15); border: 1px solid rgba(234, 88, 12, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--orange-bright); flex-shrink: 0;">
+                                        <i class="fas fa-hand-holding-usd"></i>
+                                    </div>
+                                    <div>
+                                        <div style="color: #fff; font-weight: 800; font-size: 0.95rem;">
+                                            طلب سحب <span class="text-gold">${Number(w.amount)} نقطة</span>
+                                        </div>
+                                        <div style="color: var(--silver-muted); font-size: 0.76rem;">
+                                            ${escapeSafe(w.method || 'تحويل مالي')} • ${dt}
+                                        </div>
+                                        ${detailsHtml}
+                                    </div>
+                                </div>
+                                <div>${statusBadge}</div>
+                                ${adminNoteHtml}
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // 3. رسم سجل الحركات المالية
             const typeNames = {
                 deposit: 'شحن رصيد نقاط',
                 escrow_lock: 'حجز نقاط لشراء حساب',
@@ -2551,6 +2852,33 @@
                         filter: `user_id=eq.${user.id}`
                     }, () => {
                         refreshAllWalletData();
+                    })
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'withdrawals',
+                        filter: `user_id=eq.${user.id}`
+                    }, async (payload) => {
+                        await refreshAllWalletData();
+                        if (payload.eventType === 'UPDATE' && payload.new) {
+                            if (payload.new.status === 'approved') {
+                                if (typeof waseetAlert === 'function') {
+                                    waseetAlert(
+                                        'تم تحويل مبلغ السحب بنجاح!',
+                                        `تم اعتماد طلب السحب بمقدار ${payload.new.amount} نقطة عبر (${payload.new.method}) وخصمها من محفظتك.`,
+                                        'success'
+                                    );
+                                }
+                            } else if (payload.new.status === 'rejected') {
+                                if (typeof waseetAlert === 'function') {
+                                    waseetAlert(
+                                        'تم رفض طلب السحب وفك الحجز',
+                                        `تم رفض طلب السحب وإعادة ${payload.new.amount} نقطة إلى رصيدك المتاح. السبب: ${payload.new.admin_note || 'بيانات غير مطابقة'}`,
+                                        'info'
+                                    );
+                                }
+                            }
+                        }
                     })
                     .subscribe();
             } catch (e) {
