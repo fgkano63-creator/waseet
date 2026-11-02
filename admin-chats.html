@@ -82,7 +82,7 @@
         }
     </style>
 </head>
-<body class="is-admin-mode" data-waseet-nav="auto">
+<body data-waseet-nav="auto">
     <canvas id="ambient-canvas"></canvas>
 
     <div class="app-wrapper">
@@ -110,12 +110,12 @@
                 </nav>
 
                 <!-- المجموعة 2 المخصصة للمدير -->
-                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
                         <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
                     <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin active" title="محادثات الدعم والإدارة">
@@ -265,9 +265,13 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card" data-admin-only onclick="toggleWaseetDrawer(false)">
+                <a href="admin-deposits.html" class="drawer-shortcut-card" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
+                </a>
+                <a href="admin-brokers.html" class="drawer-shortcut-card" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
+                    <i class="fas fa-globe-africa text-orange"></i>
+                    <span>الوسطاء الإقليميين</span>
                 </a>
                 <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-boxes text-gold"></i>
@@ -359,7 +363,8 @@
 
         function isAdmin(user) {
             if (!user) return false;
-            if (typeof isMediatorUser === 'function') return isMediatorUser(user);
+            if (user.role === 'regional_broker' || user.role === 'user') return false;
+            if (typeof isStrictAdmin === 'function') return isStrictAdmin(user);
             return user.role === 'admin';
         }
 

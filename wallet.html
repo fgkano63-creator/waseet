@@ -993,11 +993,11 @@
 
                 <!-- شريط المدير -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-coins text-gold"></i> طلبات الشحن
                         <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
                     <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
@@ -1338,9 +1338,13 @@
                         <i class="fas fa-headset text-orange"></i>
                         <span>تواصل مع الوسيط</span>
                     </a>
-                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;">
+                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only>
                         <i class="fas fa-coins text-gold"></i>
                         <span>طلبات الشحن (إدارة)</span>
+                    </a>
+                    <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only>
+                        <i class="fas fa-globe-africa text-orange"></i>
+                        <span>الوسطاء الإقليميين</span>
                     </a>
                 </div>
             </div>
@@ -2104,7 +2108,11 @@
             const navPts = document.getElementById('wallet-total-pts');
             if (navPts) navPts.innerText = `${available} نقطة`;
 
-            const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
+            const isAdmin = !!(user && (
+                user.role === 'admin' ||
+                (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+            ) && user.role !== 'regional_broker' && user.role !== 'user');
+            const drawerBrokersLink = document.getElementById('drawer-admin-brokers-link');
             const userNav = document.getElementById('nav-user-middle-group');
             const adminNav = document.getElementById('nav-admin-middle-group');
             const drawerAdminLink = document.getElementById('drawer-admin-deposits-link');
@@ -2115,6 +2123,10 @@
                 if (userNav) userNav.style.display = 'none';
                 if (adminNav) adminNav.style.display = 'flex';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'flex';
+                if (drawerBrokersLink) drawerBrokersLink.style.display = 'flex';
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
+                });
                 if (userDepositPanel) userDepositPanel.style.display = 'none';
                 if (adminManagerPanel) {
                     adminManagerPanel.style.display = 'block';
@@ -2124,6 +2136,10 @@
                 if (userNav) userNav.style.display = '';
                 if (adminNav) adminNav.style.display = 'none';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'none';
+                if (drawerBrokersLink) drawerBrokersLink.style.display = 'none';
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
                 if (userDepositPanel) userDepositPanel.style.display = 'block';
                 if (adminManagerPanel) adminManagerPanel.style.display = 'none';
             }

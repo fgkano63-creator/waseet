@@ -262,7 +262,7 @@
         }
     </style>
 </head>
-<body class="is-admin-mode" data-waseet-nav="auto">
+<body data-waseet-nav="auto">
 
     <canvas id="ambient-canvas"></canvas>
 
@@ -281,12 +281,12 @@
                     </a>
                 </div>
 
-                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin active" title="طلبات الشحن">
+                <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin active" title="طلبات الشحن" style="display: none;">
                         <i class="fas fa-coins text-gold"></i> طلبات الشحن
                         <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
                     <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
@@ -446,11 +446,11 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
-                <a href="admin-brokers.html" class="drawer-shortcut-card" data-admin-only onclick="toggleWaseetDrawer(false)">
+                <a href="admin-brokers.html" class="drawer-shortcut-card" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-globe-africa text-orange"></i>
                     <span>الوسطاء الإقليميين</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card active" data-admin-only onclick="toggleWaseetDrawer(false)">
+                <a href="admin-deposits.html" class="drawer-shortcut-card active" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
                 </a>
@@ -776,7 +776,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
                 const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
-                const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin || (typeof isMediatorUser === 'function' && isMediatorUser(user)) || user.email === 'fgkano63@gmail.com'));
+                const isAdmin = !!(user && (
+                    user.role === 'admin' ||
+                    (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+                ) && user.role !== 'regional_broker' && user.role !== 'user');
 
                 if (!isAdmin) {
                     document.getElementById('admin-access-denied').style.display = 'block';
