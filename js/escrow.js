@@ -1073,7 +1073,9 @@ class WaseetEscrowRoom {
                                 <i class="fas fa-store text-silver"></i>
                                 <span>شات مع البائع (${this.sanitizeText(sellerName)})</span>
                             </div>
-                            <span class="badge-role seller-badge">قناة البائع</span>
+                            <div class="chat-header-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span class="badge-role seller-badge">قناة البائع</span>
+                            </div>
                         </div>
                         <div class="chat-messages" id="chat-messages-seller">
                             ${this.renderMessageList(this.deal.sellerMessages, 'seller_mediator')}
@@ -1093,7 +1095,9 @@ class WaseetEscrowRoom {
                                 <i class="fas fa-shopping-cart text-orange"></i>
                                 <span>شات مع المشتري (${buyerName})</span>
                             </div>
-                            <span class="badge-role buyer-badge">قناة المشتري</span>
+                            <div class="chat-header-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span class="badge-role buyer-badge">قناة المشتري</span>
+                            </div>
                         </div>
                         <div class="chat-messages" id="chat-messages-buyer">
                             ${this.renderMessageList(this.deal.buyerMessages, 'buyer_mediator')}
@@ -1203,7 +1207,7 @@ class WaseetEscrowRoom {
                                 <i class="fas fa-comments text-orange"></i>
                                 <span>محادثة المشتري (${buyerName}) مع الوسيط المعتمد</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <div class="chat-header-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                                 <button type="button" class="btn-3d btn-receive-credentials ${isCompleted ? 'glow-green' : ''}" id="btn-receive-account-header" onclick="window.escrowRoom.openBuyerDeliveryModal()" title="${isCompleted ? 'انقر لعرض بيانات الدخول كاملة' : 'متابعة حالة تسليم الحساب'}">
                                     <i class="fas ${isCompleted ? 'fa-key text-gold' : 'fa-shield-alt text-orange'}"></i>
                                     <span>${isCompleted ? 'استلام بيانات الحساب' : 'حالة استلام الحساب'}</span>
@@ -1214,7 +1218,7 @@ class WaseetEscrowRoom {
 
                         <!-- شريط إشعار علوي جذاب داخل الشات للهواتف والشاشات الصغيرة -->
                         <div class="buyer-mobile-delivery-alert" onclick="window.escrowRoom.openBuyerDeliveryModal()" style="${isCompleted ? '' : 'background: rgba(234, 88, 12, 0.12); border-color: rgba(234, 88, 12, 0.4);'}">
-                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <div class="delivery-alert-left" style="display: flex; align-items: center; gap: 0.75rem;">
                                 <i class="fas ${isCompleted ? 'fa-check-circle' : 'fa-shield-alt text-orange'}" style="color: ${isCompleted ? '#10b981' : 'var(--orange-primary)'}; font-size: 1.3rem;"></i>
                                 <div>
                                     <strong style="color: #fff; font-size: 0.88rem;">${isCompleted ? 'اكتملت الصفقة بنجاح! تم فك تشفير الحساب' : 'الصفقة نشطة في خزينة الوساطة الآمنة'}</strong>
@@ -1263,7 +1267,9 @@ class WaseetEscrowRoom {
                                 <i class="fas fa-shield-alt text-silver"></i>
                                 <span>محادثة البائع (${this.sanitizeText(sellerName)}) مع الوسيط المعتمد</span>
                             </div>
-                            <span class="badge-role seller-badge"><i class="fas fa-circle" style="font-size:0.5rem;color:#10b981;margin-left:4px;"></i> متصل الآن</span>
+                            <div class="chat-header-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span class="badge-role seller-badge"><i class="fas fa-circle" style="font-size:0.5rem;color:#10b981;margin-left:4px;"></i> متصل الآن</span>
+                            </div>
                         </div>
                         <div class="chat-messages" id="chat-messages-seller">
                             ${this.renderMessageList(this.deal.sellerMessages, 'seller_mediator')}
