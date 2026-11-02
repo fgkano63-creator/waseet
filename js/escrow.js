@@ -896,11 +896,13 @@ class WaseetEscrowRoom {
             if (!allDeals.some(d => d.id === this.deal.id)) {
                 allDeals.unshift(this.deal);
             }
-            dealSelect.innerHTML = allDeals.map((d, idx) => `
-                <option value="${d.id}" ${d.id === this.deal.id ? 'selected' : ''}>
-                    #DEAL-${d.dealNumber || (idx + 1)} (${d.totalPoints} نقطة)
-                </option>
-            `).join('');
+            dealSelect.innerHTML = allDeals.map((d, idx) => {
+                const optId = this.sanitizeText(String(d.id || ''));
+                const optNum = this.sanitizeText(String(d.dealNumber || (idx + 1)));
+                const optPts = Number(d.totalPoints) || 0;
+                const isSel = (d.id === this.deal.id) ? 'selected' : '';
+                return `<option value="${optId}" ${isSel}>#DEAL-${optNum} (${optPts} نقطة)</option>`;
+            }).join('');
             dealSelect.value = this.deal.id;
             const wrap = document.getElementById('deal-switcher-wrap');
             if (wrap) {

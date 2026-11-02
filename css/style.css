@@ -7288,6 +7288,56 @@ body.chat-page-body .badge-pulse-anim {
     z-index: 10050 !important;
 }
 
+/* ==========================================================================
+   لوحة إدارة الوسطاء الإقليميين - إزالة الخلفية المائية المزعجة وضمان وضوح الحقول
+   ========================================================================== */
+body.is-admin-mode.admin-brokers-page::before,
+body.admin-brokers-page::before {
+    display: none !important;
+    opacity: 0 !important;
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+    background-image: none !important;
+}
+
+#promote-broker-panel-card,
+.promote-broker-section,
+#promote-broker-form,
+.admin-brokers-container .admin-panel-card {
+    background: #0d121f !important;
+    background-color: #0d121f !important;
+    background-image: none !important;
+    position: relative;
+    z-index: 5;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+#promote-broker-panel-card::before,
+#promote-broker-panel-card::after,
+#promote-broker-form::before,
+#promote-broker-form::after,
+.admin-brokers-container .admin-panel-card::before,
+.admin-brokers-container .admin-panel-card::after {
+    display: none !important;
+    content: none !important;
+    background-image: none !important;
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+.admin-brokers-container .form-input-custom,
+.admin-brokers-container .form-select-custom,
+#broker-target-input,
+#broker-country-select {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    animation: none !important;
+}
+
 /* إخفاء زر العودة للمتجر النصي من الترويسة العلوية نهائياً وتنسيق عناصر الشريط العلوي */
 .btn-nav-back-store {
     display: none !important;

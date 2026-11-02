@@ -42,7 +42,7 @@ Assert-Regex $css '\.drawer-user-role\s*\{[^}]*white-space:\s*nowrap[^}]*text-ov
 Assert-Regex $css '\.drawer-user-pts[^{]*\{[^}]*display:\s*flex[^}]*flex-direction:\s*row[^}]*align-items:\s*center[^}]*gap:\s*5px[^}]*white-space:\s*nowrap' "CSS -> .drawer-user-pts: display: flex; flex-direction: row; gap: 5px; white-space: nowrap;"
 
 # 5. HTML Structure Audit: .drawer-user-card is NOT inside .drawer-header
-$htmlFiles = @("index.html", "chat.html", "deals.html", "wallet.html", "admin-deposits.html", "admin-chats.html", "my-accounts.html", "pending-accounts.html", "contact-support.html", "profile.html")
+$htmlFiles = @("index.html", "chat.html", "deals.html", "wallet.html", "admin-deposits.html", "admin-chats.html", "my-accounts.html", "pending-accounts.html", "contact-support.html", "profile.html", "admin-brokers.html")
 foreach ($file in $htmlFiles) {
     if (Test-Path $file) {
         $html = Get-Content -Raw -Path $file

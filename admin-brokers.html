@@ -28,10 +28,55 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
+    <!-- EmailJS SDK for Broker Automated Notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css?v=20261026_v1">
 
     <style>
+        body.is-admin-mode::before,
+        body.admin-brokers-page::before {
+            display: none !important;
+            opacity: 0 !important;
+            animation: none !important;
+            background-image: none !important;
+        }
+
+        #promote-broker-panel-card,
+        .promote-broker-section,
+        #promote-broker-form {
+            background: #0d121f !important;
+            background-color: #0d121f !important;
+            background-image: none !important;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        #promote-broker-panel-card::before,
+        #promote-broker-panel-card::after,
+        #promote-broker-form::before,
+        #promote-broker-form::after {
+            display: none !important;
+            content: none !important;
+            background-image: none !important;
+            animation: none !important;
+            opacity: 0 !important;
+        }
+
+        .form-input-custom,
+        .form-select-custom,
+        #broker-target-input,
+        #broker-country-select {
+            background: #111827 !important;
+            background-color: #111827 !important;
+            background-image: none !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            animation: none !important;
+        }
+
         .admin-brokers-container {
             max-width: 1220px;
             margin: var(--page-gap-top) auto var(--page-gap-bottom);
@@ -207,7 +252,7 @@
         }
     </style>
 </head>
-<body class="is-admin-mode">
+<body class="is-admin-mode admin-brokers-page">
 
     <!-- ================= Header / Navbar ================= -->
     <header class="header-navbar">
@@ -323,7 +368,10 @@
                         نظام التوجيه الذكي للصفقات (Smart Routing) وتقسيم العمولات (66% للوسيط الإقليمي - 34% لأرباح المنصة).
                     </p>
                 </div>
-                <div>
+                <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn-3d btn-secondary" onclick="openEmailJsConfigModal()" style="padding: 0.6rem 1.1rem; font-size: 0.88rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1;">
+                        <i class="fas fa-envelope text-gold"></i> إعدادات EmailJS
+                    </button>
                     <button type="button" class="btn-3d btn-gold" onclick="loadBrokersData()" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
                         <i class="fas fa-sync-alt"></i> تحديث البيانات
                     </button>
@@ -374,7 +422,7 @@
             </section>
 
             <!-- 3. نموذج ترقية وتعيين وسيط إقليمي جديد -->
-            <section class="admin-panel-card">
+            <section class="admin-panel-card promote-broker-section" id="promote-broker-panel-card" style="background: #0d121f !important; background-image: none !important; position: relative; z-index: 5;">
                 <div class="admin-panel-header">
                     <div style="display: flex; align-items: center; gap: 0.6rem;">
                         <i class="fas fa-user-plus text-orange" style="font-size: 1.3rem;"></i>
@@ -494,6 +542,41 @@
         </div>
     </main>
 
+    <!-- ================= EmailJS Configuration Modal ================= -->
+    <div class="modal" id="modal-emailjs-config" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 10020; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);">
+        <div class="modal-dialog" style="max-width: 520px; width: 92%; background: linear-gradient(145deg, #111827, #0b0f19); border: 1px solid rgba(234, 88, 12, 0.45); border-radius: 18px; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <h3 style="color: #fff; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-envelope-open-text text-orange"></i> إعدادات خدمة البريد (EmailJS)
+                </h3>
+                <button type="button" class="btn-close-modal" onclick="closeEmailJsConfigModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div>
+                <p style="color: var(--silver-muted); font-size: 0.86rem; line-height: 1.6; margin-bottom: 1.2rem;">
+                    لأتمتة إرسال إيميل الترحيب بالوسيط الإقليمي فور ترقيته، أدخل مفاتيح حسابك المجاني في <a href="https://www.emailjs.com" target="_blank" rel="noopener" style="color: var(--orange-bright); text-decoration: underline;">EmailJS.com</a>:
+                </p>
+                <div class="form-group-custom" style="margin-bottom: 1rem;">
+                    <label class="form-label-custom" for="emailjs-public-key"><i class="fas fa-key text-gold"></i> Public Key (المفتاح العام):</label>
+                    <input type="text" id="emailjs-public-key" class="form-input-custom" placeholder="مثال: nq9X7... أو مفتاحك من Account > API Keys">
+                </div>
+                <div class="form-group-custom" style="margin-bottom: 1rem;">
+                    <label class="form-label-custom" for="emailjs-service-id"><i class="fas fa-server text-orange"></i> Service ID (معرف الخدمة):</label>
+                    <input type="text" id="emailjs-service-id" class="form-input-custom" placeholder="مثال: service_waseet أو service_gmail">
+                </div>
+                <div class="form-group-custom" style="margin-bottom: 1.4rem;">
+                    <label class="form-label-custom" for="emailjs-template-id"><i class="fas fa-file-alt text-emerald"></i> Template ID (معرف القالب):</label>
+                    <input type="text" id="emailjs-template-id" class="form-input-custom" placeholder="مثال: template_broker_welcome">
+                </div>
+                <div style="display: flex; gap: 0.8rem; justify-content: flex-end;">
+                    <button type="button" class="btn-3d btn-secondary" onclick="closeEmailJsConfigModal()" style="padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">إلغاء</button>
+                    <button type="button" class="btn-3d btn-orange" onclick="saveEmailJsConfig()" style="padding: 0.6rem 1.5rem;">
+                        <i class="fas fa-save"></i> حفظ وتفعيل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/purify.min.js"></script>
@@ -506,6 +589,127 @@
 
     <script>
         let currentBrokersList = [];
+
+        // ==========================================================================
+        // إعدادات خدمة EmailJS لإرسال إشعارات الترحيب التلقائية للوسطاء الإقليميين
+        // ==========================================================================
+        const WASEET_EMAILJS_CONFIG = {
+            // المفاتيح المسترجعة من الذاكرة المحلية (أو الافتراضية من الكود)
+            publicKey: localStorage.getItem('waseet_emailjs_public_key') || 'YOUR_PUBLIC_KEY',
+            serviceId: localStorage.getItem('waseet_emailjs_service_id') || 'YOUR_SERVICE_ID',
+            templateId: localStorage.getItem('waseet_emailjs_template_id') || 'YOUR_TEMPLATE_ID'
+        };
+
+        function initEmailJs() {
+            if (typeof emailjs !== 'undefined') {
+                const key = WASEET_EMAILJS_CONFIG.publicKey;
+                if (key && key !== 'YOUR_PUBLIC_KEY') {
+                    try {
+                        emailjs.init({ publicKey: key });
+                        console.log('[EmailJS] Initialized successfully with public key.');
+                    } catch (err) {
+                        console.warn('[EmailJS] Init warning:', err);
+                    }
+                }
+            }
+        }
+
+        function openEmailJsConfigModal() {
+            const modal = document.getElementById('modal-emailjs-config');
+            if (!modal) return;
+            const pkInput = document.getElementById('emailjs-public-key');
+            const sidInput = document.getElementById('emailjs-service-id');
+            const tidInput = document.getElementById('emailjs-template-id');
+
+            const currentPk = localStorage.getItem('waseet_emailjs_public_key') || (WASEET_EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY' ? WASEET_EMAILJS_CONFIG.publicKey : '');
+            const currentSid = localStorage.getItem('waseet_emailjs_service_id') || (WASEET_EMAILJS_CONFIG.serviceId !== 'YOUR_SERVICE_ID' ? WASEET_EMAILJS_CONFIG.serviceId : '');
+            const currentTid = localStorage.getItem('waseet_emailjs_template_id') || (WASEET_EMAILJS_CONFIG.templateId !== 'YOUR_TEMPLATE_ID' ? WASEET_EMAILJS_CONFIG.templateId : '');
+
+            if (pkInput) pkInput.value = currentPk;
+            if (sidInput) sidInput.value = currentSid;
+            if (tidInput) tidInput.value = currentTid;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEmailJsConfigModal() {
+            const modal = document.getElementById('modal-emailjs-config');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function saveEmailJsConfig() {
+            const pk = document.getElementById('emailjs-public-key')?.value.trim() || '';
+            const sid = document.getElementById('emailjs-service-id')?.value.trim() || '';
+            const tid = document.getElementById('emailjs-template-id')?.value.trim() || '';
+
+            if (pk) localStorage.setItem('waseet_emailjs_public_key', pk);
+            if (sid) localStorage.setItem('waseet_emailjs_service_id', sid);
+            if (tid) localStorage.setItem('waseet_emailjs_template_id', tid);
+
+            if (pk) WASEET_EMAILJS_CONFIG.publicKey = pk;
+            if (sid) WASEET_EMAILJS_CONFIG.serviceId = sid;
+            if (tid) WASEET_EMAILJS_CONFIG.templateId = tid;
+
+            initEmailJs();
+            closeEmailJsConfigModal();
+
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert('تم حفظ إعدادات EmailJS بنجاح في المتصفح وتفعيل الإرسال التلقائي للوسطاء.', 'تم التفعيل', 'success');
+            } else {
+                alert('تم حفظ إعدادات EmailJS بنجاح.');
+            }
+        }
+
+        /**
+         * إرسال بريد ترحيبي للوسيط المعتمد عبر EmailJS
+         * @param {string} toEmail البريد الإلكتروني للمستلم
+         * @param {string} countryCode رمز الدولة
+         * @param {string} countryName اسم الدولة الكامل
+         */
+        async function sendBrokerWelcomeEmail(toEmail, countryCode, countryName) {
+            if (!toEmail || !toEmail.includes('@')) {
+                console.warn('[EmailJS] Target is not an email address, skipping email dispatch:', toEmail);
+                return { ok: false, error: 'Target is not an email' };
+            }
+
+            const welcomeMessage = `مرحباً بك في فريق WASEET! تم اعتماد حسابك رسمياً كوسيط إقليمي حصري لدولة ${countryName}. يمكنك الآن تسجيل الدخول إلى المنصة للبدء في الإشراف على الصفقات واستلام عمولاتك.`;
+
+            const serviceId = WASEET_EMAILJS_CONFIG.serviceId;
+            const templateId = WASEET_EMAILJS_CONFIG.templateId;
+            const publicKey = WASEET_EMAILJS_CONFIG.publicKey;
+
+            // التحقق مما إذا كانت المفاتيح تم إدخالها
+            if (!publicKey || publicKey === 'YOUR_PUBLIC_KEY' || !serviceId || serviceId === 'YOUR_SERVICE_ID' || !templateId || templateId === 'YOUR_TEMPLATE_ID') {
+                console.info('[EmailJS] Keys not configured yet. Set them via UI or code to activate real delivery.');
+                return { ok: false, notConfigured: true, message: welcomeMessage };
+            }
+
+            if (typeof emailjs === 'undefined') {
+                console.error('[EmailJS] Library script is not loaded.');
+                return { ok: false, error: 'EmailJS library not loaded' };
+            }
+
+            try {
+                // تجهيز المتغيرات المتوافقة مع أي Template في EmailJS
+                const templateParams = {
+                    to_email: toEmail,
+                    recipient_email: toEmail,
+                    email: toEmail,
+                    user_email: toEmail,
+                    country_name: countryName,
+                    country_code: countryCode,
+                    message: welcomeMessage,
+                    platform_name: 'WASEET الوسيط'
+                };
+
+                const response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+                console.log('[EmailJS] Notification sent successfully:', response);
+                return { ok: true, response };
+            } catch (err) {
+                console.error('[EmailJS] Failed to send email notification:', err);
+                return { ok: false, error: err };
+            }
+        }
 
         function setSimFee(val) {
             const input = document.getElementById('sim-fee-input');
@@ -654,14 +858,30 @@
                     const res = await window.waseetPromoteUserToBroker(targetUser, country);
                     if (res && res.ok) {
                         targetInput.value = '';
+
+                        const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(country) : { name: country, flag: '🌍' };
+                        const countryDisplayName = countryInfo.name || country;
+
+                        let emailNotice = '';
+                        if (targetUser.includes('@')) {
+                            const emailRes = await sendBrokerWelcomeEmail(targetUser, country, countryDisplayName);
+                            if (emailRes && emailRes.ok) {
+                                emailNotice = `\n\n✉️ تم إرسال بريد الترحيب بنجاح إلى: ${targetUser}`;
+                            } else if (emailRes && emailRes.notConfigured) {
+                                emailNotice = `\n\n💡 ملاحظة: لم يتم إرسال الإيميل التلقائي لأن مفاتيح EmailJS لم تضبط بعد. يمكنك إضافتها بالضغط على زر "إعدادات EmailJS" في أعلى الصفحة.`;
+                            } else if (emailRes && emailRes.error) {
+                                emailNotice = `\n\n⚠️ تعذر إرسال الإيميل التلقائي: ${emailRes.error.text || emailRes.error.message || 'خطأ في الخدمة'}`;
+                            }
+                        }
+
                         if (typeof waseetAlert === 'function') {
                             await waseetAlert(
                                 'تمت الترقية بنجاح 🌍',
-                                `تم اعتماد المستخدم كوسيط إقليمي لدولة (${country}) مع تمكينه من إدارة الصفقات وتقسيم العمولات (66%).`,
+                                `تم اعتماد المستخدم كوسيط إقليمي لدولة (${countryDisplayName}) مع تمكينه من إدارة الصفقات وتقسيم العمولات (66%).${emailNotice}`,
                                 'success'
                             );
                         } else {
-                            alert('تمت الترقية بنجاح');
+                            alert(`تمت الترقية بنجاح!${emailNotice}`);
                         }
                         await loadBrokersData();
                     } else {
@@ -744,6 +964,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initEmailJs();
             checkAdminAccess();
             updateCommissionSimulation();
             loadBrokersData();

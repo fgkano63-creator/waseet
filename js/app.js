@@ -509,16 +509,19 @@ class WaseetApp {
                 'المرحلة 3: تحرير الرصيد وإرسال الأرباح',
                 'المرحلة 4: مكتملة بنجاح 100%'
             ];
-            const currentTitle = deal.stageText || stepTitles[deal.currentStep] || 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب';
-            const buyerName = (deal.buyer && deal.buyer.name) ? deal.buyer.name : 'المشتري';
-            const sellerName = (deal.seller && deal.seller.name) ? deal.seller.name : 'البائع';
+            const currentTitle = this.escapeHtml(deal.stageText || stepTitles[deal.currentStep] || 'المرحلة 2: نقل الملكية للمشتري وتأمين الحساب');
+            const buyerName = this.escapeHtml((deal.buyer && deal.buyer.name) ? deal.buyer.name : 'المشتري');
+            const sellerName = this.escapeHtml((deal.seller && deal.seller.name) ? deal.seller.name : 'البائع');
+            const dealTitle = this.escapeHtml(deal.accountTitle || deal.title || 'حساب وساطة');
+            const dealNumber = this.escapeHtml(String(deal.dealNumber || (idx + 1)));
+            const safeDealId = encodeURIComponent(String(deal.id || ''));
 
             return `
                 <div class="deal-card-item">
                     <div class="deal-card-header">
                         <div style="display: flex; align-items: center; gap: 0.6rem;">
-                            <span class="deal-num-tag">#DEAL-${deal.dealNumber || (idx + 1)}</span>
-                            <strong style="color: #fff; font-size: 1rem;">${deal.accountTitle || deal.title || 'حساب وساطة'}</strong>
+                            <span class="deal-num-tag">#DEAL-${dealNumber}</span>
+                            <strong style="color: #fff; font-size: 1rem;">${dealTitle}</strong>
                         </div>
                         <span style="font-family: var(--font-en); font-weight: 800; color: var(--gold-light); font-size: 1.15rem;">
                             ${deal.totalPoints || 0} نقطة
@@ -537,7 +540,7 @@ class WaseetApp {
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
-                        <a href="chat.html?dealId=${deal.id}" class="btn-3d btn-orange" style="text-decoration: none; font-size: 0.88rem; padding: 0.55rem 1.1rem;">
+                        <a href="chat.html?dealId=${safeDealId}" class="btn-3d btn-orange" style="text-decoration: none; font-size: 0.88rem; padding: 0.55rem 1.1rem;">
                             <i class="fas fa-shield-alt"></i> الدخول إلى غرفة الوساطة المباشرة لهذه الصفقة
                         </a>
                     </div>
