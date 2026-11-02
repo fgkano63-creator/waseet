@@ -31,10 +31,12 @@
 
     function isAdminUser(user) {
         if (!user) return false;
+        if (user.role === 'regional_broker' || user.role === 'user') return false;
         try {
-            if (typeof isMediatorUser === 'function') return !!isMediatorUser(user);
+            if (typeof isStrictAdmin === 'function') return !!isStrictAdmin(user);
+            if (typeof isSuperAdmin === 'function') return !!isSuperAdmin(user);
         } catch (e) { /* تجاهل */ }
-        return user.role === 'admin' || user.role === 'mediator' || user.isAdmin === true;
+        return user.role === 'admin' || user.isAdmin === true;
     }
 
     function userAvatar(user) {
@@ -193,10 +195,14 @@
             }
         }
 
-        // روابط القائمة الجانبية المخصصة للمدير فقط
-        document.querySelectorAll('[data-admin-only]').forEach(function (el) {
-            el.style.display = admin ? '' : 'none';
+        // روابط القائمة الجانبية والشريط المخصصة للمدير فقط
+        document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(function (el) {
+            el.style.display = admin ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
         });
+        var drawerBrokers = byId('drawer-admin-brokers-link');
+        if (drawerBrokers) drawerBrokers.style.display = admin ? 'flex' : 'none';
+        var drawerDeposits = byId('drawer-admin-deposits-link');
+        if (drawerDeposits) drawerDeposits.style.display = admin ? 'flex' : 'none';
 
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             try { window.waseetSyncAllNavBadges(); } catch (e) { /* تجاهل */ }

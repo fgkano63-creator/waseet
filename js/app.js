@@ -74,7 +74,11 @@ class WaseetApp {
     renderUserProfile() {
         const container = document.getElementById('nav-user-container');
         const user = WASEET_STATE.user;
-        const isAdmin = !!(user && isMediatorUser(user));
+        // فحص صلاحية المدير العام بدقة (role === 'admin' فقط، واستبعاد user و regional_broker)
+        const isAdmin = !!(user && (
+            user.role === 'admin' ||
+            (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+        ) && user.role !== 'regional_broker' && user.role !== 'user');
 
         // 1. تبديل وضع المدير على body
         if (isAdmin) {
@@ -96,11 +100,27 @@ class WaseetApp {
                 defaultWalletPill.style.display = 'none';
             }
             if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+            document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
+            });
+            const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
+            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'flex';
+            const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
+            if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'flex';
         } else {
             if (userNavMiddle) userNavMiddle.style.display = 'flex';
             if (adminNavMiddle) adminNavMiddle.style.display = 'none';
             if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
             if (adminWalletPill) adminWalletPill.style.display = 'none';
+
+            document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                el.style.display = 'none';
+            });
+            const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
+            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'none';
+            const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
+            if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
         }
 
         // شارات المدير في الشريط العلوي (تختفي تماماً إذا كان العدد 0)

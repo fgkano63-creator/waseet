@@ -83,7 +83,10 @@ body {
 /* حماية أزرار وعناصر المشرف - مخفية افتراضياً لمنع أي ظهور للمستخدم العادي */
 [data-admin-only],
 .admin-only,
-.nav-admin-middle-group {
+.nav-admin-middle-group,
+.btn-nav-admin,
+#drawer-admin-brokers-link,
+#drawer-admin-deposits-link {
     display: none !important;
 }
 
@@ -93,11 +96,19 @@ body.is-admin-mode .admin-only {
 }
 
 body.is-admin-mode [data-admin-only].btn-nav-middle,
-body.is-admin-mode .admin-only.btn-nav-middle {
+body.is-admin-mode .admin-only.btn-nav-middle,
+body.is-admin-mode .btn-nav-admin {
     display: inline-flex !important;
 }
 
 body.is-admin-mode .nav-admin-middle-group {
+    display: flex !important;
+}
+
+body.is-admin-mode [data-admin-only].drawer-shortcut-card,
+body.is-admin-mode [data-admin-only].drawer-nav-item,
+body.is-admin-mode #drawer-admin-brokers-link,
+body.is-admin-mode #drawer-admin-deposits-link {
     display: flex !important;
 }
 

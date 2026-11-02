@@ -175,30 +175,30 @@
 
                 <!-- المجموعة 2 المخصصة للمدير (أزرار التحكم الأساسية في المنتصف بتناسق) -->
                 <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
-                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط">
+                    <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="إدارة طلبات شحن النقاط" style="display: none;">
                         <i class="fas fa-money-check-alt text-gold"></i> شحن النقاط
                         <span class="deals-badge-count" id="admin-nav-deposits-badge" style="display: none;"></span>
                     </a>
-                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين" style="display: none;">
                         <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                     </a>
-                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                    <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة" style="display: none;">
                         <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
                         <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
                     </a>
-                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                    <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص" style="display: none;">
                         <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
                         <span class="deals-badge-count" id="admin-nav-pending-badge" style="display: none;"></span>
                     </a>
-                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                    <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء" style="display: none;">
                         <i class="fas fa-crown text-gold"></i> قيد الشراء
                         <span class="deals-badge-count" id="admin-nav-deals-badge" style="display: none;"></span>
                     </a>
-                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات">
+                    <a href="chat.html" class="btn-nav-middle btn-nav-admin" title="غرفة المحادثات" style="display: none;">
                         <i class="fas fa-comments text-orange"></i> المحادثات
                         <span class="deals-badge-count chats-unread-badge" id="admin-nav-chats-badge" style="display: none;"></span>
                     </a>
-                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="انقر لإدارة وشحن المحفظة">
+                    <div class="wallet-pill" id="admin-wallet-pill" onclick="window.location.href='wallet.html'" title="انقر لإدارة وشحن المحفظة" style="display: none;">
                         <i class="fas fa-wallet wallet-icon"></i>
                         <div class="wallet-details">
                             <span class="wallet-label">الرصيد</span>
@@ -1241,9 +1241,13 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
+                </a>
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                    <i class="fas fa-globe-africa text-orange"></i>
+                    <span>الوسطاء الإقليميين</span>
                 </a>
                 <a href="#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-calculator text-silver"></i>

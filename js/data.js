@@ -276,6 +276,15 @@ function isSuperAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE
     return user.role === 'admin' || user.isAdmin === true;
 }
 
+function isStrictAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
+    if (!user) return false;
+    if (user.role === 'user' || user.role === 'regional_broker') return false;
+    if (user.role === 'admin' || user.isAdmin === true || user.is_admin === true) return true;
+    const email = user.email ? String(user.email).toLowerCase().trim() : '';
+    const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+    return !!(email && adminEmails.includes(email));
+}
+
 function isRegionalBroker(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
     if (!user) return false;
     return user.role === 'regional_broker';
@@ -287,6 +296,7 @@ const WASEET_SUPPORTED_COUNTRIES = {
     'SA': { code: 'SA', name: 'السعودية', flag: '🇸🇦', currency: 'SAR' },
     'MA': { code: 'MA', name: 'المغرب', flag: '🇲🇦', currency: 'MAD' },
     'IQ': { code: 'IQ', name: 'العراق', flag: '🇮🇶', currency: 'IQD' },
+    'SY': { code: 'SY', name: 'سوريا', flag: '🇸🇾', currency: 'SYP' },
     'AE': { code: 'AE', name: 'الإمارات', flag: '🇦🇪', currency: 'AED' },
     'TN': { code: 'TN', name: 'تونس', flag: '🇹🇳', currency: 'TND' },
     'LY': { code: 'LY', name: 'ليبيا', flag: '🇱🇾', currency: 'LYD' },
@@ -309,6 +319,7 @@ function getWaseetCountryInfo(code) {
 if (typeof window !== 'undefined') {
     window.isMediatorUser = isMediatorUser;
     window.isSuperAdmin = isSuperAdmin;
+    window.isStrictAdmin = isStrictAdmin;
     window.isRegionalBroker = isRegionalBroker;
     window.WASEET_SUPPORTED_COUNTRIES = WASEET_SUPPORTED_COUNTRIES;
     window.getWaseetCountryInfo = getWaseetCountryInfo;

@@ -252,7 +252,7 @@
         }
     </style>
 </head>
-<body class="is-admin-mode admin-brokers-page">
+<body class="admin-brokers-page">
 
     <!-- ================= Header / Navbar ================= -->
     <header class="header-navbar">
@@ -268,23 +268,23 @@
                 </a>
             </div>
 
-            <!-- 2. روابط الإدارة العلوية -->
-            <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: flex;">
-                <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط">
+            <!-- 2. روابط الإدارة العلوية (مخفية افتراضياً للمدير فقط) -->
+            <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط" style="display: none;">
                     <i class="fas fa-coins text-gold"></i> طلبات الشحن
                     <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
                 </a>
-                <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin active" title="إدارة الوسطاء الإقليميين">
+                <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin active" title="إدارة الوسطاء الإقليميين" style="display: none;">
                     <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
                 </a>
-                <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص" style="display: none;">
                     <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
                 </a>
-                <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة" style="display: none;">
                     <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
                     <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
                 </a>
-                <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء" style="display: none;">
                     <i class="fas fa-crown text-gold"></i> قيد الشراء
                 </a>
             </nav>
@@ -319,19 +319,19 @@
             <!-- Populated dynamically -->
         </div>
         <nav class="drawer-links-nav">
-            <a href="admin-deposits.html" class="drawer-nav-item">
+            <a href="admin-deposits.html" class="drawer-nav-item" data-admin-only style="display: none;">
                 <i class="fas fa-coins text-gold"></i> <span>طلبات الشحن والإيداعات</span>
             </a>
-            <a href="admin-brokers.html" class="drawer-nav-item active">
+            <a href="admin-brokers.html" class="drawer-nav-item active" data-admin-only style="display: none;">
                 <i class="fas fa-globe-africa text-orange"></i> <span>إدارة الوسطاء الإقليميين</span>
             </a>
-            <a href="pending-accounts.html" class="drawer-nav-item">
+            <a href="pending-accounts.html" class="drawer-nav-item" data-admin-only style="display: none;">
                 <i class="fas fa-clipboard-check text-orange"></i> <span>الحسابات قيد الفحص</span>
             </a>
-            <a href="admin-chats.html" class="drawer-nav-item">
+            <a href="admin-chats.html" class="drawer-nav-item" data-admin-only style="display: none;">
                 <i class="fas fa-inbox text-gold"></i> <span>محادثات الإدارة والدعم</span>
             </a>
-            <a href="deals.html" class="drawer-nav-item">
+            <a href="deals.html" class="drawer-nav-item" data-admin-only style="display: none;">
                 <i class="fas fa-crown text-gold"></i> <span>كافة الصفقات الجارية</span>
             </a>
             <a href="index.html" class="drawer-nav-item">
@@ -340,8 +340,8 @@
         </nav>
     </aside>
 
-    <!-- ================= Main Content Container ================= -->
-    <main class="admin-brokers-container" id="admin-brokers-main">
+    <!-- ================= Main Content Container (مخفي افتراضياً لحين إثبات صلاحية المدير) ================= -->
+    <main class="admin-brokers-container" id="admin-brokers-main" style="display: none;">
 
         <!-- Access Denied Banner for Non-Admins -->
         <div id="access-denied-box" style="display: none; padding: 4rem 1.5rem; text-align: center; background: rgba(15, 20, 32, 0.95); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 18px; margin-top: 2rem;">
@@ -357,7 +357,7 @@
             </a>
         </div>
 
-        <div id="admin-brokers-content">
+        <div id="admin-brokers-content" style="display: none;">
             <!-- 1. Landmark Single H1 Heading for Standards & Accessibility -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem;">
                 <div>
@@ -453,6 +453,7 @@
                                 <option value="SA">🇸🇦 السعودية (SA)</option>
                                 <option value="MA">🇲🇦 المغرب (MA)</option>
                                 <option value="IQ">🇮🇶 العراق (IQ)</option>
+                                <option value="SY">🇸🇾 سوريا (SY)</option>
                                 <option value="AE">🇦🇪 الإمارات (AE)</option>
                                 <option value="TN">🇹🇳 تونس (TN)</option>
                                 <option value="LY">🇱🇾 ليبيا (LY)</option>
@@ -955,21 +956,75 @@
             }
         }
 
-        function checkAdminAccess() {
-            const user = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
-            const deniedBox = document.getElementById('access-denied-box');
+        async function checkAdminAccess() {
+            const mainContainer = document.getElementById('admin-brokers-main');
             const mainContent = document.getElementById('admin-brokers-content');
+            const deniedBox = document.getElementById('access-denied-box');
 
-            const isAdm = typeof isSuperAdmin === 'function' ? isSuperAdmin(user) : (user && (user.role === 'admin' || user.isAdmin === true));
+            // 1. فحص وجود عميل Supabase
+            const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+            if (!client || !client.auth) {
+                console.warn('[RBAC] Supabase client not available. Redirecting to home...');
+                window.location.href = 'index.html';
+                return false;
+            }
 
-            // نتيح العرض إذا كان مسجلاً كمدير أو للتطوير إذا لم تسجل جلسة بعد
-            if (deniedBox) deniedBox.style.display = 'none';
-            if (mainContent) mainContent.style.display = 'block';
+            try {
+                // 2. التحقق من وجود جلسة نشطة للمستخدم
+                const { data: { session }, error: sessionError } = await client.auth.getSession();
+                if (sessionError || !session || !session.user) {
+                    console.warn('[RBAC] No active session found. Redirecting to home...');
+                    window.location.href = 'index.html';
+                    return false;
+                }
+
+                const userId = session.user.id;
+                const userEmail = (session.user.email || '').toLowerCase().trim();
+
+                // 3. الاستعلام المباشر والصارم عن دور المستخدم (role) من جدول profiles في Supabase
+                const { data: profile, error: profileError } = await client
+                    .from('profiles')
+                    .select('id, email, role, is_admin')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                const role = (profile && profile.role) ? profile.role : (session.user.role || 'user');
+                const isAdminFlag = (profile && (profile.is_admin === true || profile.role === 'admin')) || session.user.isAdmin === true;
+                const isEmailAdmin = (userEmail === 'fgkano63@gmail.com' || userEmail === 'saadani2009@gmail.com' || userEmail === 'mediator@waseet.com');
+
+                // طرد فوري: إذا كان الدور user أو regional_broker أو أي دور غير admin
+                if (role === 'user' || role === 'regional_broker' || (!isAdminFlag && role !== 'admin' && !isEmailAdmin)) {
+                    console.warn('[RBAC] Access denied: User is not an admin. Role:', role);
+                    if (deniedBox) deniedBox.style.display = 'block';
+                    if (mainContent) mainContent.style.display = 'none';
+                    window.location.href = 'index.html';
+                    return false;
+                }
+
+                // 4. إذا تم التحقق بنجاح من أن المستخدم هو المدير (role === 'admin')
+                document.body.classList.add('is-admin-mode');
+                const adminNav = document.getElementById('nav-admin-middle-group');
+                if (adminNav) adminNav.style.display = 'flex';
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : 'flex';
+                });
+
+                if (deniedBox) deniedBox.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+                if (mainContent) mainContent.style.display = 'block';
+
+                return true;
+            } catch (err) {
+                console.error('[RBAC] Error verifying admin access:', err);
+                window.location.href = 'index.html';
+                return false;
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAccess = await checkAdminAccess();
+            if (!hasAccess) return;
             initEmailJs();
-            checkAdminAccess();
             updateCommissionSimulation();
             loadBrokersData();
         });
