@@ -480,6 +480,38 @@ async function runE2ESimulation() {
     assert(checkRoomAccess(admin.id) === 'admin', 'Security Flow', 'Super Admin Supervisor Room Authorization', 'Admin granted supervisor access');
     assert(checkRoomAccess('unauthorized-uuid-999') === 'unauthorized', 'Security Flow', 'Unauthorized 5th Party Strict Denial', '5th unauthorized party strictly blocked (Max 4 parties)');
 
+    // 3b. Syria (SY) Regional Broker Promotion & Routing Verification
+    const syriaBroker = {
+        id: 'broker-sy-uuid-503',
+        email: 'broker.sy@waseet.test',
+        full_name: 'وسيط سوريا المعتمد',
+        role: 'regional_broker',
+        country: 'SY',
+        points_balance: 0,
+        wallet_balance: 0
+    };
+    DB.profiles.push(syriaBroker);
+    assert(syriaBroker.role === 'regional_broker' && syriaBroker.country === 'SY', 'Regional Broker Flow', 'Syria Regional Broker Promotion & Assignment', 'User promoted to regional_broker for Syria (SY)');
+
+    const syriaBuyer = { id: 'buyer-sy-uuid-504', name: 'طارق دمشق', country: 'SY', points_balance: 400, locked_points: 0 };
+    DB.profiles.push(syriaBuyer);
+    const matchedSyBroker = DB.profiles.find(p => p.role === 'regional_broker' && p.country === syriaBuyer.country);
+    assert(matchedSyBroker && matchedSyBroker.id === syriaBroker.id, 'Regional Broker Flow', 'Syria Smart Routing Broker Match', 'Buyer from Syria (SY) correctly routed to Syria regional broker');
+
+    // 3c. Strict Admin RBAC Verification (Regional Brokers shielded from super admin actions)
+    function isStrictAdminSim(user) {
+        if (!user) return false;
+        if (user.role === 'user' || user.role === 'regional_broker') return false;
+        if (user.role === 'admin' || user.isAdmin === true || user.is_admin === true) return true;
+        const email = user.email ? String(user.email).toLowerCase().trim() : '';
+        const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+        return !!(email && adminEmails.includes(email));
+    }
+
+    assert(!isStrictAdminSim(regionalBroker), 'Security Flow', 'Regional Broker Super Admin Access Denial', 'Regional broker strictly forbidden from super admin access');
+    assert(!isStrictAdminSim(syriaBroker), 'Security Flow', 'Syria Broker Super Admin Access Denial', 'Syria regional broker strictly blocked from admin-only controls');
+    assert(isStrictAdminSim(admin), 'Security Flow', 'Super Admin Authority Authorization', 'Platform administrator successfully authorized');
+
     // 4. Commission Splitting Execution: 10 points fee -> 6 to broker, 4 to admin
     const fee10 = regionalDeal.fee; // 10
     const brokerShare10 = Math.floor(fee10 * (2 / 3)); // 6

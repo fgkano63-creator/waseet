@@ -212,6 +212,14 @@
                     <i class="fas fa-shield-alt text-gold"></i>
                     <span>قيد الشراء</span>
                 </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="closeChatDrawer()">
+                    <i class="fas fa-money-check-alt text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="closeChatDrawer()">
+                    <i class="fas fa-globe-africa text-orange"></i>
+                    <span>الوسطاء الإقليميين</span>
+                </a>
                 <a href="pending-accounts.html" class="drawer-shortcut-card" id="chat-drawer-btn-pending" onclick="closeChatDrawer()">
                     <i class="fas fa-clipboard-check text-orange"></i>
                     <span>حسابات قيد الفحص</span>
@@ -409,11 +417,27 @@
                 if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
                 if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
                 if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
+                });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.display = 'flex';
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.display = 'flex';
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
                 if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
                 if (adminWalletPill) adminWalletPill.style.display = 'none';
+
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.display = 'none';
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.display = 'none';
             }
 
             const pts = (user && user.wallet && user.wallet.available) || 0;

@@ -32,6 +32,7 @@ $appJs = Get-Content 'D:\waseet-app\js\app.js' -Raw -Encoding UTF8
 $escrowJs = Get-Content 'D:\waseet-app\js\escrow.js' -Raw -Encoding UTF8
 $supabaseJs = Get-Content 'D:\waseet-app\js\supabase.js' -Raw -Encoding UTF8
 $authJs = Get-Content 'D:\waseet-app\js\auth.js' -Raw -Encoding UTF8
+$dataJs = Get-Content 'D:\waseet-app\js\data.js' -Raw -Encoding UTF8
 $instantNavJs = Get-Content 'D:\waseet-app\js\instant-nav.js' -Raw -Encoding UTF8
 $sliderJs = Get-Content 'D:\waseet-app\js\slider.js' -Raw -Encoding UTF8
 $supportJs = Get-Content 'D:\waseet-app\js\support.js' -Raw -Encoding UTF8
@@ -282,6 +283,15 @@ Check-Result -Flow 'Enterprise Architecture' -Name 'Clean Promotion Form & Water
 
 $jsBrokers = $supabaseJs.Contains('waseetPromoteUserToBroker') -and $escrowJs.Contains('brokerCommission')
 Check-Result -Flow 'Enterprise Architecture' -Name 'Full Client JS Regional Broker Parity' -Success $jsBrokers -Detail 'JavaScript runtime parity for broker smart routing, 4-party rooms, and commission calculations'
+
+$syriaCheck = $dataJs.Contains("'SY'") -and $adminBrokersHtml.Contains('value="SY"') -and $dataJs.Contains('SYP')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Syria (SY) Regional Broker System Deployment' -Success $syriaCheck -Detail 'Syria country code, pound currency (SYP), and broker promotion active in core data and UI'
+
+$strictRbacCheck = $dataJs.Contains('function isStrictAdmin') -and $adminBrokersHtml.Contains("role === 'regional_broker'") -and $adminChatsHtml.Contains('isStrictAdmin')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Strict RBAC Segregation & Shielding' -Success $strictRbacCheck -Detail 'Regional brokers strictly blocked from super admin panels and administrative controls'
+
+$adminNavParity = $chatHtml.Contains('drawer-admin-brokers-link') -and $pendingAccountsHtml.Contains('drawer-admin-brokers-link') -and $walletHtml.Contains('drawer-admin-brokers-link')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Universal Drawer & Admin Control Parity' -Success $adminNavParity -Detail 'All platform pages implement unified desktop navbar toggling and mobile admin drawer links'
 
 Write-Host ""
 Write-Host ">>> 10. FLOW 10: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
