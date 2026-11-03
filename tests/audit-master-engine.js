@@ -162,6 +162,27 @@ for (const htmlFile of htmlFiles) {
     } else {
         recordAudit('codeQuality', `HTML-DeadLinks-${rel}`, 'PASS', 'INFO', `Zero broken internal hyperlinks in ${rel}`);
     }
+
+    // Check inline scripts syntax validation
+    const inlineScriptMatches = [...html.matchAll(/<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)];
+    let inlineSyntaxErr = null;
+    let sIdx = 0;
+    for (const sm of inlineScriptMatches) {
+        sIdx++;
+        const sCode = sm[1];
+        if (!sCode.trim()) continue;
+        try {
+            new vm.Script(sCode, { filename: `${rel}#script-${sIdx}` });
+        } catch (sErr) {
+            inlineSyntaxErr = `Script #${sIdx}: ${sErr.message}`;
+            break;
+        }
+    }
+    if (inlineSyntaxErr) {
+        recordAudit('codeQuality', `HTML-InlineScriptSyntax-${rel}`, 'FAIL', 'HIGH', `Inline script syntax error in ${rel}`, inlineSyntaxErr);
+    } else {
+        recordAudit('codeQuality', `HTML-InlineScriptSyntax-${rel}`, 'PASS', 'INFO', `All inline scripts syntax valid in ${rel}`);
+    }
 }
 
 // ==============================================================================

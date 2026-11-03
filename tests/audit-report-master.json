@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-03T13:15:00.860Z",
+  "timestamp": "2026-11-03T13:59:49.098Z",
   "metrics": {
-    "totalChecks": 210,
-    "passed": 210,
+    "totalChecks": 226,
+    "passed": 226,
     "warnings": 0,
     "failures": 0
   },
@@ -352,6 +352,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in 404.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-admin-brokers.html",
         "status": "PASS",
         "severity": "INFO",
@@ -377,6 +384,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in admin-brokers.html",
         "details": null
       },
       {
@@ -408,6 +422,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in admin-chats.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-admin-deposits.html",
         "status": "PASS",
         "severity": "INFO",
@@ -433,6 +454,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in admin-deposits.html",
         "details": null
       },
       {
@@ -464,6 +492,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in admin-withdrawals.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-auth\\callback\\index.html",
         "status": "PASS",
         "severity": "INFO",
@@ -489,6 +524,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in auth\\callback\\index.html",
         "details": null
       },
       {
@@ -520,6 +562,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in auth\\callback.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-chat.html",
         "status": "PASS",
         "severity": "INFO",
@@ -545,6 +594,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in chat.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in chat.html",
         "details": null
       },
       {
@@ -576,6 +632,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in contact-support.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-deals.html",
         "status": "PASS",
         "severity": "INFO",
@@ -601,6 +664,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in deals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in deals.html",
         "details": null
       },
       {
@@ -632,6 +702,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in index.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-maintenance.html",
         "status": "PASS",
         "severity": "INFO",
@@ -657,6 +734,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in maintenance.html",
         "details": null
       },
       {
@@ -688,6 +772,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in my-accounts.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-pending-accounts.html",
         "status": "PASS",
         "severity": "INFO",
@@ -713,6 +804,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in pending-accounts.html",
         "details": null
       },
       {
@@ -744,6 +842,13 @@
         "details": null
       },
       {
+        "id": "HTML-InlineScriptSyntax-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in profile.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-wallet.html",
         "status": "PASS",
         "severity": "INFO",
@@ -769,6 +874,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Zero broken internal hyperlinks in wallet.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in wallet.html",
         "details": null
       }
     ],

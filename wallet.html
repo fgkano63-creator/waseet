@@ -1025,9 +1025,13 @@
         }
 
         .admin-pm-card.is-inactive {
-            opacity: 0.55;
             border-style: dashed;
-            background: rgba(10, 13, 20, 0.75);
+            border-color: rgba(255, 255, 255, 0.16);
+            background: rgba(10, 13, 20, 0.92);
+        }
+
+        .admin-pm-card.is-inactive .admin-pm-body {
+            opacity: 0.72;
         }
 
         .admin-pm-header {
@@ -1036,6 +1040,7 @@
             justify-content: space-between;
             gap: 0.6rem;
             padding-bottom: 0.75rem;
+            padding-left: 44px;
             margin-bottom: 0.8rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -1169,13 +1174,17 @@
         }
 
         .btn-pm-delete {
-            background: rgba(239, 68, 68, 0.14);
-            border-color: rgba(239, 68, 68, 0.4);
-            color: #f87171;
+            background: rgba(220, 53, 69, 0.16) !important;
+            border: 1px solid #dc3545 !important;
+            color: #dc3545 !important;
+            font-weight: 800 !important;
+            opacity: 1 !important;
         }
         .btn-pm-delete:hover {
-            background: #ef4444;
-            color: #fff;
+            background: #dc3545 !important;
+            border-color: #dc3545 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(220, 53, 69, 0.45) !important;
             transform: translateY(-1px);
         }
 
@@ -1197,35 +1206,19 @@
             }
         }
 
-        /* ── علامات مائية لأعلام الدول في صناديق حسابات الدفع ── */
+        /* ── إلغاء الأعلام الخلفية واستبدالها بأيقونة علم صغيرة وواضحة (30px) ── */
         .admin-pm-card,
         .gateway-details-card {
             position: relative;
             overflow: hidden;
+            background-image: none !important;
         }
 
         .admin-pm-card::after,
         .gateway-details-card::after {
-            content: '';
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            width: 80px;
-            height: 54px;
-            background-repeat: no-repeat;
-            background-position: bottom left;
-            background-size: contain;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            border-radius: 4px;
-        }
-
-        .admin-pm-card:hover::after,
-        .gateway-details-card:hover::after {
-            opacity: 0.22;
-            transform: scale(1.06);
+            display: none !important;
+            content: none !important;
+            background-image: none !important;
         }
 
         .admin-pm-card > *,
@@ -1234,24 +1227,30 @@
             z-index: 1;
         }
 
-        /* ربط الأعلام بحسب الكلاس ورمز الدولة */
-        .card-dz, .card-dz::after, [data-country="DZ"], [data-country="DZ"]::after { background-image: url('assets/flags/dz.svg'); }
-        .card-eg, .card-eg::after, [data-country="EG"], [data-country="EG"]::after { background-image: url('assets/flags/eg.svg'); }
-        .card-sy, .card-sy::after, [data-country="SY"], [data-country="SY"]::after { background-image: url('assets/flags/sy.svg'); }
-        .card-sa, .card-sa::after, [data-country="SA"], [data-country="SA"]::after { background-image: url('assets/flags/sa.svg'); }
-        .card-ma, .card-ma::after, [data-country="MA"], [data-country="MA"]::after { background-image: url('assets/flags/ma.svg'); }
-        .card-iq, .card-iq::after, [data-country="IQ"], [data-country="IQ"]::after { background-image: url('assets/flags/iq.svg'); }
-        .card-ly, .card-ly::after, [data-country="LY"], [data-country="LY"]::after { background-image: url('assets/flags/ly.svg'); }
-        .card-tn, .card-tn::after, [data-country="TN"], [data-country="TN"]::after { background-image: url('assets/flags/tn.svg'); }
-        .card-jo, .card-jo::after, [data-country="JO"], [data-country="JO"]::after { background-image: url('assets/flags/jo.svg'); }
-        .card-ae, .card-ae::after, [data-country="AE"], [data-country="AE"]::after { background-image: url('assets/flags/ae.svg'); }
-        .card-kw, .card-kw::after, [data-country="KW"], [data-country="KW"]::after { background-image: url('assets/flags/kw.svg'); }
-        .card-qa, .card-qa::after, [data-country="QA"], [data-country="QA"]::after { background-image: url('assets/flags/qa.svg'); }
-        .card-bh, .card-bh::after, [data-country="BH"], [data-country="BH"]::after { background-image: url('assets/flags/bh.svg'); }
-        .card-om, .card-om::after, [data-country="OM"], [data-country="OM"]::after { background-image: url('assets/flags/om.svg'); }
-        .card-ye, .card-ye::after, [data-country="YE"], [data-country="YE"]::after { background-image: url('assets/flags/ye.svg'); }
-        .card-crypto, .card-crypto::after, .card-usdt, .card-usdt::after, .card-binance, .card-binance::after,
-        [data-country="CRYPTO"], [data-country="CRYPTO"]::after, [data-country="USDT"], [data-country="USDT"]::after, [data-country="BINANCE"], [data-country="BINANCE"]::after { background-image: url('assets/flags/crypto.svg'); }
+        .pm-card-corner-flag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 30px;
+            height: 20px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .gw-header-mini-flag {
+            width: 28px;
+            height: 19px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -1943,11 +1942,11 @@
                 methodName: 'بريد الجزائر (BaridiMob / CCP)',
                 shortLabel: 'الجزائر • بريدي موب',
                 beneficiaryLabel: 'اسم المستفيد (Nom & Prénom)',
-                beneficiaryName: '',
+                beneficiaryName: 'MOUSSAOUI DHAYA EDDINE',
                 accountLabel: 'رقم الـ RIP (لتطبيق BaridiMob)',
-                accountNumber: '',
+                accountNumber: '00799999004188617443',
                 secondaryLabel: 'رقم حساب CCP (للتحويل البريدي)',
-                secondaryValue: '',
+                secondaryValue: '0041886174 Clé 43',
                 currencyHint: 'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر',
                 instructions: 'انسخ رقم الـ RIP المعتمد أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
             },
@@ -2105,11 +2104,37 @@
             }
         ];
 
+        function sanitizeLegacyPaymentMethod(pm) {
+            if (!pm) return pm;
+            const isAlgeria = pm.id === 'algeria_baridimob'
+                || (pm.countryCode || '').toUpperCase() === 'DZ'
+                || (pm.countryName || '').includes('جزائر');
+            if (isAlgeria) {
+                if (!pm.beneficiaryName || pm.beneficiaryName.toUpperCase().includes('KARIM BENALI')) {
+                    pm.beneficiaryName = 'MOUSSAOUI DHAYA EDDINE';
+                }
+                if (!pm.accountNumber || pm.accountNumber === '00799999001234567890') {
+                    pm.accountNumber = '00799999004188617443';
+                }
+                if (!pm.secondaryValue || pm.secondaryValue === '0012345678 Clé 90') {
+                    pm.secondaryValue = '0041886174 Clé 43';
+                }
+            }
+            return pm;
+        }
+
+        function getCountryFlagSvgPath(countryCode) {
+            const code = (countryCode || '').toUpperCase().trim();
+            if (!code) return '';
+            if (code === 'CRYPTO') return 'assets/flags/crypto.svg';
+            return `assets/flags/${code.toLowerCase()}.svg`;
+        }
+
         function getGatewaysList() {
             if (typeof window.WASEET_PAYMENT_GATEWAYS !== 'undefined' && Array.isArray(window.WASEET_PAYMENT_GATEWAYS) && window.WASEET_PAYMENT_GATEWAYS.length > 0) {
-                return window.WASEET_PAYMENT_GATEWAYS;
+                return window.WASEET_PAYMENT_GATEWAYS.map(sanitizeLegacyPaymentMethod);
             }
-            return FALLBACK_PAYMENT_GATEWAYS;
+            return FALLBACK_PAYMENT_GATEWAYS.map(sanitizeLegacyPaymentMethod);
         }
 
         function setQuickPoints(pts, btnEl) {
@@ -2125,12 +2150,11 @@
         async function fetchDynamicPaymentMethods(forceRefresh = true) {
             if (typeof waseetFetchPaymentMethods === 'function') {
                 try {
-                    if (forceRefresh) {
-                        try { localStorage.removeItem('WASEET_PAYMENT_METHODS_CACHE'); } catch (e) {}
-                    }
                     const fetched = await waseetFetchPaymentMethods(true);
                     if (Array.isArray(fetched) && fetched.length > 0) {
-                        const activeList = fetched.filter(m => m.isActive !== false && m.is_active !== false);
+                        const activeList = fetched
+                            .filter(m => m.isActive !== false && m.is_active !== false)
+                            .map(sanitizeLegacyPaymentMethod);
                         window.WASEET_PAYMENT_GATEWAYS = activeList;
                         return activeList;
                     }
@@ -2274,13 +2298,14 @@
             if (!gwId) return;
 
             let list = (window.WASEET_PAYMENT_GATEWAYS && window.WASEET_PAYMENT_GATEWAYS.length > 0)
-                ? window.WASEET_PAYMENT_GATEWAYS
+                ? window.WASEET_PAYMENT_GATEWAYS.map(sanitizeLegacyPaymentMethod)
                 : getGatewaysList();
             list = list.filter(m => m.isActive !== false && m.is_active !== false);
 
             let gw = list.find(item => item.id === gwId);
 
-            // ── استدعاء مباشر من Supabase لجلب أحدث بيانات البطاقة وحقنها ديناميكياً فور الاختيار ──
+            // ── استدعاء مباشر من Supabase أو ذاكرة الإعدادات لجلب أحدث بيانات البطاقة وحقنها ديناميكياً فور الاختيار ──
+            let fetchedFromSupabaseRow = false;
             if (typeof initWaseetSupabase === 'function') {
                 const client = initWaseetSupabase();
                 if (client) {
@@ -2292,7 +2317,7 @@
                             .maybeSingle();
 
                         if (!error && dbRow) {
-                            // إذا كانت البطاقة معطلة في قاعدة البيانات، استبعادها فوراً
+                            fetchedFromSupabaseRow = true;
                             if (dbRow.is_active === false) {
                                 console.warn('[Payment Method] هذه البطاقة تم تعطيلها من الإدارة:', gwId);
                                 window.WASEET_PAYMENT_GATEWAYS = list.filter(m => m.id !== gwId);
@@ -2300,7 +2325,7 @@
                                 return;
                             }
 
-                            const freshGw = {
+                            const freshGw = sanitizeLegacyPaymentMethod({
                                 id: dbRow.id,
                                 category: dbRow.category || 'local',
                                 countryName: dbRow.country_name || '',
@@ -2320,7 +2345,7 @@
                                 instructions: dbRow.instructions || '',
                                 isActive: dbRow.is_active !== false,
                                 displayOrder: Number(dbRow.display_order) || 0
-                            };
+                            });
 
                             gw = freshGw;
                             const mIdx = list.findIndex(m => m.id === gwId);
@@ -2334,10 +2359,34 @@
                 }
             }
 
+            if (!fetchedFromSupabaseRow && typeof waseetFetchPaymentMethods === 'function') {
+                try {
+                    const allFetched = await waseetFetchPaymentMethods(false);
+                    if (Array.isArray(allFetched) && allFetched.length > 0) {
+                        const matched = allFetched.find(item => item.id === gwId);
+                        if (matched) {
+                            if (matched.isActive === false || matched.is_active === false) {
+                                window.WASEET_PAYMENT_GATEWAYS = list.filter(m => m.id !== gwId);
+                                await initPaymentGatewaysUI();
+                                return;
+                            }
+                            gw = sanitizeLegacyPaymentMethod(matched);
+                            const mIdx = list.findIndex(m => m.id === gwId);
+                            if (mIdx >= 0) list[mIdx] = gw;
+                            else list.push(gw);
+                            window.WASEET_PAYMENT_GATEWAYS = list;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Payment Method Fallback Sync Warn]', e);
+                }
+            }
+
             if (!gw) {
                 gw = list[0];
             }
             if (!gw) return;
+            gw = sanitizeLegacyPaymentMethod(gw);
 
             selectedGatewayId = gw.id;
 
@@ -2379,6 +2428,8 @@
             const card = document.getElementById('gateway-details-card');
             if (!card || !gw) return;
 
+            gw = sanitizeLegacyPaymentMethod(gw);
+
             let gwCountryCode = (gw.countryCode || '').toUpperCase().trim();
             if (!gwCountryCode) {
                 if (gw.category === 'crypto' || (gw.id && gw.id.includes('crypto')) || (gw.id && gw.id.includes('binance'))) {
@@ -2404,12 +2455,20 @@
             }
             const gwCountryClass = gwCountryCode ? `card-${gwCountryCode.toLowerCase()}` : '';
             card.className = `gateway-details-card ${gwCountryClass}`;
+            card.style.backgroundImage = 'none';
             if (gwCountryCode) card.setAttribute('data-country', gwCountryCode);
             else card.removeAttribute('data-country');
 
+            const flagSvgPath = getCountryFlagSvgPath(gwCountryCode);
+            const miniFlagImgHtml = flagSvgPath
+                ? `<img src="${escapeSafe(flagSvgPath)}" alt="${escapeSafe(gwCountryCode)}" class="gw-header-mini-flag" onerror="this.style.display='none'">`
+                : '';
+
             const iconHtml = gw.iconSvg
                 ? `<img src="${escapeSafe(gw.iconSvg)}" alt="${escapeSafe(gw.countryName)}" onerror="this.outerHTML='<span>${gw.countryFlag || '💳'}</span>'">`
-                : `<span>${gw.countryFlag || '💳'}</span>`;
+                : (flagSvgPath
+                    ? `<img src="${escapeSafe(flagSvgPath)}" alt="${escapeSafe(gw.countryName)}" onerror="this.outerHTML='<span>${gw.countryFlag || '💳'}</span>'">`
+                    : `<span>${gw.countryFlag || '💳'}</span>`);
 
             const secondaryRowHtml = gw.secondaryValue
                 ? `
@@ -2433,20 +2492,26 @@
                     <div class="gateway-details-title-wrap">
                         <div class="gateway-details-badge-icon">${iconHtml}</div>
                         <div style="min-width: 0;">
-                            <div style="color: #fff; font-weight: 900; font-size: 0.92rem; line-height: 1.3;">${escapeSafe(gw.methodName)}</div>
+                            <div style="color: #fff; font-weight: 900; font-size: 0.92rem; line-height: 1.3; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                                ${miniFlagImgHtml}
+                                <span>${escapeSafe(gw.methodName)}</span>
+                            </div>
                             <div style="color: var(--gold-light); font-size: 0.74rem; font-weight: 700; margin-top: 2px;">
                                 ${escapeSafe(gw.currencyHint || 'شحن آمن ومباشر لرصيد النقاط')}
                             </div>
                         </div>
                     </div>
-                    <span class="gateway-country-tag">${gw.countryFlag || ''} ${escapeSafe(gw.countryName)}</span>
+                    <span class="gateway-country-tag" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                        ${miniFlagImgHtml}
+                        <span>${escapeSafe(gw.countryName)}</span>
+                    </span>
                 </div>
 
                 <!-- اسم المستفيد -->
                 <div class="gateway-info-row">
                     <div style="min-width: 0;">
                         <div style="font-size: 0.73rem; color: var(--silver-muted);"><i class="fas fa-user-check text-gold"></i> ${escapeSafe(gw.beneficiaryLabel || 'اسم المستفيد المعتمد')}</div>
-                        <div style="font-size: 0.88rem; color: #fff; font-weight: 800; margin-top: 2px;">${beneficiaryDisplay}</div>
+                        <div style="font-size: 0.88rem; color: #fff; font-weight: 800; margin-top: 2px;" id="active-gw-beneficiary-name">${beneficiaryDisplay}</div>
                     </div>
                     ${gw.beneficiaryName ? `
                     <button type="button" class="btn-copy-mini" data-copy="${escapeSafe(gw.beneficiaryName)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">

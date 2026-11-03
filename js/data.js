@@ -136,13 +136,13 @@ const WASEET_PAYMENT_GATEWAYS = [
         methodName: 'بريد الجزائر (BaridiMob / CCP)',
         shortLabel: 'الجزائر • بريدي موب',
         beneficiaryLabel: 'اسم المستفيد (Nom & Prénom)',
-        beneficiaryName: '',
+        beneficiaryName: 'MOUSSAOUI DHAYA EDDINE',
         accountLabel: 'رقم الـ RIP (لتطبيق BaridiMob)',
-        accountNumber: '',
+        accountNumber: '00799999004188617443',
         secondaryLabel: 'رقم حساب CCP (للتحويل البريدي)',
-        secondaryValue: '',
+        secondaryValue: '0041886174 Clé 43',
         currencyHint: 'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر',
-        instructions: 'انسخ رقم الـ RIP المعتمد أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
+        instructions: 'انسخ رقم الـ RIP أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
     },
     {
         id: 'saudi_stcpay',

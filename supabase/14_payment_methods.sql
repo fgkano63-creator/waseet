@@ -123,8 +123,8 @@ INSERT INTO public.payment_methods (
 ),
 (
     'algeria_baridimob', 'local', 'الجزائر', 'DZ', '🇩🇿', 'assets/payments/algeria.svg', 'fas fa-money-check-alt',
-    'بريد الجزائر (BaridiMob / CCP)', 'الجزائر • بريدي موب', 'اسم المستفيد (Nom & Prénom)', 'KARIM BENALI - WASEET DZ',
-    'رقم الـ RIP (لتطبيق BaridiMob)', '00799999001234567890', 'رقم حساب CCP (للتحويل البريدي)', '0012345678 Clé 90',
+    'بريد الجزائر (BaridiMob / CCP)', 'الجزائر • بريدي موب', 'اسم المستفيد (Nom & Prénom)', 'MOUSSAOUI DHAYA EDDINE',
+    'رقم الـ RIP (لتطبيق BaridiMob)', '00799999004188617443', 'رقم حساب CCP (للتحويل البريدي)', '0041886174 Clé 43',
     'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر', 'انسخ رقم الـ RIP أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.', true, 7
 ),
 (

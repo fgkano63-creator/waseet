@@ -8433,7 +8433,7 @@ iframe[class*="netlify"] {
 }
 
 /* ==========================================================================
-   صناديق حسابات الدفع المميزة بأعلام الدول كعلامة مائية (Payment Cards Country Watermarks)
+   بطاقات حسابات الدفع وتفاصيل التحويل - بدون أعلام خلفية مع أيقونات أعلام صغيرة وأزرار حذف واضحة
    ========================================================================== */
 .admin-pm-card,
 .gateway-details-card,
@@ -8441,325 +8441,117 @@ iframe[class*="netlify"] {
 [data-country] {
     position: relative;
     overflow: hidden;
+    background-image: none !important;
 }
 
-/* علامة مائية شفافة في الزاوية اليسرى السفلية لكل صندوق دولة */
 .admin-pm-card::after,
 .gateway-details-card::after,
-.card-flag-watermark::after {
-    content: '';
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    width: 80px;
-    height: 54px;
-    background-repeat: no-repeat;
-    background-position: bottom left;
-    background-size: contain;
-    opacity: 0.1;
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    border-radius: 4px;
+.card-flag-watermark::after,
+[class*="card-"]::after,
+[data-country]::after {
+    display: none !important;
+    content: none !important;
+    background-image: none !important;
+    opacity: 0 !important;
 }
 
-/* تحسين الشفافية قليلاً عند التمرير بالماوس للمعاينة الجمالية */
-.admin-pm-card:hover::after,
-.gateway-details-card:hover::after {
-    opacity: 0.22;
-    transform: scale(1.06);
-}
-
-/* ضمان بقاء نصوص، حقول، وأزرار الصندوق واضحة 100% فوق العلم */
 .admin-pm-card > *,
 .gateway-details-card > * {
     position: relative;
     z-index: 1;
 }
 
-/* استهداف الكلاسات وخصائص data-country لأعلام الدول */
-
-/* 1. الجزائر (Algeria) - DZ */
-.card-dz,
-.card-dz::after,
-[data-country="DZ"],
-[data-country="DZ"]::after,
-[data-country="dz"],
-[data-country="dz"]::after {
-    background-image: url('../assets/flags/dz.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-dz:hover,
-.admin-pm-card[data-country="DZ"]:hover {
-    border-color: rgba(0, 98, 51, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 98, 51, 0.25);
+/* أيقونة علم صغيرة وواضحة (30px) في الزاوية العلوية للبطاقات */
+.pm-card-corner-flag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 30px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+    pointer-events: none;
 }
 
-/* 2. مصر (Egypt) - EG */
-.card-eg,
-.card-eg::after,
-[data-country="EG"],
-[data-country="EG"]::after,
-[data-country="eg"],
-[data-country="eg"]::after {
-    background-image: url('../assets/flags/eg.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-eg:hover,
-.admin-pm-card[data-country="EG"]:hover {
-    border-color: rgba(200, 16, 46, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(200, 16, 46, 0.25);
+/* أيقونة علم صغيرة ومرتبة بجوار عنوان وسيلة الدفع في نافذة تفاصيل التحويل */
+.gw-header-mini-flag {
+    width: 28px;
+    height: 19px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    flex-shrink: 0;
+    vertical-align: middle;
 }
 
-/* 3. سوريا (Syria) - SY */
-.card-sy,
-.card-sy::after,
-[data-country="SY"],
-[data-country="SY"]::after,
-[data-country="sy"],
-[data-country="sy"]::after {
-    background-image: url('../assets/flags/sy.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-sy:hover,
-.admin-pm-card[data-country="SY"]:hover {
-    border-color: rgba(206, 17, 38, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(206, 17, 38, 0.25);
+/* أزرار الحذف البارزة باللون الأحمر الواضح */
+.btn-pm-delete {
+    background: rgba(220, 53, 69, 0.16) !important;
+    border: 1px solid #dc3545 !important;
+    color: #dc3545 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
 }
 
-/* 4. السعودية (Saudi Arabia) - SA */
-.card-sa,
-.card-sa::after,
-[data-country="SA"],
-[data-country="SA"]::after,
-[data-country="sa"],
-[data-country="sa"]::after {
-    background-image: url('../assets/flags/sa.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-sa:hover,
-.admin-pm-card[data-country="SA"]:hover {
-    border-color: rgba(0, 108, 53, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 108, 53, 0.25);
+.btn-pm-delete:hover {
+    background: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.45) !important;
+    transform: translateY(-1px);
 }
 
-/* 5. المغرب (Morocco) - MA */
-.card-ma,
-.card-ma::after,
-[data-country="MA"],
-[data-country="MA"]::after,
-[data-country="ma"],
-[data-country="ma"]::after {
-    background-image: url('../assets/flags/ma.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-ma:hover,
-.admin-pm-card[data-country="MA"]:hover {
-    border-color: rgba(193, 39, 45, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(193, 39, 45, 0.25);
+/* ==========================================================================
+   قسم الوسطاء الإقليميين المعتمدين في صفحة المتجر (Store Regional Brokers Showcase)
+   ========================================================================== */
+.store-brokers-section {
+    padding: 2.2rem 0 1.2rem;
+    position: relative;
+    z-index: 2;
 }
 
-/* 6. العراق (Iraq) - IQ */
-.card-iq,
-.card-iq::after,
-[data-country="IQ"],
-[data-country="IQ"]::after,
-[data-country="iq"],
-[data-country="iq"]::after {
-    background-image: url('../assets/flags/iq.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-iq:hover,
-.admin-pm-card[data-country="IQ"]:hover {
-    border-color: rgba(206, 17, 38, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(206, 17, 38, 0.25);
+.store-brokers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.15rem;
+    margin-top: 1.1rem;
 }
 
-/* 7. ليبيا (Libya) - LY */
-.card-ly,
-.card-ly::after,
-[data-country="LY"],
-[data-country="LY"]::after,
-[data-country="ly"],
-[data-country="ly"]::after {
-    background-image: url('../assets/flags/ly.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-ly:hover,
-.admin-pm-card[data-country="LY"]:hover {
-    border-color: rgba(35, 158, 70, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(35, 158, 70, 0.25);
+.store-broker-card {
+    background: linear-gradient(155deg, rgba(16, 22, 36, 0.96), rgba(9, 13, 22, 0.98));
+    border: 1px solid rgba(234, 179, 8, 0.28);
+    border-radius: 16px;
+    padding: 1.15rem 1.25rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 8. تونس (Tunisia) - TN */
-.card-tn,
-.card-tn::after,
-[data-country="TN"],
-[data-country="TN"]::after,
-[data-country="tn"],
-[data-country="tn"]::after {
-    background-image: url('../assets/flags/tn.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-tn:hover,
-.admin-pm-card[data-country="TN"]:hover {
-    border-color: rgba(231, 0, 19, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(231, 0, 19, 0.25);
+.store-broker-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--gold-primary);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 18px rgba(197, 160, 89, 0.2);
 }
 
-/* 9. الأردن (Jordan) - JO */
-.card-jo,
-.card-jo::after,
-[data-country="JO"],
-[data-country="JO"]::after,
-[data-country="jo"],
-[data-country="jo"]::after {
-    background-image: url('../assets/flags/jo.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-jo:hover,
-.admin-pm-card[data-country="JO"]:hover {
-    border-color: rgba(0, 122, 61, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 122, 61, 0.25);
+.store-broker-flag-corner {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 30px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 
-/* 10. الإمارات (UAE) - AE */
-.card-ae,
-.card-ae::after,
-[data-country="AE"],
-[data-country="AE"]::after,
-[data-country="ae"],
-[data-country="ae"]::after {
-    background-image: url('../assets/flags/ae.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-ae:hover,
-.admin-pm-card[data-country="AE"]:hover {
-    border-color: rgba(0, 115, 47, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 115, 47, 0.25);
-}
-
-/* 11. الكويت (Kuwait) - KW */
-.card-kw,
-.card-kw::after,
-[data-country="KW"],
-[data-country="KW"]::after,
-[data-country="kw"],
-[data-country="kw"]::after {
-    background-image: url('../assets/flags/kw.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-kw:hover,
-.admin-pm-card[data-country="KW"]:hover {
-    border-color: rgba(0, 122, 61, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 122, 61, 0.25);
-}
-
-/* 12. قطر (Qatar) - QA */
-.card-qa,
-.card-qa::after,
-[data-country="QA"],
-[data-country="QA"]::after,
-[data-country="qa"],
-[data-country="qa"]::after {
-    background-image: url('../assets/flags/qa.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-qa:hover,
-.admin-pm-card[data-country="QA"]:hover {
-    border-color: rgba(141, 27, 61, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(141, 27, 61, 0.25);
-}
-
-/* 13. البحرين (Bahrain) - BH */
-.card-bh,
-.card-bh::after,
-[data-country="BH"],
-[data-country="BH"]::after,
-[data-country="bh"],
-[data-country="bh"]::after {
-    background-image: url('../assets/flags/bh.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-bh:hover,
-.admin-pm-card[data-country="BH"]:hover {
-    border-color: rgba(206, 17, 38, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(206, 17, 38, 0.25);
-}
-
-/* 14. عمان (Oman) - OM */
-.card-om,
-.card-om::after,
-[data-country="OM"],
-[data-country="OM"]::after,
-[data-country="om"],
-[data-country="om"]::after {
-    background-image: url('../assets/flags/om.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-om:hover,
-.admin-pm-card[data-country="OM"]:hover {
-    border-color: rgba(219, 22, 28, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(219, 22, 28, 0.25);
-}
-
-/* 15. اليمن (Yemen) - YE */
-.card-ye,
-.card-ye::after,
-[data-country="YE"],
-[data-country="YE"]::after,
-[data-country="ye"],
-[data-country="ye"]::after {
-    background-image: url('../assets/flags/ye.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-ye:hover,
-.admin-pm-card[data-country="YE"]:hover {
-    border-color: rgba(206, 17, 38, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(206, 17, 38, 0.25);
-}
-
-/* 16. العملات الرقمية / بينانس (Crypto / USDT / Binance) */
-.card-crypto,
-.card-crypto::after,
-.card-usdt,
-.card-usdt::after,
-.card-binance,
-.card-binance::after,
-[data-country="CRYPTO"],
-[data-country="CRYPTO"]::after,
-[data-country="USDT"],
-[data-country="USDT"]::after,
-[data-country="BINANCE"],
-[data-country="BINANCE"]::after,
-[data-country="crypto"],
-[data-country="crypto"]::after {
-    background-image: url('../assets/flags/crypto.svg');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-.admin-pm-card.card-crypto:hover,
-.admin-pm-card[data-country="CRYPTO"]:hover,
-.admin-pm-card[data-country="USDT"]:hover,
-.admin-pm-card[data-country="BINANCE"]:hover {
-    border-color: rgba(245, 158, 11, 0.7);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 18px rgba(245, 158, 11, 0.25);
-}
 
 
 
