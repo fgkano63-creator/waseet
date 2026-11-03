@@ -224,10 +224,30 @@
             .wallet-panel-title h3 {
                 font-size: 0.95rem !important;
             }
-            .gateway-pills-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 0.4rem !important;
-                width: 100% !important;
+            .gateway-icon-bar {
+                gap: 0.5rem !important;
+                padding-bottom: 0.65rem !important;
+            }
+            .gw-icon-card {
+                min-width: 88px !important;
+                padding: 0.75rem 0.35rem 0.65rem !important;
+                border-radius: 14px !important;
+            }
+            .gw-icon-circle {
+                width: 40px !important;
+                height: 40px !important;
+                margin-bottom: 0.35rem !important;
+            }
+            .gw-card-icon-img {
+                width: 26px !important;
+                height: 26px !important;
+            }
+            .gw-card-title {
+                font-size: 0.82rem !important;
+            }
+            .gw-card-subtitle {
+                font-size: 0.65rem !important;
+                max-width: 78px !important;
             }
             .gateway-details-card {
                 padding: 0.85rem 0.75rem !important;
@@ -272,8 +292,20 @@
             .wallet-hero-grid .wallet-stat-card:last-child {
                 grid-column: auto !important;
             }
-            .gateway-pills-grid {
-                grid-template-columns: 1fr !important;
+            .gw-icon-card {
+                min-width: 82px !important;
+                padding: 0.65rem 0.3rem 0.55rem !important;
+            }
+            .gw-icon-circle {
+                width: 36px !important;
+                height: 36px !important;
+            }
+            .gw-card-icon-img {
+                width: 24px !important;
+                height: 24px !important;
+            }
+            .gw-card-title {
+                font-size: 0.78rem !important;
             }
             .gateway-category-tabs {
                 grid-template-columns: 1fr !important;
@@ -568,105 +600,184 @@
             box-shadow: 0 4px 15px rgba(197, 160, 89, 0.18);
         }
 
-        .gateway-select-wrap {
-            position: relative;
-            margin-bottom: 0.75rem;
-        }
-
-        .gateway-dropdown-select {
-            width: 100%;
-            padding: 0.72rem 1rem 0.72rem 2.4rem;
-            border-radius: 12px;
-            background: rgba(12, 17, 28, 0.95);
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            color: #fff;
-            font-family: var(--font-ar);
-            font-size: 0.88rem;
-            font-weight: 800;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .gateway-dropdown-select:focus {
-            outline: none;
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
-        }
-
-        .gateway-dropdown-select option,
-        .gateway-dropdown-select optgroup {
-            background: #0d121d;
-            color: #fff;
-            font-family: var(--font-ar);
-            padding: 0.4rem;
-        }
-
-        .gateway-select-arrow {
-            position: absolute;
-            left: 0.95rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gold-primary);
-            pointer-events: none;
-            font-size: 0.85rem;
-        }
-
-        .gateway-pills-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.48rem;
+        /* ==========================================================
+           شريط وسائل الدفع البارز والعصري (Touch-Friendly Icon Bar)
+           ========================================================== */
+        .gateway-icon-bar {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 0.65rem;
+            padding: 0.4rem 0.2rem 0.85rem;
             margin-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold-primary) rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        .gateway-pill-btn {
-            background: rgba(14, 19, 30, 0.88);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 11px;
-            padding: 0.52rem 0.45rem;
-            color: var(--silver-light);
-            font-family: var(--font-ar);
-            font-size: 0.78rem;
-            font-weight: 800;
+        .gateway-icon-bar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .gateway-icon-bar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+        }
+
+        .gateway-icon-bar::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--gold-primary), var(--orange-primary));
+            border-radius: 999px;
+        }
+
+        /* في وضع العملات الرقمية (عنصرين): تمدد شبكي متناسق ومتساوي */
+        .gateway-icon-bar.crypto-mode {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            overflow-x: visible;
+            gap: 0.75rem;
+        }
+
+        /* بطاقة وسيلة الدفع البارزة */
+        .gw-icon-card {
+            flex: 0 0 auto;
+            min-width: 98px;
+            max-width: 120px;
+            scroll-snap-align: start;
+            background: linear-gradient(155deg, rgba(20, 27, 44, 0.95), rgba(11, 15, 25, 0.98));
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 0.85rem 0.5rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .gateway-icon-bar.crypto-mode .gw-icon-card {
+            min-width: 0;
+            max-width: 100%;
+            min-height: 104px;
+        }
+
+        .gw-icon-card:hover {
+            border-color: rgba(197, 160, 89, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), 0 0 14px rgba(197, 160, 89, 0.22);
+        }
+
+        .gw-icon-card.active {
+            background: linear-gradient(150deg, rgba(197, 160, 89, 0.25), rgba(234, 88, 12, 0.18));
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 0 22px rgba(197, 160, 89, 0.38), 0 10px 24px rgba(0, 0, 0, 0.6);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .gw-icon-card.active::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            font-size: 0.62rem;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.22);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.38rem;
+        }
+
+        .gw-icon-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.45rem;
+            overflow: hidden;
             transition: all 0.2s ease;
-            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .gw-icon-card.active .gw-icon-circle {
+            background: rgba(197, 160, 89, 0.24);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 14px rgba(197, 160, 89, 0.45);
+        }
+
+        .gw-card-icon-img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .gw-card-flag-emoji {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .gw-card-title {
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .gw-icon-card.active .gw-card-title {
+            color: #fff;
+            font-weight: 900;
+        }
+
+        .gw-card-subtitle {
+            color: var(--silver-muted);
+            font-size: 0.70rem;
+            font-weight: 600;
+            line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 94px;
         }
 
-        .gateway-pill-btn:hover {
-            border-color: rgba(197, 160, 89, 0.5);
-            color: #fff;
-            transform: translateY(-1px);
+        .gw-icon-card.active .gw-card-subtitle {
+            color: var(--gold-light);
+            font-weight: 700;
         }
 
-        .gateway-pill-btn.active {
-            background: linear-gradient(135deg, rgba(197, 160, 89, 0.22), rgba(234, 88, 12, 0.15));
-            border-color: var(--gold-primary);
-            color: #fff;
-            box-shadow: 0 0 14px rgba(197, 160, 89, 0.22);
-        }
-
-        .gateway-pill-flag {
-            font-size: 1.05rem;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-
-        .gateway-pill-icon-img {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            object-fit: contain;
-            flex-shrink: 0;
+        /* شبكة شاشات الحواسيب والأجهزة اللوحية العريضة */
+        @media (min-width: 769px) {
+            .gateway-icon-bar.local-mode {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                overflow-x: visible;
+                gap: 0.7rem;
+            }
+            .gateway-icon-bar.local-mode .gw-icon-card {
+                min-width: 0;
+                max-width: 100%;
+                min-height: 104px;
+            }
         }
 
         /* بطاقة تفاصيل وسيلة الدفع المختارة */
@@ -838,12 +949,34 @@
             .wallet-panel-card {
                 padding: 1.1rem 0.95rem;
             }
-            .gateway-pills-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
             .gateway-cat-tab {
                 font-size: 0.78rem;
                 padding: 0.55rem 0.45rem;
+            }
+            .gateway-icon-bar {
+                padding: 0.3rem 0.15rem 0.75rem;
+                gap: 0.55rem;
+            }
+            .gw-icon-card {
+                min-width: 92px;
+                max-width: 108px;
+                padding: 0.75rem 0.45rem 0.65rem;
+            }
+            .gw-icon-circle {
+                width: 44px;
+                height: 44px;
+                margin-bottom: 0.35rem;
+            }
+            .gw-card-icon-img {
+                width: 28px;
+                height: 28px;
+            }
+            .gw-card-title {
+                font-size: 0.84rem;
+            }
+            .gw-card-subtitle {
+                font-size: 0.68rem;
+                max-width: 86px;
             }
             .gateway-account-box {
                 flex-direction: column;
@@ -1357,17 +1490,9 @@
                                 </button>
                             </div>
 
-                            <!-- القائمة المنسدلة السريعة لاختيار الدولة أو المحفظة مباشرة -->
-                            <div class="gateway-select-wrap">
-                                <select id="gateway-dropdown-select" class="gateway-dropdown-select" onchange="selectGatewayById(this.value)" aria-label="اختر وسيلة الدفع">
-                                    <!-- يتم تعبئتها ديناميكياً من WASEET_PAYMENT_GATEWAYS -->
-                                </select>
-                                <i class="fas fa-chevron-down gateway-select-arrow"></i>
-                            </div>
-
-                            <!-- أزرار الاختيار السريع حسب التبويب المفتوح -->
-                            <div class="gateway-pills-grid" id="gateway-pills-grid">
-                                <!-- يتم توليدها ديناميكياً -->
+                            <!-- شريط وسائل الدفع البارز والعصري (Touch-Friendly Icon Bar) -->
+                            <div class="gateway-icon-bar" id="gateway-icon-bar" role="tablist" aria-label="اختر وسيلة الدفع أو الدولة">
+                                <!-- يتم توليد البطاقات التفاعلية ديناميكياً بأيقونات أعلام واضحة وأسماء بارزة -->
                             </div>
 
                             <!-- بطاقة تفاصيل الدفع الديناميكية (اسم المستفيد + رقم الحساب + زر النسخ) -->
@@ -1767,7 +1892,7 @@
         let activeGatewayCategory = 'local';
         let selectedGatewayId = 'syria_shamcash';
 
-        // قائمة احتياطية في حال لم يتم تحديث الكاش لملف js/data.js بعد
+        // قائمة احتياطية مؤقتة (خالية من أي بيانات وهمية أو أسماء شخصية قديمة)
         const FALLBACK_PAYMENT_GATEWAYS = [
             {
                 id: 'crypto_binance',
@@ -1780,13 +1905,13 @@
                 methodName: 'Binance Pay (بينانس باي)',
                 shortLabel: 'Binance Pay',
                 beneficiaryLabel: 'اسم حساب بينانس (Nickname)',
-                beneficiaryName: 'WASEET_OFFICIAL_PAY',
+                beneficiaryName: '',
                 accountLabel: 'معرّف الدفع (Binance Pay ID)',
-                accountNumber: '849201948',
+                accountNumber: '',
                 secondaryLabel: 'البريد المربوط (اختياري للتحويل)',
-                secondaryValue: 'pay@waseet-gaming.com',
+                secondaryValue: '',
                 currencyHint: '1 نقطة = 1 USDT (تحويل فوري بدون عمولة شبكة)',
-                instructions: 'افتح تطبيق Binance > اختر Binance Pay > إرسال (Send) > الصق معرّف الـ Pay ID أعلاه وتأكد من اسم المستفيد ثم التقط صورة شاشة للإيصال.'
+                instructions: 'افتح تطبيق Binance > اختر Binance Pay > إرسال (Send) > أدخل معرّف الدفع المعتمد وتأكد من صحة التحويل ثم التقط صورة شاشة للإيصال.'
             },
             {
                 id: 'crypto_usdt_trc20',
@@ -1801,87 +1926,11 @@
                 beneficiaryLabel: 'الشبكة المعتمدة (Network)',
                 beneficiaryName: 'Tron (TRC20) — أو BNB Smart Chain (BEP20)',
                 accountLabel: 'عنوان محفظة الإيداع (USDT Address)',
-                accountNumber: 'TX8k9P2mN7qR4vL6wZ1yC3bV5nM8jK2hG4',
+                accountNumber: '',
                 secondaryLabel: 'عنوان شبكة BEP20 البديل',
-                secondaryValue: '0x71C95911E9a5D330f4D621842EC243EE1343292e',
+                secondaryValue: '',
                 currencyHint: '1 نقطة = 1 USDT صافي بعد عمولة الشبكة',
-                instructions: 'يرجى التأكد من اختيار شبكة TRC20 المطابقة للعنوان عند السحب من أي منصة، ثم إرفاق رقم الـ TXID أو لقطة شاشة لتفاصيل التحويل.'
-            },
-            {
-                id: 'syria_shamcash',
-                category: 'local',
-                countryCode: 'SY',
-                countryName: 'سوريا',
-                countryFlag: '🇸🇾',
-                iconSvg: 'assets/payments/syria.svg',
-                iconClass: 'fas fa-mobile-alt',
-                methodName: 'شام كاش (Sham Cash) / سيريتل كاش',
-                shortLabel: 'سوريا • شام كاش',
-                beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'محمد الأحمد - خزينة وسيط سوريا',
-                accountLabel: 'رقم حساب شام كاش / رمز سيريتل كاش',
-                accountNumber: 'SC-90482910',
-                secondaryLabel: 'رقم سيريتل كاش (تحويل يدوي)',
-                secondaryValue: '0933123456',
-                currencyHint: 'يتم احتساب الصرف حسب السعر اليومي المعتمد في السوق السوري',
-                instructions: 'قم بالتحويل إلى رقم حساب شام كاش أو رمز سيريتل كاش الموضح أعلاه، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة الإشعار.'
-            },
-            {
-                id: 'egypt_vodafone',
-                category: 'local',
-                countryCode: 'EG',
-                countryName: 'مصر',
-                countryFlag: '🇪🇬',
-                iconSvg: 'assets/payments/egypt.svg',
-                iconClass: 'fas fa-mobile-alt',
-                methodName: 'فودافون كاش (Vodafone Cash) / إنستا باي',
-                shortLabel: 'مصر • فودافون كاش',
-                beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'أحمد محمود حسن (وكيل وسيط مصر)',
-                accountLabel: 'رقم محفظة فودافون كاش',
-                accountNumber: '01012345678',
-                secondaryLabel: 'عنوان الدفع الفوري (InstaPay IPA)',
-                secondaryValue: 'waseet.egypt@instapay',
-                currencyHint: 'يدعم التحويل الفوري من جميع المحافظ المصرية وتطبيق InstaPay',
-                instructions: 'حوّل المبلغ بالجنيه المصري إلى رقم محفظة فودافون كاش أو عنوان إنستا باي أعلاه، ثم اكتب الرقم المحوّل منه وأرفق سكرين شوت رسالة التأكيد.'
-            },
-            {
-                id: 'iraq_zaincash',
-                category: 'local',
-                countryCode: 'IQ',
-                countryName: 'العراق',
-                countryFlag: '🇮🇶',
-                iconSvg: 'assets/payments/iraq.svg',
-                iconClass: 'fas fa-wallet',
-                methodName: 'زين كاش العراق (Zain Cash) / كي كارد',
-                shortLabel: 'العراق • زين كاش',
-                beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'علي حسين العراقي - وسيط العراق',
-                accountLabel: 'رقم محفظة زين كاش (Zain Cash)',
-                accountNumber: '07801234567',
-                secondaryLabel: 'رقم بطاقة ماستر الرافدين (Qi Card)',
-                secondaryValue: '7102938475',
-                currencyHint: 'يدعم التحويل المباشر عبر تطبيق زين كاش أو ماستر كارد الرافدين',
-                instructions: 'قم بتحويل الرصيد عبر تطبيق Zain Cash إلى الرقم أعلاه، ثم أدخل رقم العملية الموجود في الإشعار وأرفق لقطة الشاشة.'
-            },
-            {
-                id: 'morocco_cih',
-                category: 'local',
-                countryCode: 'MA',
-                countryName: 'المغرب',
-                countryFlag: '🇲🇦',
-                iconSvg: 'assets/payments/morocco.svg',
-                iconClass: 'fas fa-university',
-                methodName: 'سياش بنك (CIH Bank) / البريد بنك',
-                shortLabel: 'المغرب • سياش CIH',
-                beneficiaryLabel: 'اسم المستفيد (Nom du bénéficiaire)',
-                beneficiaryName: 'YOUSSEF EL AMRANI - WASEET MA',
-                accountLabel: 'رقم حساب سياش (RIB / Numéro de compte)',
-                accountNumber: '230780123456789012345678',
-                secondaryLabel: 'حساب البريد بنك (Barid Bank)',
-                secondaryValue: '00987654321000',
-                currencyHint: 'تحويل فوري مجاني من تطبيق CIH Mobile أو Barid Bank Mobile',
-                instructions: 'قم بإجراء تحويل بنكي من تطبيق CIH Mobile إلى رقم الحساب أعلاه، ثم اكتب اسم صاحب الحساب المرسل وأرفق وصل التحويل (Reçu).'
+                instructions: 'يرجى التأكد من اختيار شبكة TRC20 المطابقة للعنوان عند السحب، ثم إرفاق رقم الـ TXID أو لقطة شاشة لتفاصيل التحويل.'
             },
             {
                 id: 'algeria_baridimob',
@@ -1894,13 +1943,70 @@
                 methodName: 'بريد الجزائر (BaridiMob / CCP)',
                 shortLabel: 'الجزائر • بريدي موب',
                 beneficiaryLabel: 'اسم المستفيد (Nom & Prénom)',
-                beneficiaryName: 'KARIM BENALI - WASEET DZ',
+                beneficiaryName: '',
                 accountLabel: 'رقم الـ RIP (لتطبيق BaridiMob)',
-                accountNumber: '00799999001234567890',
+                accountNumber: '',
                 secondaryLabel: 'رقم حساب CCP (للتحويل البريدي)',
-                secondaryValue: '0012345678 Clé 90',
+                secondaryValue: '',
                 currencyHint: 'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر',
-                instructions: 'انسخ رقم الـ RIP أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
+                instructions: 'انسخ رقم الـ RIP المعتمد أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
+            },
+            {
+                id: 'morocco_cih',
+                category: 'local',
+                countryCode: 'MA',
+                countryName: 'المغرب',
+                countryFlag: '🇲🇦',
+                iconSvg: 'assets/payments/morocco.svg',
+                iconClass: 'fas fa-university',
+                methodName: 'سياش بنك (CIH Bank) / البريد بنك',
+                shortLabel: 'المغرب • سياش CIH',
+                beneficiaryLabel: 'اسم المستفيد (Nom du bénéficiaire)',
+                beneficiaryName: '',
+                accountLabel: 'رقم حساب سياش (RIB / Numéro de compte)',
+                accountNumber: '',
+                secondaryLabel: 'حساب البريد بنك (Barid Bank)',
+                secondaryValue: '',
+                currencyHint: 'تحويل فوري مجاني من تطبيق CIH Mobile أو Barid Bank Mobile',
+                instructions: 'قم بإجراء تحويل بنكي من تطبيق CIH Mobile إلى رقم الحساب المعتمد، ثم اكتب اسم صاحب الحساب المرسل وأرفق وصل التحويل (Reçu).'
+            },
+            {
+                id: 'syria_shamcash',
+                category: 'local',
+                countryCode: 'SY',
+                countryName: 'سوريا',
+                countryFlag: '🇸🇾',
+                iconSvg: 'assets/payments/syria.svg',
+                iconClass: 'fas fa-mobile-alt',
+                methodName: 'شام كاش (Sham Cash) / سيريتل كاش',
+                shortLabel: 'سوريا • شام كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: '',
+                accountLabel: 'رقم حساب شام كاش / رمز سيريتل كاش',
+                accountNumber: '',
+                secondaryLabel: 'رقم سيريتل كاش (تحويل يدوي)',
+                secondaryValue: '',
+                currencyHint: 'يتم احتساب الصرف حسب السعر اليومي المعتمد في السوق السوري',
+                instructions: 'قم بالتحويل إلى رقم حساب شام كاش أو سيريتل كاش المعتمد، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة الإشعار.'
+            },
+            {
+                id: 'egypt_vodafone',
+                category: 'local',
+                countryCode: 'EG',
+                countryName: 'مصر',
+                countryFlag: '🇪🇬',
+                iconSvg: 'assets/payments/egypt.svg',
+                iconClass: 'fas fa-mobile-alt',
+                methodName: 'فودافون كاش (Vodafone Cash) / إنستا باي',
+                shortLabel: 'مصر • فودافون كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: '',
+                accountLabel: 'رقم محفظة فودافون كاش',
+                accountNumber: '',
+                secondaryLabel: 'عنوان الدفع الفوري (InstaPay IPA)',
+                secondaryValue: '',
+                currencyHint: 'يدعم التحويل الفوري من جميع المحافظ المصرية وتطبيق InstaPay',
+                instructions: 'حوّل المبلغ بالجنيه المصري إلى رقم المحفظة أو عنوان إنستا باي المعتمد، ثم اكتب الرقم المحوّل منه وأرفق سكرين شوت رسالة التأكيد.'
             },
             {
                 id: 'saudi_stcpay',
@@ -1913,13 +2019,32 @@
                 methodName: 'STC Pay / مصرف الراجحي / برق',
                 shortLabel: 'السعودية • STC / الراجحي',
                 beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'مؤسسة وسيط للخدمات الرقمية',
+                beneficiaryName: '',
                 accountLabel: 'رقم الآيبان (IBAN الراجحي) أو جوال STC Pay',
-                accountNumber: 'SA0380000000608010167519',
+                accountNumber: '',
                 secondaryLabel: 'رقم محفظة STC Pay / برق (Barq)',
-                secondaryValue: '0501234567',
+                secondaryValue: '',
                 currencyHint: 'يدعم التحويل السريع (سريع) من جميع البنوك السعودية ومحفظة STC Pay',
-                instructions: 'قم بالتحويل إلى رقم الآيبان أو رقم جوال STC Pay أعلاه، ثم أدخل اسم المحوّل وأرفق إيصال التحويل البنكي.'
+                instructions: 'قم بالتحويل إلى رقم الآيبان أو رقم جوال STC Pay المعتمد، ثم أدخل اسم المحوّل وأرفق إيصال التحويل البنكي.'
+            },
+            {
+                id: 'iraq_zaincash',
+                category: 'local',
+                countryCode: 'IQ',
+                countryName: 'العراق',
+                countryFlag: '🇮🇶',
+                iconSvg: 'assets/payments/iraq.svg',
+                iconClass: 'fas fa-wallet',
+                methodName: 'زين كاش العراق (Zain Cash) / كي كارد',
+                shortLabel: 'العراق • زين كاش',
+                beneficiaryLabel: 'اسم المستفيد',
+                beneficiaryName: '',
+                accountLabel: 'رقم محفظة زين كاش (Zain Cash)',
+                accountNumber: '',
+                secondaryLabel: 'رقم بطاقة ماستر الرافدين (Qi Card)',
+                secondaryValue: '',
+                currencyHint: 'يدعم التحويل المباشر عبر تطبيق زين كاش أو ماستر كارد الرافدين',
+                instructions: 'قم بتحويل الرصيد عبر تطبيق Zain Cash إلى الرقم المعتمد، ثم أدخل رقم العملية الموجود في الإشعار وأرفق لقطة الشاشة.'
             },
             {
                 id: 'libya_madar',
@@ -1932,13 +2057,13 @@
                 methodName: 'تداول / سداد / رصيد المدار وليبيانا',
                 shortLabel: 'ليبيا • المدار / تداول',
                 beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'عمر السنوسي - وكيل وسيط ليبيا',
+                beneficiaryName: '',
                 accountLabel: 'رقم المحفظة / رقم استقبال الرصيد (المدار)',
-                accountNumber: '0911234567',
+                accountNumber: '',
                 secondaryLabel: 'رقم ليبيانا / خدمة سداد',
-                secondaryValue: '0921234567',
+                secondaryValue: '',
                 currencyHint: 'متاح الشحن عبر محافظ تداول وسداد أو تحويل رصيد المدار وليبيانا',
-                instructions: 'قم بتحويل القيمة إلى الرقم الموضح أعلاه، ثم اكتب الرقم المحوّل منه أو رقم الإيصال وأرفق لقطة شاشة لإتمام العملية.'
+                instructions: 'قم بتحويل القيمة إلى الرقم المعتمد أعلاه، ثم اكتب الرقم المحوّل منه أو رقم الإيصال وأرفق لقطة شاشة لإتمام العملية.'
             },
             {
                 id: 'tunisia_d17',
@@ -1951,13 +2076,13 @@
                 methodName: 'تطبيق D17 / البريد التونسي (e-Dinar)',
                 shortLabel: 'تونس • تطبيق D17',
                 beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'أمين التونسي - WASEET TN',
+                beneficiaryName: '',
                 accountLabel: 'رقم الهاتف المربوط بتطبيق D17',
-                accountNumber: '20123456',
+                accountNumber: '',
                 secondaryLabel: 'رقم بطاقة e-Dinar Smart (البريد التونسي)',
-                secondaryValue: '5359820012345678',
+                secondaryValue: '',
                 currencyHint: 'تحويل فوري عبر تطبيق D17 التابع للبريد التونسي',
-                instructions: 'افتح تطبيق D17 واختر إرسال أموال (Transfert d\'argent) إلى الرقم أعلاه، ثم أدخل رقم التفويض/العملية وأرفق صورة الإيصال.'
+                instructions: 'افتح تطبيق D17 واختر إرسال أموال (Transfert d\'argent) إلى الرقم المعتمد أعلاه، ثم أدخل رقم التفويض/العملية وأرفق صورة الإيصال.'
             },
             {
                 id: 'jordan_cliq',
@@ -1970,13 +2095,13 @@
                 methodName: 'نظام كليك (CliQ) / زين كاش الأردن',
                 shortLabel: 'الأردن • كليك / زين كاش',
                 beneficiaryLabel: 'اسم المستفيد',
-                beneficiaryName: 'زيد عبدالله الأردني - وسيط الأردن',
+                beneficiaryName: '',
                 accountLabel: 'الاسم المستعار في كليك (CliQ Alias)',
-                accountNumber: 'WASEETJO',
+                accountNumber: '',
                 secondaryLabel: 'رقم محفظة زين كاش الأردن / UWallet',
-                secondaryValue: '0791234567',
+                secondaryValue: '',
                 currencyHint: 'يدعم الدفع الفوري من جميع البنوك والمحافظ الأردنية عبر CliQ',
-                instructions: 'أرسل المبلغ بالدينار الأردني عبر نظام CliQ إلى الاسم المستعار (WASEETJO) أو رقم زين كاش، ثم أدخل اسم المرسل وأرفق صورة الإشعار.'
+                instructions: 'أرسل المبلغ بالدينار الأردني عبر نظام CliQ إلى الاسم المستعار المعتمد أو رقم زين كاش، ثم أدخل اسم المرسل وأرفق صورة الإشعار.'
             }
         ];
 
@@ -1994,39 +2119,76 @@
             if (btnEl) btnEl.classList.add('active');
         }
 
-        async function initPaymentGatewaysUI() {
+        /**
+         * جلب ديناميكي مباشر من قاعدة بيانات Supabase لطرق الدفع الفعالة فقط
+         */
+        async function fetchDynamicPaymentMethods(forceRefresh = true) {
             if (typeof waseetFetchPaymentMethods === 'function') {
                 try {
-                    await waseetFetchPaymentMethods(true);
-                } catch (e) {}
+                    if (forceRefresh) {
+                        try { localStorage.removeItem('WASEET_PAYMENT_METHODS_CACHE'); } catch (e) {}
+                    }
+                    const fetched = await waseetFetchPaymentMethods(true);
+                    if (Array.isArray(fetched) && fetched.length > 0) {
+                        const activeList = fetched.filter(m => m.isActive !== false && m.is_active !== false);
+                        window.WASEET_PAYMENT_GATEWAYS = activeList;
+                        return activeList;
+                    }
+                } catch (e) {
+                    console.warn('[Payment Gateways] Fetch dynamic warning:', e);
+                }
             }
-            const list = getGatewaysList();
-            const selectEl = document.getElementById('gateway-dropdown-select');
-            if (selectEl) {
-                const localItems = list.filter(g => g.category === 'local');
-                const cryptoItems = list.filter(g => g.category === 'crypto');
+            const fallback = getGatewaysList().filter(m => m.isActive !== false && m.is_active !== false);
+            return fallback;
+        }
 
-                const localOptionsHtml = localItems.map(g =>
-                    `<option value="${escapeSafe(g.id)}">${g.countryFlag || '🌍'} ${escapeSafe(g.countryName)} — ${escapeSafe(g.methodName)}</option>`
-                ).join('');
+        function getGatewayIconPath(gw) {
+            if (gw.iconSvg && gw.iconSvg.trim().length > 0) return gw.iconSvg;
+            const code = (gw.countryCode || '').toLowerCase().trim();
+            if (gw.category === 'crypto' || (gw.id && gw.id.includes('crypto')) || (gw.id && gw.id.includes('binance'))) {
+                if (gw.id && gw.id.includes('binance')) return 'assets/payments/binance.svg';
+                return 'assets/flags/crypto.svg';
+            }
+            if (code) {
+                return `assets/flags/${code}.svg`;
+            }
+            const name = (gw.countryName || '');
+            if (name.includes('جزائر')) return 'assets/flags/dz.svg';
+            if (name.includes('مصر')) return 'assets/flags/eg.svg';
+            if (name.includes('سوريا')) return 'assets/flags/sy.svg';
+            if (name.includes('سعودي')) return 'assets/flags/sa.svg';
+            if (name.includes('مغرب')) return 'assets/flags/ma.svg';
+            if (name.includes('عراق')) return 'assets/flags/iq.svg';
+            if (name.includes('ليبيا')) return 'assets/flags/ly.svg';
+            if (name.includes('تونس')) return 'assets/flags/tn.svg';
+            if (name.includes('أردن') || name.includes('اردن')) return 'assets/flags/jo.svg';
+            if (name.includes('إمارات') || name.includes('امارات')) return 'assets/flags/ae.svg';
+            if (name.includes('كويت')) return 'assets/flags/kw.svg';
+            if (name.includes('قطر')) return 'assets/flags/qa.svg';
+            if (name.includes('بحرين')) return 'assets/flags/bh.svg';
+            if (name.includes('عمان') || name.includes('عُمان')) return 'assets/flags/om.svg';
+            if (name.includes('يمن')) return 'assets/flags/ye.svg';
+            return '';
+        }
 
-                const cryptoOptionsHtml = cryptoItems.map(g =>
-                    `<option value="${escapeSafe(g.id)}">${g.countryFlag || '💎'} ${escapeSafe(g.methodName)}</option>`
-                ).join('');
+        async function initPaymentGatewaysUI(preferredGwId = null) {
+            const list = await fetchDynamicPaymentMethods(true);
 
-                selectEl.innerHTML = `
-                    <optgroup label="🌍 المحافظ والبنوك في الدول العربية">
-                        ${localOptionsHtml}
-                    </optgroup>
-                    <optgroup label="💎 العملات الرقمية العالمية (Crypto)">
-                        ${cryptoOptionsHtml}
-                    </optgroup>
-                `;
+            if (list.length === 0) {
+                const card = document.getElementById('gateway-details-card');
+                if (card) {
+                    card.innerHTML = `<div style="text-align: center; padding: 1.5rem; color: var(--silver-muted); font-size: 0.88rem;">لا توجد وسائل دفع معتمدة ومفعلة حالياً في منطقتك. يرجى التواصل مع إدارة المنصة.</div>`;
+                }
+                const iconBar = document.getElementById('gateway-icon-bar');
+                if (iconBar) iconBar.innerHTML = '';
+                return;
             }
 
-            const initialId = (list && list[0]) ? list[0].id : 'syria_shamcash';
-            const initialCat = (list && list[0] && list[0].category) ? list[0].category : 'local';
-            switchGatewayCategory(initialCat, initialId);
+            const targetId = preferredGwId || selectedGatewayId || list[0].id;
+            const currentGw = list.find(g => g.id === targetId) || list[0];
+
+            switchGatewayCategory(currentGw.category || 'local', currentGw.id);
+            await selectGatewayById(currentGw.id, true);
         }
 
         function switchGatewayCategory(category, preferredId) {
@@ -2038,43 +2200,148 @@
                 tabCrypto.classList.toggle('active', activeGatewayCategory === 'crypto');
             }
 
-            const list = getGatewaysList();
-            const filtered = list.filter(g => g.category === activeGatewayCategory);
-            const targetId = preferredId || (filtered[0] ? filtered[0].id : list[0].id);
+            const bar = document.getElementById('gateway-icon-bar');
+            if (bar) {
+                bar.classList.toggle('crypto-mode', activeGatewayCategory === 'crypto');
+                bar.classList.toggle('local-mode', activeGatewayCategory === 'local');
+            }
 
-            renderGatewayPills(filtered, targetId);
-            selectGatewayById(targetId, true);
+            const list = getGatewaysList().filter(m => m.isActive !== false && m.is_active !== false);
+            const filtered = list.filter(g => g.category === activeGatewayCategory);
+            const targetId = preferredId || (filtered[0] ? filtered[0].id : (list[0] ? list[0].id : null));
+
+            renderGatewayCards(filtered, targetId);
+            if (targetId) {
+                selectGatewayById(targetId, true);
+            }
         }
 
-        function renderGatewayPills(items, currentId) {
-            const grid = document.getElementById('gateway-pills-grid');
-            if (!grid) return;
+        function renderGatewayCards(items, currentId) {
+            const bar = document.getElementById('gateway-icon-bar');
+            if (!bar) return;
 
-            grid.style.gridTemplateColumns = activeGatewayCategory === 'crypto' ? 'repeat(2, 1fr)' : '';
+            bar.classList.toggle('crypto-mode', activeGatewayCategory === 'crypto');
+            bar.classList.toggle('local-mode', activeGatewayCategory === 'local');
 
-            grid.innerHTML = items.map(g => {
+            bar.innerHTML = items.map(g => {
                 const isActive = g.id === currentId;
-                const badgeVisual = g.iconSvg
-                    ? `<img src="${escapeSafe(g.iconSvg)}" alt="" class="gateway-pill-icon-img" onerror="this.style.display='none'">`
-                    : `<span class="gateway-pill-flag">${g.countryFlag || '🌍'}</span>`;
+                const iconPath = getGatewayIconPath(g);
+                const flagEmoji = g.countryFlag || (g.category === 'crypto' ? '💎' : '🌍');
+
+                let primaryTitle = '';
+                let subTitle = '';
+                if (g.category === 'crypto') {
+                    if (g.id.includes('binance')) {
+                        primaryTitle = 'Binance Pay';
+                        subTitle = 'بينانس باي';
+                    } else {
+                        primaryTitle = 'USDT';
+                        subTitle = 'شبكة TRC20';
+                    }
+                } else {
+                    primaryTitle = g.countryName || 'محفظة';
+                    subTitle = (g.shortLabel || g.methodName || '').replace(primaryTitle, '').replace(/^[\s•\-\/]+/, '').trim() || g.methodName;
+                    if (subTitle.length > 24) {
+                        subTitle = subTitle.substring(0, 22) + '..';
+                    }
+                }
+
+                const iconHtml = iconPath
+                    ? `<img src="${escapeSafe(iconPath)}" alt="${escapeSafe(primaryTitle)}" class="gw-card-icon-img" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline';"><span class="gw-card-flag-emoji" style="display:none;">${flagEmoji}</span>`
+                    : `<span class="gw-card-flag-emoji">${flagEmoji}</span>`;
 
                 return `
-                    <button type="button" class="gateway-pill-btn ${isActive ? 'active' : ''}" data-gw-id="${escapeSafe(g.id)}" onclick="selectGatewayById('${escapeSafe(g.id)}')">
-                        ${badgeVisual}
-                        <span>${escapeSafe(g.shortLabel || g.countryName)}</span>
+                    <button type="button" 
+                            class="gw-icon-card ${isActive ? 'active' : ''}" 
+                            data-gw-id="${escapeSafe(g.id)}" 
+                            role="tab"
+                            aria-selected="${isActive ? 'true' : 'false'}"
+                            onclick="selectGatewayById('${escapeSafe(g.id)}')">
+                        <div class="gw-icon-circle">
+                            ${iconHtml}
+                        </div>
+                        <span class="gw-card-title">${escapeSafe(primaryTitle)}</span>
+                        <span class="gw-card-subtitle" title="${escapeSafe(g.methodName)}">${escapeSafe(subTitle)}</span>
                     </button>
                 `;
             }).join('');
         }
 
-        function selectGatewayById(gwId, skipCategorySync) {
-            const list = getGatewaysList();
-            const gw = list.find(item => item.id === gwId) || list[0];
+        // الحفاظ على التوافقية البرمجية
+        window.renderGatewayPills = renderGatewayCards;
+
+        async function selectGatewayById(gwId, skipCategorySync) {
+            if (!gwId) return;
+
+            let list = (window.WASEET_PAYMENT_GATEWAYS && window.WASEET_PAYMENT_GATEWAYS.length > 0)
+                ? window.WASEET_PAYMENT_GATEWAYS
+                : getGatewaysList();
+            list = list.filter(m => m.isActive !== false && m.is_active !== false);
+
+            let gw = list.find(item => item.id === gwId);
+
+            // ── استدعاء مباشر من Supabase لجلب أحدث بيانات البطاقة وحقنها ديناميكياً فور الاختيار ──
+            if (typeof initWaseetSupabase === 'function') {
+                const client = initWaseetSupabase();
+                if (client) {
+                    try {
+                        const { data: dbRow, error } = await client
+                            .from('payment_methods')
+                            .select('*')
+                            .eq('id', gwId)
+                            .maybeSingle();
+
+                        if (!error && dbRow) {
+                            // إذا كانت البطاقة معطلة في قاعدة البيانات، استبعادها فوراً
+                            if (dbRow.is_active === false) {
+                                console.warn('[Payment Method] هذه البطاقة تم تعطيلها من الإدارة:', gwId);
+                                window.WASEET_PAYMENT_GATEWAYS = list.filter(m => m.id !== gwId);
+                                await initPaymentGatewaysUI();
+                                return;
+                            }
+
+                            const freshGw = {
+                                id: dbRow.id,
+                                category: dbRow.category || 'local',
+                                countryName: dbRow.country_name || '',
+                                countryCode: dbRow.country_code || '',
+                                countryFlag: dbRow.country_flag || '💳',
+                                iconSvg: dbRow.icon_svg || '',
+                                iconClass: dbRow.icon_class || 'fas fa-credit-card',
+                                methodName: dbRow.method_name || '',
+                                shortLabel: dbRow.short_label || dbRow.method_name || '',
+                                beneficiaryLabel: dbRow.beneficiary_label || 'اسم المستفيد',
+                                beneficiaryName: dbRow.beneficiary_name || '',
+                                accountLabel: dbRow.account_label || 'رقم الحساب / المحفظة',
+                                accountNumber: dbRow.account_number || '',
+                                secondaryLabel: dbRow.secondary_label || '',
+                                secondaryValue: dbRow.secondary_value || '',
+                                currencyHint: dbRow.currency_hint || '',
+                                instructions: dbRow.instructions || '',
+                                isActive: dbRow.is_active !== false,
+                                displayOrder: Number(dbRow.display_order) || 0
+                            };
+
+                            gw = freshGw;
+                            const mIdx = list.findIndex(m => m.id === gwId);
+                            if (mIdx >= 0) list[mIdx] = freshGw;
+                            else list.push(freshGw);
+                            window.WASEET_PAYMENT_GATEWAYS = list;
+                        }
+                    } catch (e) {
+                        console.warn('[Payment Method Dynamic Fetch Warn]', e);
+                    }
+                }
+            }
+
+            if (!gw) {
+                gw = list[0];
+            }
             if (!gw) return;
 
             selectedGatewayId = gw.id;
 
-            // إذا اختار المستخدم من القائمة المنسدلة وسيلة تنتمي لتبويب آخر، نحدث التبويب والأزرار تلقائياً
+            // إذا كانت الوسيلة تنتمي لتبويب آخر، نحدث التبويب والشريط تلقائياً
             if (!skipCategorySync && gw.category !== activeGatewayCategory) {
                 activeGatewayCategory = gw.category;
                 const tabLocal = document.getElementById('gw-tab-local');
@@ -2083,18 +2350,19 @@
                     tabLocal.classList.toggle('active', activeGatewayCategory === 'local');
                     tabCrypto.classList.toggle('active', activeGatewayCategory === 'crypto');
                 }
-                const filtered = list.filter(item => item.category === activeGatewayCategory);
-                renderGatewayPills(filtered, gw.id);
+                const filtered = list.filter(item => item.category === activeGatewayCategory && item.isActive !== false && item.is_active !== false);
+                renderGatewayCards(filtered, gw.id);
             } else {
-                document.querySelectorAll('.gateway-pill-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.getAttribute('data-gw-id') === gw.id);
+                document.querySelectorAll('.gw-icon-card').forEach(btn => {
+                    const isSelected = btn.getAttribute('data-gw-id') === gw.id;
+                    btn.classList.toggle('active', isSelected);
+                    btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+                    if (isSelected) {
+                        try {
+                            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        } catch (e) {}
+                    }
                 });
-            }
-
-            // مزامنة القائمة المنسدلة وحقل الإدخال المخفي
-            const selectEl = document.getElementById('gateway-dropdown-select');
-            if (selectEl && selectEl.value !== gw.id) {
-                selectEl.value = gw.id;
             }
 
             const hiddenInput = document.getElementById('deposit-method-input');
@@ -2157,6 +2425,9 @@
                 `
                 : '';
 
+            const beneficiaryDisplay = gw.beneficiaryName ? escapeSafe(gw.beneficiaryName) : 'حساب منصة وسيط الرسمي المعتمد';
+            const accountDisplay = gw.accountNumber ? escapeSafe(gw.accountNumber) : 'يرجى مراجعة إدارة المنصة للحساب المعتمد';
+
             card.innerHTML = `
                 <div class="gateway-details-header">
                     <div class="gateway-details-title-wrap">
@@ -2175,11 +2446,12 @@
                 <div class="gateway-info-row">
                     <div style="min-width: 0;">
                         <div style="font-size: 0.73rem; color: var(--silver-muted);"><i class="fas fa-user-check text-gold"></i> ${escapeSafe(gw.beneficiaryLabel || 'اسم المستفيد المعتمد')}</div>
-                        <div style="font-size: 0.88rem; color: #fff; font-weight: 800; margin-top: 2px;">${escapeSafe(gw.beneficiaryName)}</div>
+                        <div style="font-size: 0.88rem; color: #fff; font-weight: 800; margin-top: 2px;">${beneficiaryDisplay}</div>
                     </div>
+                    ${gw.beneficiaryName ? `
                     <button type="button" class="btn-copy-mini" data-copy="${escapeSafe(gw.beneficiaryName)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">
                         <i class="far fa-copy"></i> نسخ الاسم
-                    </button>
+                    </button>` : ''}
                 </div>
 
                 <!-- رقم الحساب / المحفظة / Pay ID مع زر النسخ السريع -->
@@ -2188,12 +2460,13 @@
                         <div style="font-size: 0.74rem; color: var(--silver-light); font-weight: 700; margin-bottom: 3px;">
                             <i class="fas fa-key text-gold"></i> ${escapeSafe(gw.accountLabel || 'رقم الحساب / المحفظة')}
                         </div>
-                        <div class="gateway-account-number" id="active-gw-account-num">${escapeSafe(gw.accountNumber)}</div>
+                        <div class="gateway-account-number" id="active-gw-account-num">${accountDisplay}</div>
                     </div>
+                    ${gw.accountNumber ? `
                     <button type="button" class="btn-copy-gateway" data-copy="${escapeSafe(gw.accountNumber)}" onclick="copyGatewayText(this.getAttribute('data-copy'), this)">
                         <i class="fas fa-copy"></i>
                         <span>نسخ الرقم</span>
-                    </button>
+                    </button>` : ''}
                 </div>
 
                 ${secondaryRowHtml}
@@ -2204,6 +2477,24 @@
                     ${escapeSafe(gw.instructions || 'قم بالتحويل للرقم الموضح أعلاه ثم أدخل رقم العملية وأرفق صورة الإيصال بالأسفل.')}
                 </div>
             `;
+        }
+
+        function subscribeToPaymentMethodsRealtime() {
+            if (typeof initWaseetSupabase !== 'function') return;
+            const client = initWaseetSupabase();
+            if (!client || typeof client.channel !== 'function') return;
+
+            try {
+                client.channel('public:payment_methods_live_sync_' + Date.now())
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'payment_methods' }, async (payload) => {
+                        console.log('[Realtime] طرق الدفع تغيرت من لوحة الإدارة:', payload);
+                        try { localStorage.removeItem('WASEET_PAYMENT_METHODS_CACHE'); } catch (e) {}
+                        await initPaymentGatewaysUI(selectedGatewayId);
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.warn('[Realtime Payment Methods Warn]', err);
+            }
         }
 
         async function copyGatewayText(textToCopy, btnEl) {
