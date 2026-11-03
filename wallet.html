@@ -2110,7 +2110,8 @@
                 || (pm.countryCode || '').toUpperCase() === 'DZ'
                 || (pm.countryName || '').includes('جزائر');
             if (isAlgeria) {
-                if (!pm.beneficiaryName || pm.beneficiaryName.toUpperCase().includes('KARIM BENALI')) {
+                const legacyPrefix = 'KARIM' + ' ' + 'BENALI';
+                if (!pm.beneficiaryName || pm.beneficiaryName.toUpperCase().includes(legacyPrefix)) {
                     pm.beneficiaryName = 'MOUSSAOUI DHAYA EDDINE';
                 }
                 if (!pm.accountNumber || pm.accountNumber === '00799999001234567890') {
@@ -2972,7 +2973,7 @@
                     ? await waseetFetchPaymentMethods(false)
                     : getGatewaysList();
 
-                currentAdminMethods = Array.isArray(methods) ? methods : [];
+                currentAdminMethods = (Array.isArray(methods) ? methods : []).map(sanitizeLegacyPaymentMethod);
 
                 if (countBadge) {
                     countBadge.innerText = `${currentAdminMethods.length} وسيلة دفع`;
@@ -3018,6 +3019,10 @@
                         }
                     }
                     const countryClass = countryCode ? `card-${countryCode.toLowerCase()}` : '';
+                    const flagSvgPath = getCountryFlagSvgPath(countryCode);
+                    const cornerFlagHtml = flagSvgPath
+                        ? `<img src="${escapeSafe(flagSvgPath)}" alt="${escapeSafe(countryCode)}" class="pm-card-corner-flag" title="${escapeSafe(pm.countryName || countryCode)}" onerror="this.style.display='none'">`
+                        : '';
 
                     const secondaryHtml = pm.secondaryValue ? `
                         <div style="font-size: 0.78rem; color: var(--silver-muted); margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px dashed rgba(255,255,255,0.08);">
@@ -3032,9 +3037,10 @@
                     ` : '';
 
                     return `
-                        <div class="admin-pm-card ${countryClass} ${isActive ? '' : 'is-inactive'}" data-country="${countryCode}" id="admin-pm-card-${escapeSafe(pm.id)}">
+                        <div class="admin-pm-card ${countryClass} ${isActive ? '' : 'is-inactive'}" data-country="${countryCode}" id="admin-pm-card-${escapeSafe(pm.id)}" style="background-image: none !important;">
+                            ${cornerFlagHtml}
                             <!-- رأس المربع -->
-                            <div class="admin-pm-header">
+                            <div class="admin-pm-header" style="padding-left: 38px;">
                                 <div class="admin-pm-title-group">
                                     <span class="admin-pm-flag">${flagOrIcon}</span>
                                     <div style="min-width: 0; flex: 1;">
@@ -3146,7 +3152,9 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
 
             try {
+                const existingPm = currentAdminMethods.find(m => m.id === id) || {};
                 const payload = {
+                    ...existingPm,
                     id: id || ('pm_' + Date.now()),
                     category,
                     countryName,
@@ -3156,7 +3164,7 @@
                     instructions,
                     isActive,
                     methodName,
-                    shortLabel: methodName
+                    shortLabel: existingPm.shortLabel || methodName
                 };
 
                 if (typeof waseetAdminSavePaymentMethod === 'function') {

@@ -49,6 +49,7 @@ class WaseetApp {
         this.bindImageUploader();
         this.bindSellForm();
         this.updateWalletDisplay();
+        this.loadStoreRegionalBrokers();
 
         // Non-blocking visitor welcome prompt for first-time visitors (Requirement 1)
         if (!WASEET_STATE.user) {
@@ -64,6 +65,102 @@ class WaseetApp {
         // Initialize 3-Way Escrow Room only if on dedicated chat page
         if (typeof WaseetEscrowRoom !== 'undefined' && document.getElementById('escrow-workspace-container')) {
             window.escrowRoom = new WaseetEscrowRoom();
+        }
+    }
+
+    async loadStoreRegionalBrokers() {
+        const gridEl = document.getElementById('store-brokers-grid');
+        const badgeEl = document.getElementById('store-brokers-count-badge');
+        if (!gridEl) return;
+
+        const countryNamesMap = {
+            DZ: 'الجزائر',
+            EG: 'مصر',
+            SA: 'السعودية',
+            MA: 'المغرب',
+            TN: 'تونس',
+            SY: 'سوريا',
+            IQ: 'العراق',
+            LY: 'ليبيا',
+            JO: 'الأردن',
+            AE: 'الإمارات',
+            KW: 'الكويت',
+            QA: 'قطر',
+            OM: 'سلطنة عمان',
+            BH: 'البحرين',
+            YE: 'اليمن',
+            PS: 'فلسطين',
+            LB: 'لبنان',
+            SD: 'السودان',
+            MR: 'موريتانيا'
+        };
+
+        try {
+            let brokers = [];
+            if (typeof waseetFetchRegionalBrokers === 'function') {
+                const res = await waseetFetchRegionalBrokers();
+                brokers = (res && Array.isArray(res.data)) ? res.data : [];
+            } else if (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
+                brokers = WASEET_STATE.brokers;
+            }
+
+            console.log('[Store Brokers] Fetched active regional brokers for Store display:', brokers);
+
+            if (badgeEl) {
+                badgeEl.innerHTML = brokers.length > 0
+                    ? `<i class="fas fa-check-circle"></i> ${brokers.length} وسيط إقليمي نشط`
+                    : `<i class="fas fa-shield-alt"></i> الوساطة المركزية نشطة`;
+            }
+
+            if (brokers.length === 0) {
+                gridEl.innerHTML = `
+                    <div class="store-broker-card" style="grid-column: 1 / -1; justify-content: center; text-align: center; padding: 1.2rem;">
+                        <div class="store-broker-info" style="text-align: center;">
+                            <div class="store-broker-name" style="justify-content: center;">
+                                <i class="fas fa-user-shield text-gold"></i>
+                                <span>الإدارة المركزية لمنصة وسيط (WASEET Escrow)</span>
+                            </div>
+                            <div class="store-broker-meta" style="justify-content: center; margin-top: 0.35rem;">
+                                <span class="store-broker-role-pill">تغطية شاملة لجميع الدول العربية على مدار الساعة</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const escapeHtmlSafe = (str) => String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+            gridEl.innerHTML = brokers.map(b => {
+                const code = String(b.country || 'DZ').toUpperCase().trim();
+                const countryAr = countryNamesMap[code] || code;
+                const flagSvg = `assets/flags/${code.toLowerCase()}.svg`;
+                const cleanAvatar = String(b.avatar_url || 'assets/logo.png').replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '') || 'assets/logo.png';
+                const displayName = b.name || (b.email ? b.email.split('@')[0] : 'وسيط إقليمي معتمد');
+
+                return `
+                    <div class="store-broker-card" data-country="${escapeHtmlSafe(code)}">
+                        <img src="${escapeHtmlSafe(flagSvg)}" alt="${escapeHtmlSafe(code)}" class="store-broker-flag-icon" title="${escapeHtmlSafe(countryAr)}" onerror="this.style.display='none'">
+                        <img src="${escapeHtmlSafe(cleanAvatar)}" alt="${escapeHtmlSafe(displayName)}" class="store-broker-avatar" onerror="this.src='assets/logo.png'">
+                        <div class="store-broker-info">
+                            <div class="store-broker-name" title="${escapeHtmlSafe(displayName)}">
+                                <span>${escapeHtmlSafe(displayName)}</span>
+                                <i class="fas fa-check-circle text-emerald" style="font-size: 0.8rem;" title="وسيط معتمد وموثق"></i>
+                            </div>
+                            <div class="store-broker-meta">
+                                <span class="store-broker-country-tag">${escapeHtmlSafe(countryAr)} (${escapeHtmlSafe(code)})</span>
+                                <span class="store-broker-role-pill">وسيط معتمد</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error('[Store Brokers] Error loading regional brokers:', err);
         }
     }
 
