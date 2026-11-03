@@ -1685,7 +1685,7 @@ body::before {
     gap: 0.55rem;
     color: #fff;
     flex: 1 1 auto;
-    min-width: fit-content;
+    min-width: 0;
 }
 
 .chat-header-actions,
@@ -7372,7 +7372,14 @@ body.chat-page-body .chat-input-bar {
 /* ==========================================================================
    إصلاح رأس المحادثة وصندوق حالة استلام الصفقة على الجوال والشاشات الصغيرة
    ========================================================================== */
-@media (max-width: 768px) {
+body.chat-page-body #support-floating-btn,
+body.chat-page-body .support-floating-pill {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 900px) {
     .chat-header,
     body.chat-page-body .chat-header {
         flex-direction: column !important;

@@ -34,7 +34,7 @@
      * حقن الزر العائم للتواصل الفوري في أسفل الشاشة
      */
     function initSupportUI() {
-        if (window.location.pathname.includes('contact-support.html') || window.location.pathname.includes('admin-chats.html')) {
+        if (window.location.pathname.includes('contact-support.html') || window.location.pathname.includes('admin-chats.html') || window.location.pathname.includes('chat.html')) {
             return;
         }
         if (document.getElementById('support-floating-btn')) return;
