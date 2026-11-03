@@ -117,13 +117,13 @@ const WASEET_PAYMENT_GATEWAYS = [
         methodName: 'سياش بنك (CIH Bank) / البريد بنك',
         shortLabel: 'المغرب • سياش CIH',
         beneficiaryLabel: 'اسم المستفيد (Nom du bénéficiaire)',
-        beneficiaryName: 'YOUSSEF EL AMRANI - WASEET MA',
+        beneficiaryName: '',
         accountLabel: 'رقم حساب سياش (RIB / Numéro de compte)',
-        accountNumber: '230780123456789012345678',
+        accountNumber: '',
         secondaryLabel: 'حساب البريد بنك (Barid Bank)',
-        secondaryValue: '00987654321000',
+        secondaryValue: '',
         currencyHint: 'تحويل فوري مجاني من تطبيق CIH Mobile أو Barid Bank Mobile',
-        instructions: 'قم بإجراء تحويل بنكي من تطبيق CIH Mobile إلى رقم الحساب أعلاه، ثم اكتب اسم صاحب الحساب المرسل وأرفق وصل التحويل (Reçu).'
+        instructions: 'قم بإجراء تحويل بنكي من تطبيق CIH Mobile إلى رقم الحساب المعتمد، ثم اكتب اسم صاحب الحساب المرسل وأرفق وصل التحويل (Reçu).'
     },
     {
         id: 'algeria_baridimob',
@@ -136,13 +136,13 @@ const WASEET_PAYMENT_GATEWAYS = [
         methodName: 'بريد الجزائر (BaridiMob / CCP)',
         shortLabel: 'الجزائر • بريدي موب',
         beneficiaryLabel: 'اسم المستفيد (Nom & Prénom)',
-        beneficiaryName: 'KARIM BENALI - WASEET DZ',
+        beneficiaryName: '',
         accountLabel: 'رقم الـ RIP (لتطبيق BaridiMob)',
-        accountNumber: '00799999001234567890',
+        accountNumber: '',
         secondaryLabel: 'رقم حساب CCP (للتحويل البريدي)',
-        secondaryValue: '0012345678 Clé 90',
+        secondaryValue: '',
         currencyHint: 'يدعم التحويل الفوري عبر تطبيق BaridiMob أو مكاتب بريد الجزائر',
-        instructions: 'انسخ رقم الـ RIP أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
+        instructions: 'انسخ رقم الـ RIP المعتمد أعلاه وقم بالتحويل عبر تطبيق بريدي موب، ثم أدخل رقم العملية أو اسم المرسل وأرفق صورة وصل التحويل.'
     },
     {
         id: 'saudi_stcpay',

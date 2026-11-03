@@ -614,13 +614,16 @@
             // المفاتيح المسترجعة من الذاكرة المحلية (أو الافتراضية من الكود)
             publicKey: (localStorage.getItem('waseet_emailjs_public_key') || 'YOUR_PUBLIC_KEY').trim(),
             serviceId: (localStorage.getItem('waseet_emailjs_service_id') || 'YOUR_SERVICE_ID').trim(),
-            templateId: (localStorage.getItem('waseet_emailjs_template_id') || 'YOUR_TEMPLATE_ID').trim()
+            templateId: (localStorage.getItem('waseet_emailjs_template_id') || 'template_zl3v97n').trim()
         };
 
         function getActiveEmailJsConfig() {
             const pk = (localStorage.getItem('waseet_emailjs_public_key') || WASEET_EMAILJS_CONFIG.publicKey || '').trim();
             const sid = (localStorage.getItem('waseet_emailjs_service_id') || WASEET_EMAILJS_CONFIG.serviceId || '').trim();
-            const tid = (localStorage.getItem('waseet_emailjs_template_id') || WASEET_EMAILJS_CONFIG.templateId || '').trim();
+            let tid = (localStorage.getItem('waseet_emailjs_template_id') || WASEET_EMAILJS_CONFIG.templateId || 'template_zl3v97n').trim();
+            if (!tid || tid === 'YOUR_TEMPLATE_ID' || tid === 'template_broker_welcome') {
+                tid = 'template_zl3v97n';
+            }
             return { publicKey: pk, serviceId: sid, templateId: tid };
         }
 
@@ -647,9 +650,9 @@
 
             const { publicKey, serviceId, templateId } = getActiveEmailJsConfig();
 
-            if (pkInput) pkInput.value = publicKey !== 'YOUR_PUBLIC_KEY' ? publicKey : '';
-            if (sidInput) sidInput.value = serviceId !== 'YOUR_SERVICE_ID' ? serviceId : '';
-            if (tidInput) tidInput.value = templateId !== 'YOUR_TEMPLATE_ID' ? templateId : '';
+            if (pkInput) pkInput.value = (publicKey && publicKey !== 'YOUR_PUBLIC_KEY') ? publicKey : '';
+            if (sidInput) sidInput.value = (serviceId && serviceId !== 'YOUR_SERVICE_ID') ? serviceId : '';
+            if (tidInput) tidInput.value = (templateId && templateId !== 'YOUR_TEMPLATE_ID') ? templateId : 'template_zl3v97n';
 
             modal.style.display = 'flex';
         }
@@ -662,15 +665,18 @@
         async function saveEmailJsConfig() {
             const pk = document.getElementById('emailjs-public-key')?.value.trim() || '';
             const sid = document.getElementById('emailjs-service-id')?.value.trim() || '';
-            const tid = document.getElementById('emailjs-template-id')?.value.trim() || '';
+            let tid = document.getElementById('emailjs-template-id')?.value.trim() || '';
+            if (!tid || tid === 'YOUR_TEMPLATE_ID' || tid === 'template_broker_welcome') {
+                tid = 'template_zl3v97n';
+            }
 
             if (pk) localStorage.setItem('waseet_emailjs_public_key', pk);
             if (sid) localStorage.setItem('waseet_emailjs_service_id', sid);
-            if (tid) localStorage.setItem('waseet_emailjs_template_id', tid);
+            localStorage.setItem('waseet_emailjs_template_id', tid);
 
             WASEET_EMAILJS_CONFIG.publicKey = pk || WASEET_EMAILJS_CONFIG.publicKey;
             WASEET_EMAILJS_CONFIG.serviceId = sid || WASEET_EMAILJS_CONFIG.serviceId;
-            WASEET_EMAILJS_CONFIG.templateId = tid || WASEET_EMAILJS_CONFIG.templateId;
+            WASEET_EMAILJS_CONFIG.templateId = tid;
 
             initEmailJs();
             closeEmailJsConfigModal();
@@ -688,13 +694,16 @@
         async function testEmailJsConnection() {
             const pk = document.getElementById('emailjs-public-key')?.value.trim() || '';
             const sid = document.getElementById('emailjs-service-id')?.value.trim() || '';
-            const tid = document.getElementById('emailjs-template-id')?.value.trim() || '';
+            let tid = document.getElementById('emailjs-template-id')?.value.trim() || '';
+            if (!tid || tid === 'YOUR_TEMPLATE_ID' || tid === 'template_broker_welcome') {
+                tid = 'template_zl3v97n';
+            }
 
-            if (!pk || !sid || !tid) {
+            if (!pk || !sid || pk === 'YOUR_PUBLIC_KEY' || sid === 'YOUR_SERVICE_ID') {
                 if (typeof waseetAlert === 'function') {
-                    await waseetAlert('يرجى ملء جميع الحقول الثلاثة (Public Key, Service ID, Template ID) قبل إجراء الاختبار.', 'تنبيه', 'warning');
+                    await waseetAlert('يرجى ملء المفتاح العام (Public Key) ومعرف الخدمة (Service ID) في الحقول أعلاه قبل إجراء الاختبار.', 'تنبيه', 'warning');
                 } else {
-                    alert('يرجى ملء جميع الحقول الثلاثة أولاً.');
+                    alert('يرجى ملء المفتاح العام ومعرف الخدمة أولاً.');
                 }
                 return;
             }
@@ -712,10 +721,10 @@
                 testEmail = await waseetPrompt(
                     'اختبار إرسال بريد الترحيب عبر EmailJS',
                     'أدخل بريدك الإلكتروني لاستلام رسالة ترحيب تجريبية والتأكد من صحة الربط:',
-                    'broker@gmail.com'
+                    'z1a2k4i5@gmail.com'
                 );
             } else {
-                testEmail = prompt('أدخل بريدك الإلكتروني لإجراء اختبار الإرسال:', 'broker@gmail.com');
+                testEmail = prompt('أدخل بريدك الإلكتروني لإجراء اختبار الإرسال:', 'z1a2k4i5@gmail.com');
             }
 
             if (!testEmail || !testEmail.includes('@')) return;
@@ -737,6 +746,7 @@
                 } else {
                     const errStatus = res?.error?.status ? ` [رمز: ${res.error.status}]` : '';
                     const errText = res?.error?.text || res?.error?.message || 'فشل غير معروف';
+                    console.error('[EmailJS Test Failure Details]', res?.error);
                     if (typeof waseetAlert === 'function') {
                         await waseetAlert(`تعذر إرسال الإيميل التجريبي:\n${errText}${errStatus}\n\nيرجى مراجعة الكونسول (F12) لمعرفة التشخيص المفصل للخطأ.`, 'تنبيه خطأ البريد', 'danger');
                     } else {
@@ -776,26 +786,32 @@
 
             // التحقق مما إذا كانت المفاتيح تم إدخالها
             if (isPlaceholder(publicKey, 'YOUR_PUBLIC_KEY') || isPlaceholder(serviceId, 'YOUR_SERVICE_ID') || isPlaceholder(templateId, 'YOUR_TEMPLATE_ID')) {
-                console.info('[EmailJS] Keys not configured yet. Set them via UI or code to activate real delivery.', {
+                const missingKeys = {
                     publicKeyConfigured: !isPlaceholder(publicKey, 'YOUR_PUBLIC_KEY'),
                     serviceIdConfigured: !isPlaceholder(serviceId, 'YOUR_SERVICE_ID'),
-                    templateIdConfigured: !isPlaceholder(templateId, 'YOUR_TEMPLATE_ID')
-                });
-                return { ok: false, notConfigured: true, message: `Welcome ${countryName}` };
+                    templateIdConfigured: !isPlaceholder(templateId, 'YOUR_TEMPLATE_ID'),
+                    publicKey,
+                    serviceId,
+                    templateId
+                };
+                console.error('[EmailJS ERROR] Missing API configuration keys! Cannot dispatch email.', missingKeys);
+                return { ok: false, notConfigured: true, message: `Welcome ${countryName}`, error: missingKeys };
             }
 
             if (typeof emailjs === 'undefined') {
-                console.error('[EmailJS ERROR] Library script is not loaded.');
-                return { ok: false, error: { message: 'EmailJS library not loaded' } };
+                const libErr = { message: 'EmailJS library script (email.min.js) is not loaded or was blocked.' };
+                console.error('[EmailJS ERROR]', libErr);
+                return { ok: false, error: libErr };
             }
 
             const displayName = brokerName || cleanEmail.split('@')[0] || 'الوسيط الإقليمي';
             const welcomeMessage = `مرحباً بك ${displayName} في فريق منصة وسيط (WASEET)! تم اعتماد حسابك رسمياً كوسيط إقليمي لدولة ${countryName || countryCode}. يمكنك الآن تسجيل الدخول إلى المنصة للبدء في الإشراف على الصفقات واستلام عمولاتك.`;
 
-            // تجهيز المتغيرات مع التأكد الصارم من أن to_email يحمل البريد الإلكتروني للوسيط
+            // تجهيز كافة المتغيرات الممكنة في قالب EmailJS لضمان التطابق
             const templateParams = {
                 to_email: cleanEmail,
                 to_name: displayName,
+                name: displayName,
                 broker_name: displayName,
                 broker_email: cleanEmail,
                 recipient_email: cleanEmail,
@@ -808,29 +824,52 @@
                 login_url: (typeof window !== 'undefined' && window.location) ? window.location.origin : 'https://waseetar.vercel.app'
             };
 
+            // إعادة تهيئة الـ SDK لضمان تسجيل المفتاح العام
             try {
-                // إعادة تهيئة الـ SDK لضمان تسجيل المفتاح العام
                 if (typeof emailjs.init === 'function') {
                     emailjs.init({ publicKey });
                 }
+            } catch (initErr) {
+                console.warn('[EmailJS] emailjs.init warning:', initErr);
+            }
 
-                console.log(`[EmailJS] Dispatching welcome notification to: ${cleanEmail}`, {
-                    serviceId,
-                    templateId,
-                    to_email: templateParams.to_email
-                });
+            console.log(`[EmailJS] Dispatching welcome notification to: ${cleanEmail}`, {
+                serviceId,
+                templateId,
+                to_email: templateParams.to_email
+            });
 
-                // استدعاء دالة الإرسال مع تمرير المفتاح في خيارات v4 ومعامل التوافق البديل
-                let response;
+            // استدعاء دالة الإرسال مع الربط الصريح بـ .then() و .catch()
+            try {
+                let sendPromise;
                 try {
-                    response = await emailjs.send(serviceId, templateId, templateParams, { publicKey });
-                } catch (sendErrObj) {
-                    console.warn('[EmailJS] send with { publicKey } options failed, falling back to string key argument...', sendErrObj);
-                    response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+                    sendPromise = emailjs.send(serviceId, templateId, templateParams, { publicKey });
+                } catch (optsErr) {
+                    console.warn('[EmailJS] Call with options object failed, falling back to string key argument...', optsErr);
+                    sendPromise = emailjs.send(serviceId, templateId, templateParams, publicKey);
                 }
 
-                console.log('[EmailJS] Notification sent successfully:', response);
-                return { ok: true, response, templateParams };
+                const result = await sendPromise
+                    .then((response) => {
+                        console.log('[EmailJS SUCCESS] Notification delivered successfully:', response);
+                        return { ok: true, response, templateParams };
+                    })
+                    .catch((err) => {
+                        const errorDetails = {
+                            status: err?.status || err?.statusCode || (typeof err === 'number' ? err : 'UNKNOWN'),
+                            text: err?.text || (typeof err === 'string' ? err : err?.message) || 'Unknown error occurred during EmailJS dispatch',
+                            message: err?.message || (typeof err === 'string' ? err : 'Email dispatch failed'),
+                            serviceId,
+                            templateId,
+                            to_email: cleanEmail,
+                            rawError: err
+                        };
+                        console.error('[EmailJS ERROR] Failed to send email notification:', errorDetails);
+                        console.error('[EmailJS ERROR RAW OBJECT]', err);
+                        return { ok: false, error: errorDetails, templateParams };
+                    });
+
+                return result;
             } catch (err) {
                 const errorDetails = {
                     status: err?.status || err?.statusCode || (typeof err === 'number' ? err : 'UNKNOWN'),
@@ -841,7 +880,7 @@
                     to_email: cleanEmail,
                     rawError: err
                 };
-                console.error('[EmailJS ERROR] Failed to send email notification:', errorDetails);
+                console.error('[EmailJS ERROR] Outer exception during email notification:', errorDetails);
                 return { ok: false, error: errorDetails, templateParams };
             }
         }
@@ -987,57 +1026,108 @@
 
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترقية...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترقية في قاعدة البيانات...';
             }
 
             try {
                 if (typeof window.waseetPromoteUserToBroker === 'function') {
                     const res = await window.waseetPromoteUserToBroker(targetUser, country);
-                    if (res && res.ok) {
-                        targetInput.value = '';
-
-                        const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(country) : { name: country, flag: '🌍' };
-                        const countryDisplayName = countryInfo.name || country;
-
-                        // استخراج البريد الإلكتروني للمستلم سواء تم إدخال بريد مباشر أو معرف حساب
-                        const recipientEmail = (targetUser.includes('@') ? targetUser : (res?.data?.email || '')).trim();
-                        const brokerName = res?.data?.name || res?.data?.full_name || '';
-
-                        let emailNotice = '';
-                        if (recipientEmail && recipientEmail.includes('@')) {
-                            const emailRes = await sendBrokerWelcomeEmail(recipientEmail, country, countryDisplayName, brokerName);
-                            if (emailRes && emailRes.ok) {
-                                emailNotice = `\n\n✉️ تم إرسال بريد الترحيب بنجاح إلى: ${recipientEmail}`;
-                            } else if (emailRes && emailRes.notConfigured) {
-                                emailNotice = `\n\n💡 ملاحظة: لم يتم إرسال الإيميل التلقائي لأن مفاتيح EmailJS لم تضبط بعد. يمكنك إضافتها بالضغط على زر "إعدادات EmailJS" في أعلى الصفحة.`;
-                            } else if (emailRes && emailRes.error) {
-                                const errText = emailRes.error.text || emailRes.error.message || 'خطأ في الخدمة';
-                                const errStatus = emailRes.error.status && emailRes.error.status !== 'UNKNOWN' ? ` (رمز: ${emailRes.error.status})` : '';
-                                emailNotice = `\n\n⚠️ تعذر إرسال الإيميل التلقائي: ${errText}${errStatus}\nتفاصيل الخطأ مسجلة في الـ Console (F12).`;
-                            }
-                        }
-
-                        if (typeof waseetAlert === 'function') {
-                            await waseetAlert(
-                                'تمت الترقية بنجاح 🌍',
-                                `تم اعتماد المستخدم كوسيط إقليمي لدولة (${countryDisplayName}) مع تمكينه من إدارة الصفقات وتقسيم العمولات (66%).${emailNotice}`,
-                                'success'
-                            );
-                        } else {
-                            alert(`تمت الترقية بنجاح!${emailNotice}`);
-                        }
-                        await loadBrokersData();
-                    } else {
+                    if (!res || !res.ok) {
                         const errMsg = res?.error?.message || 'تعذر ترقية المستخدم، تأكد من صحة البريد أو المعرف.';
                         if (typeof waseetAlert === 'function') {
                             await waseetAlert(errMsg, 'خطأ في الترقية', 'danger');
                         } else {
                             alert(errMsg);
                         }
+                        return;
+                    }
+
+                    const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(country) : { name: country, flag: '🌍' };
+                    const countryDisplayName = countryInfo.name || country;
+
+                    // استخراج البريد الإلكتروني للمستلم سواء تم إدخال بريد مباشر أو معرف حساب
+                    const recipientEmail = (targetUser.includes('@') ? targetUser : (res?.data?.email || '')).trim();
+                    const brokerName = res?.data?.name || res?.data?.full_name || '';
+
+                    if (!recipientEmail || !recipientEmail.includes('@')) {
+                        console.warn('[Promotion Flow] User upgraded in DB, but has no valid email address:', targetUser);
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(
+                                'تنبيه: الترقية تمت بدون إرسال بريد ⚠️',
+                                `تمت ترقية الوسيط في قاعدة البيانات لدولة (${countryDisplayName})، ولكن لم يتم إرسال إيميل الترحيب لأن المستخدم ليس لديه بريد إلكتروني مسجل (${targetUser}).`,
+                                'warning'
+                            );
+                        } else {
+                            alert(`تمت الترقية لدولة ${countryDisplayName} ولكن لا يوجد بريد إلكتروني لإرسال الترحيب.`);
+                        }
+                        targetInput.value = '';
+                        await loadBrokersData();
+                        return;
+                    }
+
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال إيميل الترحيب عبر EmailJS...';
+                    }
+
+                    console.log(`[Promotion Flow] User promoted in DB. Now sending welcome email to: ${recipientEmail}...`);
+
+                    // استدعاء دالة الإرسال مع الربط الصريح بنجاح الإرسال:
+                    // الحظر الصارم لرسالة "تمت الترقية بنجاح" إلا بعد التأكد من نجاح إرسال البريد فعلياً
+                    const emailRes = await sendBrokerWelcomeEmail(recipientEmail, country, countryDisplayName, brokerName);
+
+                    if (emailRes && emailRes.ok) {
+                        // نجاح مؤكد وحقيقي (DB + EmailJS Delivered)
+                        targetInput.value = '';
+                        console.log('[Promotion Flow SUCCESS] EmailJS delivered successfully to:', recipientEmail);
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(
+                                'تمت الترقية بنجاح 🌍',
+                                `تم اعتماد المستخدم كوسيط إقليمي لدولة (${countryDisplayName}) مع تمكينه من إدارة الصفقات وتقسيم العمولات (66%).\n\n✉️ تم إرسال بريد الترحيب بنجاح إلى:\n${recipientEmail}`,
+                                'success'
+                            );
+                        } else {
+                            alert(`تمت الترقية بنجاح! وتم إرسال بريد الترحيب إلى: ${recipientEmail}`);
+                        }
+                        await loadBrokersData();
+                    } else if (emailRes && emailRes.notConfigured) {
+                        // مفاتيح EmailJS غير مضبوطة - منع رسالة النجاح الكاذبة
+                        console.error('[Promotion Flow Error] EmailJS keys missing or placeholder:', emailRes);
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(
+                                'تنبيه: تم تعديل الرتبة ولكن لم يتم إرسال الإيميل ⚠️',
+                                `تمت ترقية رتبة الوسيط في قاعدة البيانات بنجاح، لكن لم يتم إرسال بريد الترحيب لأن مفاتيح EmailJS لم تضبط بعد!\n\nيرجى الضغط على زر "إعدادات EmailJS" في أعلى الصفحة وإدخال:\n• Public Key (المفتاح العام)\n• Service ID (معرف الخدمة)\n• Template ID (معرف القالب: ${WASEET_EMAILJS_CONFIG.templateId})\nثم يمكنك اختبار الإرسال للتأكد من وصول الإيميل.`,
+                                'warning'
+                            );
+                        } else {
+                            alert(`تمت ترقية الرتبة في قاعدة البيانات، ولكن لم يتم إرسال الإيميل لأن مفاتيح EmailJS غير مضبوطة.`);
+                        }
+                        await loadBrokersData();
+                    } else {
+                        // فشل إرسال الإيميل (خطأ من EmailJS أو الشبكة) - منع رسالة النجاح الكاذبة وطباعة الخطأ في الكونسول
+                        const err = emailRes?.error || {};
+                        const errText = err.text || err.message || 'خطأ غير معروف في خادم البريد';
+                        const errStatus = err.status && err.status !== 'UNKNOWN' ? ` (رمز: ${err.status})` : '';
+                        console.error('[Promotion Flow Error] EmailJS dispatch failed:', err);
+
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert(
+                                'فشل إرسال بريد الترحيب عبر EmailJS ❌',
+                                `تم تعديل رتبة المستخدم في قاعدة البيانات، لكن فشل إرسال بريد الترحيب إلى (${recipientEmail}):\n${errText}${errStatus}\n\n🔍 تم تسجيل تفاصيل الخطأ كاملة في كونسول المتصفح (F12 > Console). يرجى مراجعة إعدادات EmailJS ومعرف القالب.`,
+                                'danger'
+                            );
+                        } else {
+                            alert(`تمت الترقية ولكن فشل إرسال بريد الترحيب: ${errText}${errStatus}\nراجع الـ Console لمزيد من التفاصيل.`);
+                        }
+                        await loadBrokersData();
                     }
                 }
             } catch (err) {
-                console.error(err);
+                console.error('[Promotion Flow Exception]', err);
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert(`حدث خطأ غير متوقع أثناء معالجة الترقية: ${err.message || err}`, 'خطأ في النظام', 'danger');
+                } else {
+                    alert(`خطأ: ${err.message || err}`);
+                }
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
