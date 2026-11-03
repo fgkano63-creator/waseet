@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect width="640" height="480" fill="#c1272d"/>
+  <!-- Green Interlaced Pentagram -->
+  <g transform="translate(320, 240)">
+    <polygon points="0,-120 70,96 -114,-37 114,-37 -70,96" fill="none" stroke="#006233" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+</svg>

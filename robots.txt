@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /admin-chats
 Disallow: /admin-deposits
+Disallow: /admin-withdrawals
+Disallow: /admin-brokers
 Disallow: /pending-accounts
 Disallow: /auth/
 

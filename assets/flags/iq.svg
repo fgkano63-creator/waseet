@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect width="640" height="160" fill="#ce1126"/>
+  <rect y="160" width="640" height="160" fill="#ffffff"/>
+  <rect y="320" width="640" height="160" fill="#000000"/>
+  <!-- Kufic Takbir "الله أكبر" -->
+  <g fill="#007a3d" transform="translate(320, 240) scale(0.85)">
+    <!-- ALLAH -->
+    <path d="M-150,25 L-150,-35 L-130,-35 L-130,25 Z"/>
+    <path d="M-120,25 L-120,-35 L-100,-35 L-100,-5 L-70,-5 L-70,-35 L-50,-35 L-50,25 L-120,25 Z"/>
+    <path d="M-40,25 L-40,-35 L-20,-35 L-20,25 Z"/>
+    <!-- AKBAR -->
+    <path d="M10,25 L10,-35 L30,-35 L30,25 Z"/>
+    <path d="M40,25 L40,-35 L60,-35 L60,0 L90,0 L90,-35 L110,-35 L110,25 L40,25 Z"/>
+    <path d="M120,25 L120,-35 L140,-35 L140,-5 L170,-5 L170,25 Z"/>
+  </g>
+</svg>

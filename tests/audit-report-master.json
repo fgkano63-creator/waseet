@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-03T12:42:03.203Z",
+  "timestamp": "2026-11-03T12:46:41.398Z",
   "metrics": {
-    "totalChecks": 180,
-    "passed": 180,
+    "totalChecks": 210,
+    "passed": 210,
     "warnings": 0,
     "failures": 0
   },
@@ -345,6 +345,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-404.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in 404.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-admin-brokers.html",
         "status": "PASS",
         "severity": "INFO",
@@ -363,6 +370,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in admin-brokers.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in admin-brokers.html",
         "details": null
       },
       {
@@ -387,6 +401,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in admin-chats.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-admin-deposits.html",
         "status": "PASS",
         "severity": "INFO",
@@ -405,6 +426,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in admin-deposits.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in admin-deposits.html",
         "details": null
       },
       {
@@ -429,6 +457,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in admin-withdrawals.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-auth\\callback\\index.html",
         "status": "PASS",
         "severity": "INFO",
@@ -447,6 +482,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in auth\\callback\\index.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-auth\\callback\\index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in auth\\callback\\index.html",
         "details": null
       },
       {
@@ -471,6 +513,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-auth\\callback.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in auth\\callback.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-chat.html",
         "status": "PASS",
         "severity": "INFO",
@@ -489,6 +538,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in chat.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in chat.html",
         "details": null
       },
       {
@@ -513,6 +569,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in contact-support.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-deals.html",
         "status": "PASS",
         "severity": "INFO",
@@ -531,6 +594,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in deals.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in deals.html",
         "details": null
       },
       {
@@ -555,6 +625,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in index.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-maintenance.html",
         "status": "PASS",
         "severity": "INFO",
@@ -573,6 +650,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in maintenance.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-maintenance.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in maintenance.html",
         "details": null
       },
       {
@@ -597,6 +681,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in my-accounts.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-pending-accounts.html",
         "status": "PASS",
         "severity": "INFO",
@@ -615,6 +706,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in pending-accounts.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in pending-accounts.html",
         "details": null
       },
       {
@@ -639,6 +737,13 @@
         "details": null
       },
       {
+        "id": "HTML-DeadLinks-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in profile.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-wallet.html",
         "status": "PASS",
         "severity": "INFO",
@@ -657,6 +762,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All <img> tags have alt attribute in wallet.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in wallet.html",
         "details": null
       }
     ],
@@ -1144,6 +1256,104 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Security header Permissions-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/deals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /deals synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/chat",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /chat synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/wallet",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /wallet synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/my-accounts",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /my-accounts synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/profile",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /profile synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/pending-accounts",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /pending-accounts synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/admin-chats",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /admin-chats synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/admin-deposits",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /admin-deposits synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/admin-withdrawals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /admin-withdrawals synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/admin-brokers",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /admin-brokers synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/contact-support",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /contact-support synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/maintenance",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /maintenance synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "RouteParity-/auth/callback",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Route /auth/callback synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "details": null
+      },
+      {
+        "id": "Robots-AdminShield",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All admin endpoints and auth callbacks protected with Disallow in robots.txt",
         "details": null
       }
     ],

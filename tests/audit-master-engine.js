@@ -143,6 +143,25 @@ for (const htmlFile of htmlFiles) {
     } else {
         recordAudit('codeQuality', `HTML-ImgAlt-${rel}`, 'PASS', 'INFO', `All <img> tags have alt attribute in ${rel}`);
     }
+
+    // Check internal href links for dead targets
+    const hrefMatches = [...html.matchAll(/href=["']([^"'#]+)["']/gi)];
+    let deadLinks = [];
+    for (const m of hrefMatches) {
+        const href = m[1].trim();
+        if (href.startsWith('http') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:') || href.endsWith('.css') || href.startsWith('data:') || href === '') continue;
+        let clean = href.split('?')[0];
+        if (!path.extname(clean) && !clean.endsWith('/')) clean += '.html';
+        const targetPath = clean.startsWith('/') ? path.join(ROOT_DIR, clean.replace(/^\//, '')) : path.join(path.dirname(htmlFile), clean);
+        if (!fs.existsSync(targetPath)) {
+            deadLinks.push(href);
+        }
+    }
+    if (deadLinks.length > 0) {
+        recordAudit('codeQuality', `HTML-DeadLinks-${rel}`, 'WARN', 'MEDIUM', `Potentially broken internal link in ${rel}: ${deadLinks.join(', ')}`);
+    } else {
+        recordAudit('codeQuality', `HTML-DeadLinks-${rel}`, 'PASS', 'INFO', `Zero broken internal hyperlinks in ${rel}`);
+    }
 }
 
 // ==============================================================================
@@ -329,6 +348,58 @@ for (const hdr of requiredHeaders) {
         recordAudit('security', `Header-${hdr}`, 'WARN', 'LOW', `Security header ${hdr} partially configured (missing in some hosting configs)`);
     } else {
         recordAudit('security', `Header-${hdr}`, 'FAIL', 'HIGH', `Missing critical security header: ${hdr}`);
+    }
+}
+
+// 3.5 Multi-Cloud Routing Parity Audit
+const redirectsFile = path.join(ROOT_DIR, '_redirects');
+const redirectsContent = fs.existsSync(redirectsFile) ? fs.readFileSync(redirectsFile, 'utf8') : '';
+
+const coreRoutes = [
+    '/deals',
+    '/chat',
+    '/wallet',
+    '/my-accounts',
+    '/profile',
+    '/pending-accounts',
+    '/admin-chats',
+    '/admin-deposits',
+    '/admin-withdrawals',
+    '/admin-brokers',
+    '/contact-support',
+    '/maintenance',
+    '/auth/callback'
+];
+
+let routingMismatchCount = 0;
+for (const route of coreRoutes) {
+    const inRedirects = redirectsContent.includes(route);
+    const inNetlify = netlifyContent.includes(`"${route}"`) || netlifyContent.includes(`'${route}'`);
+    const inVercel = vercelContent.includes(`"${route}"`) || vercelContent.includes(`'${route}'`);
+
+    if (inRedirects && inNetlify && inVercel) {
+        recordAudit('security', `RouteParity-${route}`, 'PASS', 'INFO', `Route ${route} synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)`);
+    } else {
+        routingMismatchCount++;
+        recordAudit('security', `RouteParity-${route}`, 'WARN', 'MEDIUM', `Route ${route} missing in hosting configuration (_redirects: ${inRedirects}, netlify: ${inNetlify}, vercel: ${inVercel})`);
+    }
+}
+
+// 3.6 Crawler Indexing & Admin Shielding (robots.txt)
+const robotsFile = path.join(ROOT_DIR, 'robots.txt');
+if (fs.existsSync(robotsFile)) {
+    const robotsContent = fs.readFileSync(robotsFile, 'utf8');
+    const sensitiveAdminPaths = ['/admin-chats', '/admin-deposits', '/admin-withdrawals', '/admin-brokers', '/pending-accounts', '/auth/'];
+    let exposedPaths = [];
+    for (const p of sensitiveAdminPaths) {
+        if (!robotsContent.includes(`Disallow: ${p}`)) {
+            exposedPaths.push(p);
+        }
+    }
+    if (exposedPaths.length > 0) {
+        recordAudit('security', 'Robots-AdminShield', 'WARN', 'MEDIUM', `robots.txt does not disallow sensitive admin paths: ${exposedPaths.join(', ')}`);
+    } else {
+        recordAudit('security', 'Robots-AdminShield', 'PASS', 'INFO', 'All admin endpoints and auth callbacks protected with Disallow in robots.txt');
     }
 }
 

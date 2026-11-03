@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect width="640" height="480" fill="#e70013"/>
+  <!-- White Disk -->
+  <circle cx="320" cy="240" r="120" fill="#ffffff"/>
+  <!-- Red Crescent -->
+  <circle cx="320" cy="240" r="90" fill="#e70013"/>
+  <circle cx="340" cy="240" r="72" fill="#ffffff"/>
+  <!-- Red Star -->
+  <polygon points="340,195 352,230 388,230 358,252 370,285 340,265 310,285 322,252 292,230 328,230" fill="#e70013"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect x="160" y="0" width="480" height="160" fill="#ffffff"/>
+  <rect x="160" y="160" width="480" height="160" fill="#db161c"/>
+  <rect x="160" y="320" width="480" height="160" fill="#008000"/>
+  <rect x="0" y="0" width="160" height="480" fill="#db161c"/>
+  <!-- Khanjar Emblem -->
+  <g fill="#ffffff" transform="translate(80, 80) scale(0.6)">
+    <path d="M-25,-30 L25,30 M25,-30 L-25,30" stroke="#ffffff" stroke-width="6"/>
+    <path d="M0,-40 L0,15 Q0,40 -20,40" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+    <rect x="-15" y="-45" width="30" height="10" rx="3"/>
+  </g>
+</svg>

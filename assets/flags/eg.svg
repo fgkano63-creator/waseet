@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect width="640" height="160" fill="#c8102e"/>
+  <rect y="160" width="640" height="160" fill="#ffffff"/>
+  <rect y="320" width="640" height="160" fill="#000000"/>
+  <!-- Golden Eagle of Saladin -->
+  <g transform="translate(320, 240) scale(0.68)">
+    <!-- Wings -->
+    <path d="M-55,-40 C-80,-20 -90,30 -60,65 C-45,75 -35,50 -30,30 C-20,70 0,75 0,75 C0,75 20,70 30,30 C35,50 45,75 60,65 C90,30 80,-20 55,-40 C45,-50 35,-35 25,-20 C20,-45 0,-60 0,-60 C0,-60 -20,-45 -25,-20 C-35,-35 -45,-50 -55,-40 Z" fill="#c5a059"/>
+    <!-- Head -->
+    <path d="M-8,-65 Q0,-80 16,-72 Q24,-65 18,-55 Q10,-55 6,-48 Q-6,-48 -8,-65 Z" fill="#c5a059"/>
+    <circle cx="10" cy="-65" r="2.5" fill="#000000"/>
+    <!-- Chest Shield -->
+    <path d="M-22,-20 L22,-20 L22,25 Q22,45 0,55 Q-22,45 -22,25 Z" fill="#ffffff" stroke="#c5a059" stroke-width="4"/>
+    <path d="M-20,-18 L-7,-18 L-7,45 Q-14,38 -20,24 Z" fill="#c8102e"/>
+    <path d="M7,-18 L20,-18 L20,24 Q14,38 7,45 Z" fill="#000000"/>
+    <!-- Scroll at feet -->
+    <rect x="-42" y="70" width="84" height="14" rx="4" fill="#c5a059"/>
+    <rect x="-36" y="73" width="72" height="8" rx="2" fill="#ffffff"/>
+  </g>
+</svg>

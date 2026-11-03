@@ -764,6 +764,7 @@
             padding: 1.15rem;
             transition: all 0.25s ease;
             position: relative;
+            overflow: hidden;
             height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
@@ -950,6 +951,62 @@
                 gap: 14px !important;
             }
         }
+
+        /* ── علامات مائية لأعلام الدول في صناديق حسابات الدفع ── */
+        .admin-pm-card,
+        .gateway-details-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-pm-card::after,
+        .gateway-details-card::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 80px;
+            height: 54px;
+            background-repeat: no-repeat;
+            background-position: bottom left;
+            background-size: contain;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .admin-pm-card:hover::after,
+        .gateway-details-card:hover::after {
+            opacity: 0.22;
+            transform: scale(1.06);
+        }
+
+        .admin-pm-card > *,
+        .gateway-details-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ربط الأعلام بحسب الكلاس ورمز الدولة */
+        .card-dz, .card-dz::after, [data-country="DZ"], [data-country="DZ"]::after { background-image: url('assets/flags/dz.svg'); }
+        .card-eg, .card-eg::after, [data-country="EG"], [data-country="EG"]::after { background-image: url('assets/flags/eg.svg'); }
+        .card-sy, .card-sy::after, [data-country="SY"], [data-country="SY"]::after { background-image: url('assets/flags/sy.svg'); }
+        .card-sa, .card-sa::after, [data-country="SA"], [data-country="SA"]::after { background-image: url('assets/flags/sa.svg'); }
+        .card-ma, .card-ma::after, [data-country="MA"], [data-country="MA"]::after { background-image: url('assets/flags/ma.svg'); }
+        .card-iq, .card-iq::after, [data-country="IQ"], [data-country="IQ"]::after { background-image: url('assets/flags/iq.svg'); }
+        .card-ly, .card-ly::after, [data-country="LY"], [data-country="LY"]::after { background-image: url('assets/flags/ly.svg'); }
+        .card-tn, .card-tn::after, [data-country="TN"], [data-country="TN"]::after { background-image: url('assets/flags/tn.svg'); }
+        .card-jo, .card-jo::after, [data-country="JO"], [data-country="JO"]::after { background-image: url('assets/flags/jo.svg'); }
+        .card-ae, .card-ae::after, [data-country="AE"], [data-country="AE"]::after { background-image: url('assets/flags/ae.svg'); }
+        .card-kw, .card-kw::after, [data-country="KW"], [data-country="KW"]::after { background-image: url('assets/flags/kw.svg'); }
+        .card-qa, .card-qa::after, [data-country="QA"], [data-country="QA"]::after { background-image: url('assets/flags/qa.svg'); }
+        .card-bh, .card-bh::after, [data-country="BH"], [data-country="BH"]::after { background-image: url('assets/flags/bh.svg'); }
+        .card-om, .card-om::after, [data-country="OM"], [data-country="OM"]::after { background-image: url('assets/flags/om.svg'); }
+        .card-ye, .card-ye::after, [data-country="YE"], [data-country="YE"]::after { background-image: url('assets/flags/ye.svg'); }
+        .card-crypto, .card-crypto::after, .card-usdt, .card-usdt::after, .card-binance, .card-binance::after,
+        [data-country="CRYPTO"], [data-country="CRYPTO"]::after, [data-country="USDT"], [data-country="USDT"]::after, [data-country="BINANCE"], [data-country="BINANCE"]::after { background-image: url('assets/flags/crypto.svg'); }
     </style>
 </head>
 <body>
@@ -1603,6 +1660,7 @@
             {
                 id: 'crypto_binance',
                 category: 'crypto',
+                countryCode: 'CRYPTO',
                 countryName: 'عالمي (العملات الرقمية)',
                 countryFlag: '🌐',
                 iconSvg: 'assets/payments/binance.svg',
@@ -1621,6 +1679,7 @@
             {
                 id: 'crypto_usdt_trc20',
                 category: 'crypto',
+                countryCode: 'CRYPTO',
                 countryName: 'عالمي (شبكة العملات الرقمية)',
                 countryFlag: '💎',
                 iconSvg: 'assets/payments/binance.svg',
@@ -1939,6 +1998,34 @@
         function renderGatewayDetailsCard(gw) {
             const card = document.getElementById('gateway-details-card');
             if (!card || !gw) return;
+
+            let gwCountryCode = (gw.countryCode || '').toUpperCase().trim();
+            if (!gwCountryCode) {
+                if (gw.category === 'crypto' || (gw.id && gw.id.includes('crypto')) || (gw.id && gw.id.includes('binance'))) {
+                    gwCountryCode = 'CRYPTO';
+                } else if (gw.countryName) {
+                    const cn = gw.countryName;
+                    if (cn.includes('جزائر')) gwCountryCode = 'DZ';
+                    else if (cn.includes('مصر')) gwCountryCode = 'EG';
+                    else if (cn.includes('سوريا')) gwCountryCode = 'SY';
+                    else if (cn.includes('سعودي')) gwCountryCode = 'SA';
+                    else if (cn.includes('مغرب')) gwCountryCode = 'MA';
+                    else if (cn.includes('عراق')) gwCountryCode = 'IQ';
+                    else if (cn.includes('ليبيا')) gwCountryCode = 'LY';
+                    else if (cn.includes('تونس')) gwCountryCode = 'TN';
+                    else if (cn.includes('أردن') || cn.includes('اردن')) gwCountryCode = 'JO';
+                    else if (cn.includes('إمارات') || cn.includes('امارات')) gwCountryCode = 'AE';
+                    else if (cn.includes('كويت')) gwCountryCode = 'KW';
+                    else if (cn.includes('قطر')) gwCountryCode = 'QA';
+                    else if (cn.includes('بحرين')) gwCountryCode = 'BH';
+                    else if (cn.includes('عمان') || cn.includes('عُمان')) gwCountryCode = 'OM';
+                    else if (cn.includes('يمن')) gwCountryCode = 'YE';
+                }
+            }
+            const gwCountryClass = gwCountryCode ? `card-${gwCountryCode.toLowerCase()}` : '';
+            card.className = `gateway-details-card ${gwCountryClass}`;
+            if (gwCountryCode) card.setAttribute('data-country', gwCountryCode);
+            else card.removeAttribute('data-country');
 
             const iconHtml = gw.iconSvg
                 ? `<img src="${escapeSafe(gw.iconSvg)}" alt="${escapeSafe(gw.countryName)}" onerror="this.outerHTML='<span>${gw.countryFlag || '💳'}</span>'">`
@@ -2439,6 +2526,31 @@
                     const flagOrIcon = pm.countryFlag || (pm.category === 'crypto' ? '💎' : '💳');
                     const catLabel = pm.category === 'crypto' ? 'عملة رقمية' : (pm.countryName || 'محفظة محلية');
 
+                    let countryCode = (pm.countryCode || '').toUpperCase().trim();
+                    if (!countryCode) {
+                        if (pm.category === 'crypto' || (pm.id && pm.id.includes('crypto')) || (pm.id && pm.id.includes('binance'))) {
+                            countryCode = 'CRYPTO';
+                        } else if (pm.countryName) {
+                            const cn = pm.countryName;
+                            if (cn.includes('جزائر')) countryCode = 'DZ';
+                            else if (cn.includes('مصر')) countryCode = 'EG';
+                            else if (cn.includes('سوريا')) countryCode = 'SY';
+                            else if (cn.includes('سعودي')) countryCode = 'SA';
+                            else if (cn.includes('مغرب')) countryCode = 'MA';
+                            else if (cn.includes('عراق')) countryCode = 'IQ';
+                            else if (cn.includes('ليبيا')) countryCode = 'LY';
+                            else if (cn.includes('تونس')) countryCode = 'TN';
+                            else if (cn.includes('أردن') || cn.includes('اردن')) countryCode = 'JO';
+                            else if (cn.includes('إمارات') || cn.includes('امارات')) countryCode = 'AE';
+                            else if (cn.includes('كويت')) countryCode = 'KW';
+                            else if (cn.includes('قطر')) countryCode = 'QA';
+                            else if (cn.includes('بحرين')) countryCode = 'BH';
+                            else if (cn.includes('عمان') || cn.includes('عُمان')) countryCode = 'OM';
+                            else if (cn.includes('يمن')) countryCode = 'YE';
+                        }
+                    }
+                    const countryClass = countryCode ? `card-${countryCode.toLowerCase()}` : '';
+
                     const secondaryHtml = pm.secondaryValue ? `
                         <div style="font-size: 0.78rem; color: var(--silver-muted); margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px dashed rgba(255,255,255,0.08);">
                             <i class="fas fa-link text-gold" style="font-size: 0.75rem;"></i> <strong>حساب إضافي:</strong> <span dir="ltr" style="color: #fff; font-weight: 700;">${escapeSafe(pm.secondaryValue)}</span>
@@ -2452,7 +2564,7 @@
                     ` : '';
 
                     return `
-                        <div class="admin-pm-card ${isActive ? '' : 'is-inactive'}" id="admin-pm-card-${escapeSafe(pm.id)}">
+                        <div class="admin-pm-card ${countryClass} ${isActive ? '' : 'is-inactive'}" data-country="${countryCode}" id="admin-pm-card-${escapeSafe(pm.id)}">
                             <!-- رأس المربع -->
                             <div class="admin-pm-header">
                                 <div class="admin-pm-title-group">

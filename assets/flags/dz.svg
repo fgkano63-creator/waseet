@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <defs>
+    <clipPath id="dzClip">
+      <rect width="640" height="480"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#dzClip)">
+    <rect width="320" height="480" fill="#006233"/>
+    <rect x="320" width="320" height="480" fill="#ffffff"/>
+    <!-- Red Crescent -->
+    <circle cx="320" cy="240" r="120" fill="#d21034"/>
+    <circle cx="344" cy="240" r="96" fill="#ffffff"/>
+    <!-- Red Star -->
+    <polygon points="340,192 355,230 395,230 363,253 375,290 340,268 305,290 317,253 285,230 325,230" fill="#d21034" transform="rotate(-18 340 240)"/>
+  </g>
+</svg>
