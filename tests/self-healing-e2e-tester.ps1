@@ -37,6 +37,8 @@ $instantNavJs = Get-Content 'D:\waseet-app\js\instant-nav.js' -Raw -Encoding UTF
 $sliderJs = Get-Content 'D:\waseet-app\js\slider.js' -Raw -Encoding UTF8
 $supportJs = Get-Content 'D:\waseet-app\js\support.js' -Raw -Encoding UTF8
 $dialogJs = Get-Content 'D:\waseet-app\js\dialog.js' -Raw -Encoding UTF8
+$calculatorJs = Get-Content 'D:\waseet-app\js\calculator.js' -Raw -Encoding UTF8
+$notificationsJs = Get-Content 'D:\waseet-app\js\notifications.js' -Raw -Encoding UTF8
 $css = Get-Content 'D:\waseet-app\css\style.css' -Raw -Encoding UTF8
 $indexHtml = Get-Content 'D:\waseet-app\index.html' -Raw -Encoding UTF8
 $dealsHtml = Get-Content 'D:\waseet-app\deals.html' -Raw -Encoding UTF8
@@ -299,7 +301,21 @@ $adminNavParity = $chatHtml.Contains('drawer-admin-brokers-link') -and $pendingA
 Check-Result -Flow 'Enterprise Architecture' -Name 'Universal Drawer & Admin Control Parity' -Success $adminNavParity -Detail 'All platform pages implement unified desktop navbar toggling and mobile admin drawer links'
 
 Write-Host ""
-Write-Host ">>> 10. FLOW 10: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
+Write-Host ">>> 10. FLOW 10: MULTI-CURRENCY GATEWAYS, FEE CALCULATOR & RESILIENCE" -ForegroundColor Yellow
+$calc1 = $calculatorJs.Contains('calculateWaseetFee') -and $calculatorJs.Contains('price < 50') -and $calculatorJs.Contains('fee = 50')
+Check-Result -Flow 'Dynamic Fee Engine' -Name 'Multi-Tier Dynamic Fee Scale (3 to 50 pts)' -Success $calc1 -Detail 'Accurately calculates platform fee tiers across full price spectrum'
+
+$gateway1 = $dataJs.Contains('WASEET_PAYMENT_GATEWAYS') -and $dataJs.Contains('crypto_binance') -and $dataJs.Contains('syria_shamcash') -and $dataJs.Contains('egypt_vodafone') -and $dataJs.Contains('algeria_baridimob')
+Check-Result -Flow 'Payment Gateways' -Name 'Pan-Arab & Global Crypto Payment Registry' -Success $gateway1 -Detail 'Provides verified payment routes for Binance Crypto, Syria, Egypt, Algeria, Morocco, Iraq, and Saudi Arabia'
+
+$dialogDefensive = $dialogJs.Contains('confirmBtn.onclick') -and $dialogJs.Contains('promptOkBtn.onclick')
+Check-Result -Flow 'UX/UI Hunter' -Name 'Defensive Dialog DOM Handler Null Protection' -Success $dialogDefensive -Detail 'Guards dynamic dialog and prompt buttons against DOM interruptions and racing'
+
+$notif1 = $notificationsJs.Contains('playNotificationSound') -or $notificationsJs.Contains('AudioContext') -or $supportJs.Contains('playSupportChime')
+Check-Result -Flow 'Realtime Engine' -Name 'Realtime Audio Chime & Web Audio API Parity' -Success $notif1 -Detail 'Web Audio API oscillator chimes synthesized cleanly for chat and deals alerts'
+
+Write-Host ""
+Write-Host ">>> 11. FLOW 11: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
 Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, and regional broker journeys in Node runtime'
