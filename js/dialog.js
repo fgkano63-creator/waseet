@@ -85,23 +85,32 @@ class WaseetDialogManager {
                     <button class="btn-3d btn-orange" id="waseet-dialog-btn-confirm">${confirmText}</button>
                 `;
 
-                document.getElementById('waseet-dialog-btn-confirm').onclick = () => {
-                    this.close();
-                    resolve(true);
-                };
-                document.getElementById('waseet-dialog-btn-cancel').onclick = () => {
-                    this.close();
-                    resolve(false);
-                };
+                const confirmBtn = document.getElementById('waseet-dialog-btn-confirm');
+                if (confirmBtn) {
+                    confirmBtn.onclick = () => {
+                        this.close();
+                        resolve(true);
+                    };
+                }
+                const cancelBtn = document.getElementById('waseet-dialog-btn-cancel');
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => {
+                        this.close();
+                        resolve(false);
+                    };
+                }
             } else {
                 actionsEl.innerHTML = `
                     <button class="btn-3d btn-gold" id="waseet-dialog-btn-ok" style="min-width: 140px;">${okText}</button>
                 `;
 
-                document.getElementById('waseet-dialog-btn-ok').onclick = () => {
-                    this.close();
-                    resolve(true);
-                };
+                const okBtn = document.getElementById('waseet-dialog-btn-ok');
+                if (okBtn) {
+                    okBtn.onclick = () => {
+                        this.close();
+                        resolve(true);
+                    };
+                }
             }
 
             // Show with animation
@@ -162,17 +171,23 @@ class WaseetDialogManager {
                 <button class="btn-3d btn-outline" id="waseet-dialog-prompt-cancel" style="min-width: 90px;">${cancelText}</button>
             `;
 
-            document.getElementById('waseet-dialog-prompt-ok').onclick = () => {
-                const inp = document.getElementById('waseet-prompt-input');
-                const val = inp ? inp.value : '';
-                this.close();
-                resolve(val);
-            };
+            const promptOkBtn = document.getElementById('waseet-dialog-prompt-ok');
+            if (promptOkBtn) {
+                promptOkBtn.onclick = () => {
+                    const inp = document.getElementById('waseet-prompt-input');
+                    const val = inp ? inp.value : '';
+                    this.close();
+                    resolve(val);
+                };
+            }
 
-            document.getElementById('waseet-dialog-prompt-cancel').onclick = () => {
-                this.close();
-                resolve(null);
-            };
+            const promptCancelBtn = document.getElementById('waseet-dialog-prompt-cancel');
+            if (promptCancelBtn) {
+                promptCancelBtn.onclick = () => {
+                    this.close();
+                    resolve(null);
+                };
+            }
 
             this.overlay.classList.add('active');
             boxEl.classList.remove('animate-out');

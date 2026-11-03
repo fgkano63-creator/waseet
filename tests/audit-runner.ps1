@@ -248,10 +248,10 @@ if ($secretMatchesFound -eq 0) {
 # ------------------------------------------------------------------------------
 # 4. HTTP SECURITY HEADERS & MULTI-PLATFORM DEPLOYMENT AUDIT
 # ------------------------------------------------------------------------------
-Write-Host "`n>>> 4. HTTP SECURITY HEADERS & MULTI-PLATFORM DEPLOYMENT AUDIT" -ForegroundColor White
+# 4. HTTP SECURITY HEADERS & VERCEL EXCLUSIVE DEPLOYMENT AUDIT
+# ------------------------------------------------------------------------------
+Write-Host "`n>>> 4. HTTP SECURITY HEADERS & VERCEL EXCLUSIVE DEPLOYMENT AUDIT" -ForegroundColor White
 
-$headersContent = if (Test-Path "D:\waseet-app\_headers") { Get-Content "D:\waseet-app\_headers" -Raw } else { "" }
-$netlifyContent = if (Test-Path "D:\waseet-app\netlify.toml") { Get-Content "D:\waseet-app\netlify.toml" -Raw } else { "" }
 $vercelContent = if (Test-Path "D:\waseet-app\vercel.json") { Get-Content "D:\waseet-app\vercel.json" -Raw } else { "" }
 
 $requiredHeaders = @(
@@ -264,14 +264,11 @@ $requiredHeaders = @(
 )
 
 foreach ($h in $requiredHeaders) {
-    $inHeaders = $headersContent -match $h.Header
-    $inNetlify = $netlifyContent -match $h.Header
-    if ($inHeaders -and $inNetlify) {
-        Report-AuditItem -Category "Security-Headers" -Item $h.Name -Status "PASS" -Message "Present in both _headers and netlify.toml"
-    } elseif ($inHeaders -or $inNetlify) {
-        Report-AuditItem -Category "Security-Headers" -Item $h.Name -Status "WARN" -Message "Configured in only one server file" -Severity "LOW"
+    $inVercel = $vercelContent -match $h.Header
+    if ($inVercel) {
+        Report-AuditItem -Category "Security-Headers" -Item $h.Name -Status "PASS" -Message "Fully configured with strict security policy in vercel.json"
     } else {
-        Report-AuditItem -Category "Security-Headers" -Item $h.Name -Status "FAIL" -Message "Missing security header!" -Severity "HIGH"
+        Report-AuditItem -Category "Security-Headers" -Item $h.Name -Status "FAIL" -Message "Missing security header in vercel.json!" -Severity "HIGH"
     }
 }
 
@@ -280,14 +277,14 @@ if ($vercelContent) {
     if ($vercelHasCallback) {
         Report-AuditItem -Category "Deployment-Vercel" -Item "/auth/callback rewrite" -Status "PASS" -Message "Canonical OAuth rewrite configured in vercel.json"
     } else {
-        Report-AuditItem -Category "Deployment-Vercel" -Item "/auth/callback rewrite" -Status "WARN" -Message "vercel.json is missing /auth/callback rewrite rule (breaks OAuth redirects on Vercel)" -Severity "MEDIUM"
+        Report-AuditItem -Category "Deployment-Vercel" -Item "/auth/callback rewrite" -Status "WARN" -Message "vercel.json is missing /auth/callback rewrite rule" -Severity "MEDIUM"
     }
 
     $vercelHasHeaders = $vercelContent -match '"headers":'
     if ($vercelHasHeaders) {
-        Report-AuditItem -Category "Deployment-Vercel" -Item "Security Headers Parity" -Status "PASS" -Message "Security headers mirrored in vercel.json"
+        Report-AuditItem -Category "Deployment-Vercel" -Item "Security Headers Parity" -Status "PASS" -Message "Security headers active and enforced in vercel.json"
     } else {
-        Report-AuditItem -Category "Deployment-Vercel" -Item "Security Headers Parity" -Status "WARN" -Message "vercel.json contains no security headers (Netlify has full CSP/HSTS/Frame protection)" -Severity "MEDIUM"
+        Report-AuditItem -Category "Deployment-Vercel" -Item "Security Headers Parity" -Status "WARN" -Message "vercel.json contains no security headers" -Severity "MEDIUM"
     }
 }
 

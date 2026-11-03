@@ -50,8 +50,6 @@ $adminChatsHtml = Get-Content 'D:\waseet-app\admin-chats.html' -Raw -Encoding UT
 $adminBrokersHtml = Get-Content 'D:\waseet-app\admin-brokers.html' -Raw -Encoding UTF8
 $contactSupportHtml = Get-Content 'D:\waseet-app\contact-support.html' -Raw -Encoding UTF8
 $profileHtml = Get-Content 'D:\waseet-app\profile.html' -Raw -Encoding UTF8
-$netlifyToml = Get-Content 'D:\waseet-app\netlify.toml' -Raw -Encoding UTF8
-$redirects = Get-Content 'D:\waseet-app\_redirects' -Raw -Encoding UTF8
 $vercelJson = Get-Content 'D:\waseet-app\vercel.json' -Raw -Encoding UTF8
 $sitemapXml = Get-Content 'D:\waseet-app\sitemap.xml' -Raw -Encoding UTF8
 $robotsTxt = Get-Content 'D:\waseet-app\robots.txt' -Raw -Encoding UTF8
@@ -164,8 +162,8 @@ Check-Result -Flow 'Security and Auth' -Name 'Minimal OAuth Scope Restriction' -
 $sec3 = (Test-Path 'D:\waseet-app\auth\callback.html') -and (Test-Path 'D:\waseet-app\auth\callback\index.html')
 Check-Result -Flow 'Security and Auth' -Name 'Dedicated OAuth Callback Endpoints' -Success $sec3 -Detail 'Provides canonical /auth/callback pages for secure OAuth token exchange'
 
-$sec4 = $redirects.Contains('/auth/callback') -and $netlifyToml.Contains('/auth/callback')
-Check-Result -Flow 'Security and Auth' -Name 'OAuth Callback Netlify 200 Rewrite' -Success $sec4 -Detail 'Guarantees 200 OK routing without redirects or parameter loss during login'
+$sec4 = $vercelJson.Contains('"source": "/auth/callback"') -and $vercelJson.Contains('"destination": "/auth/callback.html"')
+Check-Result -Flow 'Security and Auth' -Name 'OAuth Callback Vercel 200 Rewrite' -Success $sec4 -Detail 'Guarantees 200 OK routing without redirects or parameter loss during login on Vercel'
 
 $sec5 = $dialogJs.Contains('DOMPurify.sanitize') -and $chatHtml.Contains('purify.min.js')
 Check-Result -Flow 'Security and Auth' -Name 'DOMPurify Dynamic HTML Shielding' -Success $sec5 -Detail 'Strict client-side sanitization preventing XSS across dialogs and chat'
@@ -190,8 +188,8 @@ Check-Result -Flow 'UX/UI Hunter' -Name 'Mobile Chat Cleared of Overlapping Bott
 $ui5 = $css -match 'padding:\s*0\.2rem\s+0\.35rem\s+0\.35rem\s*!important;'
 Check-Result -Flow 'UX/UI Hunter' -Name 'Mobile Chat Padding Void Elimination' -Success $ui5 -Detail 'Eliminated 64px dead space bottom padding now that bottom bar is hidden'
 
-$ui6 = $redirects.Contains('/index.html') -and $netlifyToml.Contains('from = "/"')
-Check-Result -Flow 'UX/UI Hunter' -Name 'Netlify Canonical 200 Route Configuration' -Success $ui6 -Detail 'Prevents Netlify 404 Site not found errors on root and pretty paths'
+$ui6 = $vercelJson.Contains('"cleanUrls": true') -and $vercelJson.Contains('"source": "/deals"')
+Check-Result -Flow 'UX/UI Hunter' -Name 'Vercel Canonical Clean URLs & Route Configuration' -Success $ui6 -Detail 'Guarantees 200 OK routing on root and clean page paths without 404 errors on Vercel'
 
 $ui7 = $sliderJs.Contains('intervalMs = 3000') -and $sliderJs.Contains('isRtl ? 1 : -1')
 Check-Result -Flow 'UX/UI Hunter' -Name 'Luxury Hero Auto-Slider (3s Interval & GPU Opacity Layers)' -Success $ui7 -Detail '3-second auto-rotation with GPU-accelerated opacity layers and RTL swipe'
@@ -220,7 +218,7 @@ $cloud1 = $vercelJson.Contains('"cleanUrls": true') -and $vercelJson.Contains('"
 Check-Result -Flow 'Cloud & SEO' -Name 'Vercel Rewrites & OAuth Callback Parity' -Success $cloud1 -Detail 'Vercel configuration maps all canonical pages and OAuth callback seamlessly'
 
 $cloud2 = $vercelJson.Contains('Content-Security-Policy') -and $vercelJson.Contains('Strict-Transport-Security')
-Check-Result -Flow 'Cloud & SEO' -Name 'Vercel Security Headers Parity' -Success $cloud2 -Detail 'Vercel headers mirror Netlify HSTS, CSP, and X-Frame-Options security policies'
+Check-Result -Flow 'Cloud & SEO' -Name 'Vercel Security Headers Enforcement' -Success $cloud2 -Detail 'Vercel configuration enforces full HSTS, CSP, and X-Frame-Options security policies'
 
 $cloud3 = $sitemapXml.Contains('<loc>https://waseetar.vercel.app/</loc>') -and $sitemapXml.Contains('<loc>https://waseetar.vercel.app/deals</loc>')
 Check-Result -Flow 'Cloud & SEO' -Name 'Multi-Route XML Sitemap' -Success $cloud3 -Detail 'Sitemap lists home, deals, wallet, and support endpoints with priority and changefreq'

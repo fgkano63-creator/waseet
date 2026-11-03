@@ -27,7 +27,9 @@ foreach ($t in $tests) {
     $hasFail = ($outStr -match '\[FAIL\]') -or ($LASTEXITCODE -ne 0)
 
     $checksCount = 0
-    if ($outStr -match 'Total Checks Conducted\s*:\s*([0-9]+)') {
+    if ($outStr -match '\[E2E SIMULATION AND VERIFICATION SUMMARY\][\s\S]*?Total Tests\s*:\s*([0-9]+)') {
+        $checksCount = [int]$Matches[1]
+    } elseif ($outStr -match 'Total Checks Conducted\s*:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'Total Checks\s*:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]

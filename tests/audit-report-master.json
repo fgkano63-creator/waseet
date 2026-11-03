@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-03T12:46:41.398Z",
+  "timestamp": "2026-11-03T12:54:36.941Z",
   "metrics": {
     "totalChecks": 210,
     "passed": 210,
@@ -1031,7 +1031,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 78 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 75 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1220,133 +1220,133 @@
         "id": "Header-X-Frame-Options",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header X-Frame-Options fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header X-Frame-Options fully configured in vercel.json",
         "details": null
       },
       {
         "id": "Header-X-Content-Type-Options",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header X-Content-Type-Options fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header X-Content-Type-Options fully configured in vercel.json",
         "details": null
       },
       {
         "id": "Header-Strict-Transport-Security",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header Strict-Transport-Security fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header Strict-Transport-Security fully configured in vercel.json",
         "details": null
       },
       {
         "id": "Header-Content-Security-Policy",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header Content-Security-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header Content-Security-Policy fully configured in vercel.json",
         "details": null
       },
       {
         "id": "Header-Referrer-Policy",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header Referrer-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header Referrer-Policy fully configured in vercel.json",
         "details": null
       },
       {
         "id": "Header-Permissions-Policy",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Security header Permissions-Policy fully configured across _headers, netlify.toml and vercel.json",
+        "message": "Security header Permissions-Policy fully configured in vercel.json",
         "details": null
       },
       {
         "id": "RouteParity-/deals",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /deals synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /deals canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/chat",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /chat synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /chat canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/wallet",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /wallet synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /wallet canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/my-accounts",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /my-accounts synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /my-accounts canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/profile",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /profile synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /profile canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/pending-accounts",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /pending-accounts synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /pending-accounts canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/admin-chats",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /admin-chats synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /admin-chats canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/admin-deposits",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /admin-deposits synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /admin-deposits canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/admin-withdrawals",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /admin-withdrawals synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /admin-withdrawals canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/admin-brokers",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /admin-brokers synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /admin-brokers canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/contact-support",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /contact-support synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /contact-support canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/maintenance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /maintenance synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /maintenance canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {
         "id": "RouteParity-/auth/callback",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Route /auth/callback synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)",
+        "message": "Route /auth/callback canonically configured in Vercel (vercel.json)",
         "details": null
       },
       {

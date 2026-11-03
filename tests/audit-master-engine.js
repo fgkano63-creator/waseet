@@ -319,13 +319,8 @@ for (const jsFile of allJsFiles) {
     }
 }
 
-// 3.4 HTTP Security Headers Audit
-const headersFile = path.join(ROOT_DIR, '_headers');
-const netlifyTomlFile = path.join(ROOT_DIR, 'netlify.toml');
+// 3.4 HTTP Security Headers Audit (Exclusive Vercel Architecture)
 const vercelJsonFile = path.join(ROOT_DIR, 'vercel.json');
-
-const headersContent = fs.existsSync(headersFile) ? fs.readFileSync(headersFile, 'utf8') : '';
-const netlifyContent = fs.existsSync(netlifyTomlFile) ? fs.readFileSync(netlifyTomlFile, 'utf8') : '';
 const vercelContent = fs.existsSync(vercelJsonFile) ? fs.readFileSync(vercelJsonFile, 'utf8') : '';
 
 const requiredHeaders = [
@@ -338,23 +333,16 @@ const requiredHeaders = [
 ];
 
 for (const hdr of requiredHeaders) {
-    const inHeaders = headersContent.includes(hdr);
-    const inNetlify = netlifyContent.includes(hdr);
     const inVercel = vercelContent.includes(hdr);
 
-    if (inHeaders && inNetlify && inVercel) {
-        recordAudit('security', `Header-${hdr}`, 'PASS', 'INFO', `Security header ${hdr} fully configured across _headers, netlify.toml and vercel.json`);
-    } else if (inHeaders || inNetlify || inVercel) {
-        recordAudit('security', `Header-${hdr}`, 'WARN', 'LOW', `Security header ${hdr} partially configured (missing in some hosting configs)`);
+    if (inVercel) {
+        recordAudit('security', `Header-${hdr}`, 'PASS', 'INFO', `Security header ${hdr} fully configured in vercel.json`);
     } else {
-        recordAudit('security', `Header-${hdr}`, 'FAIL', 'HIGH', `Missing critical security header: ${hdr}`);
+        recordAudit('security', `Header-${hdr}`, 'FAIL', 'HIGH', `Missing critical security header in vercel.json: ${hdr}`);
     }
 }
 
-// 3.5 Multi-Cloud Routing Parity Audit
-const redirectsFile = path.join(ROOT_DIR, '_redirects');
-const redirectsContent = fs.existsSync(redirectsFile) ? fs.readFileSync(redirectsFile, 'utf8') : '';
-
+// 3.5 Vercel Canonical Routing & Rewrites Audit
 const coreRoutes = [
     '/deals',
     '/chat',
@@ -373,15 +361,13 @@ const coreRoutes = [
 
 let routingMismatchCount = 0;
 for (const route of coreRoutes) {
-    const inRedirects = redirectsContent.includes(route);
-    const inNetlify = netlifyContent.includes(`"${route}"`) || netlifyContent.includes(`'${route}'`);
     const inVercel = vercelContent.includes(`"${route}"`) || vercelContent.includes(`'${route}'`);
 
-    if (inRedirects && inNetlify && inVercel) {
-        recordAudit('security', `RouteParity-${route}`, 'PASS', 'INFO', `Route ${route} synchronized across Netlify (_redirects, netlify.toml) & Vercel (vercel.json)`);
+    if (inVercel) {
+        recordAudit('security', `RouteParity-${route}`, 'PASS', 'INFO', `Route ${route} canonically configured in Vercel (vercel.json)`);
     } else {
         routingMismatchCount++;
-        recordAudit('security', `RouteParity-${route}`, 'WARN', 'MEDIUM', `Route ${route} missing in hosting configuration (_redirects: ${inRedirects}, netlify: ${inNetlify}, vercel: ${inVercel})`);
+        recordAudit('security', `RouteParity-${route}`, 'FAIL', 'HIGH', `Route ${route} missing in vercel.json rewrites`);
     }
 }
 
