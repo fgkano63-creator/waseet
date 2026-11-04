@@ -427,7 +427,8 @@ const knownTables = [
     'support_messages',
     'notifications',
     'payment_methods',
-    'withdrawals'
+    'withdrawals',
+    'regional_brokers'
 ];
 
 let allSqlCombined = '';
@@ -502,6 +503,27 @@ if (hasSecretsUpdateLock) {
     recordAudit('databaseRLS', 'DB-SecretsActiveDealLock', 'PASS', 'INFO', 'Sellers strictly blocked from mutating marketplace_account_secrets once account is in_deal or sold');
 } else {
     recordAudit('databaseRLS', 'DB-SecretsActiveDealLock', 'WARN', 'HIGH', 'Sellers can overwrite account secrets during active escrow deals');
+}
+
+// 4.8 Check regional broker dispute cancellation and refund parity (Migration 21)
+if (allSqlCombined.includes('v_caller_is_broker') && allSqlCombined.includes('refund_escrow_deal_points')) {
+    recordAudit('databaseRLS', 'DB-BrokerDisputeRefundParity', 'PASS', 'INFO', 'Assigned regional brokers empowered to cancel disputed deals and refund points without auth exception (Migration 21)');
+} else {
+    recordAudit('databaseRLS', 'DB-BrokerDisputeRefundParity', 'WARN', 'MEDIUM', 'refund_escrow_deal_points does not support assigned regional broker refund');
+}
+
+// 4.9 Check cascading broker demotion and deletion integrity (Migration 22)
+if (allSqlCombined.includes('demote_regional_broker') && allSqlCombined.includes('regional_brokers')) {
+    recordAudit('databaseRLS', 'DB-BrokerCascadingDemote', 'PASS', 'INFO', 'Cascading broker demote and delete stored procedure active with profile role reversion (Migration 22)');
+} else {
+    recordAudit('databaseRLS', 'DB-BrokerCascadingDemote', 'WARN', 'MEDIUM', 'demote_regional_broker function missing or incomplete in migrations');
+}
+
+// 4.10 Check atomic deal cancellation stored procedure (Migration 23)
+if (allSqlCombined.includes('cancel_escrow_deal') && allSqlCombined.includes('p_deal_id')) {
+    recordAudit('databaseRLS', 'DB-AtomicDealCancellation', 'PASS', 'INFO', 'Database procedure cancel_escrow_deal guarantees atomic refund and status restoration (Migration 23)');
+} else {
+    recordAudit('databaseRLS', 'DB-AtomicDealCancellation', 'WARN', 'MEDIUM', 'cancel_escrow_deal function missing or incomplete in migrations');
 }
 
 // ==============================================================================

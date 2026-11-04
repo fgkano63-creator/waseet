@@ -64,8 +64,8 @@ Check-Result -Flow 'Seller Flow' -Name 'Form Security Validation (Min 6 chars pa
 $seller2 = $appJs.Contains('credSellerEmail.toLowerCase() === credRecoveryEmail.toLowerCase()')
 Check-Result -Flow 'Seller Flow' -Name 'Recovery Email Non-Collision Guard' -Success $seller2 -Detail 'Prevents identical primary and recovery email addresses'
 
-$seller3 = $appJs.Contains('WASEET_SELLER_FORM_DRAFT') -and $appJs.Contains('WASEET_SIMULATION_MODE')
-Check-Result -Flow 'Seller Flow' -Name 'Draft Preservation and Simulation Fallback' -Success $seller3 -Detail 'Draft saved automatically in localStorage for guests, simulation fallback prevents crash'
+$seller3 = $appJs.Contains('WASEET_SELLER_FORM_DRAFT') -and $appJs.Contains('restoreSellerFormDraft')
+Check-Result -Flow 'Seller Flow' -Name 'Draft Preservation and Dynamic Restoration' -Success $seller3 -Detail 'Draft saved in localStorage and auto-restored when seller modal reopens'
 
 $seller4 = $appJs -match "status:\s*['""]pending['""]"
 Check-Result -Flow 'Seller Flow' -Name "Account Status Initialization to 'pending'" -Success $seller4 -Detail "Submitted account correctly initiates in 'pending' status for mediation review"
@@ -92,6 +92,9 @@ Check-Result -Flow 'Buyer Flow' -Name 'Storefront Escrow Creation (profile.html)
 
 $buyer5 = $profileHtml.Contains('ProfileStore.init') -and $profileHtml.Contains('requestEscrow')
 Check-Result -Flow 'Buyer Flow' -Name 'Public Seller Storefront Integration' -Success $buyer5 -Detail 'Direct buy buttons on seller profiles hook into the escrow pipeline'
+
+$buyer6 = $profileHtml.Contains('currentUser.id === sellerId')
+Check-Result -Flow 'Buyer Flow' -Name 'Public Storefront Self-Purchase Guard' -Success $buyer6 -Detail 'Prevents sellers from purchasing their own listed accounts'
 
 Write-Host ""
 Write-Host ">>> 3. FLOW 3: 3-WAY ESCROW ROOM AND 48H GUARANTEE LIFECYCLE" -ForegroundColor Yellow
@@ -135,6 +138,9 @@ Check-Result -Flow 'Wallet System' -Name 'Withdrawal Request Submission & Balanc
 
 $wallet7 = $adminWithdrawalsHtml.Contains('handleApproveWithdrawal') -and $adminWithdrawalsHtml.Contains('handleRejectWithdrawal') -and $supabaseJs.Contains('waseetAdminApproveWithdrawal') -and $supabaseJs.Contains('waseetAdminRejectWithdrawal')
 Check-Result -Flow 'Wallet System' -Name 'Admin Withdrawal Payout Approval & Unfreeze Rejection' -Success $wallet7 -Detail 'Allows admin to review financial accounts, approve payout deduction or reject with unfreeze'
+
+$wallet8 = $supabaseJs.Contains('isRpcMissing')
+Check-Result -Flow 'Wallet System' -Name 'Withdrawal RPC Error Boundary & Anti-Trigger Collision' -Success $wallet8 -Detail 'Cleanly catches RPC business errors without crashing against Migration 20 un-frozen insert trigger'
 
 Write-Host ""
 Write-Host ">>> 5. FLOW 5: ADMIN MEDIATION AND LIFECYCLE PARITY" -ForegroundColor Yellow
@@ -216,6 +222,9 @@ Check-Result -Flow 'UX/UI Hunter' -Name 'Floating Circular Support FAB (56x56, 5
 
 $ui13 = $appJs.Contains('account-verified-static-badge') -and $css.Contains('.account-verified-static-badge')
 Check-Result -Flow 'UX/UI Hunter' -Name 'Marketplace Account Verified Static Badge' -Success $ui13 -Detail 'Displays certified green inspection badge on approved marketplace accounts'
+
+$ui14 = $appJs.Contains('toggleWaseetDrawer(false)')
+Check-Result -Flow 'UX/UI Hunter' -Name 'Modal Open Automatic Mobile Drawer Dismissal' -Success $ui14 -Detail 'Automatically hides mobile drawer backdrop when any modal or deck is launched'
 
 Write-Host ""
 Write-Host ">>> 8. FLOW 8: MULTI-CLOUD DEPLOYABILITY, SEO & PWA HYGIENE" -ForegroundColor Yellow
@@ -302,6 +311,15 @@ Check-Result -Flow 'Enterprise Architecture' -Name 'Strict RBAC Segregation & Sh
 
 $adminNavParity = $chatHtml.Contains('drawer-admin-brokers-link') -and $pendingAccountsHtml.Contains('drawer-admin-brokers-link') -and $walletHtml.Contains('drawer-admin-brokers-link')
 Check-Result -Flow 'Enterprise Architecture' -Name 'Universal Drawer & Admin Control Parity' -Success $adminNavParity -Detail 'All platform pages implement unified desktop navbar toggling and mobile admin drawer links'
+
+$mig21 = (Test-Path 'D:\waseet-app\supabase\21_fix_regional_broker_refund_and_dispute_rls.sql') -and ((Get-Content 'D:\waseet-app\supabase\21_fix_regional_broker_refund_and_dispute_rls.sql' -Raw).Contains('v_caller_is_broker'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 21 Assigned Broker Dispute Refund RLS' -Success $mig21 -Detail 'Empowers assigned regional brokers to cancel disputed deals and refund points without auth exception'
+
+$mig22 = (Test-Path 'D:\waseet-app\supabase\22_cascading_broker_delete_and_demote.sql') -and ((Get-Content 'D:\waseet-app\supabase\22_cascading_broker_delete_and_demote.sql' -Raw).Contains('demote_regional_broker')) -and ($supabaseJs.Contains('waseetDemoteBroker'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 22 Cascading Broker Demote & Delete Parity' -Success $mig22 -Detail 'Stored procedure demote_regional_broker and client waseetDemoteBroker purge broker records and revert profile to user'
+
+$mig23 = (Test-Path 'D:\waseet-app\supabase\23_atomic_cancel_escrow_deal.sql') -and ((Get-Content 'D:\waseet-app\supabase\23_atomic_cancel_escrow_deal.sql' -Raw).Contains('cancel_escrow_deal')) -and ($supabaseJs.Contains('cancel_escrow_deal'))
+Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 23 Atomic Escrow Cancellation Parity' -Success $mig23 -Detail 'Database procedure cancel_escrow_deal and client fallback execute atomic refund and status reset'
 
 Write-Host ""
 Write-Host ">>> 10. FLOW 10: MULTI-CURRENCY GATEWAYS, FEE CALCULATOR & RESILIENCE" -ForegroundColor Yellow

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -970,6 +970,17 @@
                 return;
             }
 
+            // منع الشراء الذاتي (Seller cannot buy their own account)
+            const sellerId = acc.seller_id || acc.sellerId;
+            if (currentUser.id && sellerId && currentUser.id === sellerId) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تنبيه الشراء', 'لا يمكنك شراء حسابك الخاص المعروض للبيع.', 'warning');
+                } else {
+                    alert('لا يمكنك شراء حسابك الخاص!');
+                }
+                return;
+            }
+
             // تحديث الرصيد قبل التحقق
             if (typeof window.waseetRefreshMyWalletBalance === 'function') {
                 try { await window.waseetRefreshMyWalletBalance(); } catch (e) {}
@@ -1020,13 +1031,23 @@
                         account_title: acc.title
                     });
 
-                    if (deal && deal.id) {
+                    if (deal && deal.id && !deal.error) {
                         window.location.href = `chat.html?dealId=${deal.id}&role=buyer`;
                         return;
                     }
+                    if (deal && deal.error) {
+                        throw new Error(deal.error.message || 'فشل حجز نقاط الصفقة في الخزينة');
+                    }
                 }
             } catch (err) {
-                console.warn('[ProfileStore] فشل إنشاء الصفقة عبر Supabase مباشرة، جاري المتابعة:', err);
+                console.warn('[ProfileStore] فشل إنشاء الصفقة عبر Supabase:', err);
+                const errMsg = err?.message || 'تعذر إتمام حجز الصفقة. يرجى التحقق من رصيد النقاط والمحاولة لاحقاً.';
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('خطأ في حجز الصفقة', errMsg, 'danger');
+                } else {
+                    alert(errMsg);
+                }
+                return;
             }
 
             // توجيه المستخدم لغرفة الوساطة أو المتجر الرئيسي

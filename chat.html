@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -440,14 +440,14 @@
 
                 document.querySelectorAll('.btn-nav-admin').forEach(el => {
                     const href = String(el.getAttribute('href') || '');
-                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
                     el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
                 });
                 document.querySelectorAll('[data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
                 const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
-                if (drawerBrokers) drawerBrokers.style.display = 'none';
+                if (drawerBrokers) drawerBrokers.style.display = 'flex';
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
                 if (drawerDeposits) drawerDeposits.style.display = 'none';
             } else {

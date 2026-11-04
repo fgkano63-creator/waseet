@@ -91,6 +91,12 @@
                     '<span style="color:var(--gold-light);font-size:0.76rem;font-weight:700;"><i class="fas fa-percentage"></i> عمولتك: 66.6% من صفقات دولتك (رصيدك: ' + pts + ' نقطة)</span>' +
                 '</div>' +
                 '<div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">' +
+                    '<a href="admin-brokers.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#38bdf8;color:#38bdf8;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-globe-africa"></i> لوحة الوساطة الإقليمية' +
+                    '</a>' +
+                    '<a href="wallet.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#eab308;color:#facc15;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-credit-card"></i> تغيير البطاقات' +
+                    '</a>' +
                     '<a href="deals.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#10b981;color:#34d399;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
                         '<i class="fas fa-handshake"></i> إدارة صفقات الوساطة' +
                     '</a>' +
@@ -205,15 +211,40 @@
 
         var userGroup = byId('nav-user-middle-group');
         var adminGroup = byId('nav-admin-middle-group');
-        if (userGroup) userGroup.style.display = (admin || broker) ? 'none' : '';
-        if (adminGroup) adminGroup.style.display = (admin || broker) ? 'flex' : 'none';
+        // للمدير العام فقط تظهر أزرار الإدارة، أما الوسيط الإقليمي وكافة المستخدمين يظل الشريط العلوي موحداً كلياً
+        if (userGroup) userGroup.style.display = admin ? 'none' : '';
+        if (adminGroup) adminGroup.style.display = admin ? 'flex' : 'none';
+
+        // إظهار زر إشراف الوساطة الخاص للوسيط الإقليمي في الشريط العلوي الموحد
+        if (userGroup) {
+            var brokerBtn = byId('broker-supervision-nav-btn');
+            if (broker) {
+                if (!brokerBtn) {
+                    brokerBtn = document.createElement('a');
+                    brokerBtn.id = 'broker-supervision-nav-btn';
+                    brokerBtn.href = 'pending-accounts.html';
+                    brokerBtn.className = 'btn-nav-middle btn-broker-supervision';
+                    brokerBtn.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;';
+                    brokerBtn.title = 'لوحة فحص الحسابات وإشراف الوساطة الإقليمية';
+                    var countryCode = (user && user.country) ? ' (' + String(user.country).toUpperCase() + ')' : '';
+                    brokerBtn.innerHTML = '<i class="fas fa-user-shield text-emerald"></i> <span>إشراف الوساطة' + countryCode + '</span>';
+                    userGroup.appendChild(brokerBtn);
+                } else {
+                    brokerBtn.style.display = 'inline-flex';
+                }
+            } else if (brokerBtn) {
+                brokerBtn.style.display = 'none';
+            }
+        }
 
         ['wallet-total-pts', 'admin-wallet-total-pts'].forEach(function (id) {
             var el = byId(id);
             if (el) el.textContent = pts + ' نقطة';
         });
         var walletPill = byId('wallet-pill-btn');
-        if (walletPill) walletPill.style.display = user ? '' : 'none';
+        var adminWalletPill = byId('admin-wallet-pill');
+        if (walletPill) walletPill.style.display = (user && !admin) ? 'inline-flex' : (user ? '' : 'none');
+        if (adminWalletPill) adminWalletPill.style.display = admin ? 'inline-flex' : 'none';
 
         // زر الحساب في الشريط العلوي (يظهر على الكمبيوتر فقط، ويُخفى على الجوال ≤ 768px)
         var box = byId('nav-user-container');

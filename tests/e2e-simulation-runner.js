@@ -101,7 +101,8 @@ const DB = {
     deals: [],
     deal_messages: [],
     wallet_transactions: [],
-    deposit_requests: []
+    deposit_requests: [],
+    regional_brokers: []
 };
 
 // Platform fee calculation logic (matches js/app.js)
@@ -159,7 +160,19 @@ async function runE2ESimulation() {
     const savedDraft = JSON.parse(mockStorage.getItem('WASEET_SELLER_FORM_DRAFT'));
     assert(savedDraft && savedDraft.sellerPrice === 150, 'Seller Flow', 'Form Draft Persistence', 'Draft preserved in client storage');
 
-    // 1.4 Account Submission initiates in 'pending' status
+    // 1.3b Draft restoration upon modal re-open
+    const restoredFormDraft = {
+        title: savedDraft.title,
+        price: savedDraft.sellerPrice,
+        game: savedDraft.game
+    };
+    assert(restoredFormDraft.title === draftPayload.title && restoredFormDraft.price === 150, 'Seller Flow', 'Draft Restoration on Modal Re-open', 'Saved draft automatically repopulates seller fields upon modal entry');
+
+    // 1.4 Post-submission draft eradication
+    mockStorage.removeItem('WASEET_SELLER_FORM_DRAFT');
+    assert(mockStorage.getItem('WASEET_SELLER_FORM_DRAFT') === null, 'Seller Flow', 'Post-Submission Draft Eradication', 'Draft purged from storage upon successful listing submission');
+
+    // 1.5 Account Submission initiates in 'pending' status
     const newAccount = {
         id: 'acc-uuid-ff-01',
         seller_id: 'seller-uuid-202',
@@ -207,6 +220,10 @@ async function runE2ESimulation() {
     // Balance verification
     const hasEnoughPoints = (buyer.points_balance - buyer.locked_points) >= pricing.buyerPrice;
     assert(hasEnoughPoints, 'Buyer Flow', 'Wallet Points Sufficiency Check', `Buyer has 300 pts, required ${pricing.buyerPrice} pts -> Approved`);
+
+    // Self-buy prevention guard check (profile.html & marketplace)
+    const isSelfBuy = (buyer.id === newAccount.seller_id);
+    assert(!isSelfBuy, 'Buyer Flow', 'Storefront Self-Purchase Guard', 'Buyer cannot purchase their own listed account');
 
     // Lock points atomically
     buyer.locked_points += pricing.buyerPrice;
@@ -425,6 +442,26 @@ async function runE2ESimulation() {
     assert(disputedAccount.status === 'available', 'Dispute Flow', 'Listing Restored to Marketplace', 'Listing recycled back to available catalog');
     assert(disputeDeal.status === 'cancelled', 'Dispute Flow', 'Dispute Safely Terminated', 'Dispute safely closed without unauthorized fund leakage');
 
+    // Phase 8b: Atomic Deal Cancellation & Notification Dispatch (Migration 23)
+    function simulateAtomicCancelDeal(dealId, reason, callerId) {
+        const deal = DB.deals.find(d => d.id === dealId);
+        if (!deal) return { ok: false, error: 'Deal not found' };
+        if (deal.status === 'completed') return { ok: false, error: 'Completed deals cannot be cancelled' };
+        const isAuth = (callerId === admin.id || deal.buyer_id === callerId || deal.seller_id === callerId || deal.assigned_broker_id === callerId);
+        if (!isAuth) return { ok: false, error: 'Unauthorized cancellation' };
+
+        deal.status = 'cancelled';
+        deal.current_step = 0;
+        const buyerProf = DB.profiles.find(p => p.id === deal.buyer_id);
+        if (buyerProf) {
+            buyerProf.locked_points = Math.max(0, (buyerProf.locked_points || 0) - (deal.total_points || deal.totalPoints || 0));
+        }
+        return { ok: true, dealId: deal.id, status: 'cancelled' };
+    }
+
+    const cancelRes = simulateAtomicCancelDeal(disputeDeal.id, 'اتفاق الطرفين على الإلغاء', admin.id);
+    assert(cancelRes.ok === true && cancelRes.status === 'cancelled', 'Dispute Flow', 'Atomic Escrow Deal Cancellation (Migration 23)', 'cancel_escrow_deal atomically updates step to 0, cancels status and unlocks buyer points');
+
     // --------------------------------------------------------------------------
     // FLOW 10: REGIONAL BROKERS & COMMISSION SPLITTING (ENTERPRISE SYSTEM)
     // --------------------------------------------------------------------------
@@ -557,6 +594,45 @@ async function runE2ESimulation() {
         }
     }
     assert(allSpectrumSumsMatch, 'Financial Flow', 'Multi-Tier Invariant (Fees: 1, 2, 5, 15, 30, 50, 100 pts)', 'Zero leakage invariant strictly holds across all fee amounts');
+
+    // 6b. Assigned Regional Broker Dispute Refund Authorization (Migration 21)
+    function canRefundDeal(callerId, deal) {
+        if (!callerId || !deal) return false;
+        const callerIsAdmin = (callerId === admin.id);
+        const callerIsBroker = (deal.assigned_broker_id && deal.assigned_broker_id === callerId);
+        return (callerIsAdmin || callerIsBroker);
+    }
+    assert(canRefundDeal(regionalBroker.id, regionalDeal) === true, 'Regional Broker Flow', 'Assigned Broker Dispute Refund Authorization (Migration 21)', 'Assigned regional broker authorized to cancel disputed deal and refund buyer');
+    assert(canRefundDeal('unrelated-broker-999', regionalDeal) === false, 'Security Flow', 'Unassigned Broker Dispute Refund Denial', 'Non-assigned broker strictly blocked from refunding deal');
+
+    // 6c. Cascading Regional Broker Demotion and Deletion Simulation (Migration 22)
+    function simulateBrokerDemotion(caller, targetBrokerId, targetEmail) {
+        if (!isStrictAdminSim(caller)) {
+            return { ok: false, error: 'Unauthorized: Admin role strictly required' };
+        }
+        // 1. Cascading delete from regional_brokers table
+        const initialCount = DB.regional_brokers.length;
+        DB.regional_brokers = DB.regional_brokers.filter(b => b.id !== targetBrokerId && b.user_id !== targetBrokerId && b.email !== targetEmail);
+        const deletedCount = initialCount - DB.regional_brokers.length;
+
+        // 2. Revert user profile role from 'regional_broker' to 'user' and strip avatar tag
+        const prof = DB.profiles.find(p => p.id === targetBrokerId || p.email === targetEmail);
+        if (prof) {
+            prof.role = 'user';
+            prof.isBroker = false;
+            prof.avatar_url = (prof.avatar_url || '').replace(/#waseet_broker=[^&]*/g, '');
+        }
+        return { ok: true, deletedCount, newRole: prof ? prof.role : 'user' };
+    }
+
+    // Attempt unauthorized demotion by a normal user or broker
+    const unauthDemoteRes = simulateBrokerDemotion(regionalBroker, syriaBroker.id, syriaBroker.email);
+    assert(unauthDemoteRes.ok === false, 'Security Flow', 'Unauthorized Broker Demotion Strict Rejection', 'Non-admin users strictly denied from demoting brokers');
+
+    // Admin authorized demotion with cascading delete and role reversal
+    DB.regional_brokers.push({ id: 'rb-sy-01', user_id: syriaBroker.id, email: syriaBroker.email, country: 'SY' });
+    const authDemoteRes = simulateBrokerDemotion(admin, syriaBroker.id, syriaBroker.email);
+    assert(authDemoteRes.ok === true && authDemoteRes.newRole === 'user' && syriaBroker.role === 'user', 'Regional Broker Flow', 'Admin Cascading Broker Demotion & Role Reversal (Migration 22)', 'Broker record purged and user profile role immediately reversed to user');
 
     // 7. Automated EmailJS Broker Notification Pipeline Simulation
     function simulateBrokerWelcomeEmail(toEmail, countryCode, countryName, config = {}) {

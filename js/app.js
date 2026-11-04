@@ -163,51 +163,45 @@ class WaseetApp {
             if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'flex';
             const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'flex';
-        } else if (isBroker) {
-            if (userNavMiddle) userNavMiddle.style.display = 'none';
-            if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
-            if (defaultWalletPill && window.innerWidth > 900) {
-                defaultWalletPill.style.display = 'none';
-            }
-            if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
-
-            document.querySelectorAll('.btn-nav-admin').forEach(el => {
-                const href = String(el.getAttribute('href') || '');
-                const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
-                if (isStrictAdminOnly) {
-                    el.style.display = 'none';
-                } else {
-                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
-                }
-            });
-            document.querySelectorAll('[data-admin-only]').forEach(el => {
-                if (el.id === 'drawer-admin-brokers-link' || (el.getAttribute('href') && el.getAttribute('href').includes('admin-brokers'))) {
-                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : 'flex';
-                } else {
-                    el.style.display = 'none';
-                }
-            });
-            const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'flex';
-            const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-            if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
-            const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
-            if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         } else {
+            // للوسيط الإقليمي وكافة مستخدمي الموقع (الزوار، المشترين، والبائعين):
+            // الشريط العلوي موحد تماماً كباقي مستخدمي الموقع دون تدمير أو تغيير شكله الأساسي
             if (userNavMiddle) userNavMiddle.style.display = 'flex';
             if (adminNavMiddle) adminNavMiddle.style.display = 'none';
-            if (defaultWalletPill) defaultWalletPill.style.display = 'inline-flex';
+            if (defaultWalletPill) defaultWalletPill.style.display = user ? 'inline-flex' : 'none';
             if (adminWalletPill) adminWalletPill.style.display = 'none';
 
             document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                 el.style.display = 'none';
             });
             const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'none';
+            if (drawerAdminBrokers) drawerAdminBrokers.style.display = isBroker ? 'flex' : 'none';
             const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
             if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
             const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
+        }
+
+        // إظهار زر إشراف الوساطة الأنيق للوسيط الإقليمي في الشريط العلوي الموحد
+        if (userNavMiddle) {
+            let brokerBtn = document.getElementById('broker-supervision-nav-btn');
+            if (isBroker) {
+                if (!brokerBtn) {
+                    brokerBtn = document.createElement('a');
+                    brokerBtn.id = 'broker-supervision-nav-btn';
+                    brokerBtn.href = 'pending-accounts.html';
+                    brokerBtn.className = 'btn-nav-middle btn-broker-supervision';
+                    brokerBtn.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;';
+                    brokerBtn.title = 'لوحة فحص الحسابات وإشراف الوساطة الإقليمية';
+                    const countryBadge = (user && user.country) ? ` (${String(user.country).toUpperCase()})` : '';
+                    brokerBtn.innerHTML = `<i class="fas fa-user-shield text-emerald"></i> <span>إشراف الوساطة${countryBadge}</span>`;
+                    userNavMiddle.appendChild(brokerBtn);
+                } else {
+                    brokerBtn.style.display = 'inline-flex';
+                }
+            } else if (brokerBtn) {
+                brokerBtn.style.display = 'none';
+            }
         }
 
         // شريط إشراف الوسيط الإقليمي المعتمد
@@ -502,10 +496,65 @@ class WaseetApp {
     }
 
     openSellModal() {
+        if (typeof window.toggleWaseetDrawer === 'function') window.toggleWaseetDrawer(false);
         const modal = document.getElementById('modal-sell');
         if (modal) {
             modal.style.display = '';
             modal.classList.add('active');
+            this.restoreSellerFormDraft();
+        }
+    }
+
+    restoreSellerFormDraft() {
+        try {
+            const rawDraft = localStorage.getItem('WASEET_SELLER_FORM_DRAFT');
+            if (!rawDraft) return;
+            const draft = JSON.parse(rawDraft);
+            if (!draft || typeof draft !== 'object') return;
+
+            const titleEl = document.getElementById('form-title');
+            if (titleEl && !titleEl.value && draft.title) titleEl.value = draft.title;
+
+            const levelEl = document.getElementById('form-level');
+            if (levelEl && (!levelEl.value || levelEl.value === '50') && draft.level) levelEl.value = draft.level;
+
+            const priceEl = document.getElementById('form-seller-price');
+            if (priceEl && (!priceEl.value || priceEl.value === '30') && draft.price) {
+                priceEl.value = draft.price;
+                if (typeof this.updateCalculatedFees === 'function') this.updateCalculatedFees();
+            }
+
+            const emailEl = document.getElementById('form-seller-email');
+            if (emailEl && !emailEl.value && draft.email) emailEl.value = draft.email;
+
+            const passEl = document.getElementById('form-seller-password');
+            if (passEl && !passEl.value && draft.sellerPassword) passEl.value = draft.sellerPassword;
+
+            const recEmailEl = document.getElementById('form-recovery-email');
+            if (recEmailEl && !recEmailEl.value && draft.recoveryEmail) recEmailEl.value = draft.recoveryEmail;
+
+            const notesEl = document.getElementById('form-account-notes');
+            if (notesEl && !notesEl.value && draft.notes) notesEl.value = draft.notes;
+
+            if (draft.game) {
+                const gameRadio = document.querySelector(`input[name="game"][value="${draft.game}"]`);
+                if (gameRadio) {
+                    gameRadio.checked = true;
+                    if (typeof this.handleGameSwitch === 'function') this.handleGameSwitch(draft.game);
+                }
+            }
+
+            if (draft.loginType) {
+                const ltEl = document.getElementById('form-login-type');
+                if (ltEl) ltEl.value = draft.loginType;
+            }
+
+            if (draft.bindStatus) {
+                const bsEl = document.getElementById('form-bind-status');
+                if (bsEl) bsEl.value = draft.bindStatus;
+            }
+        } catch (e) {
+            console.warn('[Waseet] Failed to restore seller draft:', e);
         }
     }
 
@@ -1075,6 +1124,7 @@ class WaseetApp {
        ========================================================================== */
 
     openCardDeck(accountId) {
+        if (typeof window.toggleWaseetDrawer === 'function') window.toggleWaseetDrawer(false);
         const acc = WASEET_STATE.accounts.find(a => a.id === accountId);
         if (!acc) return;
 
@@ -1706,7 +1756,13 @@ class WaseetApp {
                                     title: (document.getElementById('form-title')?.value || '').trim(),
                                     level: parseInt(document.getElementById('form-level')?.value) || 50,
                                     price: parseFloat(document.getElementById('form-seller-price')?.value) || 30,
-                                    email: credSellerEmail
+                                    email: credSellerEmail,
+                                    sellerPassword: credSellerPassword,
+                                    recoveryEmail: credRecoveryEmail,
+                                    notes: (document.getElementById('form-account-notes')?.value || '').trim(),
+                                    game: (document.querySelector('input[name="game"]:checked')?.value || 'free_fire'),
+                                    loginType: (document.getElementById('form-login-type')?.value || 'Google'),
+                                    bindStatus: (document.getElementById('form-bind-status')?.value || 'صافي (بدون بريد استرداد)')
                                 }));
                             } catch (e) {}
                             if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
@@ -1885,6 +1941,7 @@ class WaseetApp {
                     this.renderImagePreviews();
                     this.closeSellModal();
                     form.reset();
+                    try { localStorage.removeItem('WASEET_SELLER_FORM_DRAFT'); } catch (e) {}
 
                     this.showAutoDismissToast('تم إرسال الحساب للفحص', 'تم استلام حسابك بنجاح وهو الآن قيد الفحص لدى الإدارة.', 3500);
 
@@ -2344,6 +2401,7 @@ class WaseetApp {
     }
 
     async openSellerListingsModal() {
+        if (typeof window.toggleWaseetDrawer === 'function') window.toggleWaseetDrawer(false);
         const user = WASEET_STATE.user;
         if (!user) {
             this.openLoginModal();

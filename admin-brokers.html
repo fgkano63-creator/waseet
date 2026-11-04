@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -561,7 +561,7 @@
             </div>
             <div>
                 <p style="color: var(--silver-muted); font-size: 0.86rem; line-height: 1.6; margin-bottom: 1.2rem;">
-                    لأتمتة إرسال إيميل الترحيب بالوسيط الإقليمي فور ترقيته، أدخل مفاتيح حسابك المجاني في <a href="https://www.emailjs.com" target="_blank" rel="noopener" style="color: var(--orange-bright); text-decoration: underline;">EmailJS.com</a>:
+                    لأتمتة إرسال إيميل الترحيب بالوسيط الإقليمي فور ترقيته، أدخل مفاتيح حسابك المجاني في <a href="https://www.emailjs.com" target="_blank" rel="noopener noreferrer" style="color: var(--orange-bright); text-decoration: underline;">EmailJS.com</a>:
                 </p>
                 <div class="form-group-custom" style="margin-bottom: 1rem;">
                     <label class="form-label-custom" for="emailjs-public-key"><i class="fas fa-key text-gold"></i> Public Key (المفتاح العام):</label>
@@ -909,39 +909,23 @@
             adminOut.textContent = `${adminFee} نقطة`;
         }
 
-        async function loadBrokersData() {
+        function renderBrokersGrid(brokers) {
             const container = document.getElementById('brokers-roster-container');
             const badge = document.getElementById('brokers-count-badge');
             const statActive = document.getElementById('stat-active-brokers');
             const statCountries = document.getElementById('stat-covered-countries');
 
-            if (container) {
-                container.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                        <i class="fas fa-spinner fa-spin text-orange" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
-                        <span>جاري جلب قائمة الوسطاء الإقليميين وتحديث الأرصدة...</span>
-                    </div>
-                `;
-            }
+            currentBrokersList = Array.isArray(brokers) ? brokers : [];
+            const isSuperAdmin = document.body.classList.contains('is-admin-mode');
 
-            let brokers = [];
-            if (typeof window.waseetFetchRegionalBrokers === 'function') {
-                const res = await window.waseetFetchRegionalBrokers();
-                if (res && res.ok && Array.isArray(res.data)) {
-                    brokers = res.data;
-                }
-            }
-
-            currentBrokersList = brokers;
-
-            const uniqueCountries = new Set(brokers.map(b => String(b.country || 'DZ').toUpperCase()));
-            if (statActive) statActive.textContent = brokers.length;
+            const uniqueCountries = new Set(currentBrokersList.map(b => String(b.country || 'DZ').toUpperCase()));
+            if (statActive) statActive.textContent = currentBrokersList.length;
             if (statCountries) statCountries.textContent = uniqueCountries.size;
-            if (badge) badge.textContent = `${brokers.length} وسيط معتمد`;
+            if (badge) badge.textContent = `${currentBrokersList.length} وسيط معتمد`;
 
             if (!container) return;
 
-            if (brokers.length === 0) {
+            if (currentBrokersList.length === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: rgba(0,0,0,0.3); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1);">
                         <i class="fas fa-globe-africa text-gold" style="font-size: 2.8rem; margin-bottom: 0.8rem; display: block; opacity: 0.8;"></i>
@@ -954,7 +938,7 @@
                 return;
             }
 
-            container.innerHTML = brokers.map(b => {
+            container.innerHTML = currentBrokersList.map(b => {
                 const countryCode = String(b.country || 'DZ').toUpperCase();
                 const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(countryCode) : { name: countryCode, flag: '🌍' };
                 const safeName = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(b.name || 'وسيط إقليمي') : (b.name || 'وسيط إقليمي');
@@ -992,17 +976,46 @@
                             <code style="color: var(--silver-muted); font-size: 0.72rem;">${String(b.id).slice(0, 13)}...</code>
                         </div>
 
+                        ${isSuperAdmin ? `
                         <div style="margin-top: 1rem; display: flex; gap: 0.6rem;">
                             <button type="button" class="btn-3d btn-gold" onclick="handleChangeCountryPrompt('${b.id}', '${countryCode}')" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">
                                 <i class="fas fa-edit"></i> تغيير الدولة
                             </button>
-                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}')" style="padding: 0.5rem 0.9rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
+                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="padding: 0.5rem 0.9rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
                                 <i class="fas fa-user-minus"></i> إلغاء
                             </button>
                         </div>
+                        ` : `
+                        <div style="margin-top: 1rem; padding: 0.5rem; text-align: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; color: #34d399; font-size: 0.78rem; font-weight: 700;">
+                            <i class="fas fa-shield-alt"></i> وسيط إقليمي معتمد وموثق
+                        </div>
+                        `}
                     </div>
                 `;
             }).join('');
+        }
+
+        async function loadBrokersData() {
+            const container = document.getElementById('brokers-roster-container');
+
+            if (container) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                        <i class="fas fa-spinner fa-spin text-orange" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
+                        <span>جاري جلب قائمة الوسطاء الإقليميين وتحديث الأرصدة...</span>
+                    </div>
+                `;
+            }
+
+            let brokers = [];
+            if (typeof window.waseetFetchRegionalBrokers === 'function') {
+                const res = await window.waseetFetchRegionalBrokers();
+                if (res && res.ok && Array.isArray(res.data)) {
+                    brokers = res.data;
+                }
+            }
+
+            renderBrokersGrid(brokers);
         }
 
         async function handlePromoteBroker(e) {
@@ -1137,6 +1150,14 @@
         }
 
         async function handleChangeCountryPrompt(brokerId, currentCountry) {
+            if (!document.body.classList.contains('is-admin-mode')) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('صلاحية محظورة', 'تغيير دولة الوسيط من صلاحيات المدير العام للمنصة فقط.', 'warning');
+                } else {
+                    alert('تغيير دولة الوسيط من صلاحيات المدير العام للمنصة فقط.');
+                }
+                return;
+            }
             let newCountry = currentCountry;
             if (typeof waseetPrompt === 'function') {
                 newCountry = await waseetPrompt(
@@ -1159,12 +1180,20 @@
             }
         }
 
-        async function handleDemoteBroker(brokerId, brokerName) {
+        async function handleDemoteBroker(brokerId, brokerName, brokerEmail) {
+            if (!document.body.classList.contains('is-admin-mode')) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('صلاحية محظورة', 'إلغاء رتبة الوسيط من صلاحيات المدير العام للمنصة فقط.', 'warning');
+                } else {
+                    alert('إلغاء رتبة الوسيط من صلاحيات المدير العام للمنصة فقط.');
+                }
+                return;
+            }
             if (typeof waseetConfirm === 'function') {
                 const confirmed = await waseetConfirm(
                     'إلغاء صفة الوسيط الإقليمي',
-                    `هل أنت متأكد من إلغاء صفة الوسيط الإقليمي عن "${brokerName}" وإعادته إلى مستخدم عادي؟`,
-                    'نعم، إلغاء الترقية',
+                    `هل أنت متأكد من إلغاء صفة الوسيط الإقليمي عن "${brokerName}" وحذفه نهائياً وإعادته إلى مستخدم عادي؟`,
+                    'نعم، حذف وإلغاء الترقية',
                     'تراجع',
                     'danger'
                 );
@@ -1174,12 +1203,25 @@
             }
 
             if (typeof window.waseetDemoteBroker === 'function') {
-                const res = await window.waseetDemoteBroker(brokerId);
+                const res = await window.waseetDemoteBroker(brokerId, brokerEmail);
                 if (res && res.ok) {
+                    currentBrokersList = currentBrokersList.filter(b => {
+                        const bId = String(b.id || '').trim();
+                        const bEmail = String(b.email || '').trim().toLowerCase();
+                        if (brokerId && bId === String(brokerId).trim()) return false;
+                        if (brokerEmail && bEmail === String(brokerEmail).trim().toLowerCase()) return false;
+                        return true;
+                    });
+                    renderBrokersGrid(currentBrokersList);
+
                     if (typeof waseetAlert === 'function') {
-                        await waseetAlert('تم إلغاء رتبة الوسيط بنجاح وإعادته لمستخدم عادي.', 'تم الإلغاء', 'success');
+                        await waseetAlert('تم إلغاء رتبة الوسيط بنجاح وحذفه جذرياً وإعادته لمستخدم عادي.', 'تم الحذف والإلغاء', 'success');
                     }
                     await loadBrokersData();
+                } else {
+                    if (typeof waseetAlert === 'function') {
+                        await waseetAlert('حدث خطأ أثناء إلغاء رتبة الوسيط: ' + (res && res.error ? res.error.message : 'خطأ غير معروف'), 'فشل الإلغاء', 'error');
+                    }
                 }
             }
         }
@@ -1219,23 +1261,42 @@
                 const role = (profile && profile.role) ? profile.role : (session.user.role || 'user');
                 const isAdminFlag = (profile && (profile.is_admin === true || profile.role === 'admin')) || session.user.isAdmin === true;
                 const isEmailAdmin = (userEmail === 'fgkano63@gmail.com' || userEmail === 'saadani2009@gmail.com' || userEmail === 'mediator@waseet.com');
+                const isBrokerUser = (role === 'broker' || role === 'regional_broker' || (profile && (profile.is_broker === true || profile.isBroker === true)) || session.user.isBroker === true);
+                const isRealAdmin = isAdminFlag || role === 'admin' || isEmailAdmin;
 
-                // طرد فوري: إذا كان الدور user أو regional_broker أو أي دور غير admin
-                if (role === 'user' || role === 'regional_broker' || (!isAdminFlag && role !== 'admin' && !isEmailAdmin)) {
-                    console.warn('[RBAC] Access denied: User is not an admin. Role:', role);
+                // السماح للمدير العام وللوسيط الإقليمي المعتمد بالدخول إلى لوحة الوساطة الإقليمية
+                if (!isRealAdmin && !isBrokerUser) {
+                    console.warn('[RBAC] Access denied: User is neither an admin nor a broker. Role:', role);
                     if (deniedBox) deniedBox.style.display = 'block';
                     if (mainContent) mainContent.style.display = 'none';
                     window.location.href = 'index.html';
                     return false;
                 }
 
-                // 4. إذا تم التحقق بنجاح من أن المستخدم هو المدير (role === 'admin')
-                document.body.classList.add('is-admin-mode');
+                // 4. تطبيق الأنماط وعرض عناصر التحكم حسب الصلاحية
+                document.body.classList.toggle('is-admin-mode', isRealAdmin);
+                document.body.classList.toggle('is-broker-mode', isBrokerUser && !isRealAdmin);
                 const adminNav = document.getElementById('nav-admin-middle-group');
                 if (adminNav) adminNav.style.display = 'flex';
-                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
-                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : 'flex';
+                document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                    const href = String(el.getAttribute('href') || '');
+                    const isStrictSuperAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    if (!isRealAdmin && isStrictSuperAdminOnly) {
+                        el.style.display = 'none';
+                    } else {
+                        el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : 'flex';
+                    }
                 });
+
+                // إخفاء عناصر الإدارة العليا عن الوسيط الإقليمي (تخص المدير فقط)
+                const promoteSection = document.getElementById('promote-broker-panel-card');
+                if (promoteSection) {
+                    promoteSection.style.display = isRealAdmin ? 'block' : 'none';
+                }
+                const emailJsBtn = document.querySelector('button[onclick="openEmailJsConfigModal()"]');
+                if (emailJsBtn) {
+                    emailJsBtn.style.display = isRealAdmin ? 'inline-flex' : 'none';
+                }
 
                 if (deniedBox) deniedBox.style.display = 'none';
                 if (mainContainer) mainContainer.style.display = 'block';

@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-04T15:57:01.856Z",
+  "timestamp": "2026-11-04T18:02:43.506Z",
   "metrics": {
-    "totalChecks": 242,
-    "passed": 242,
+    "totalChecks": 246,
+    "passed": 246,
     "warnings": 0,
     "failures": 0
   },
@@ -26,7 +26,7 @@
         "id": "JS-AsyncCatch-js\\app.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\app.js async error-handling coverage verified (1 async, 18 catch)",
+        "message": "js\\app.js async error-handling coverage verified (1 async, 20 catch)",
         "details": null
       },
       {
@@ -278,7 +278,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (44 async, 90 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (44 async, 93 catch)",
         "details": null
       },
       {
@@ -1206,7 +1206,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 80 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 83 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1632,6 +1632,13 @@
         "details": null
       },
       {
+        "id": "RLS-Enabled-regional_brokers",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'regional_brokers'",
+        "details": null
+      },
+      {
         "id": "DB-SearchPathHygiene",
         "status": "PASS",
         "severity": "INFO",
@@ -1671,6 +1678,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Sellers strictly blocked from mutating marketplace_account_secrets once account is in_deal or sold",
+        "details": null
+      },
+      {
+        "id": "DB-BrokerDisputeRefundParity",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Assigned regional brokers empowered to cancel disputed deals and refund points without auth exception (Migration 21)",
+        "details": null
+      },
+      {
+        "id": "DB-BrokerCascadingDemote",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Cascading broker demote and delete stored procedure active with profile role reversion (Migration 22)",
+        "details": null
+      },
+      {
+        "id": "DB-AtomicDealCancellation",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Database procedure cancel_escrow_deal guarantees atomic refund and status restoration (Migration 23)",
         "details": null
       }
     ],
