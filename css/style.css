@@ -8508,50 +8508,63 @@ iframe[class*="netlify"] {
 }
 
 /* ==========================================================================
-   قسم الوسطاء الإقليميين المعتمدين في صفحة المتجر (Store Regional Brokers Showcase)
+   مستطيل الوسيط المعتمد الأنيق في أسفل المتجر (Store Bottom Mini Broker Rect)
    ========================================================================== */
-.store-brokers-section {
-    padding: 2.2rem 0 1.2rem;
+.store-brokers-bottom-section {
+    padding: 1.1rem 0 1.6rem;
     position: relative;
     z-index: 2;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: transparent;
 }
 
-.store-brokers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.15rem;
-    margin-top: 1.1rem;
-}
-
-.store-broker-card {
-    background: linear-gradient(155deg, rgba(16, 22, 36, 0.96), rgba(9, 13, 22, 0.98));
-    border: 1px solid rgba(234, 179, 8, 0.28);
-    border-radius: 16px;
-    padding: 1.15rem 1.25rem;
-    position: relative;
+.store-mini-brokers-container {
     display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    width: 100%;
 }
 
-.store-broker-card:hover {
-    transform: translateY(-3px);
+.store-mini-broker-rect {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(16, 22, 36, 0.95), rgba(11, 15, 25, 0.98));
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 8px;
+    padding: 0.38rem 0.85rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    transition: all 0.25s ease;
+    cursor: default;
+    max-width: fit-content;
+}
+
+.store-mini-broker-rect:hover {
     border-color: var(--gold-primary);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 18px rgba(197, 160, 89, 0.2);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65), 0 0 12px rgba(212, 175, 55, 0.25);
+    transform: translateY(-1px);
 }
 
-.store-broker-flag-corner {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 30px;
-    height: 20px;
+.store-mini-broker-flag {
+    width: 22px;
+    height: 15px;
     object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.store-mini-broker-name {
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: var(--font-ar);
+    line-height: 1;
+    letter-spacing: 0.2px;
 }
 
 /* ===================================================

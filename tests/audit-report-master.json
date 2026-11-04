@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-04T15:35:57.706Z",
+  "timestamp": "2026-11-04T15:57:01.856Z",
   "metrics": {
     "totalChecks": 242,
     "passed": 242,
@@ -215,7 +215,7 @@
         "id": "JS-AsyncCatch-js\\particles.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\particles.js async error-handling coverage verified (0 async, 0 catch)",
+        "message": "js\\particles.js async error-handling coverage verified (2 async, 2 catch)",
         "details": null
       },
       {

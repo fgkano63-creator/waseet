@@ -478,7 +478,7 @@ function waseetApplyLiveRoleUpdateToUI(user) {
 
             document.querySelectorAll('.btn-nav-admin').forEach(el => {
                 const href = String(el.getAttribute('href') || '');
-                const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
                 if (isBroker && isStrictAdminOnly) {
                     el.style.display = 'none';
                 } else {
@@ -487,7 +487,11 @@ function waseetApplyLiveRoleUpdateToUI(user) {
             });
 
             document.querySelectorAll('[data-admin-only]').forEach(el => {
-                el.style.display = isAdmin ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
+                if (isBroker && (el.id === 'drawer-admin-brokers-link' || (el.getAttribute('href') && el.getAttribute('href').includes('admin-brokers')))) {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : 'flex';
+                } else {
+                    el.style.display = isAdmin ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
+                }
             });
         } else {
             if (userNavMiddle) userNavMiddle.style.display = 'flex';
@@ -506,7 +510,7 @@ function waseetApplyLiveRoleUpdateToUI(user) {
         const drawerPendingBtn = document.getElementById('drawer-btn-pending-verification');
         if (drawerPendingBtn) drawerPendingBtn.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
         const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminBrokers) drawerAdminBrokers.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
         if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? 'flex' : 'none';
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -1547,10 +1547,10 @@
                     </form>
                 </div>
 
-                <!-- العمود الأيمن البديل للمدير: لوحة إدارة حسابات وطرق الدفع -->
+                <!-- العمود الأيمن البديل للمدير والوسيط: لوحة إدارة حسابات وطرق الدفع وتغيير البطاقات -->
                 <div class="wallet-panel-card" id="admin-payment-manager-panel" style="display: none;">
                     <div class="wallet-panel-title">
-                        <h3><i class="fas fa-money-check-alt text-gold"></i> إدارة حسابات الدفع (للمدير)</h3>
+                        <h3><i class="fas fa-money-check-alt text-gold"></i> لوحة تحكم وتغيير بطاقات الدفع (الوساطة الإقليمية)</h3>
                         <button type="button" class="btn-3d btn-gold" onclick="openAddPaymentMethodModal()" style="padding: 0.45rem 0.95rem; font-size: 0.82rem; white-space: nowrap;">
                             <i class="fas fa-plus-circle"></i> إضافة حساب/بطاقة جديدة
                         </button>
@@ -2941,17 +2941,21 @@
                 if (userNav) userNav.style.display = 'none';
                 if (adminNav) adminNav.style.display = 'flex';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'none';
-                if (drawerBrokersLink) drawerBrokersLink.style.display = 'none';
+                if (drawerBrokersLink) drawerBrokersLink.style.display = 'flex';
                 document.querySelectorAll('.btn-nav-admin').forEach(el => {
                     const href = String(el.getAttribute('href') || '');
-                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
                     el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
                 });
                 document.querySelectorAll('[data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
-                if (userDepositPanel) userDepositPanel.style.display = 'block';
-                if (adminManagerPanel) adminManagerPanel.style.display = 'none';
+                // الوسيط: إخفاء شاشة الشحن العادية وتفعيل لوحة تحكم وتغيير البطاقات الخاصة به فوراً
+                if (userDepositPanel) userDepositPanel.style.display = 'none';
+                if (adminManagerPanel) {
+                    adminManagerPanel.style.display = 'block';
+                    loadAdminPaymentMethods();
+                }
             } else {
                 if (userNav) userNav.style.display = '';
                 if (adminNav) adminNav.style.display = 'none';

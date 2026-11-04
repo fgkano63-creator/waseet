@@ -367,31 +367,6 @@
             </div>
         </section>
 
-        <!-- ================= Regional Brokers Showcase Section (Dynamic from Supabase) ================= -->
-        <section class="store-brokers-section" id="regional-brokers-showcase" aria-label="الوسطاء الإقليميون المعتمدون">
-            <div class="container">
-                <div class="store-brokers-card">
-                    <div class="store-brokers-header">
-                        <div>
-                            <h2 class="store-brokers-title">
-                                <i class="fas fa-user-shield text-orange"></i>
-                                الوسطاء الإقليميون المعتمدون حسب الدولة
-                            </h2>
-                            <p class="store-brokers-subtitle">
-                                يتم توجيه صفقات الشراء والبيع تلقائياً إلى الوسيط الإقليمي المعتمد في دولتك لضمان أسرع خدمة وأعلى أمان
-                            </p>
-                        </div>
-                        <span class="store-brokers-badge" id="store-brokers-count-badge">
-                            <i class="fas fa-globe-africa"></i> جاري جلب الوسطاء...
-                        </span>
-                    </div>
-                    <div class="store-brokers-grid" id="store-brokers-grid">
-                        <!-- يتم حقن الوسطاء النشطين ديناميكياً من Supabase عبر waseetFetchRegionalBrokers -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- ================= Marketplace Section ================= -->
         <section class="marketplace-section" id="marketplace">
             <div class="container">
@@ -549,6 +524,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= شريط الوسيط الإقليمي في أسفل المتجر (مستطيل صغير وأنيق) ================= -->
+        <section class="store-brokers-bottom-section" id="regional-brokers-showcase" aria-label="الوسيط الإقليمي المعتمد">
+            <div class="container" style="display: flex; justify-content: center; align-items: center; padding: 1.2rem 1rem;">
+                <div id="store-brokers-grid" class="store-mini-brokers-container">
+                    <!-- يتم حقن المستطيل الصغير ديناميكياً: علم الجزائر على اليمين وبجانبه اسم حساب الوسيط -->
                 </div>
             </div>
         </section>
@@ -1270,9 +1254,9 @@
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
                 </a>
-                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-globe-africa text-orange"></i>
-                    <span>الوسطاء الإقليميين</span>
+                    <span>الوساطة الإقليمية</span>
                 </a>
                 <a href="#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetApp && window.waseetApp.closeMobileDrawer()">
                     <i class="fas fa-calculator text-silver"></i>
