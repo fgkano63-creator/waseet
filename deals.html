@@ -519,13 +519,16 @@
             const isAdmin = !!(user && (
                 user.role === 'admin' ||
                 (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
-            ) && user.role !== 'regional_broker' && user.role !== 'user');
+            ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+            const isBroker = !isAdmin && !!(user && (
+                user.role === 'regional_broker' ||
+                user.role === 'broker' ||
+                user.isBroker === true ||
+                user.brokerRole === 'broker'
+            ));
 
-            if (isAdmin) {
-                document.body.classList.add('is-admin-mode');
-            } else {
-                document.body.classList.remove('is-admin-mode');
-            }
+            document.body.classList.toggle('is-admin-mode', isAdmin);
+            document.body.classList.toggle('is-broker-mode', isBroker);
 
             const userNavMiddle = document.getElementById('nav-user-middle-group');
             const adminNavMiddle = document.getElementById('nav-admin-middle-group');
@@ -541,6 +544,20 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
                 });
+            } else if (isBroker) {
+                if (userNavMiddle) userNavMiddle.style.display = 'none';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+                if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
+                if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+                document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                    const href = String(el.getAttribute('href') || '');
+                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
+                });
+                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -550,6 +567,10 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
+            }
+
+            if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+                window.waseetRenderBrokerSupervisionBanner(user);
             }
 
             const pts = (user && user.wallet && user.wallet.available) || 0;

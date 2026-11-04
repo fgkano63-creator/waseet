@@ -3,11 +3,22 @@
  * يتعامل حصرياً مع تسجيل الدخول وجلب الملف الشخصي (Profile) المطبق عليه سياسات RLS الصارمة.
  */
 
+const WASEET_DEFAULT_SUPABASE_URL = 'https://vjhcvvewbqeiigrjtydu.supabase.co';
+
+function waseetValidateSupabaseOrigin(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== 'string') return WASEET_DEFAULT_SUPABASE_URL;
+    const cleaned = rawUrl.trim().replace(/\/+$/, '');
+    if (/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(cleaned)) {
+        return cleaned;
+    }
+    return WASEET_DEFAULT_SUPABASE_URL;
+}
+
 const WASEET_SUPABASE_CONFIG = {
     // المفتاح العام المعتمد والآمن للمتصفح
     publishableKey: 'sb_publishable_UEvEqB66XyoQscufdRq06A_3CR2SEqn',
-    // رابط مشروع Supabase المعتمد
-    projectUrl: localStorage.getItem('WASEET_SUPABASE_URL') || 'https://vjhcvvewbqeiigrjtydu.supabase.co'
+    // رابط مشروع Supabase المعتمد مع التحقق الصارم من النطاق
+    projectUrl: waseetValidateSupabaseOrigin(localStorage.getItem('WASEET_SUPABASE_URL'))
 };
 
 let waseetSupabaseClient = null;
@@ -48,10 +59,14 @@ function initWaseetSupabase() {
  * تحديث رابط المشروع برمجياً أو عبر واجهة الإعدادات
  */
 function setWaseetSupabaseUrl(url) {
-    if (!url) return false;
-    url = url.trim().replace(/\/+$/, '');
-    WASEET_SUPABASE_CONFIG.projectUrl = url;
-    localStorage.setItem('WASEET_SUPABASE_URL', url);
+    if (!url || typeof url !== 'string') return false;
+    const cleaned = url.trim().replace(/\/+$/, '');
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(cleaned)) {
+        console.warn('[Supabase Security] تم رفض رابط غير موثوق خارج نطاق supabase.co');
+        return false;
+    }
+    WASEET_SUPABASE_CONFIG.projectUrl = cleaned;
+    localStorage.setItem('WASEET_SUPABASE_URL', cleaned);
     waseetSupabaseClient = null;
     const client = initWaseetSupabase();
     if (client) {
@@ -124,6 +139,64 @@ async function waseetSignOut() {
     window.location.reload();
 }
 
+function enrichProfileWithBrokerStatus(profileRecord) {
+    if (!profileRecord) return null;
+    const rawAvatar = String(profileRecord.avatar_url || '').trim();
+    const match = rawAvatar.match(/#waseet_broker=([A-Za-z]{2,6})/i);
+    const cleanAvatar = rawAvatar.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '') || profileRecord.avatar_url || '';
+    const avatarTagCountry = match ? match[1].toUpperCase() : '';
+
+    let cachedMatch = null;
+    try {
+        const cachedList = typeof getCachedRegionalBrokersList === 'function'
+            ? getCachedRegionalBrokersList()
+            : JSON.parse(localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE') || '[]');
+        const emailLower = String(profileRecord.email || '').toLowerCase().trim();
+        if (Array.isArray(cachedList)) {
+            cachedMatch = cachedList.find(b =>
+                b && b.is_active !== false && (
+                    (b.id && profileRecord.id && String(b.id) === String(profileRecord.id)) ||
+                    (b.email && emailLower && String(b.email).toLowerCase().trim() === emailLower)
+                )
+            );
+        }
+    } catch (e) {}
+
+    const emailLower = String(profileRecord.email || '').toLowerCase().trim();
+    const isAdminRole = profileRecord.role === 'admin' || profileRecord.role === 'mediator' ||
+        ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'].includes(emailLower);
+
+    const isBroker = !isAdminRole && (
+        profileRecord.role === 'broker' ||
+        profileRecord.role === 'regional_broker' ||
+        Boolean(match) ||
+        Boolean(cachedMatch)
+    );
+
+    if (isBroker) {
+        const resolvedCountry = String(
+            profileRecord.country ||
+            avatarTagCountry ||
+            (cachedMatch && cachedMatch.country) ||
+            'DZ'
+        ).toUpperCase().trim();
+
+        return {
+            ...profileRecord,
+            avatar_url: cleanAvatar,
+            role: 'regional_broker',
+            brokerRole: 'broker',
+            isBroker: true,
+            country: resolvedCountry
+        };
+    }
+
+    return {
+        ...profileRecord,
+        avatar_url: cleanAvatar
+    };
+}
+
 /**
  * جلب بيانات ملف المستخدم من جدول profiles المحمي بـ RLS
  */
@@ -138,11 +211,26 @@ async function waseetFetchUserProfile(userId) {
             .eq('id', userId)
             .maybeSingle();
 
+        if (!error && data) {
+            return enrichProfileWithBrokerStatus(data);
+        }
+
+        // محاولة احتياطية من جدول users إن وجد
+        try {
+            const { data: userRow, error: userErr } = await client
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .maybeSingle();
+            if (!userErr && userRow) {
+                return enrichProfileWithBrokerStatus(userRow);
+            }
+        } catch (uEx) {}
+
         if (error) {
             console.warn('[Supabase Profiles] تعذر جلب الملف الشخصي:', error.message);
-            return null;
         }
-        return data;
+        return null;
     } catch (err) {
         console.warn('[Supabase Profiles] استثناء جلب الملف:', err);
         return null;
@@ -326,7 +414,35 @@ async function waseetSyncAuthState() {
             emailLower === 'mediator@waseet.com'
         );
 
-        const userRole = isAdmin ? 'admin' : ((profile && profile.role) || 'user');
+        let cachedBrokerEntry = null;
+        try {
+            const cachedList = typeof getCachedRegionalBrokersList === 'function'
+                ? getCachedRegionalBrokersList()
+                : JSON.parse(localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE') || '[]');
+            if (Array.isArray(cachedList)) {
+                cachedBrokerEntry = cachedList.find(b =>
+                    b && b.is_active !== false && (
+                        (b.id && authUser.id && String(b.id) === String(authUser.id)) ||
+                        (b.email && emailLower && String(b.email).toLowerCase().trim() === emailLower)
+                    )
+                );
+            }
+        } catch (e) {}
+
+        const isBroker = !isAdmin && !!(
+            (profile && (profile.role === 'regional_broker' || profile.role === 'broker' || profile.isBroker === true)) ||
+            cachedBrokerEntry
+        );
+
+        const userRole = isAdmin
+            ? 'admin'
+            : (isBroker ? 'regional_broker' : ((profile && profile.role) || 'user'));
+
+        const userCountry = String(
+            (profile && profile.country) ||
+            (cachedBrokerEntry && cachedBrokerEntry.country) ||
+            'DZ'
+        ).toUpperCase().trim();
 
         const rawAvail = profile
             ? (profile.points_balance !== undefined && profile.points_balance !== null
@@ -344,6 +460,9 @@ async function waseetSyncAuthState() {
             avatar: avatarUrl,
             user_metadata: authUser.user_metadata || {},
             role: userRole,
+            brokerRole: isBroker ? 'broker' : null,
+            isBroker: isBroker,
+            country: userCountry,
             isAdmin: isAdmin,
             provider: 'supabase_google',
             wallet: {
@@ -375,10 +494,11 @@ async function waseetSyncAuthState() {
         if (typeof renderNavbarUser === 'function') renderNavbarUser();
         if (typeof renderMyAccountsNavbarUser === 'function') renderMyAccountsNavbarUser();
 
-        // جلب ومزامنة جميع الصفقات والحسابات من قاعدة بيانات Supabase بالتوازي لتسريع التنقل
+        // جلب ومزامنة جميع الصفقات والحسابات والوسطاء من قاعدة بيانات Supabase بالتوازي
         await Promise.allSettled([
             waseetFetchAccountsFromSupabase(),
-            waseetFetchDealsFromSupabase()
+            waseetFetchDealsFromSupabase(),
+            typeof waseetFetchRegionalBrokers === 'function' ? waseetFetchRegionalBrokers() : Promise.resolve()
         ]);
 
         // تحديث عناصر الواجهة فوراً وظهور الصورة والتاج في الشريط العلوي
@@ -397,6 +517,9 @@ async function waseetSyncAuthState() {
             if (typeof window.waseetApp.updateWalletDisplay === 'function') {
                 window.waseetApp.updateWalletDisplay();
             }
+            if (typeof window.waseetApp.loadStoreRegionalBrokers === 'function') {
+                window.waseetApp.loadStoreRegionalBrokers();
+            }
         }
 
         // إذا كان في صفحة حساباتي، تحديث حسابات البائع فوراً
@@ -414,8 +537,8 @@ async function waseetSyncAuthState() {
             renderDealsView();
         }
 
-        // إذا كان في غرفة الشات وهو وسيط معتمد، تحويل الشاشة فوراً لوضع الوسيط (3 شاشات)
-        if (isAdmin && window.escrowRoom) {
+        // إذا كان في غرفة الشات وهو وسيط معتمد أو وسيط إقليمي، تحويل الشاشة فوراً لوضع الوسيط (3 شاشات)
+        if ((isAdmin || isBroker) && window.escrowRoom) {
             window.escrowRoom.setViewerRole('mediator');
         }
     } catch (err) {
@@ -2880,7 +3003,20 @@ async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
             console.warn('[Broker Promotion] RPC Exception:', rpcErr);
         }
 
-        // 2. محاولة الحفظ في جدول regional_brokers إن وجد
+        // 2. محاولة التحديث في جدول users (role = 'broker') إن وجد
+        try {
+            const isUuidUser = waseetIsValidUuid(cleanTarget);
+            const userUpdateQuery = isUuidUser
+                ? client.from('users').update({ role: 'broker', country: cleanCountry }).eq('id', cleanTarget)
+                : client.from('users').update({ role: 'broker', country: cleanCountry }).ilike('email', cleanTarget);
+            const { data: uData, error: uErr } = await userUpdateQuery.select('*').maybeSingle();
+            if (!uErr && uData) {
+                console.log('[Broker Promotion] Updated users table role = broker:', uData);
+                resolvedBrokerRecord = uData;
+            }
+        } catch (uEx) {}
+
+        // 2b. محاولة الحفظ في جدول regional_brokers إن وجد
         try {
             const { data: rbData, error: rbErr } = await client
                 .from('regional_brokers')
@@ -2899,7 +3035,7 @@ async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
             }
         } catch (rbEx) {}
 
-        // 3. البحث في جدول profiles وتحديثه (يدعم العمل مع أو بدون عمود country)
+        // 3. البحث في جدول profiles وتحديثه (يدعم العمل مع أو بدون عمود country ومع role = 'broker' أو 'regional_broker')
         try {
             const isUuid = waseetIsValidUuid(cleanTarget);
             const lookupQuery = isUuid
@@ -2930,14 +3066,17 @@ async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
                     resolvedBrokerRecord = {
                         ...fullUpdate,
                         role: 'regional_broker',
+                        brokerRole: 'broker',
+                        isBroker: true,
                         country: cleanCountry,
                         avatar_url: avatarMeta.cleanAvatarUrl
                     };
                 } else {
-                    // محاولة ثانية متوافقة مع جدول profiles الأساسي بدون عمود country
-                    const { data: compatUpdate, error: compatErr } = await client
+                    // محاولة ثانية لتحديث role إلى broker أو regional_broker بدون عمود country
+                    const { data: roleOnlyUpdate, error: roleOnlyErr } = await client
                         .from('profiles')
                         .update({
+                            role: 'regional_broker',
                             avatar_url: taggedAvatar,
                             updated_at: new Date().toISOString()
                         })
@@ -2945,14 +3084,39 @@ async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
                         .select('*')
                         .maybeSingle();
 
-                    if (!compatErr && compatUpdate) {
-                        console.log('[Broker Promotion] Updated profiles row (compatible schema):', compatUpdate);
+                    if (!roleOnlyErr && roleOnlyUpdate) {
+                        console.log('[Broker Promotion] Updated profiles row (role + tagged avatar):', roleOnlyUpdate);
                         resolvedBrokerRecord = {
-                            ...compatUpdate,
+                            ...roleOnlyUpdate,
                             role: 'regional_broker',
+                            brokerRole: 'broker',
+                            isBroker: true,
                             country: cleanCountry,
                             avatar_url: avatarMeta.cleanAvatarUrl
                         };
+                    } else {
+                        // محاولة ثالثة متوافقة 100% مع جدول profiles الأساسي المحمي بـ Trigger
+                        const { data: compatUpdate, error: compatErr } = await client
+                            .from('profiles')
+                            .update({
+                                avatar_url: taggedAvatar,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingProfile.id)
+                            .select('*')
+                            .maybeSingle();
+
+                        if (!compatErr && compatUpdate) {
+                            console.log('[Broker Promotion] Updated profiles row (compatible schema):', compatUpdate);
+                            resolvedBrokerRecord = {
+                                ...compatUpdate,
+                                role: 'regional_broker',
+                                brokerRole: 'broker',
+                                isBroker: true,
+                                country: cleanCountry,
+                                avatar_url: avatarMeta.cleanAvatarUrl
+                            };
+                        }
                     }
                 }
             }
@@ -3134,6 +3298,30 @@ async function waseetFetchRegionalBrokers() {
 
     const finalBrokers = Array.from(mergedMap.values());
     saveCachedRegionalBrokersList(finalBrokers);
+
+    // إذا كان المستخدم المسجل حالياً ضمن قائمة الوسطاء الإقليميين النشطين، نرقّي صلاحياته فوراً في الجلسة الحالية
+    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.role !== 'admin' && !WASEET_STATE.user.isAdmin) {
+        const curId = String(WASEET_STATE.user.id || '');
+        const curEmail = String(WASEET_STATE.user.email || '').toLowerCase().trim();
+        const myBrokerRecord = finalBrokers.find(b =>
+            (b.id && curId && String(b.id) === curId) ||
+            (b.email && curEmail && String(b.email).toLowerCase().trim() === curEmail)
+        );
+        if (myBrokerRecord) {
+            const wasAlreadyBroker = WASEET_STATE.user.role === 'regional_broker' && WASEET_STATE.user.country === myBrokerRecord.country;
+            WASEET_STATE.user.role = 'regional_broker';
+            WASEET_STATE.user.brokerRole = 'broker';
+            WASEET_STATE.user.isBroker = true;
+            WASEET_STATE.user.country = myBrokerRecord.country || 'DZ';
+            if (typeof saveWaseetData === 'function') saveWaseetData();
+            if (!wasAlreadyBroker) {
+                if (typeof renderNavbarUser === 'function') renderNavbarUser();
+                if (window.waseetApp && typeof window.waseetApp.renderUserProfile === 'function') {
+                    window.waseetApp.renderUserProfile();
+                }
+            }
+        }
+    }
 
     console.log('[Regional Brokers] Total active regional brokers loaded:', finalBrokers.length, finalBrokers);
     return { ok: true, data: finalBrokers };

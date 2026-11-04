@@ -367,6 +367,31 @@
             </div>
         </section>
 
+        <!-- ================= Regional Brokers Showcase Section (Dynamic from Supabase) ================= -->
+        <section class="store-brokers-section" id="regional-brokers-showcase" aria-label="الوسطاء الإقليميون المعتمدون">
+            <div class="container">
+                <div class="store-brokers-card">
+                    <div class="store-brokers-header">
+                        <div>
+                            <h2 class="store-brokers-title">
+                                <i class="fas fa-user-shield text-orange"></i>
+                                الوسطاء الإقليميون المعتمدون حسب الدولة
+                            </h2>
+                            <p class="store-brokers-subtitle">
+                                يتم توجيه صفقات الشراء والبيع تلقائياً إلى الوسيط الإقليمي المعتمد في دولتك لضمان أسرع خدمة وأعلى أمان
+                            </p>
+                        </div>
+                        <span class="store-brokers-badge" id="store-brokers-count-badge">
+                            <i class="fas fa-globe-africa"></i> جاري جلب الوسطاء...
+                        </span>
+                    </div>
+                    <div class="store-brokers-grid" id="store-brokers-grid">
+                        <!-- يتم حقن الوسطاء النشطين ديناميكياً من Supabase عبر waseetFetchRegionalBrokers -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- ================= Marketplace Section ================= -->
         <section class="marketplace-section" id="marketplace">
             <div class="container">
@@ -468,31 +493,6 @@
                     <!-- Populated by JS -->
                 </div>
 
-            </div>
-        </section>
-
-        <!-- ================= Regional Brokers Showcase Section (Dynamic from Supabase) ================= -->
-        <section class="store-brokers-section" id="regional-brokers-showcase" aria-label="الوسطاء الإقليميون المعتمدون">
-            <div class="container">
-                <div class="store-brokers-card">
-                    <div class="store-brokers-header">
-                        <div>
-                            <h2 class="store-brokers-title">
-                                <i class="fas fa-user-shield text-orange"></i>
-                                الوسطاء الإقليميون المعتمدون حسب الدولة
-                            </h2>
-                            <p class="store-brokers-subtitle">
-                                يتم توجيه صفقات الشراء والبيع تلقائياً إلى الوسيط الإقليمي المعتمد في دولتك لضمان أسرع خدمة وأعلى أمان
-                            </p>
-                        </div>
-                        <span class="store-brokers-badge" id="store-brokers-count-badge">
-                            <i class="fas fa-globe-africa"></i> جاري جلب الوسطاء...
-                        </span>
-                    </div>
-                    <div class="store-brokers-grid" id="store-brokers-grid">
-                        <!-- يتم حقن الوسطاء النشطين ديناميكياً من Supabase عبر waseetFetchRegionalBrokers -->
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -1303,19 +1303,19 @@
 
     <!-- Scripts (Deferred for Fast LCP & Unblocked Parser) -->
     <script src="js/vendor/supabase.min.js" defer></script>
-    <script src="js/supabase.js" defer></script>
+    <script src="js/supabase.js?v=20261104_v5" defer></script>
     <script src="js/purify.min.js" defer></script>
-    <script src="js/data.js" defer></script>
+    <script src="js/data.js?v=20261104_v5" defer></script>
     <script src="js/calculator.js" defer></script>
     <script src="js/particles.js" defer></script>
-    <script src="js/escrow.js" defer></script>
+    <script src="js/escrow.js?v=20261104_v5" defer></script>
     <script src="js/dialog.js" defer></script>
     <script src="js/auth.js" defer></script>
     <script src="js/notifications.js?v=20261026_w2" defer></script>
-    <script src="js/navbar.js" defer></script>
+    <script src="js/navbar.js?v=20261104_v5" defer></script>
     <script src="js/slider.js" defer></script>
     <script src="js/instant-nav.js" defer></script>
-    <script src="js/app.js?v=20261017_v1" defer></script>
+    <script src="js/app.js?v=20261104_v5" defer></script>
     <script src="js/support.js?v=20261017" defer></script>
     <script src="js/pwa-register.js" defer></script>
 </body>

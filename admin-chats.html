@@ -210,7 +210,7 @@
                             <button type="button" class="wa-mobile-back" onclick="AdminChats.backToList()" title="رجوع">
                                 <i class="fas fa-arrow-right"></i>
                             </button>
-                            <img id="wa-active-avatar" class="whatsapp-contact-avatar" style="width: 42px; height: 42px;" src="" alt="" referrerpolicy="no-referrer">
+                            <img id="wa-active-avatar" class="whatsapp-contact-avatar" style="width: 42px; height: 42px;" src="" alt="صورة العميل" referrerpolicy="no-referrer">
                             <div style="min-width: 0;">
                                 <div id="wa-active-name" style="color: #fff; font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
                                 <div id="wa-active-email" style="color: var(--silver-muted); font-size: 0.74rem; direction: ltr; text-align: right;"></div>
@@ -363,7 +363,8 @@
 
         function isAdmin(user) {
             if (!user) return false;
-            if (user.role === 'regional_broker' || user.role === 'user') return false;
+            if (user.role === 'user') return false;
+            if (user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker') return true;
             if (typeof isStrictAdmin === 'function') return isStrictAdmin(user);
             return user.role === 'admin';
         }
@@ -481,7 +482,7 @@
                 return `
                     <div class="whatsapp-contact-item ${c.userId === activeUserId ? 'active' : ''}" data-user-id="${esc(c.userId)}">
                         <div class="whatsapp-contact-avatar-wrap" style="position: relative;">
-                            <img class="whatsapp-contact-avatar" src="${esc(p.avatar)}" referrerpolicy="no-referrer" onerror="this.src='${DEFAULT_AVATAR}'" alt="">
+                            <img class="whatsapp-contact-avatar" src="${esc(p.avatar)}" referrerpolicy="no-referrer" onerror="this.src='${DEFAULT_AVATAR}'" alt="${esc(p.name)}">
                             <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #0d121d;" title="متصل الآن"></span>
                         </div>
                         <div class="whatsapp-contact-meta">

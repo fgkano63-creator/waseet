@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-03T14:03:03.551Z",
+  "timestamp": "2026-11-04T15:06:54.427Z",
   "metrics": {
-    "totalChecks": 226,
-    "passed": 226,
+    "totalChecks": 230,
+    "passed": 230,
     "warnings": 0,
     "failures": 0
   },
@@ -26,7 +26,7 @@
         "id": "JS-AsyncCatch-js\\app.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\app.js async error-handling coverage verified (1 async, 17 catch)",
+        "message": "js\\app.js async error-handling coverage verified (1 async, 18 catch)",
         "details": null
       },
       {
@@ -89,7 +89,7 @@
         "id": "JS-AsyncCatch-js\\data.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\data.js async error-handling coverage verified (0 async, 3 catch)",
+        "message": "js\\data.js async error-handling coverage verified (0 async, 4 catch)",
         "details": null
       },
       {
@@ -278,7 +278,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (44 async, 73 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (44 async, 75 catch)",
         "details": null
       },
       {
@@ -1113,7 +1113,7 @@
         "id": "CSS-Breakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive layout defined with 41 media queries",
+        "message": "Comprehensive responsive layout defined with 42 media queries",
         "details": null
       },
       {
@@ -1143,7 +1143,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 75 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 78 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1541,6 +1541,13 @@
         "details": null
       },
       {
+        "id": "RLS-Enabled-withdrawals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on table 'withdrawals'",
+        "details": null
+      },
+      {
         "id": "DB-SearchPathHygiene",
         "status": "PASS",
         "severity": "INFO",
@@ -1559,6 +1566,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Seller credentials quarantined in marketplace_account_secrets and unmasked only via authenticated RPC during deal",
+        "details": null
+      },
+      {
+        "id": "DB-DealsTamperingGuard",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Deals financial columns (seller_price, fee, total_points) and status transitions strictly guarded by BEFORE UPDATE trigger",
+        "details": null
+      },
+      {
+        "id": "DB-WithdrawalsFreezeGuard",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Direct unfrozen withdrawal inserts blocked by BEFORE INSERT trigger and internal_wallet_op RLS policy",
+        "details": null
+      },
+      {
+        "id": "DB-SecretsActiveDealLock",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Sellers strictly blocked from mutating marketplace_account_secrets once account is in_deal or sold",
         "details": null
       }
     ],

@@ -171,18 +171,22 @@ class WaseetApp {
     renderUserProfile() {
         const container = document.getElementById('nav-user-container');
         const user = WASEET_STATE.user;
-        // فحص صلاحية المدير العام بدقة (role === 'admin' فقط، واستبعاد user و regional_broker)
+        // فحص صلاحية المدير العام بدقة (role === 'admin' فقط، واستبعاد user و regional_broker و broker)
         const isAdmin = !!(user && (
             user.role === 'admin' ||
             (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
-        ) && user.role !== 'regional_broker' && user.role !== 'user');
+        ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+        const isBroker = !isAdmin && !!(user && (
+            user.role === 'regional_broker' ||
+            user.role === 'broker' ||
+            user.isBroker === true ||
+            user.brokerRole === 'broker' ||
+            (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+        ));
 
-        // 1. تبديل وضع المدير على body
-        if (isAdmin) {
-            document.body.classList.add('is-admin-mode');
-        } else {
-            document.body.classList.remove('is-admin-mode');
-        }
+        // 1. تبديل وضع المدير والوسيط على body
+        document.body.classList.toggle('is-admin-mode', isAdmin);
+        document.body.classList.toggle('is-broker-mode', isBroker);
 
         // 2. تحديث المجموعات في الشريط العلوي (Navbar Groups)
         const userNavMiddle = document.getElementById('nav-user-middle-group');
@@ -207,6 +211,32 @@ class WaseetApp {
             if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'flex';
             const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'flex';
+        } else if (isBroker) {
+            if (userNavMiddle) userNavMiddle.style.display = 'none';
+            if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+            if (defaultWalletPill && window.innerWidth > 900) {
+                defaultWalletPill.style.display = 'none';
+            }
+            if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+            document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                const href = String(el.getAttribute('href') || '');
+                const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                if (isStrictAdminOnly) {
+                    el.style.display = 'none';
+                } else {
+                    el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
+                }
+            });
+            document.querySelectorAll('[data-admin-only]').forEach(el => {
+                el.style.display = 'none';
+            });
+            const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
+            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'none';
+            const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
+            if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
+            const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
+            if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         } else {
             if (userNavMiddle) userNavMiddle.style.display = 'flex';
             if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -224,13 +254,18 @@ class WaseetApp {
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         }
 
-        // شارات المدير في الشريط العلوي (تختفي تماماً إذا كان العدد 0)
+        // شريط إشراف الوسيط الإقليمي المعتمد
+        if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+            window.waseetRenderBrokerSupervisionBanner(user);
+        }
+
+        // شارات المدير والوسيط في الشريط العلوي (تختفي تماماً إذا كان العدد 0)
         const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
         if (adminDealsBadge) {
             const activeDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
             const dCount = activeDeals.length;
             adminDealsBadge.innerText = dCount > 0 ? String(dCount) : '';
-            adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-flex' : 'none';
+            adminDealsBadge.style.display = ((isAdmin || isBroker) && dCount > 0) ? 'inline-flex' : 'none';
         }
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             window.waseetSyncAllNavBadges();
@@ -239,9 +274,9 @@ class WaseetApp {
             window.WaseetNotificationStore.renderAllBadges();
         }
 
-        // روابط القائمة الجانبية للمدير
+        // روابط القائمة الجانبية للمدير والوسيط
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = isAdmin ? '' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? '' : 'none';
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
         if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? '' : 'none';
         const drawerAdminWithdrawalsLink = document.getElementById('drawer-admin-withdrawals-link');
@@ -359,6 +394,17 @@ class WaseetApp {
         const userCard = document.getElementById('drawer-user-card');
         const authActions = document.getElementById('drawer-auth-actions');
         const user = WASEET_STATE.user;
+        const isAdmin = !!(user && (
+            user.role === 'admin' ||
+            (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
+        ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+        const isBroker = !isAdmin && !!(user && (
+            user.role === 'regional_broker' ||
+            user.role === 'broker' ||
+            user.isBroker === true ||
+            user.brokerRole === 'broker' ||
+            (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+        ));
 
         if (userCard) {
             userCard.style.cursor = 'pointer';
@@ -370,7 +416,9 @@ class WaseetApp {
                     || (isMediatorUser(user) 
                         ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
                         : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
-                const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
+                const roleLabel = isBroker
+                    ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
+                    : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
                 const pts = user.wallet ? user.wallet.available : 0;
                 const safeName = this.escapeHtml(user.name);
                 userCard.innerHTML = `
@@ -404,14 +452,20 @@ class WaseetApp {
                     <a href="wallet.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: var(--gold-light); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                         <i class="fas fa-wallet text-gold"></i> محفظتي وشحن النقاط
                     </a>
-                    ${!isMediatorUser(user) ? `
+                    ${(!isAdmin && !isBroker) ? `
                         <button class="btn-3d btn-outline" onclick="window.waseetApp.openSellerListingsModal(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: #fff;">
                             <i class="fas fa-boxes text-gold"></i> حساباتي المعروضة للبيع
                         </button>
                     ` : `
+                        ${isAdmin ? `
                         <a href="admin-deposits.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-money-check-alt"></i> إدارة طلبات شحن النقاط
                         </a>
+                        ` : `
+                        <a href="deals.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-handshake"></i> إدارة صفقات الوساطة الإقليمية
+                        </a>
+                        `}
                         <a href="pending-accounts.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص والمراجعة
                         </a>
@@ -457,7 +511,11 @@ class WaseetApp {
         const currentStatusBox = document.getElementById('login-current-status-box');
         if (currentStatusBox) {
             if (WASEET_STATE.user) {
-                const roleBadge = isMediatorUser(WASEET_STATE.user) ? '👑 الوسيط المعتمد (المدير)' : 'مستخدم';
+                const u = WASEET_STATE.user;
+                const isBrokerModal = !!(u.role === 'regional_broker' || u.role === 'broker' || u.isBroker === true || u.brokerRole === 'broker');
+                const roleBadge = isBrokerModal
+                    ? `🌍 وسيط إقليمي معتمد (${u.country || 'DZ'})`
+                    : (isMediatorUser(u) ? '👑 الوسيط المعتمد (المدير)' : 'مستخدم');
                 const avatar = (WASEET_STATE.user.user_metadata && WASEET_STATE.user.user_metadata.avatar_url)
                     || WASEET_STATE.user.avatar
                     || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
@@ -467,6 +525,12 @@ class WaseetApp {
                         <div style="font-size: 0.8rem; color: var(--silver-muted);">أنت مسجل حالياً باسم:</div>
                         <strong style="color: #fff; font-size: 0.95rem;">${WASEET_STATE.user.name}</strong>
                         <div style="font-size: 0.75rem; color: var(--gold-light); margin-top: 2px;">(${roleBadge})</div>
+                        ${isBrokerModal ? `
+                        <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;margin-top:0.55rem;">
+                            <a href="deals.html" class="btn-3d btn-outline" style="padding:0.28rem 0.6rem;font-size:0.74rem;border-color:#10b981;color:#34d399;text-decoration:none;"><i class="fas fa-handshake"></i> إدارة الصفقات</a>
+                            <a href="pending-accounts.html" class="btn-3d btn-outline" style="padding:0.28rem 0.6rem;font-size:0.74rem;border-color:var(--orange-bright);color:var(--orange-bright);text-decoration:none;"><i class="fas fa-clipboard-check"></i> فحص الحسابات</a>
+                        </div>
+                        ` : ''}
                         <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser()" style="width: 100%; margin-top: 0.6rem; padding: 0.35rem; font-size: 0.8rem; border-color: rgba(239,68,68,0.5); color: #ef4444;">
                             <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
                         </button>
@@ -1001,11 +1065,12 @@ class WaseetApp {
 
     escapeHtml(str) {
         if (!str) return '';
+        let cleaned = String(str);
         if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
-            return DOMPurify.sanitize(String(str));
+            cleaned = DOMPurify.sanitize(cleaned, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
         }
-        return String(str)
-            .replace(/&/g, '&amp;')
+        return cleaned
+            .replace(/&(?!(amp|lt|gt|quot|#039|#39);)/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')

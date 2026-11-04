@@ -57,15 +57,16 @@ class WaseetEscrowRoom {
         const brokerId = String(this.deal?.assigned_broker_id || this.deal?.assignedBrokerId || (this.deal?.assignedBroker && this.deal?.assignedBroker.id) || '');
 
         const isSuper = typeof isSuperAdmin === 'function' ? isSuperAdmin(currentUser) : (currentUser && (currentUser.role === 'admin' || currentUser.isAdmin === true));
-        const isAssignedBroker = myId && brokerId && myId === brokerId;
+        const isBrokerUser = Boolean(currentUser && (currentUser.role === 'regional_broker' || currentUser.role === 'broker' || currentUser.isBroker === true));
+        const isAssignedBroker = (myId && brokerId && myId === brokerId) || (isBrokerUser && !brokerId);
 
         // 1. صلاحية الإشراف: مسموح للمدير العام أو الوسيط الإقليمي المعين لهذه الصفقة
         if (isSuper || isAssignedBroker) {
             return 'mediator';
         }
 
-        // 2. إذا كان وسيطاً إقليمياً ولكن غير معين لهذه الصفقة ولم يكن مشترياً أو بائعاً
-        if (currentUser && currentUser.role === 'regional_broker' && !isSuper && myId !== buyerId && myId !== sellerId) {
+        // 2. إذا كان وسيطاً إقليمياً ولكن الصفقة معينة لوسيط آخر ولم يكن مشترياً أو بائعاً
+        if (isBrokerUser && !isSuper && brokerId && brokerId !== myId && myId !== buyerId && myId !== sellerId) {
             return 'unauthorized';
         }
 
@@ -1575,17 +1576,19 @@ class WaseetEscrowRoom {
 
     sanitizeText(str) {
         if (!str) return '';
-        const raw = String(str);
+        let raw = String(str);
         if (typeof window.DOMPurify !== 'undefined' && typeof window.DOMPurify.sanitize === 'function') {
-            return window.DOMPurify.sanitize(raw, {
-                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'span', 'br', 'code'],
-                ALLOWED_ATTR: ['href', 'target', 'class', 'style']
+            raw = window.DOMPurify.sanitize(raw, {
+                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'br', 'code'],
+                ALLOWED_ATTR: []
             });
+        } else {
+            raw = raw
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
         }
         return raw
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }

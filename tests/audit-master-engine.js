@@ -426,7 +426,8 @@ const knownTables = [
     'deal_messages',
     'support_messages',
     'notifications',
-    'payment_methods'
+    'payment_methods',
+    'withdrawals'
 ];
 
 let allSqlCombined = '';
@@ -479,6 +480,28 @@ if (hasSecretsIsolation) {
     recordAudit('databaseRLS', 'DB-SecretsIsolation', 'PASS', 'INFO', 'Seller credentials quarantined in marketplace_account_secrets and unmasked only via authenticated RPC during deal');
 } else {
     recordAudit('databaseRLS', 'DB-SecretsIsolation', 'WARN', 'HIGH', 'Ensure passwords are not stored in unencrypted public columns');
+}
+
+// 4.5 Check deals financial tampering and status progression trigger (Migration 20)
+if (allSqlCombined.includes('prevent_deal_financial_tampering') && allSqlCombined.includes('tr_prevent_deal_financial_tampering')) {
+    recordAudit('databaseRLS', 'DB-DealsTamperingGuard', 'PASS', 'INFO', 'Deals financial columns (seller_price, fee, total_points) and status transitions strictly guarded by BEFORE UPDATE trigger');
+} else {
+    recordAudit('databaseRLS', 'DB-DealsTamperingGuard', 'FAIL', 'CRITICAL', 'Deals table lacks BEFORE UPDATE trigger against price/status tampering!');
+}
+
+// 4.6 Check withdrawals unfrozen direct insert guard (Migration 20)
+if (allSqlCombined.includes('prevent_unfrozen_withdrawal_insert') && allSqlCombined.includes('tr_prevent_unfrozen_withdrawal_insert')) {
+    recordAudit('databaseRLS', 'DB-WithdrawalsFreezeGuard', 'PASS', 'INFO', 'Direct unfrozen withdrawal inserts blocked by BEFORE INSERT trigger and internal_wallet_op RLS policy');
+} else {
+    recordAudit('databaseRLS', 'DB-WithdrawalsFreezeGuard', 'FAIL', 'CRITICAL', 'Withdrawals table allows direct client INSERT without freezing points!');
+}
+
+// 4.7 Check marketplace_account_secrets active deal mutation guard (Migration 20)
+const hasSecretsUpdateLock = /CREATE\s+POLICY\s+["']account_secrets_seller_update["'][\s\S]*?NOT\s+IN\s*\(\s*['"]in_deal['"]/i.test(allSqlCombined);
+if (hasSecretsUpdateLock) {
+    recordAudit('databaseRLS', 'DB-SecretsActiveDealLock', 'PASS', 'INFO', 'Sellers strictly blocked from mutating marketplace_account_secrets once account is in_deal or sold');
+} else {
+    recordAudit('databaseRLS', 'DB-SecretsActiveDealLock', 'WARN', 'HIGH', 'Sellers can overwrite account secrets during active escrow deals');
 }
 
 // ==============================================================================

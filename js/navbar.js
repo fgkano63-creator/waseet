@@ -31,13 +31,82 @@
 
     function isAdminUser(user) {
         if (!user) return false;
-        if (user.role === 'regional_broker' || user.role === 'user') return false;
+        if (user.role === 'regional_broker' || user.role === 'broker' || user.role === 'user') return false;
         try {
             if (typeof isStrictAdmin === 'function') return !!isStrictAdmin(user);
             if (typeof isSuperAdmin === 'function') return !!isSuperAdmin(user);
         } catch (e) { /* تجاهل */ }
         return user.role === 'admin' || user.isAdmin === true;
     }
+
+    function isBrokerUser(user) {
+        if (!user) return false;
+        if (isAdminUser(user)) return false;
+        try {
+            if (typeof isRegionalBroker === 'function' && isRegionalBroker(user)) return true;
+        } catch (e) { /* تجاهل */ }
+        return user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker';
+    }
+
+    var COUNTRY_NAMES_AR = {
+        DZ: 'الجزائر', MA: 'المغرب', TN: 'تونس', LY: 'ليبيا', EG: 'مصر',
+        SA: 'السعودية', AE: 'الإمارات', KW: 'الكويت', QA: 'قطر', BH: 'البحرين',
+        OM: 'سلطنة عُمان', JO: 'الأردن', IQ: 'العراق', SY: 'سوريا', LB: 'لبنان',
+        PS: 'فلسطين', YE: 'اليمن', SD: 'السودان', MR: 'موريتانيا', SO: 'الصومال',
+        DJ: 'جيبوتي', KM: 'جزر القمر'
+    };
+
+    function renderBrokerSupervisionBanner(user) {
+        var existing = byId('waseet-broker-supervision-bar');
+        if (!isBrokerUser(user)) {
+            if (existing) existing.style.display = 'none';
+            return;
+        }
+        var header = document.querySelector('.header-navbar');
+        if (!header) return;
+
+        var code = String(user.country || 'DZ').toUpperCase();
+        var countryAr = COUNTRY_NAMES_AR[code] || code;
+        var flagSvg = 'assets/flags/' + code.toLowerCase() + '.svg';
+        var pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
+
+        if (!existing) {
+            existing = document.createElement('div');
+            existing.id = 'waseet-broker-supervision-bar';
+            existing.style.cssText = 'background: linear-gradient(90deg, rgba(16,185,129,0.16), rgba(13,17,26,0.96), rgba(197,160,89,0.14)); border-bottom: 1px solid rgba(16,185,129,0.45); padding: 0.55rem 1rem; position: relative; z-index: 90;';
+            header.insertAdjacentElement('afterend', existing);
+        }
+
+        existing.style.display = 'block';
+        existing.innerHTML =
+            '<div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;">' +
+                '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">' +
+                    '<span style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.55);color:#34d399;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.78rem;font-weight:800;">' +
+                        '<i class="fas fa-user-shield"></i> شريط إشراف الوسيط الإقليمي المعتمد' +
+                    '</span>' +
+                    '<span style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#f8fafc;padding:0.22rem 0.6rem;border-radius:8px;font-size:0.76rem;font-weight:700;">' +
+                        '<img src="' + esc(flagSvg) + '" alt="' + esc(code) + '" style="width:18px;height:13px;border-radius:2px;object-fit:cover;" onerror="this.style.display=\'none\'">' +
+                        '<span>إقليم الوساطة: ' + esc(countryAr) + ' (' + esc(code) + ')</span>' +
+                    '</span>' +
+                    '<span style="color:var(--gold-light);font-size:0.76rem;font-weight:700;"><i class="fas fa-percentage"></i> عمولتك: 66.6% من صفقات دولتك (رصيدك: ' + pts + ' نقطة)</span>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">' +
+                    '<a href="deals.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#10b981;color:#34d399;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-handshake"></i> إدارة صفقات الوساطة' +
+                    '</a>' +
+                    '<a href="pending-accounts.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:var(--orange-bright);color:var(--orange-bright);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-clipboard-check"></i> فحص الحسابات المعلقة' +
+                    '</a>' +
+                    '<a href="chat.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:var(--gold-primary);color:var(--gold-light);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-comments"></i> غرفة الوساطة المباشرة' +
+                    '</a>' +
+                    '<a href="admin-chats.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:rgba(255,255,255,0.25);color:#e2e8f0;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
+                        '<i class="fas fa-headset"></i> محادثات المشترين' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+    }
+    window.waseetRenderBrokerSupervisionBanner = renderBrokerSupervisionBanner;
 
     function userAvatar(user) {
         return (user && ((user.user_metadata && user.user_metadata.avatar_url) || user.avatar)) || DEFAULT_AVATAR;
@@ -128,14 +197,16 @@
     function autoRenderNavbar() {
         var user = currentUser();
         var admin = isAdminUser(user);
+        var broker = !admin && isBrokerUser(user);
         var pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
 
         document.body.classList.toggle('is-admin-mode', admin);
+        document.body.classList.toggle('is-broker-mode', broker);
 
         var userGroup = byId('nav-user-middle-group');
         var adminGroup = byId('nav-admin-middle-group');
-        if (userGroup) userGroup.style.display = admin ? 'none' : '';
-        if (adminGroup) adminGroup.style.display = admin ? 'flex' : 'none';
+        if (userGroup) userGroup.style.display = (admin || broker) ? 'none' : '';
+        if (adminGroup) adminGroup.style.display = (admin || broker) ? 'flex' : 'none';
 
         ['wallet-total-pts', 'admin-wallet-total-pts'].forEach(function (id) {
             var el = byId(id);
@@ -164,8 +235,8 @@
         var card = byId('drawer-user-card');
         if (card) {
             if (user) {
-                var role = (user.role === 'regional_broker')
-                    ? '🌍 وسيط إقليمي (' + (user.country || 'معتمد') + ')'
+                var role = broker
+                    ? '🌍 وسيط إقليمي معتمد (' + (user.country || 'DZ') + ')'
                     : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
                 card.innerHTML =
                     '<img src="' + esc(userAvatar(user)) + '" class="drawer-avatar" alt="' + esc(user.name) + '" referrerpolicy="no-referrer" ' +
@@ -195,9 +266,15 @@
             }
         }
 
-        // روابط القائمة الجانبية والشريط المخصصة للمدير فقط
-        document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(function (el) {
-            el.style.display = admin ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
+        // روابط القائمة الجانبية والشريط المخصصة للمدير والوسيط الإقليمي
+        document.querySelectorAll('.btn-nav-admin').forEach(function (el) {
+            var href = String(el.getAttribute('href') || '');
+            var isStrictAdminOnlyLink = href.indexOf('admin-brokers') !== -1 || href.indexOf('admin-deposits') !== -1 || href.indexOf('admin-withdrawals') !== -1;
+            var canShow = admin || (broker && !isStrictAdminOnlyLink);
+            el.style.display = canShow ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
+        });
+        document.querySelectorAll('[data-admin-only]').forEach(function (el) {
+            el.style.display = admin ? '' : 'none';
         });
         var drawerBrokers = byId('drawer-admin-brokers-link');
         if (drawerBrokers) drawerBrokers.style.display = admin ? 'flex' : 'none';
@@ -205,6 +282,8 @@
         if (drawerDeposits) drawerDeposits.style.display = admin ? 'flex' : 'none';
         var drawerWithdrawals = byId('drawer-admin-withdrawals-link');
         if (drawerWithdrawals) drawerWithdrawals.style.display = admin ? 'flex' : 'none';
+
+        renderBrokerSupervisionBanner(user);
 
         if (typeof window.waseetSyncAllNavBadges === 'function') {
             try { window.waseetSyncAllNavBadges(); } catch (e) { /* تجاهل */ }
@@ -234,11 +313,18 @@
             // إعادة الرسم بعد اكتمال استعادة الجلسة من Supabase
             setTimeout(autoRenderNavbar, 900);
             setTimeout(autoRenderNavbar, 2500);
+        } else {
+            renderBrokerSupervisionBanner(currentUser());
+            setTimeout(function () { renderBrokerSupervisionBanner(currentUser()); }, 900);
+            setTimeout(function () { renderBrokerSupervisionBanner(currentUser()); }, 2500);
         }
 
         refreshDrawerExtras();
-        // مزامنة دورية خفيفة لرصيد المحفظة داخل القائمة الجانبية
-        setInterval(refreshDrawerExtras, 2500);
+        // مزامنة دورية خفيفة لرصيد المحفظة وشريط إشراف الوسيط الإقليمي
+        setInterval(function () {
+            refreshDrawerExtras();
+            renderBrokerSupervisionBanner(currentUser());
+        }, 2500);
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {

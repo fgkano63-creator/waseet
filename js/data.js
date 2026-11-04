@@ -262,7 +262,7 @@ function isMediatorUser(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STA
     if (email && adminEmails.includes(email)) return true;
 
     // التحقق من صلاحية الدور (مدير، وسيط عام، أو وسيط إقليمي)
-    if (user.role === 'mediator' || user.role === 'admin' || user.role === 'regional_broker') return true;
+    if (user.role === 'mediator' || user.role === 'admin' || user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true) return true;
     if (user.isAdmin === true) return true;
 
     return false;
@@ -278,7 +278,7 @@ function isSuperAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE
 
 function isStrictAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
     if (!user) return false;
-    if (user.role === 'user' || user.role === 'regional_broker') return false;
+    if (user.role === 'user' || user.role === 'regional_broker' || user.role === 'broker') return false;
     if (user.role === 'admin' || user.isAdmin === true || user.is_admin === true) return true;
     const email = user.email ? String(user.email).toLowerCase().trim() : '';
     const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
@@ -287,7 +287,7 @@ function isStrictAdmin(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STAT
 
 function isRegionalBroker(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
     if (!user) return false;
-    return user.role === 'regional_broker';
+    return user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker';
 }
 
 const WASEET_SUPPORTED_COUNTRIES = {
@@ -366,8 +366,14 @@ function loadWaseetData() {
         // 1. Permanent User Login Recovery
         const savedUser = localStorage.getItem('WASEET_SAVED_USER_PERMANENT');
         if (savedUser) {
-            const parsed = JSON.parse(savedUser);
-            WASEET_STATE.user = parsed;
+            try {
+                const parsed = JSON.parse(savedUser);
+                WASEET_STATE.user = parsed;
+            } catch (parseErr) {
+                console.warn('[Storage Healing] تم مسح بيانات مستخدم تالفة من localStorage:', parseErr);
+                localStorage.removeItem('WASEET_SAVED_USER_PERMANENT');
+                WASEET_STATE.user = null;
+            }
         } else {
             WASEET_STATE.user = null; // New visitor / Guest
         }

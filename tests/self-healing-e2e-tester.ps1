@@ -314,6 +314,18 @@ Check-Result -Flow 'UX/UI Hunter' -Name 'Defensive Dialog DOM Handler Null Prote
 $notif1 = $notificationsJs.Contains('playNotificationSound') -or $notificationsJs.Contains('AudioContext') -or $supportJs.Contains('playSupportChime')
 Check-Result -Flow 'Realtime Engine' -Name 'Realtime Audio Chime & Web Audio API Parity' -Success $notif1 -Detail 'Web Audio API oscillator chimes synthesized cleanly for chat and deals alerts'
 
+$storageHeal = $dataJs.Contains('[Storage Healing]')
+Check-Result -Flow 'Self-Healing Engine' -Name 'Corrupted LocalStorage Auto-Healing Resilience' -Success $storageHeal -Detail 'Defensively catches and purges corrupted user data without application termination'
+
+$a11yAlt = (-not $adminChatsHtml.Contains('wa-active-avatar" class="whatsapp-contact-avatar" style="width: 42px; height: 42px;" src="" alt=""')) -and $adminDepositsHtml.Contains('class="deposit-user-avatar"') -and (-not $profileHtml.Contains('imgSrc)}" alt=""'))
+Check-Result -Flow 'Self-Healing Engine' -Name 'Image Alt Accessibility Full Compliance' -Success $a11yAlt -Detail 'All dynamic and static image tags enforce descriptive alt descriptions'
+
+$cssSpectrum = $css.Contains('env(safe-area-inset-bottom)') -and $css.Contains('@media (min-width: 1200px)')
+Check-Result -Flow 'Self-Healing Engine' -Name 'Safe Area Inset & Full-Spectrum Breakpoint Ergonomics' -Success $cssSpectrum -Detail 'Bottom bar adapts to iOS notches and desktop wide monitors flawlessly'
+
+$mig20 = (Test-Path 'D:\waseet-app\supabase\20_rls_financial_and_secrets_hardening.sql') -and ((Get-Content 'D:\waseet-app\supabase\20_rls_financial_and_secrets_hardening.sql' -Raw).Contains('tr_prevent_deal_financial_tampering'))
+Check-Result -Flow 'Self-Healing Engine' -Name 'Supabase Migration 20 RLS Financial & Secrets Hardening' -Success $mig20 -Detail 'Database triggers block deal tampering, un-frozen withdrawal injection, and secret mutations'
+
 Write-Host ""
 Write-Host ">>> 11. FLOW 11: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru

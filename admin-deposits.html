@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -500,9 +500,9 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js?v=20261021"></script>
+    <script src="js/supabase.js?v=20261104_v5"></script>
     <script src="js/purify.min.js"></script>
-    <script src="js/data.js?v=20261021"></script>
+    <script src="js/data.js?v=20261104_v5"></script>
     <script src="js/calculator.js?v=20261021"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
@@ -658,7 +658,7 @@
                     <article class="deposit-admin-card ${req.status === 'pending' ? 'is-pending' : ''}">
                         <div class="deposit-card-header">
                             <div class="deposit-user-info">
-                                <img src="${escHtml(userAvatar)}" alt="" class="deposit-user-avatar" onerror="this.src='assets/logo.png'">
+                                <img src="${escHtml(userAvatar)}" alt="${escHtml(userName)}" class="deposit-user-avatar" onerror="this.src='assets/logo.png'">
                                 <div style="min-width: 0;">
                                     <div style="color: #fff; font-weight: 800; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escHtml(userName)}</div>
                                     <div style="color: var(--silver-muted); font-size: 0.73rem; direction: ltr; text-align: right;">${escHtml(userEmail)}</div>

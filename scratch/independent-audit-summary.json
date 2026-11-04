@@ -1,0 +1,1575 @@
+{
+  "pass": 196,
+  "warn": 0,
+  "fail": 0,
+  "items": [
+    {
+      "category": "HTML-ID",
+      "id": "404.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (0 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "404.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "404.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 1 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "404.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 0 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "404.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 1 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "admin-brokers.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (30 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "admin-brokers.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "admin-brokers.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 3 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-brokers.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 13 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-brokers.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "admin-brokers.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "admin-chats.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (34 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "admin-chats.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "admin-chats.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 4 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-chats.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 12 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-chats.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "admin-chats.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "admin-deposits.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (28 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "admin-deposits.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "admin-deposits.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 5 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-deposits.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 13 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-deposits.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "admin-deposits.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "admin-withdrawals.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (26 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "admin-withdrawals.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "admin-withdrawals.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 3 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-withdrawals.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 12 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "admin-withdrawals.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "admin-withdrawals.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "chat.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (28 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "chat.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "chat.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 4 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "chat.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 14 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "chat.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "chat.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "contact-support.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (30 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "contact-support.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "contact-support.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 5 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "contact-support.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 11 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "contact-support.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "contact-support.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "deals.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (22 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "deals.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "deals.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 5 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "deals.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 14 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "deals.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "deals.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "index.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (124 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "index.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "index.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 17 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "index.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 16 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "index.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 5 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "maintenance.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (0 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "maintenance.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "maintenance.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 1 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "maintenance.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 0 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "maintenance.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 0 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "my-accounts.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (49 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "my-accounts.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "my-accounts.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 6 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "my-accounts.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 15 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "my-accounts.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "my-accounts.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "pending-accounts.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (43 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "pending-accounts.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "pending-accounts.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 8 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "pending-accounts.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 13 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "pending-accounts.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 5 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "pending-accounts.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "profile.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (44 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "profile.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "profile.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 6 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "profile.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 13 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "profile.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "profile.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "wallet.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (74 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "wallet.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "wallet.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 11 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "wallet.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 13 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "wallet.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "wallet.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "auth\\callback.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (8 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "auth\\callback.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "auth\\callback.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 0 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "auth\\callback.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 4 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "auth\\callback.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "auth\\callback.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "HTML-ID",
+      "id": "auth\\callback\\index.html Duplicate IDs",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero duplicate IDs found (8 IDs checked)",
+      "details": null
+    },
+    {
+      "category": "HTML-Viewport",
+      "id": "auth\\callback\\index.html Viewport",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Responsive viewport configured",
+      "details": null
+    },
+    {
+      "category": "HTML-A11y",
+      "id": "auth\\callback\\index.html Image Alt Tags",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 0 <img> tags have alt descriptions",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "auth\\callback\\index.html Script Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 4 script sources resolve on disk",
+      "details": null
+    },
+    {
+      "category": "HTML-Asset",
+      "id": "auth\\callback\\index.html Stylesheet Sources",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 2 stylesheet links resolve on disk",
+      "details": null
+    },
+    {
+      "category": "JS-InlineSyntax",
+      "id": "auth\\callback\\index.html inline script #1",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Syntax valid",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\app.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\app.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\app.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\app.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\app.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\auth.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\auth.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\auth.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\auth.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\auth.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\calculator.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\calculator.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\calculator.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\calculator.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\calculator.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\data.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\data.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\data.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\data.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\data.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\dialog.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\dialog.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\dialog.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\dialog.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\dialog.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\escrow.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\escrow.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\escrow.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\escrow.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\escrow.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\instant-nav.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\instant-nav.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\instant-nav.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\instant-nav.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\instant-nav.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\navbar.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\navbar.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\navbar.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\navbar.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\navbar.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\notifications.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\notifications.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\notifications.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\notifications.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\notifications.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\particles.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\particles.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\particles.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\particles.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\particles.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\pwa-register.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\pwa-register.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\pwa-register.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\pwa-register.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\pwa-register.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\slider.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\slider.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\slider.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\slider.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\slider.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\supabase.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\supabase.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\supabase.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\supabase.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\supabase.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "js\\support.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "js\\support.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "js\\support.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "js\\support.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "js\\support.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "JS-Syntax",
+      "id": "service-worker.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JavaScript syntax",
+      "details": null
+    },
+    {
+      "category": "JS-DynamicExec",
+      "id": "service-worker.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Zero eval() or dynamic Function constructors found",
+      "details": null
+    },
+    {
+      "category": "JS-DocWrite",
+      "id": "service-worker.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No document.write() usage",
+      "details": null
+    },
+    {
+      "category": "JS-JSONParse",
+      "id": "service-worker.js",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All JSON.parse calls wrapped in try/catch or protected",
+      "details": null
+    },
+    {
+      "category": "JS-XSS",
+      "id": "service-worker.js innerHTML sanitization",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All dynamic innerHTML interpolations sanitized",
+      "details": null
+    },
+    {
+      "category": "CSS-Breakpoints",
+      "id": "Responsive Breakpoints",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Found 42 media queries spanning mobile, tablet, and desktop viewports",
+      "details": null
+    },
+    {
+      "category": "CSS-Overflow",
+      "id": "Horizontal Overflow Protection",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "overflow-x: hidden enforced",
+      "details": null
+    },
+    {
+      "category": "CSS-RTL",
+      "id": "RTL Layout Rules",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Found 3 explicit RTL directionality rules in style.css",
+      "details": null
+    },
+    {
+      "category": "CSS-SafeArea",
+      "id": "iOS Safe Area Inset Support",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "env(safe-area-inset-bottom) properly configured for notched devices",
+      "details": null
+    },
+    {
+      "category": "CSS-FixedWidth",
+      "id": "Mobile Fixed-Width Overflow",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "No unconstrained fixed-width blocks (>400px) found",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on profiles",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'profiles'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on deals",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'deals'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on marketplace_accounts",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'marketplace_accounts'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on marketplace_account_secrets",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'marketplace_account_secrets'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on wallet_transactions",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'wallet_transactions'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on deposit_requests",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'deposit_requests'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on deal_messages",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'deal_messages'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on support_messages",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'support_messages'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on notifications",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'notifications'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on payment_methods",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'payment_methods'",
+      "details": null
+    },
+    {
+      "category": "DB-RLS",
+      "id": "RLS on withdrawals",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Row Level Security explicitly enabled on table 'withdrawals'",
+      "details": null
+    },
+    {
+      "category": "DB-SecDefiner",
+      "id": "SECURITY DEFINER search_path hygiene",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "All 60 SECURITY DEFINER functions set search_path = public, pg_temp",
+      "details": null
+    },
+    {
+      "category": "DB-Financial",
+      "id": "Deals Financial Tampering Guard",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "BEFORE UPDATE trigger prevents tampering with seller_price, fee, total_points, or status transitions",
+      "details": null
+    },
+    {
+      "category": "DB-Financial",
+      "id": "Withdrawals Atomic Points Freeze Guard",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "BEFORE INSERT trigger prevents direct un-frozen withdrawal injection",
+      "details": null
+    },
+    {
+      "category": "DB-Financial",
+      "id": "Account Secrets Active Deal Lock",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Sellers locked from modifying credentials once an account is in deal or sold",
+      "details": null
+    },
+    {
+      "category": "Security-Git",
+      "id": ".gitignore .env protection",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": ".env files strictly excluded from git",
+      "details": null
+    },
+    {
+      "category": "Deployment-Vercel",
+      "id": "vercel.json syntax",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Valid JSON configuration",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "Content-Security-Policy",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "X-Frame-Options",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "X-Content-Type-Options",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "Strict-Transport-Security",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "Referrer-Policy",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    },
+    {
+      "category": "Security-Headers",
+      "id": "Permissions-Policy",
+      "status": "PASS",
+      "severity": "INFO",
+      "msg": "Configured in vercel.json",
+      "details": null
+    }
+  ]
+}

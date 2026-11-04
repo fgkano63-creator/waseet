@@ -336,6 +336,15 @@ if ($hasMigration15) {
     Report-AuditItem -Category "Database-Security" -Item "Active Escrow Account Deletion Guard" -Status "PASS" -Message "Mitigated in Migration 15: accounts_seller_delete_own guards status NOT IN ('in_deal', 'sold', 'completed')"
 }
 
+$hasMigration20 = Test-Path "D:\waseet-app\supabase\20_rls_financial_and_secrets_hardening.sql"
+if ($hasMigration20) {
+    Report-AuditItem -Category "Database-Security" -Item "Deals Financial & Status Tampering Trigger" -Status "PASS" -Message "Mitigated in Migration 20: tr_prevent_deal_financial_tampering guards seller_price, fee, total_points, and status"
+    Report-AuditItem -Category "Database-Security" -Item "Withdrawals Unfrozen Direct INSERT Guard" -Status "PASS" -Message "Mitigated in Migration 20: tr_prevent_unfrozen_withdrawal_insert & RLS enforce atomic point freeze via request_withdrawal()"
+    Report-AuditItem -Category "Database-Security" -Item "Account Secrets Active Deal Mutation Lock" -Status "PASS" -Message "Mitigated in Migration 20: account_secrets_seller_update blocks password changes during in_deal or sold states"
+} else {
+    Report-AuditItem -Category "Database-Security" -Item "Migration 20 Financial & Secrets Hardening" -Status "FAIL" -Message "Missing supabase/20_rls_financial_and_secrets_hardening.sql" -Severity "CRITICAL"
+}
+
 # ------------------------------------------------------------------------------
 # 6. CSS INTEGRITY, RESPONSIVENESS & MOBILE AUDIT
 # ------------------------------------------------------------------------------

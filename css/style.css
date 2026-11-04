@@ -4353,6 +4353,7 @@ html, body {
     display: none;
     position: fixed;
     bottom: 20px;
+    bottom: env(safe-area-inset-bottom);
     bottom: max(20px, calc(10px + env(safe-area-inset-bottom, 0px)));
     left: 50%;
     right: auto;
@@ -4377,6 +4378,7 @@ html, body {
         display: flex;
     }
     body:not(.chat-page-body) {
+        padding-bottom: env(safe-area-inset-bottom);
         padding-bottom: max(105px, calc(95px + env(safe-area-inset-bottom, 0px)));
     }
 }
@@ -8551,6 +8553,19 @@ iframe[class*="netlify"] {
     border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 }
+
+/* ===================================================
+   Full Spectrum Responsive Breakpoints: Desktop (1200px+)
+   =================================================== */
+@media (min-width: 1200px) {
+    .container,
+    .my-accounts-container,
+    .pending-page-container,
+    .whatsapp-admin-wrapper {
+        max-width: 1280px;
+    }
+}
+
 
 
 

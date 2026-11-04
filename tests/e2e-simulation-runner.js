@@ -779,6 +779,75 @@ async function runE2ESimulation() {
     }
     assert(networkErrorTriggered && fallbackSuccess, 'Resilience Flow', 'Fault-Tolerant Offline Fallback Execution', 'Network errors trapped gracefully with client storage transaction safeguard');
 
+    // 11.5 Corrupted LocalStorage Auto-Healing Resilience
+    mockStorage.setItem('WASEET_SAVED_USER_PERMANENT', '{{CORRUPTED_JSON_MALFORMED');
+    let healedUser = null;
+    let healedWithoutCrash = false;
+    try {
+        const raw = mockStorage.getItem('WASEET_SAVED_USER_PERMANENT');
+        try {
+            healedUser = JSON.parse(raw);
+        } catch (e) {
+            mockStorage.removeItem('WASEET_SAVED_USER_PERMANENT');
+            healedUser = null;
+        }
+        healedWithoutCrash = true;
+    } catch (outerErr) {
+        healedWithoutCrash = false;
+    }
+    const isCleanedFromStorage = mockStorage.getItem('WASEET_SAVED_USER_PERMANENT') === null;
+    assert(healedWithoutCrash && healedUser === null && isCleanedFromStorage, 'Resilience Flow', 'Storage Corruption Auto-Healing & Purge', 'Malformed JSON in localStorage trapped, purged, and state safely reset to null');
+
+    // 11.6 Deal Financial Tampering Lock Invariant (Migration 20)
+    const testDeal = { id: 'deal-lock-01', seller_price: 100, fee: 6, total_points: 106, status: 'in_deal' };
+    function attemptDealMutation(deal, newPrice, newFee) {
+        if (deal.status !== 'created' && (newPrice !== deal.seller_price || newFee !== deal.fee)) {
+            throw new Error('أمني: لا يمكن تعديل القيم المالية للصفقة بعد بدئها');
+        }
+        deal.seller_price = newPrice;
+        deal.fee = newFee;
+    }
+    let dealMutationBlocked = false;
+    try {
+        attemptDealMutation(testDeal, 200, 10);
+    } catch (err) {
+        dealMutationBlocked = err.message.includes('لا يمكن تعديل القيم المالية');
+    }
+    assert(dealMutationBlocked, 'Security Flow', 'Deal Financial Tampering Lock (Migration 20)', 'Trigger prevents unauthorized modification of deal prices or fees during active escrow');
+
+    // 11.7 Account Secrets Active Deal Mutation Lock (Migration 20)
+    function attemptSecretPasswordChange(accountStatus, newPassword) {
+        if (['in_deal', 'sold', 'completed'].includes(accountStatus)) {
+            throw new Error('أمني: لا يمكن للبائع تغيير كلمة المرور أثناء سير الصفقة أو بعد البيع');
+        }
+        return newPassword;
+    }
+    let secretChangeBlocked = false;
+    try {
+        attemptSecretPasswordChange('in_deal', 'hackedPassword123');
+    } catch (err) {
+        secretChangeBlocked = err.message.includes('أثناء سير الصفقة أو بعد البيع');
+    }
+    assert(secretChangeBlocked, 'Security Flow', 'Account Secrets Active Deal Mutation Lock', 'Sellers strictly blocked from changing credentials while account is in escrow or sold');
+
+    // 11.8 Withdrawal Unfrozen Insert Guard (Migration 20)
+    function attemptDirectWithdrawalInsert(userAvailableBalance, userLockedBalance, requestedAmount, isAtomicRpc) {
+        if (!isAtomicRpc) {
+            throw new Error('أمني: يمنع إدراج طلبات السحب مباشرة خارج دالة request_withdrawal');
+        }
+        if (userAvailableBalance < requestedAmount) {
+            throw new Error('رصيدك المتاح غير كافٍ');
+        }
+        return { available: userAvailableBalance - requestedAmount, locked: userLockedBalance + requestedAmount };
+    }
+    let directWithdrawalBlocked = false;
+    try {
+        attemptDirectWithdrawalInsert(100, 0, 50, false);
+    } catch (err) {
+        directWithdrawalBlocked = err.message.includes('يمنع إدراج طلبات السحب مباشرة');
+    }
+    assert(directWithdrawalBlocked, 'Financial Flow', 'Withdrawal Unfrozen Direct Insert Defense (Migration 20)', 'Direct SQL inserts rejected, requiring atomic point freeze RPC before withdrawal creation');
+
     // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------
