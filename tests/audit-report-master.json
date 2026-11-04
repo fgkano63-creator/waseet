@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-04T15:06:54.427Z",
+  "timestamp": "2026-11-04T15:35:57.706Z",
   "metrics": {
-    "totalChecks": 230,
-    "passed": 230,
+    "totalChecks": 242,
+    "passed": 242,
     "warnings": 0,
     "failures": 0
   },
@@ -173,7 +173,7 @@
         "id": "JS-AsyncCatch-js\\navbar.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\navbar.js async error-handling coverage verified (1 async, 4 catch)",
+        "message": "js\\navbar.js async error-handling coverage verified (1 async, 5 catch)",
         "details": null
       },
       {
@@ -278,7 +278,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (44 async, 75 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (44 async, 90 catch)",
         "details": null
       },
       {
@@ -300,6 +300,69 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\support.js async error-handling coverage verified (2 async, 10 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\vendor\\gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\vendor\\gsap.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\vendor\\gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\vendor\\gsap.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\vendor\\gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\vendor\\gsap.min.js async error-handling coverage verified (0 async, 2 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\vendor\\lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\vendor\\lenis.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\vendor\\lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\vendor\\lenis.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\vendor\\lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\vendor\\lenis.min.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\vendor\\ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\vendor\\ScrollTrigger.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\vendor\\ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\vendor\\ScrollTrigger.min.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\vendor\\ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\vendor\\ScrollTrigger.min.js async error-handling coverage verified (0 async, 0 catch)",
         "details": null
       },
       {
@@ -1143,7 +1206,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 78 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 80 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1319,6 +1382,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "No raw unescaped user-input innerHTML interpolations detected in js\\support.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\vendor\\gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\vendor\\gsap.min.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\vendor\\lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\vendor\\lenis.min.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\vendor\\ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\vendor\\ScrollTrigger.min.js",
         "details": null
       },
       {

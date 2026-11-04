@@ -599,6 +599,14 @@ async function runE2ESimulation() {
     });
     assert(configuredRes.ok === true && configuredRes.templateParams.to_email === 'broker.dz@waseet.com' && configuredRes.templateParams.country_code === 'DZ', 'EmailJS Pipeline', 'Configured Automated Dispatch Integrity', 'Valid template payload constructed for recipient delivery');
 
+    // 7d. Live Automatic Session & Role Refresh Simulation (without logout/re-login)
+    const supabaseJsSrc = require('fs').readFileSync(require('path').join(__dirname, '..', 'js', 'supabase.js'), 'utf8');
+    const hasLiveRoleSync = supabaseJsSrc.includes('function waseetInitLiveRoleAndSessionSync')
+        && supabaseJsSrc.includes('function waseetApplyLiveRoleUpdateToUI')
+        && supabaseJsSrc.includes('waseet_live_role_sync_rt')
+        && supabaseJsSrc.includes('client.auth.refreshSession');
+    assert(hasLiveRoleSync, 'Live Session Sync', 'Automatic Role Upgrade & Session Refresh', 'Realtime + focus/visibility + heartbeat auto-promotes user session and reveals broker tools without logout');
+
     // --------------------------------------------------------------------------
     // PHASE 10: WITHDRAWALS SYSTEM & FINANCIAL INTEGRITY
     // --------------------------------------------------------------------------

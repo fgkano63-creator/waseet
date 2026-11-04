@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -709,14 +709,14 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js"></script>
+    <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
-    <script src="js/data.js"></script>
+    <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/particles.js"></script>
+    <script src="js/particles.js?v=20261104_v6"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
-    <script src="js/navbar.js"></script>
+    <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
 
@@ -841,12 +841,16 @@
             const isAdmin = !!(currentUser && (
                 currentUser.role === 'admin' ||
                 (typeof isStrictAdmin === 'function' ? isStrictAdmin(currentUser) : (currentUser.isAdmin === true || currentUser.is_admin === true))
-            ) && currentUser.role !== 'regional_broker' && currentUser.role !== 'user');
-            if (isAdmin) {
-                document.body.classList.add('is-admin-mode');
-            } else {
-                document.body.classList.remove('is-admin-mode');
-            }
+            ) && currentUser.role !== 'regional_broker' && currentUser.role !== 'broker' && currentUser.role !== 'user');
+            const isBroker = !isAdmin && !!(currentUser && (
+                currentUser.role === 'regional_broker' ||
+                currentUser.role === 'broker' ||
+                currentUser.isBroker === true ||
+                currentUser.brokerRole === 'broker' ||
+                (typeof isRegionalBroker === 'function' && isRegionalBroker(currentUser))
+            ));
+            document.body.classList.toggle('is-admin-mode', isAdmin);
+            document.body.classList.toggle('is-broker-mode', isBroker);
 
             const userNavMiddle = document.getElementById('nav-user-middle-group');
             const adminNavMiddle = document.getElementById('nav-admin-middle-group');
@@ -862,6 +866,20 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
                 });
+            } else if (isBroker) {
+                if (userNavMiddle) userNavMiddle.style.display = 'none';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+                if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
+                if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+                document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                    const href = String(el.getAttribute('href') || '');
+                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
+                });
+                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -871,6 +889,10 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
+            }
+
+            if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+                window.waseetRenderBrokerSupervisionBanner(currentUser);
             }
 
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
@@ -916,7 +938,7 @@
             if (drawerCard) {
                 const avatar = (currentUser && currentUser.avatar) || 'assets/logo.png';
                 const name = (currentUser && currentUser.name) || 'زائر';
-                const roleLabel = (currentUser && currentUser.role === 'admin') ? '👑 الوسيط المعتمد (المدير)' : '🏷️ مستخدم موثق';
+                const roleLabel = isAdmin ? '👑 الوسيط المعتمد (المدير)' : (isBroker ? '🛡️ وسيط إقليمي معتمد' : '🏷️ مستخدم موثق');
                 drawerCard.innerHTML = `
                     <img src="${avatar}" class="drawer-avatar" alt="${name}" onerror="this.src='assets/logo.png'">
                     <div class="drawer-user-meta">

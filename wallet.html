@@ -1872,16 +1872,16 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js?v=20261104_v5"></script>
+    <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
-    <script src="js/data.js?v=20261104_v5"></script>
+    <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/calculator.js?v=20261025_gw"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/particles.js"></script>
+    <script src="js/particles.js?v=20261104_v6"></script>
     <script src="js/support.js"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
-    <script src="js/navbar.js"></script>
+    <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
 
@@ -2906,7 +2906,17 @@
             const isAdmin = !!(user && (
                 user.role === 'admin' ||
                 (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
-            ) && user.role !== 'regional_broker' && user.role !== 'user');
+            ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+            const isBroker = !isAdmin && !!(user && (
+                user.role === 'regional_broker' ||
+                user.role === 'broker' ||
+                user.isBroker === true ||
+                user.brokerRole === 'broker' ||
+                (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+            ));
+            document.body.classList.toggle('is-admin-mode', isAdmin);
+            document.body.classList.toggle('is-broker-mode', isBroker);
+
             const drawerBrokersLink = document.getElementById('drawer-admin-brokers-link');
             const userNav = document.getElementById('nav-user-middle-group');
             const adminNav = document.getElementById('nav-admin-middle-group');
@@ -2927,6 +2937,21 @@
                     adminManagerPanel.style.display = 'block';
                     loadAdminPaymentMethods();
                 }
+            } else if (isBroker) {
+                if (userNav) userNav.style.display = 'none';
+                if (adminNav) adminNav.style.display = 'flex';
+                if (drawerAdminLink) drawerAdminLink.style.display = 'none';
+                if (drawerBrokersLink) drawerBrokersLink.style.display = 'none';
+                document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                    const href = String(el.getAttribute('href') || '');
+                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
+                });
+                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                if (userDepositPanel) userDepositPanel.style.display = 'block';
+                if (adminManagerPanel) adminManagerPanel.style.display = 'none';
             } else {
                 if (userNav) userNav.style.display = '';
                 if (adminNav) adminNav.style.display = 'none';
@@ -2937,6 +2962,10 @@
                 });
                 if (userDepositPanel) userDepositPanel.style.display = 'block';
                 if (adminManagerPanel) adminManagerPanel.style.display = 'none';
+            }
+
+            if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+                window.waseetRenderBrokerSupervisionBanner(user);
             }
 
             const navUserContainer = document.getElementById('nav-user-container');

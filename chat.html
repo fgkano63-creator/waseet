@@ -306,17 +306,17 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
-    <script src="js/supabase.js?v=20261104_v5"></script>
+    <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
-    <script src="js/data.js?v=20261104_v5"></script>
+    <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/calculator.js"></script>
     <!-- particles disabled for chat stability -->
-    <script src="js/escrow.js?v=20261104_v5"></script>
+    <script src="js/escrow.js?v=20261104_v6"></script>
     <script src="js/dialog.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/support.js?v=20261017_v4"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
-    <script src="js/navbar.js"></script>
+    <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
     <script>
@@ -351,7 +351,10 @@
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
-                    const roleLabel = isMediatorUser(user) ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق');
+                    const isBrokerRole = !!(user && (user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker' || (typeof isRegionalBroker === 'function' && isRegionalBroker(user))));
+                    const roleLabel = (typeof isStrictAdmin === 'function' && isStrictAdmin(user))
+                        ? '👑 الوسيط المعتمد (المدير)'
+                        : (isBrokerRole ? '🛡️ وسيط إقليمي معتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
                     const pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
                     userCard.innerHTML = `
                         <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
@@ -400,12 +403,16 @@
             const isAdmin = !!(user && (
                 user.role === 'admin' ||
                 (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
-            ) && user.role !== 'regional_broker' && user.role !== 'user');
-            if (isAdmin) {
-                document.body.classList.add('is-admin-mode');
-            } else {
-                document.body.classList.remove('is-admin-mode');
-            }
+            ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+            const isBroker = !isAdmin && !!(user && (
+                user.role === 'regional_broker' ||
+                user.role === 'broker' ||
+                user.isBroker === true ||
+                user.brokerRole === 'broker' ||
+                (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+            ));
+            document.body.classList.toggle('is-admin-mode', isAdmin);
+            document.body.classList.toggle('is-broker-mode', isBroker);
 
             const userNavMiddle = document.getElementById('nav-user-middle-group');
             const adminNavMiddle = document.getElementById('nav-admin-middle-group');
@@ -425,6 +432,24 @@
                 if (drawerBrokers) drawerBrokers.style.display = 'flex';
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
                 if (drawerDeposits) drawerDeposits.style.display = 'flex';
+            } else if (isBroker) {
+                if (userNavMiddle) userNavMiddle.style.display = 'none';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
+                if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
+                if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+
+                document.querySelectorAll('.btn-nav-admin').forEach(el => {
+                    const href = String(el.getAttribute('href') || '');
+                    const isStrictAdminOnly = href.includes('admin-brokers') || href.includes('admin-deposits') || href.includes('admin-withdrawals');
+                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
+                });
+                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.display = 'none';
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.display = 'none';
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -438,6 +463,10 @@
                 if (drawerBrokers) drawerBrokers.style.display = 'none';
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
                 if (drawerDeposits) drawerDeposits.style.display = 'none';
+            }
+
+            if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+                window.waseetRenderBrokerSupervisionBanner(user);
             }
 
             const pts = (user && user.wallet && user.wallet.available) || 0;

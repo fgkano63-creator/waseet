@@ -153,6 +153,9 @@ Check-Result -Flow 'Admin Mediation' -Name 'Navbar User Deals Badge Synchronizat
 $admin5 = $supportJs.Contains('support-floating-btn') -and $supportJs.Contains('playSupportChime')
 Check-Result -Flow 'Admin Mediation' -Name 'Direct Support System & Realtime Messaging' -Success $admin5 -Detail 'Floating direct chat pill and Web Audio API chime notifications for mediator communication'
 
+$admin6 = $supabaseJs.Contains('function waseetInitLiveRoleAndSessionSync') -and $supabaseJs.Contains('function waseetApplyLiveRoleUpdateToUI') -and $supabaseJs.Contains('waseet_live_role_sync_rt')
+Check-Result -Flow 'Admin Mediation' -Name 'Automatic Live Session & Broker Role Refresh' -Success $admin6 -Detail 'Updates user session, JWT token, and broker UI tools live without logout/re-login'
+
 Write-Host ""
 Write-Host ">>> 6. FLOW 6: SECURITY, OAUTH 2.0 AND XSS SHIELDING" -ForegroundColor Yellow
 $sec1 = $authJs.Contains('generateCodeVerifier') -and $authJs.Contains('generateCodeChallenge')

@@ -8566,13 +8566,115 @@ iframe[class*="netlify"] {
     }
 }
 
+/* ==========================================================================
+   LENIS SMOOTH SCROLL (darkroom.engineering) & GSAP ANTI-GRAVITY + REACT BITS
+   ========================================================================== */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
 
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
 
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
 
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
 
+.lenis.lenis-smooth iframe {
+    pointer-events: none;
+}
 
+/* React Bits Dark Luxury Aurora & Ambient Backdrop */
+#react-bits-aurora-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% -10%, rgba(197, 160, 89, 0.08), transparent 65%),
+                radial-gradient(ellipse at 85% 25%, rgba(234, 88, 12, 0.06), transparent 55%),
+                radial-gradient(ellipse at 15% 75%, rgba(16, 185, 129, 0.05), transparent 60%);
+}
 
+#react-bits-aurora-bg .rb-aurora-beam {
+    position: absolute;
+    width: 65vw;
+    height: 65vw;
+    max-width: 780px;
+    max-height: 780px;
+    border-radius: 50%;
+    filter: blur(95px);
+    opacity: 0.22;
+    will-change: transform, opacity;
+    pointer-events: none;
+}
 
+#react-bits-aurora-bg .rb-aurora-beam.beam-gold {
+    top: -18%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.42) 0%, rgba(197, 160, 89, 0) 70%);
+}
 
+#react-bits-aurora-bg .rb-aurora-beam.beam-ember {
+    bottom: -20%;
+    left: -12%;
+    background: radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(234, 88, 12, 0) 70%);
+}
+
+#react-bits-aurora-bg .rb-aurora-beam.beam-emerald {
+    top: 38%;
+    left: 28%;
+    width: 48vw;
+    height: 48vw;
+    opacity: 0.14;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.32) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+/* React Bits SpotlightCard Effect on Store & Broker Cards */
+.account-card,
+.store-broker-card,
+.stat-card,
+.step-card,
+.broker-stat-card {
+    --spotlight-x: 50%;
+    --spotlight-y: 50%;
+    position: relative;
+    will-change: transform;
+}
+
+.account-card::after,
+.store-broker-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+        420px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+        rgba(212, 175, 55, 0.13),
+        rgba(234, 88, 12, 0.04) 40%,
+        transparent 75%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 1;
+}
+
+.account-card:hover::after,
+.store-broker-card:hover::after {
+    opacity: 1;
+}
+
+.gsap-antigravity-logo,
+.gsap-antigravity-card {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
 
 
