@@ -1837,6 +1837,47 @@ async function waseetRefreshMyWalletBalance() {
 }
 
 /**
+ * مزامنة وتصحيح الرصيد المحجوز (Escrow & Withdrawals) وإعادة أي فائض معلق للمتاح
+ */
+async function waseetSyncWalletLockedPoints() {
+    const client = initWaseetSupabase();
+    if (!client) return { ok: false, message: 'تعذر الاتصال بالسحابة' };
+
+    try {
+        const { data, error } = await client.rpc('sync_wallet_locked_points');
+        if (error) {
+            console.warn('[Sync Locked Points RPC Warn]', error.message || error);
+            // Fallback محلي إذا لم تكن دالة RPC مثبتة بعد في Supabase
+            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.wallet) {
+                const user = WASEET_STATE.user;
+                const activeDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
+                let realLocked = 0;
+                activeDeals.forEach(d => {
+                    const isBuyer = (user.id && (String(d.buyer_id) === String(user.id) || (d.buyer && String(d.buyer.id) === String(user.id)))) ||
+                                    (user.name && d.buyer && d.buyer.name === user.name);
+                    if (isBuyer) {
+                        realLocked += Number(d.totalPoints || d.total_points || 0);
+                    }
+                });
+                const oldLocked = Number(user.wallet.locked || 0);
+                const orphan = Math.max(0, oldLocked - realLocked);
+                user.wallet.locked = realLocked;
+                user.wallet.available = Number(user.wallet.available || 0) + orphan;
+                user.wallet.total = user.wallet.available + user.wallet.locked;
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+                return { ok: true, data: { orphan_released: orphan, new_locked: realLocked, new_available: user.wallet.available } };
+            }
+            return { ok: false, error };
+        }
+        await waseetRefreshMyWalletBalance();
+        return { ok: true, data };
+    } catch (err) {
+        console.error('[Sync Locked Points Exception]', err);
+        return { ok: false, message: err.message };
+    }
+}
+
+/**
  * إرسال طلب شحن رصيد يدوي مرفق بصورة الإيصال إلى جدول deposit_requests
  */
 async function waseetSubmitDepositRequest({ amount, paymentMethod, receiptImageUrl, notes }) {
@@ -2910,6 +2951,7 @@ function waseetInitGlobalNavRealtimeBadges() {
 }
 
 window.waseetRefreshMyWalletBalance = waseetRefreshMyWalletBalance;
+window.waseetSyncWalletLockedPoints = waseetSyncWalletLockedPoints;
 window.waseetSubmitDepositRequest = waseetSubmitDepositRequest;
 window.waseetFetchMyDepositRequests = waseetFetchMyDepositRequests;
 window.waseetFetchMyWalletTransactions = waseetFetchMyWalletTransactions;

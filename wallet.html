@@ -1919,7 +1919,7 @@
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1.1rem;">
                 <h3 style="margin: 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
                     <i class="fas fa-shield-alt text-orange"></i>
-                    <span>أين حُجزت نقاطي؟ (تفاصيل صفقات Escrow)</span>
+                    <span>أين حُجزت نقاطي؟ (تفاصيل الرصيد المحجوز)</span>
                 </h3>
                 <button type="button" onclick="closeEscrowDetailsModal()" style="background: none; border: none; color: var(--silver-muted); font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
             </div>
@@ -1927,7 +1927,7 @@
             <!-- Banner info -->
             <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
                 <div>
-                    <span style="color: var(--silver-light); font-size: 0.78rem; display: block;">إجمالي النقاط المحجوزة في ذمة الوساطة:</span>
+                    <span style="color: var(--silver-light); font-size: 0.78rem; display: block;">إجمالي الرصيد المحجوز في ذمة الوساطة:</span>
                     <strong style="color: var(--orange-bright); font-size: 1.35rem; font-family: var(--font-en);"><span id="modal-escrow-total-locked">0</span> نقطة</strong>
                 </div>
                 <div style="text-align: left; font-size: 0.72rem; color: #34d399;">
@@ -1936,7 +1936,7 @@
             </div>
 
             <p style="color: var(--silver-muted); font-size: 0.82rem; line-height: 1.5; margin: 0 0 1rem 0;">
-                قائمة الصفقات الجارية التي قمت بشرائها، حيث تبقى النقاط محجوزة في الخزينة ولا تُسلم للبائع حتى تتأكد من استلام الحساب وتغيير بياناته بنجاح:
+                بيان شفاف وشامل بكافة المبالغ المحجوزة في حسابك، سواء في صفقات وساطة قيد الاستلام أو طلبات سحب رصيد قيد التحويل:
             </p>
 
             <!-- Deal items container -->
@@ -2814,16 +2814,26 @@
             listEl.innerHTML = `
                 <div style="text-align: center; padding: 1.5rem 1rem; color: var(--silver-muted); font-size: 0.86rem;">
                     <i class="fas fa-spinner fa-spin text-orange" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
-                    جاري جلب تفاصيل الصفقات وقيد الشراء من الخزينة الآمنة...
+                    جاري جلب وتدقيق تفاصيل الصفقات وطلبات السحب من الخزينة الآمنة...
                 </div>
             `;
 
             let user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const lockedPts = user && user.wallet ? Number(user.wallet.locked || 0) : 0;
             const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
 
             let activeDeals = [];
+            let pendingWithdrawals = [];
 
-            // 1. الاستعلام المباشر من قاعدة بيانات Supabase (جدول deals)
+            // 1. جلب الصفقات النشطة
+            if (typeof window.waseetFetchDealsFromSupabase === 'function') {
+                try {
+                    await window.waseetFetchDealsFromSupabase();
+                } catch (e) {
+                    console.warn('[Escrow Fetch Deals Warn]', e);
+                }
+            }
+
             if (client && client.auth) {
                 try {
                     const { data: sessionData } = await client.auth.getSession();
@@ -2834,21 +2844,50 @@
                         const { data, error } = await client
                             .from('deals')
                             .select('*')
-                            .eq('buyer_id', uid)
                             .order('created_at', { ascending: false });
 
                         if (!error && Array.isArray(data)) {
-                            // تصفية الصفقات غير المكتملة وغير الملغاة (التي تحجز رصيداً فعلياً)
                             const openDeals = data.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
                             openDeals.forEach(d => {
-                                activeDeals.push({
-                                    id: d.id,
-                                    title: d.account_title || d.title || 'حساب وسيط معتمد',
-                                    sellerPrice: Number(d.seller_price || 0),
-                                    fee: Number(d.fee || 0),
-                                    totalPoints: Number(d.total_points || (Number(d.seller_price || 0) + Number(d.fee || 0))),
-                                    status: d.status || 'in_progress',
-                                    stageText: d.stage_text || 'المرحلة 2: جاري فحص الحساب وتأمينه من الوسيط'
+                                const isParticipant = String(d.buyer_id) === String(uid) ||
+                                                      (d.buyer && String(d.buyer.id) === String(uid)) ||
+                                                      (user && user.name && d.buyer && d.buyer.name === user.name);
+                                if (isParticipant) {
+                                    let parsed = null;
+                                    if (d.notes && typeof d.notes === 'string' && d.notes.trim().startsWith('{')) {
+                                        try { parsed = JSON.parse(d.notes); } catch (err) {}
+                                    }
+                                    const title = (parsed && (parsed.accountTitle || parsed.title)) || d.account_title || d.title || `صفقة وساطة #${d.account_number || d.id}`;
+                                    const pts = Number((parsed && parsed.totalPoints) || d.total_points || (Number(d.seller_price || 0) + Number(d.fee || 0)));
+                                    const stage = (parsed && parsed.stageText) || d.stage_text || 'المرحلة 2: جاري فحص الحساب وتأمينه من الوسيط';
+                                    activeDeals.push({
+                                        id: d.id,
+                                        title: title,
+                                        totalPoints: pts,
+                                        status: d.status || 'in_progress',
+                                        stageText: stage
+                                    });
+                                }
+                            });
+                        }
+
+                        // 2. جلب طلبات السحب المعلقة للمستخدم
+                        const { data: wData, error: wError } = await client
+                            .from('withdrawals')
+                            .select('*')
+                            .eq('user_id', uid)
+                            .order('created_at', { ascending: false });
+
+                        if (!wError && Array.isArray(wData)) {
+                            const pendings = wData.filter(w => w.status === 'pending');
+                            pendings.forEach(w => {
+                                pendingWithdrawals.push({
+                                    id: w.id,
+                                    amount: Number(w.amount || 0),
+                                    method: w.method || 'تحويل مالي',
+                                    details: w.details || '',
+                                    status: 'pending',
+                                    createdAt: w.created_at
                                 });
                             });
                         }
@@ -2858,7 +2897,7 @@
                 }
             }
 
-            // 2. دمج أو استرجاع الصفقات النشطة من الذاكرة المحلية (WASEET_STATE.deals)
+            // 3. دمج الصفقات من WASEET_STATE.deals (إن لم تكن مضافة مسبقاً)
             if (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.deals)) {
                 const uId = user ? String(user.id || '') : '';
                 const uName = user ? String(user.name || '') : '';
@@ -2872,8 +2911,6 @@
                             activeDeals.push({
                                 id: d.id,
                                 title: d.accountTitle || d.account_title || d.title || 'حساب وسيط معتمد',
-                                sellerPrice: Number(d.sellerPrice || 0),
-                                fee: Number(d.fee || 0),
                                 totalPoints: Number(d.totalPoints || d.total_points || (Number(d.sellerPrice || 0) + Number(d.fee || 0))),
                                 status: d.status || 'in_progress',
                                 stageText: d.stageText || d.stage_text || 'جاري فحص وتأمين الحساب من الوسيط'
@@ -2883,59 +2920,209 @@
                 });
             }
 
-            // 3. عرض النتيجة في واجهة النافذة المنبثقة
-            if (activeDeals.length === 0) {
-                listEl.innerHTML = `
+            // 4. دمج طلبات السحب من الذاكرة المحلية إن وجدت
+            if (pendingWithdrawals.length === 0 && typeof waseetFetchMyWithdrawals === 'function') {
+                try {
+                    const localW = await waseetFetchMyWithdrawals();
+                    if (Array.isArray(localW)) {
+                        localW.filter(w => w.status === 'pending').forEach(w => {
+                            const exists = pendingWithdrawals.some(ew => String(ew.id) === String(w.id));
+                            if (!exists) {
+                                pendingWithdrawals.push({
+                                    id: w.id,
+                                    amount: Number(w.amount || 0),
+                                    method: w.method || 'تحويل مالي',
+                                    details: w.details || '',
+                                    status: 'pending',
+                                    createdAt: w.created_at
+                                });
+                            }
+                        });
+                    }
+                } catch (we) {}
+            }
+
+            // حساب المبالغ
+            const dealsPtsTotal = activeDeals.reduce((sum, d) => sum + Number(d.totalPoints || 0), 0);
+            const withdrawalsPtsTotal = pendingWithdrawals.reduce((sum, w) => sum + Number(w.amount || 0), 0);
+            const totalIdentified = dealsPtsTotal + withdrawalsPtsTotal;
+            const orphanPts = Math.max(0, lockedPts - totalIdentified);
+
+            // تحديث نص البانر العلوي
+            const totalLockedEl = document.getElementById('modal-escrow-total-locked');
+            if (totalLockedEl) totalLockedEl.innerText = lockedPts;
+
+            let html = '';
+
+            // قسم أ: صفقات الوساطة النشطة
+            if (activeDeals.length > 0) {
+                html += `
+                    <div style="margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.76rem; color: var(--gold-light); font-weight: 800; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;">
+                            <i class="fas fa-shopping-bag"></i> صفقات قيد الاستلام والفحص (${activeDeals.length} صفقة • ${dealsPtsTotal} نقطة):
+                        </span>
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                            ${activeDeals.map(deal => {
+                                const dealId = escapeSafe(deal.id);
+                                const title = escapeSafe(deal.title);
+                                const stage = escapeSafe(deal.stageText);
+                                const pts = Number(deal.totalPoints || 0);
+                                return `
+                                    <div style="background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 0.85rem 0.95rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                        <div style="min-width: 0; flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem;">
+                                                <span style="background: rgba(234, 88, 12, 0.2); color: var(--orange-bright); font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 6px; font-family: var(--font-en);">
+                                                    #${dealId}
+                                                </span>
+                                                <strong style="color: #fff; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 250px;" title="${title}">
+                                                    ${title}
+                                                </strong>
+                                            </div>
+                                            <div style="color: var(--silver-muted); font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem;">
+                                                <i class="fas fa-clock text-gold"></i>
+                                                <span>${stage}</span>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                            <div style="text-align: left;">
+                                                <div style="font-size: 0.7rem; color: var(--silver-muted);">النقاط المحجوزة:</div>
+                                                <strong style="color: var(--orange-bright); font-size: 1.15rem; font-family: var(--font-en); font-weight: 900;">${pts} <span style="font-size: 0.75rem;">نقطة</span></strong>
+                                            </div>
+                                            <a href="chat.html?dealId=${encodeURIComponent(deal.id)}" class="btn-3d btn-orange" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 8px;">
+                                                <i class="fas fa-comments"></i> غرفة الوساطة
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // قسم ب: طلبات سحب الرصيد قيد المراجعة
+            if (pendingWithdrawals.length > 0) {
+                html += `
+                    <div style="margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.76rem; color: #60a5fa; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;">
+                            <i class="fas fa-hand-holding-usd"></i> طلبات سحب رصيد قيد التحويل (${pendingWithdrawals.length} طلب • ${withdrawalsPtsTotal} نقطة):
+                        </span>
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                            ${pendingWithdrawals.map(w => {
+                                const wId = escapeSafe(String(w.id).slice(0, 8));
+                                const method = escapeSafe(w.method);
+                                const details = escapeSafe(w.details || '');
+                                const amt = Number(w.amount || 0);
+                                return `
+                                    <div style="background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(96, 165, 250, 0.35); border-radius: 12px; padding: 0.85rem 0.95rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                        <div style="min-width: 0; flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem;">
+                                                <span style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 6px; font-family: var(--font-en);">
+                                                    #سحب-${wId}
+                                                </span>
+                                                <strong style="color: #fff; font-size: 0.92rem;">
+                                                    سحب عبر ${method}
+                                                </strong>
+                                            </div>
+                                            <div style="color: var(--silver-muted); font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem;">
+                                                <i class="fas fa-hourglass-half text-gold"></i>
+                                                <span>قيد مراجعة وتحويل الوسيط المعتمد ${details ? '• ' + details : ''}</span>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: left;">
+                                            <div style="font-size: 0.7rem; color: var(--silver-muted);">المبلغ المجمد للسحب:</div>
+                                            <strong style="color: #60a5fa; font-size: 1.15rem; font-family: var(--font-en); font-weight: 900;">${amt} <span style="font-size: 0.75rem;">نقطة</span></strong>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // قسم ج: رصيد معلق قابل للتحرير (Orphan points)
+            if (orphanPts > 0) {
+                html += `
+                    <div style="background: rgba(234, 88, 12, 0.12); border: 1.5px solid rgba(234, 88, 12, 0.45); border-radius: 14px; padding: 1.1rem; text-align: center; margin-bottom: 0.8rem;">
+                        <i class="fas fa-unlock-alt text-gold" style="font-size: 1.8rem; margin-bottom: 0.5rem; display: block;"></i>
+                        <h4 style="color: #fff; margin: 0 0 0.35rem; font-size: 0.98rem;">رصيد معلق في حسابك (${orphanPts} نقطة)</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.82rem; line-height: 1.5; margin: 0 0 0.9rem 0;">
+                            هذا الرصيد معلق من عمليات سابقة في الخزينة ولا توجد صفقات أو طلبات سحب جارية تحجزه حالياً. يمكنك تحريره فوراً وإعادته لرصيدك المتاح للشراء أو السحب بنقرة واحدة.
+                        </p>
+                        <button type="button" class="btn-3d btn-gold" id="btn-release-orphan-points" onclick="releaseOrphanLockedPoints(${orphanPts})" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 1.25rem; font-size: 0.86rem; border-radius: 10px; cursor: pointer; font-weight: 800;">
+                            <i class="fas fa-magic"></i> تصحيح وتحرير ${orphanPts} نقطة إلى رصيدك المتاح
+                        </button>
+                    </div>
+                `;
+            }
+
+            // قسم د: لا توجد أي نقاط محجوزة على الإطلاق
+            if (activeDeals.length === 0 && pendingWithdrawals.length === 0 && orphanPts === 0) {
+                html = `
                     <div style="text-align: center; padding: 1.8rem 1rem; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
                         <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.2rem; margin-bottom: 0.6rem; display: block;"></i>
-                        <h4 style="color: #fff; margin: 0 0 0.3rem; font-size: 1rem;">لا توجد صفقات تحجز نقاطك حالياً</h4>
+                        <h4 style="color: #fff; margin: 0 0 0.3rem; font-size: 1rem;">لا توجد نقاط محجوزة حالياً</h4>
                         <p style="color: var(--silver-muted); font-size: 0.82rem; margin: 0 0 1rem 0;">كافة نقاط محفظتك متاحة للشراء الفوري أو سحب الأرباح.</p>
                         <a href="deals.html" class="btn-3d btn-gold" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 1rem; font-size: 0.82rem; text-decoration: none;">
                             <i class="fas fa-crown"></i> تصفح صفحة قيد الشراء
                         </a>
                     </div>
                 `;
-                return;
             }
 
-            listEl.innerHTML = activeDeals.map(deal => {
-                const dealId = escapeSafe(deal.id);
-                const title = escapeSafe(deal.title);
-                const stage = escapeSafe(deal.stageText);
-                const pts = Number(deal.totalPoints || 0);
+            listEl.innerHTML = html;
+        }
 
-                return `
-                    <div style="background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 0.85rem 0.95rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem;">
-                                <span style="background: rgba(234, 88, 12, 0.2); color: var(--orange-bright); font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 6px; font-family: var(--font-en);">
-                                    #${dealId}
-                                </span>
-                                <strong style="color: #fff; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 250px;" title="${title}">
-                                    ${title}
-                                </strong>
-                            </div>
-                            <div style="color: var(--silver-muted); font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem;">
-                                <i class="fas fa-clock text-gold"></i>
-                                <span>${stage}</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                            <div style="text-align: left;">
-                                <div style="font-size: 0.7rem; color: var(--silver-muted);">النقاط المحجوزة:</div>
-                                <strong style="color: var(--orange-bright); font-size: 1.15rem; font-family: var(--font-en); font-weight: 900;">${pts} <span style="font-size: 0.75rem;">نقطة</span></strong>
-                            </div>
-                            <a href="chat.html?dealId=${encodeURIComponent(deal.id)}" class="btn-3d btn-orange" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 8px;">
-                                <i class="fas fa-comments"></i> غرفة الوساطة
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        async function releaseOrphanLockedPoints(orphanAmount) {
+            const btn = document.getElementById('btn-release-orphan-points');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحرير الرصيد...';
+            }
+
+            try {
+                let synced = false;
+                if (typeof window.waseetSyncWalletLockedPoints === 'function') {
+                    const res = await window.waseetSyncWalletLockedPoints();
+                    if (res && res.ok) synced = true;
+                }
+
+                if (!synced) {
+                    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.wallet) {
+                        const u = WASEET_STATE.user;
+                        const oldLocked = Number(u.wallet.locked || 0);
+                        const release = orphanAmount || oldLocked;
+                        u.wallet.locked = Math.max(0, oldLocked - release);
+                        u.wallet.available = Number(u.wallet.available || 0) + release;
+                        u.wallet.total = u.wallet.available + u.wallet.locked;
+                        if (typeof saveWaseetData === 'function') saveWaseetData();
+                        synced = true;
+                    }
+                }
+
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تم تحرير وتصحيح الرصيد بنجاح!', `تمت استعادة ${orphanAmount || 'النقاط'} نقطة وإعادتها فوراً إلى رصيدك المتاح للشراء أو السحب.`, 'success');
+                } else {
+                    alert(`تم تحرير ${orphanAmount || ''} نقطة وإعادتها لرصيدك المتاح بنجاح!`);
+                }
+
+                if (typeof updateWalletUI === 'function') updateWalletUI();
+                closeEscrowDetailsModal();
+                if (typeof refreshAllWalletData === 'function') await refreshAllWalletData();
+            } catch (err) {
+                console.error('Release points error:', err);
+                alert('حدث خطأ أثناء تحرير النقاط: ' + (err.message || err));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-unlock-alt"></i> إعادة المحاولة';
+                }
+            }
         }
 
         window.openEscrowDetailsModal = openEscrowDetailsModal;
         window.closeEscrowDetailsModal = closeEscrowDetailsModal;
+        window.releaseOrphanLockedPoints = releaseOrphanLockedPoints;
 
         async function handleWithdrawalFormSubmit(e) {
             e.preventDefault();
@@ -3097,6 +3284,20 @@
                         <i class="fas fa-check-circle" style="color: #10b981; font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
                         <h4 style="color: #fff; margin: 0 0 0.3rem; font-size: 1rem;">لا توجد نقاط محجوزة حالياً</h4>
                         <p style="color: var(--silver-muted); font-size: 0.82rem; margin: 0;">كافة نقاط محفظتك متاحة للاستخدام الفوري في شراء الحسابات أو السحب.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (userDeals.length === 0 && lockedPts > 0) {
+                container.innerHTML = `
+                    <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 1.2rem; text-align: center;">
+                        <i class="fas fa-shield-alt text-orange" style="font-size: 1.8rem; margin-bottom: 0.5rem; display: block;"></i>
+                        <h4 style="color: #fff; margin: 0 0 0.35rem; font-size: 1rem;">لديك ${lockedPts} نقطة محجوزة في الخزينة</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.82rem; margin: 0 0 0.9rem 0;">النقاط معلقة لحماية حسابك أو في طلبات سحب رصيد قيد التحويل. يمكنك الاطلاع على التفاصيل الكاملة أو تحريرها بضغطة زر.</p>
+                        <button type="button" class="btn-3d btn-orange" onclick="openEscrowDetailsModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.45rem 1.1rem; font-size: 0.84rem; cursor: pointer;">
+                            <i class="fas fa-search-dollar"></i> تفاصيل الحجز وتحرير الرصيد
+                        </button>
                     </div>
                 `;
                 return;
@@ -3698,6 +3899,12 @@
             try {
                 if (typeof waseetRefreshMyWalletBalance === 'function') {
                     await waseetRefreshMyWalletBalance();
+                }
+                if (typeof window.waseetFetchDealsFromSupabase === 'function') {
+                    try { await window.waseetFetchDealsFromSupabase(); } catch (e) {}
+                }
+                if (typeof window.waseetFetchMyWithdrawals === 'function') {
+                    try { await window.waseetFetchMyWithdrawals(); } catch (e) {}
                 }
                 renderWalletSummaryUI();
                 await loadAndRenderHistory();
