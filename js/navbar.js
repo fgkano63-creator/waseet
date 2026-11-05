@@ -121,6 +121,9 @@
             '<a href="admin-brokers.html" class="btn-nav-middle btn-nav-broker' + (isBrokersPage ? ' active' : '') + '" style="border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;" title="لوحة إدارة الوساطة الإقليمية">' +
                 '<i class="fas fa-globe-africa text-emerald"></i> <span>الوساطة (' + esc(countryCode) + ')</span>' +
             '</a>' +
+            '<a href="wallet.html#admin-payment-manager-panel" class="btn-nav-middle btn-nav-broker" style="border: 1px solid rgba(234, 179, 8, 0.45); background: rgba(234, 179, 8, 0.12); color: #facc15; font-weight: 700;" title="لوحة تحكم وتغيير بطاقات الدفع">' +
+                '<i class="fas fa-credit-card text-gold"></i> <span>تغيير البطاقات</span>' +
+            '</a>' +
             '<a href="pending-accounts.html" class="btn-nav-middle btn-nav-broker' + (isPendingPage ? ' active' : '') + '" style="border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); color: #fbbf24; font-weight: 700;" title="فحص الحسابات المعلقة">' +
                 '<i class="fas fa-clipboard-check text-orange"></i> <span>فحص الحسابات</span>' +
                 '<span class="deals-badge-count admin-pending-badge" id="broker-unified-pending-badge" style="display: none;">0</span>' +

@@ -2106,19 +2106,27 @@
 
         function sanitizeLegacyPaymentMethod(pm) {
             if (!pm) return pm;
+            const countryCode = (pm.countryCode || pm.country_code || '').toUpperCase().trim();
+            const countryName = pm.countryName || pm.country_name || '';
             const isAlgeria = pm.id === 'algeria_baridimob'
-                || (pm.countryCode || '').toUpperCase() === 'DZ'
-                || (pm.countryName || '').includes('جزائر');
+                || countryCode === 'DZ'
+                || countryName.includes('جزائر');
             if (isAlgeria) {
                 const legacyPrefix = 'KARIM' + ' ' + 'BENALI';
-                if (!pm.beneficiaryName || pm.beneficiaryName.toUpperCase().includes(legacyPrefix)) {
+                const bName = pm.beneficiaryName || pm.beneficiary_name || '';
+                if (!bName || bName.toUpperCase().includes(legacyPrefix)) {
                     pm.beneficiaryName = 'MOUSSAOUI DHAYA EDDINE';
+                    if (pm.beneficiary_name) pm.beneficiary_name = 'MOUSSAOUI DHAYA EDDINE';
                 }
-                if (!pm.accountNumber || pm.accountNumber === '00799999001234567890') {
+                const accNum = pm.accountNumber || pm.account_number || '';
+                if (!accNum || accNum === '00799999001234567890') {
                     pm.accountNumber = '00799999004188617443';
+                    if (pm.account_number) pm.account_number = '00799999004188617443';
                 }
-                if (!pm.secondaryValue || pm.secondaryValue === '0012345678 Clé 90') {
+                const secVal = pm.secondaryValue || pm.secondary_value || '';
+                if (!secVal || secVal === '0012345678 Clé 90') {
                     pm.secondaryValue = '0041886174 Clé 43';
+                    if (pm.secondary_value) pm.secondary_value = '0041886174 Clé 43';
                 }
             }
             return pm;

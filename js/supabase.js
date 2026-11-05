@@ -78,38 +78,64 @@ function setWaseetSupabaseUrl(url) {
 /**
  * تسجيل الدخول الحقيقي عبر Google OAuth باستخدام دالة Supabase الرسمية
  */
-async function waseetSignInWithGoogle() {
+async function waseetSignInWithGoogle(options = {}) {
+    console.log('[Supabase Auth] waseetSignInWithGoogle invoked');
     const client = initWaseetSupabase();
-    if (!client) {
-        if (typeof waseetAlert === 'function') {
-            waseetAlert('خطأ في الاتصال', 'تعذر تهيئة اتصال Supabase.', 'warning');
-        } else {
-            alert('تعذر تهيئة اتصال Supabase.');
+    const returnUrl = (options && options.redirectTo)
+        ? options.redirectTo
+        : ((typeof window !== 'undefined' && window.location) ? window.location.href.split('#')[0] : '');
+
+    if (!client || !client.auth) {
+        console.warn('[Supabase Auth] Supabase client not ready, trying fallback to waseetAuth...');
+        if (typeof window.waseetAuth !== 'undefined' && typeof window.waseetAuth.initiateGoogleLogin === 'function') {
+            return await window.waseetAuth.initiateGoogleLogin({ redirect: true });
         }
+        alert('تعذر تهيئة اتصال Supabase، يرجى إعادة المحاولة.');
         return false;
     }
 
     try {
+        console.log('[Supabase Auth] Starting signInWithOAuth for Google with redirectTo:', returnUrl);
         const { data, error } = await client.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin
+                redirectTo: returnUrl || window.location.origin,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'select_account'
+                }
             }
         });
 
         if (error) {
             console.error('[Supabase Auth] خطأ تسجيل الدخول عبر Google:', error.message);
+            if (typeof window.waseetAuth !== 'undefined' && typeof window.waseetAuth.initiateGoogleLogin === 'function') {
+                return await window.waseetAuth.initiateGoogleLogin({ redirect: true });
+            }
             if (typeof waseetAlert === 'function') {
                 waseetAlert('خطأ في تسجيل الدخول', error.message, 'danger');
+            } else {
+                alert('خطأ في تسجيل الدخول: ' + error.message);
             }
             return false;
+        }
+
+        if (data && data.url) {
+            console.log('[Supabase Auth] Redirecting browser to Google OAuth URL:', data.url);
+            window.location.href = data.url;
         }
         return true;
     } catch (err) {
         console.error('[Supabase Auth] استثناء تسجيل الدخول:', err);
+        if (typeof window.waseetAuth !== 'undefined' && typeof window.waseetAuth.initiateGoogleLogin === 'function') {
+            return await window.waseetAuth.initiateGoogleLogin({ redirect: true });
+        }
         return false;
     }
 }
+
+window.waseetSignInWithGoogle = waseetSignInWithGoogle;
+window.signInWithOAuth = waseetSignInWithGoogle;
 
 /**
  * تسجيل الخروج وإنهاء الجلسة الرسمية
@@ -138,6 +164,8 @@ async function waseetSignOut() {
     // إعادة تحميل خفيفة لتحديث الواجهة بالحالة الجديدة
     window.location.reload();
 }
+
+window.waseetSignOut = waseetSignOut;
 
 function enrichProfileWithBrokerStatus(profileRecord, extraSources = {}) {
     if (!profileRecord) return null;
