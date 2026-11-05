@@ -293,6 +293,8 @@ class WaseetApp {
      * معالجة الجلسة عند تحميل الصفحة وتثبيت مستمع onAuthStateChange
      */
     async initAuthSession() {
+        if (this._authSessionInitialized) return;
+        this._authSessionInitialized = true;
         console.log('[WaseetApp] Initializing Auth Session & Listener...');
         const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : (window.waseetSupabaseClient || null);
         if (!client || !client.auth) {

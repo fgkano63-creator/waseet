@@ -947,6 +947,7 @@
 
         @media (max-width: 640px) {
             #modal-withdrawal-request .modal-dialog,
+            #modal-escrow-details .modal-dialog,
             #modal-payment-method .modal-dialog {
                 max-height: 60vh !important;
                 overflow-y: auto !important;
@@ -1214,6 +1215,34 @@
             transform: translateY(-1px);
         }
 
+        .btn-escrow-details {
+            margin-top: 0.65rem;
+            width: 100%;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.84rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            background: rgba(234, 88, 12, 0.14);
+            border: 1px solid rgba(234, 88, 12, 0.45);
+            color: #fb923c;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-ar);
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+        .btn-escrow-details:hover {
+            background: rgba(234, 88, 12, 0.28);
+            border-color: #f97316;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+        }
+
         @media (max-width: 640px) {
             .admin-methods-list {
                 grid-template-columns: 1fr !important;
@@ -1411,6 +1440,9 @@
                     <div style="margin-top: 0.5rem; font-size: 0.76rem; color: var(--silver-muted);">
                         محمية في خزينة المنصة لحين استلام الحساب
                     </div>
+                    <button type="button" class="btn-escrow-details" id="btn-escrow-details" onclick="openEscrowDetailsModal()" title="عرض الصفقات التي تحجز نقاطك">
+                        <i class="fas fa-search-dollar text-orange"></i> أين حُجزت نقاطي؟ (تفاصيل الحجز)
+                    </button>
                 </div>
 
                 <div class="wallet-stat-card">
@@ -1877,6 +1909,50 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ================= Modal: تفاصيل النقاط المحجوزة في الصفقات (Escrow Breakdown Modal) ================= -->
+    <div class="modal-backdrop" id="modal-escrow-details" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10045; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(6px);">
+        <div class="card-3d modal-dialog" style="max-width: 580px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 1.4rem; position: relative; border: 1.5px solid rgba(234, 88, 12, 0.55); box-shadow: 0 20px 60px rgba(0,0,0,0.9); border-radius: 18px; background: linear-gradient(155deg, rgba(17, 24, 39, 0.98), rgba(11, 15, 25, 0.99));">
+            <!-- Modal Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1.1rem;">
+                <h3 style="margin: 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fas fa-shield-alt text-orange"></i>
+                    <span>أين حُجزت نقاطي؟ (تفاصيل صفقات Escrow)</span>
+                </h3>
+                <button type="button" onclick="closeEscrowDetailsModal()" style="background: none; border: none; color: var(--silver-muted); font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Banner info -->
+            <div style="background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+                <div>
+                    <span style="color: var(--silver-light); font-size: 0.78rem; display: block;">إجمالي النقاط المحجوزة في ذمة الوساطة:</span>
+                    <strong style="color: var(--orange-bright); font-size: 1.35rem; font-family: var(--font-en);"><span id="modal-escrow-total-locked">0</span> نقطة</strong>
+                </div>
+                <div style="text-align: left; font-size: 0.72rem; color: #34d399;">
+                    <i class="fas fa-lock"></i> محمية في خزينة المنصة الآمنة
+                </div>
+            </div>
+
+            <p style="color: var(--silver-muted); font-size: 0.82rem; line-height: 1.5; margin: 0 0 1rem 0;">
+                قائمة الصفقات الجارية التي قمت بشرائها، حيث تبقى النقاط محجوزة في الخزينة ولا تُسلم للبائع حتى تتأكد من استلام الحساب وتغيير بياناته بنجاح:
+            </p>
+
+            <!-- Deal items container -->
+            <div id="modal-escrow-deals-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.2rem;">
+                <!-- Populated dynamically by fetchAndRenderEscrowModalDeals() -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="display: flex; gap: 0.6rem; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.85rem; flex-wrap: wrap;">
+                <a href="deals.html" class="btn-3d btn-outline" style="padding: 0.55rem 1.1rem; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <i class="fas fa-external-link-alt text-gold"></i> الذهاب إلى صفحة قيد الشراء
+                </a>
+                <button type="button" class="btn-3d btn-primary" onclick="closeEscrowDetailsModal()" style="padding: 0.55rem 1.4rem; font-size: 0.84rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); color: #fff;">
+                    إغلاق
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2704,6 +2780,163 @@
             if (input) input.value = available;
         }
 
+        /* ================= Modal: تفاصيل النقاط المحجوزة (Escrow Breakdown) ================= */
+        async function openEscrowDetailsModal() {
+            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            if (!user || user.isGuest) {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول بحسابك أولاً للاطلاع على تفاصيل الصفقات المحجوزة.', 'warning');
+                } else {
+                    alert('يرجى تسجيل الدخول أولاً للاطلاع على تفاصيل الصفقات المحجوزة.');
+                }
+                return;
+            }
+
+            const modal = document.getElementById('modal-escrow-details');
+            if (modal) modal.style.display = 'flex';
+
+            const lockedPts = user.wallet ? Number(user.wallet.locked || 0) : 0;
+            const totalLockedEl = document.getElementById('modal-escrow-total-locked');
+            if (totalLockedEl) totalLockedEl.innerText = lockedPts;
+
+            await fetchAndRenderEscrowModalDeals();
+        }
+
+        function closeEscrowDetailsModal() {
+            const modal = document.getElementById('modal-escrow-details');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function fetchAndRenderEscrowModalDeals() {
+            const listEl = document.getElementById('modal-escrow-deals-list');
+            if (!listEl) return;
+
+            listEl.innerHTML = `
+                <div style="text-align: center; padding: 1.5rem 1rem; color: var(--silver-muted); font-size: 0.86rem;">
+                    <i class="fas fa-spinner fa-spin text-orange" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
+                    جاري جلب تفاصيل الصفقات وقيد الشراء من الخزينة الآمنة...
+                </div>
+            `;
+
+            let user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+
+            let activeDeals = [];
+
+            // 1. الاستعلام المباشر من قاعدة بيانات Supabase (جدول deals)
+            if (client && client.auth) {
+                try {
+                    const { data: sessionData } = await client.auth.getSession();
+                    const sessionUser = sessionData?.session?.user;
+                    const uid = sessionUser?.id || (user ? user.id : null);
+
+                    if (uid) {
+                        const { data, error } = await client
+                            .from('deals')
+                            .select('*')
+                            .eq('buyer_id', uid)
+                            .order('created_at', { ascending: false });
+
+                        if (!error && Array.isArray(data)) {
+                            // تصفية الصفقات غير المكتملة وغير الملغاة (التي تحجز رصيداً فعلياً)
+                            const openDeals = data.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
+                            openDeals.forEach(d => {
+                                activeDeals.push({
+                                    id: d.id,
+                                    title: d.account_title || d.title || 'حساب وسيط معتمد',
+                                    sellerPrice: Number(d.seller_price || 0),
+                                    fee: Number(d.fee || 0),
+                                    totalPoints: Number(d.total_points || (Number(d.seller_price || 0) + Number(d.fee || 0))),
+                                    status: d.status || 'in_progress',
+                                    stageText: d.stage_text || 'المرحلة 2: جاري فحص الحساب وتأمينه من الوسيط'
+                                });
+                            });
+                        }
+                    }
+                } catch (dbErr) {
+                    console.warn('[Escrow Details Modal Supabase Warn]', dbErr);
+                }
+            }
+
+            // 2. دمج أو استرجاع الصفقات النشطة من الذاكرة المحلية (WASEET_STATE.deals)
+            if (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.deals)) {
+                const uId = user ? String(user.id || '') : '';
+                const uName = user ? String(user.name || '') : '';
+                WASEET_STATE.deals.forEach(d => {
+                    if (!d || d.status === 'completed' || d.status === 'cancelled') return;
+                    const buyerMatches = (uId && (String(d.buyer_id) === uId || (d.buyer && String(d.buyer.id) === uId))) ||
+                                         (uName && d.buyer && d.buyer.name === uName);
+                    if (buyerMatches) {
+                        const exists = activeDeals.some(existing => String(existing.id) === String(d.id));
+                        if (!exists) {
+                            activeDeals.push({
+                                id: d.id,
+                                title: d.accountTitle || d.account_title || d.title || 'حساب وسيط معتمد',
+                                sellerPrice: Number(d.sellerPrice || 0),
+                                fee: Number(d.fee || 0),
+                                totalPoints: Number(d.totalPoints || d.total_points || (Number(d.sellerPrice || 0) + Number(d.fee || 0))),
+                                status: d.status || 'in_progress',
+                                stageText: d.stageText || d.stage_text || 'جاري فحص وتأمين الحساب من الوسيط'
+                            });
+                        }
+                    }
+                });
+            }
+
+            // 3. عرض النتيجة في واجهة النافذة المنبثقة
+            if (activeDeals.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 1.8rem 1rem; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.2rem; margin-bottom: 0.6rem; display: block;"></i>
+                        <h4 style="color: #fff; margin: 0 0 0.3rem; font-size: 1rem;">لا توجد صفقات تحجز نقاطك حالياً</h4>
+                        <p style="color: var(--silver-muted); font-size: 0.82rem; margin: 0 0 1rem 0;">كافة نقاط محفظتك متاحة للشراء الفوري أو سحب الأرباح.</p>
+                        <a href="deals.html" class="btn-3d btn-gold" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 1rem; font-size: 0.82rem; text-decoration: none;">
+                            <i class="fas fa-crown"></i> تصفح صفحة قيد الشراء
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = activeDeals.map(deal => {
+                const dealId = escapeSafe(deal.id);
+                const title = escapeSafe(deal.title);
+                const stage = escapeSafe(deal.stageText);
+                const pts = Number(deal.totalPoints || 0);
+
+                return `
+                    <div style="background: rgba(8, 12, 22, 0.85); border: 1px solid rgba(234, 88, 12, 0.35); border-radius: 12px; padding: 0.85rem 0.95rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <div style="min-width: 0; flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem;">
+                                <span style="background: rgba(234, 88, 12, 0.2); color: var(--orange-bright); font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 6px; font-family: var(--font-en);">
+                                    #${dealId}
+                                </span>
+                                <strong style="color: #fff; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 250px;" title="${title}">
+                                    ${title}
+                                </strong>
+                            </div>
+                            <div style="color: var(--silver-muted); font-size: 0.78rem; display: flex; align-items: center; gap: 0.35rem;">
+                                <i class="fas fa-clock text-gold"></i>
+                                <span>${stage}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                            <div style="text-align: left;">
+                                <div style="font-size: 0.7rem; color: var(--silver-muted);">النقاط المحجوزة:</div>
+                                <strong style="color: var(--orange-bright); font-size: 1.15rem; font-family: var(--font-en); font-weight: 900;">${pts} <span style="font-size: 0.75rem;">نقطة</span></strong>
+                            </div>
+                            <a href="chat.html?dealId=${encodeURIComponent(deal.id)}" class="btn-3d btn-orange" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 8px;">
+                                <i class="fas fa-comments"></i> غرفة الوساطة
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.openEscrowDetailsModal = openEscrowDetailsModal;
+        window.closeEscrowDetailsModal = closeEscrowDetailsModal;
+
         async function handleWithdrawalFormSubmit(e) {
             e.preventDefault();
             const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
@@ -2921,6 +3154,18 @@
             document.getElementById('ui-available-pts').innerText = available;
             document.getElementById('ui-locked-pts').innerText = locked;
             document.getElementById('ui-total-pts').innerText = total;
+
+            const escrowBtn = document.getElementById('btn-escrow-details');
+            if (escrowBtn) {
+                if (locked > 0) {
+                    escrowBtn.innerHTML = `<i class="fas fa-search-dollar text-orange"></i> أين حُجزت نقاطي؟ (${locked} نقطة)`;
+                    escrowBtn.title = 'عرض تفاصيل الصفقات وقيد الشراء التي تحجز نقاطك';
+                } else {
+                    escrowBtn.innerHTML = `<i class="fas fa-check-circle" style="color: #34d399;"></i> لا توجد نقاط محجوزة حالياً`;
+                    escrowBtn.title = 'كافة نقاط محفظتك متاحة للشراء الفوري أو السحب';
+                }
+            }
+
             renderEscrowLockedDeals(user);
 
             const navPts = document.getElementById('wallet-total-pts');
