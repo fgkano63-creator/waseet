@@ -773,7 +773,7 @@
                     return r;
                 }).filter(Boolean);
 
-                activeCount = activeAccounts.length;
+                activeCount = activeAccounts.filter(a => a.status === 'available' || a.status === 'approved').length;
 
                 // تحديث الواجهة
                 renderProfileView({
@@ -852,8 +852,47 @@
             document.getElementById('stat-active-count').textContent = data.activeCount;
             document.getElementById('storefront-counter-pill').textContent = data.activeCount + ' حساب متاح';
 
+            // تطبيق فخامة المستوى النحاسي (Copper Level Styling)
+            const heroCard = document.querySelector('.profile-hero-card');
+            if (heroCard) heroCard.classList.add('tier-copper-card');
+            const avatarWrap = document.querySelector('.profile-avatar-wrap');
+            if (avatarWrap) avatarWrap.classList.add('tier-copper-wrap');
+
+            // تفعيل التمرير السلس Lenis
+            initStoreLenis();
+
             // رسم شبكة الحسابات المعروضة
             renderStorefrontGrid(data.listings);
+
+            // تشغيل حركة الدخول الفخمة عبر GSAP
+            if (window.gsap) {
+                try {
+                    gsap.from('.profile-hero-card', {
+                        y: 35,
+                        opacity: 0,
+                        duration: 0.85,
+                        ease: 'power3.out'
+                    });
+                    gsap.from('.profile-stat-box', {
+                        y: 25,
+                        opacity: 0,
+                        duration: 0.65,
+                        stagger: 0.1,
+                        ease: 'power2.out',
+                        delay: 0.15
+                    });
+                    gsap.from('.account-card-3d', {
+                        y: 30,
+                        opacity: 0,
+                        duration: 0.7,
+                        stagger: 0.08,
+                        ease: 'power3.out',
+                        delay: 0.25
+                    });
+                } catch (e) {
+                    console.warn('[GSAP] Error in entrance animation:', e);
+                }
+            }
         }
 
         /* ── رسم شبكة الحسابات المعروضة ── */
@@ -891,10 +930,20 @@
                     primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff;"><i class="fas fa-award"></i> ${esc(acc.badge)}</div>`;
                 }
 
+                const isSold = acc.status === 'sold' || acc.status === 'completed';
+                const soldStampHtml = isSold
+                    ? `<div class="sold-out-stamp-badge"><i class="fas fa-ban"></i> تم البيع</div>`
+                    : '';
+                const cardClass = isSold ? 'account-card-3d card-3d is-sold' : 'account-card-3d card-3d';
+                const actionBtnHtml = isSold
+                    ? `<button class="btn-3d" disabled style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); color: #94a3b8; cursor: not-allowed; opacity: 0.85;" title="هذا الحساب تم بيعه بالكامل"><i class="fas fa-lock"></i> تم البيع (مغلق)</button>`
+                    : `<button class="btn-3d btn-orange" onclick="ProfileStore.requestEscrow('${acc.id}')"><i class="fas fa-shield-alt"></i> طلب وساطة</button>`;
+
                 return `
-                    <div class="account-card-3d card-3d">
+                    <div class="${cardClass}">
                         <div class="card-media" onclick="ProfileStore.openModal('${acc.id}')" style="cursor: pointer;" title="انقر لعرض كامل الصور والمواصفات">
                             <img src="${esc(imagesList[0])}" alt="${esc(acc.title)}" class="card-img" onerror="this.onerror=null; this.src='assets/logo.png'; this.style.objectFit='contain';">
+                            ${soldStampHtml}
                             ${primeBadgeHtml}
                             <div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${accNum}</div>
                             <div class="level-tag">Lv. ${acc.level || 50}</div>
@@ -914,9 +963,7 @@
                                     <span class="price-sub">صافي البائع: ${price.sellerPrice} نقطة</span>
                                     <span class="price-main">${price.buyerPrice} <small style="font-size: 0.72em;">نقطة</small></span>
                                 </div>
-                                <button class="btn-3d btn-orange" onclick="ProfileStore.requestEscrow('${acc.id}')">
-                                    <i class="fas fa-shield-alt"></i> طلب وساطة
-                                </button>
+                                ${actionBtnHtml}
                             </div>
                         </div>
                     </div>
@@ -995,10 +1042,26 @@
                 notesEl.style.display = 'none';
             }
 
-            buyBtn.onclick = () => {
-                closeModal();
-                requestEscrow(acc.id);
-            };
+            if (acc.status === 'sold' || acc.status === 'completed') {
+                buyBtn.disabled = true;
+                buyBtn.innerHTML = '<i class="fas fa-lock"></i> تم البيع بنجاح (مغلق)';
+                buyBtn.style.background = 'rgba(255, 255, 255, 0.08)';
+                buyBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                buyBtn.style.color = '#94a3b8';
+                buyBtn.style.cursor = 'not-allowed';
+                buyBtn.onclick = null;
+            } else {
+                buyBtn.disabled = false;
+                buyBtn.innerHTML = '<i class="fas fa-shield-alt"></i> طلب وساطة وشراء الحساب';
+                buyBtn.style.background = '';
+                buyBtn.style.borderColor = '';
+                buyBtn.style.color = '';
+                buyBtn.style.cursor = '';
+                buyBtn.onclick = () => {
+                    closeModal();
+                    requestEscrow(acc.id);
+                };
+            }
 
             renderModalGallery();
             modal.style.display = 'flex';
@@ -1050,6 +1113,15 @@
         async function requestEscrow(accountId) {
             const acc = activeAccounts.find(a => a.id === accountId);
             if (!acc) return;
+
+            if (acc.status === 'sold' || acc.status === 'completed') {
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('حساب مباع', 'هذا الحساب تم بيعه مسبقاً وغير متاح للشراء.', 'info');
+                } else {
+                    alert('هذا الحساب تم بيعه مسبقاً وغير متاح للشراء.');
+                }
+                return;
+            }
 
             // التحقق من تسجيل الدخول
             const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;

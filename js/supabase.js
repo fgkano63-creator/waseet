@@ -585,6 +585,14 @@ window.waseetApplyLiveRoleUpdateToUI = waseetApplyLiveRoleUpdateToUI;
 function waseetShowRoleUpgradeToast(user) {
     try {
         if (!user || typeof document === 'undefined') return;
+        const toastKey = 'waseet_upgrade_toast_shown_' + (user.id || user.email || 'user') + '_' + (user.role || 'broker');
+        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(toastKey)) {
+            return; // تم عرضه مسبقاً في هذه الجلسة — منع التكرار المزعج
+        }
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(toastKey, 'true');
+        }
+
         const existing = document.getElementById('waseet-role-upgrade-toast');
         if (existing) existing.remove();
 
@@ -595,18 +603,19 @@ function waseetShowRoleUpgradeToast(user) {
 
         const toast = document.createElement('div');
         toast.id = 'waseet-role-upgrade-toast';
-        toast.style.cssText = 'position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10040;background:linear-gradient(135deg, rgba(16,185,129,0.96), rgba(13,20,33,0.98));border:1px solid #34d399;border-radius:14px;padding:0.85rem 1.25rem;color:#fff;box-shadow:0 18px 45px rgba(0,0,0,0.65);display:flex;align-items:center;gap:0.75rem;max-width:92vw;font-family:inherit;direction:rtl;';
+        toast.style.cssText = 'position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10040;background:linear-gradient(135deg, rgba(16,185,129,0.96), rgba(13,20,33,0.98));border:1px solid #34d399;border-radius:14px;padding:0.75rem 1.15rem;color:#fff;box-shadow:0 18px 45px rgba(0,0,0,0.65);display:flex;align-items:center;gap:0.75rem;max-width:92vw;font-family:inherit;direction:rtl;';
         toast.innerHTML = `
-            <i class="fas fa-user-shield" style="font-size:1.45rem;color:#fde047;"></i>
-            <div>
-                <div style="font-weight:800;font-size:0.92rem;color:#fff;">🎉 تم تحديث جلستك وترقية رتبتك تلقائياً!</div>
-                <div style="font-size:0.8rem;color:#d1fae5;margin-top:2px;">أنت الآن <strong>${roleTitle}</strong> — تم تفعيل جميع أدوات الوساطة فوراً.</div>
+            <i class="fas fa-user-shield" style="font-size:1.4rem;color:#fde047;"></i>
+            <div style="flex:1;">
+                <div style="font-weight:800;font-size:0.9rem;color:#fff;">🎉 تم تحديث جلستك وترقية رتبتك تلقائياً!</div>
+                <div style="font-size:0.78rem;color:#d1fae5;margin-top:2px;">أنت الآن <strong>${roleTitle}</strong> — تم تفعيل جميع أدوات الوساطة فوراً.</div>
             </div>
+            <button type="button" onclick="this.closest('#waseet-role-upgrade-toast').remove()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;opacity:0.8;padding:0 4px;margin-right:4px;" title="إغلاق">&times;</button>
         `;
         document.body.appendChild(toast);
         setTimeout(() => {
             if (toast && toast.parentNode) toast.remove();
-        }, 5500);
+        }, 4000);
     } catch (e) {}
 }
 
@@ -4153,13 +4162,13 @@ function waseetInitLiveRoleAndSessionSync() {
         }
     });
 
-    // 4. فحص دوري خفيف بالخلفية كل 5 ثوانٍ لضمان انعكاس الترقية حتى لو لم يكن Realtime مفعلاً على الجدول
+    // 4. فحص دوري خفيف بالخلفية كل 30 ثانية كاحتياط إضافي لضمان انعكاس الترقية حتى لو لم يكن Realtime مفعلاً
     setInterval(() => {
         if (document.hidden) return;
         if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && !WASEET_STATE.user.isGuest) {
             waseetSyncAuthState({ force: true, profileOnly: true });
         }
-    }, 5000);
+    }, 30000);
 }
 
 window.waseetInitLiveRoleAndSessionSync = waseetInitLiveRoleAndSessionSync;

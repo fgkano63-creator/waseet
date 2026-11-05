@@ -308,7 +308,7 @@
             // Mark scrollable modals & drawers with data-lenis-prevent
             const markPreventContainers = () => {
                 document.querySelectorAll(
-                    '.modal-box, .mobile-drawer, .mobile-drawer-sidebar, .chat-messages, .support-chat-messages, #pending-accounts-list-container'
+                    '.modal-box, .modal-box-3d, .cards-deck-modal-box, .modal-overlay, .modal-body, .store-modal-card, .mobile-drawer, .mobile-drawer-sidebar, .chat-messages, .support-chat-messages, #pending-accounts-list-container, #inspect-account-modal-body, [class*="modal"]'
                 ).forEach((el) => {
                     if (!el.hasAttribute('data-lenis-prevent')) {
                         el.setAttribute('data-lenis-prevent', 'true');
@@ -317,13 +317,32 @@
             };
             markPreventContainers();
 
+            // إيقاف اعتراض عجلة الماوس داخل أي نافذة منبثقة أو درج جانبي
+            document.addEventListener('wheel', (e) => {
+                if (e.target && e.target.closest && e.target.closest('.modal-overlay, .modal-box, .modal-box-3d, .cards-deck-modal-box, .store-modal-card, .mobile-drawer, [data-lenis-prevent]')) {
+                    e.stopPropagation();
+                }
+            }, { passive: true, capture: true });
+
             const lenis = new window.Lenis({
                 autoRaf: typeof window.gsap === 'undefined',
                 duration: 1.12,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                 smoothWheel: true,
                 wheelMultiplier: 1.0,
-                touchMultiplier: 1.5
+                touchMultiplier: 1.5,
+                prevent: (node) => {
+                    return !!(node && node.nodeType === 1 && (
+                        node.hasAttribute('data-lenis-prevent') ||
+                        node.closest('[data-lenis-prevent]') ||
+                        node.closest('.modal-overlay') ||
+                        node.closest('.modal-box') ||
+                        node.closest('.modal-box-3d') ||
+                        node.closest('.cards-deck-modal-box') ||
+                        node.closest('.store-modal-card') ||
+                        node.closest('.mobile-drawer')
+                    ));
+                }
             });
 
             window.waseetLenis = lenis;
