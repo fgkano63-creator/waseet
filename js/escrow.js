@@ -1163,7 +1163,7 @@ class WaseetEscrowRoom {
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرّف:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                     <code style="color: #facc15; font-size: 0.88rem; font-weight: 700; word-break: break-all;">${safeEmail}</code>
-                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeEmail}', 'تم نسخ البريد')" title="نسخ البريد"><i class="far fa-copy"></i></button>
+                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerEmail()" title="نسخ البريد"><i class="far fa-copy"></i></button>
                                 </div>
                             </div>
                             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
@@ -1171,8 +1171,8 @@ class WaseetEscrowRoom {
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                     <code id="hero-buyer-pwd" style="color: #34d399; font-size: 0.92rem; font-weight: 800; letter-spacing: 1px;">••••••••••••</code>
                                     <div style="display: flex; gap: 0.25rem;">
-                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('${rawPwd}', 'hero-buyer-pwd', 'hero-buyer-eye')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-eye"></i></button>
-                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور"><i class="far fa-copy"></i></button>
+                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('hero-buyer-pwd', 'hero-buyer-eye')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-eye"></i></button>
+                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerPassword()" title="نسخ كلمة المرور"><i class="far fa-copy"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -1180,14 +1180,14 @@ class WaseetEscrowRoom {
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                     <span style="color: #fff; font-size: 0.82rem; word-break: break-all;">${safeBackup}</span>
-                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeBackup}', 'تم نسخ الملاحظات')" title="نسخ"><i class="far fa-copy"></i></button>
+                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerBackup()" title="نسخ"><i class="far fa-copy"></i></button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-3d btn-gold glow-gold" style="flex: 2; min-width: 190px; padding: 0.7rem 1.1rem; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="window.escrowRoom.copyAllCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeBackup}')">
+                        <button type="button" class="btn-3d btn-gold glow-gold" style="flex: 2; min-width: 190px; padding: 0.7rem 1.1rem; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="window.escrowRoom.copyAllCredentialsFromDeal()">
                             <i class="fas fa-clipboard-check"></i>
                             <span>نسخ كافة بيانات الدخول</span>
                         </button>
@@ -2219,7 +2219,7 @@ class WaseetEscrowRoom {
                             <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرف:</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span class="cred-value font-mono text-gold" id="modal-buyer-email" style="font-weight: 700;">${safeEmail}</span>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeEmail}', 'تم نسخ البريد الإلكتروني')" title="نسخ البريد">
+                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerEmail()" title="نسخ البريد">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -2229,10 +2229,10 @@ class WaseetEscrowRoom {
                             <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span class="cred-value font-mono" id="modal-buyer-pwd" style="color: #10b981; font-weight: 700;">••••••••••••</span>
-                                <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('${rawPwd}', 'modal-buyer-pwd', 'modal-buyer-eye')" title="إظهار / إخفاء">
+                                <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('modal-buyer-pwd', 'modal-buyer-eye')" title="إظهار / إخفاء">
                                     <i class="fas fa-eye" id="modal-buyer-eye"></i>
                                 </button>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور">
+                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerPassword()" title="نسخ كلمة المرور">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -2242,7 +2242,7 @@ class WaseetEscrowRoom {
                             <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span class="cred-value font-mono text-silver" style="font-size: 0.85rem;">${safeBackup}</span>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyCredText('${safeBackup}', 'تم نسخ الملاحظات')" title="نسخ">
+                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerBackup()" title="نسخ">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -2255,7 +2255,7 @@ class WaseetEscrowRoom {
                     </div>
 
                     <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="window.escrowRoom.copyAllCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeBackup}')">
+                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="window.escrowRoom.copyAllCredentialsFromDeal()">
                             <i class="fas fa-clipboard-check"></i> نسخ كافة البيانات
                         </button>
                         <a href="my-accounts.html?tab=purchases" class="btn-3d btn-outline" style="padding: 0.75rem 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
@@ -2300,9 +2300,21 @@ class WaseetEscrowRoom {
         }
     }
 
-    toggleBuyerCredPassword(rawPwd, elId = 'buyer-cred-pwd', eyeId = 'buyer-cred-eye') {
-        const pwdEl = document.getElementById(elId);
-        const eyeEl = document.getElementById(eyeId);
+    toggleBuyerCredPassword(rawPwdOrElId, elId = 'buyer-cred-pwd', eyeId = 'buyer-cred-eye') {
+        let rawPwd = '';
+        let targetElId = elId;
+        let targetEyeId = eyeId;
+
+        if (arguments.length <= 2 && typeof rawPwdOrElId === 'string' && !rawPwdOrElId.includes('••••')) {
+            targetElId = rawPwdOrElId || 'buyer-cred-pwd';
+            targetEyeId = elId || 'buyer-cred-eye';
+            rawPwd = (this.deal && this.deal.credentials && (this.deal.credentials.rawPassword || this.deal.credentials.password)) || '';
+        } else {
+            rawPwd = rawPwdOrElId || (this.deal && this.deal.credentials && (this.deal.credentials.rawPassword || this.deal.credentials.password)) || '';
+        }
+
+        const pwdEl = document.getElementById(targetElId);
+        const eyeEl = document.getElementById(targetEyeId);
         if (!pwdEl) return;
         if (pwdEl.innerText.includes('•')) {
             pwdEl.innerText = rawPwd;
@@ -2311,6 +2323,31 @@ class WaseetEscrowRoom {
             pwdEl.innerText = '••••••••••••';
             if (eyeEl) { eyeEl.classList.remove('fa-eye-slash'); eyeEl.classList.add('fa-eye'); }
         }
+    }
+
+    copyBuyerEmail() {
+        const email = (this.deal && this.deal.credentials && this.deal.credentials.email) || '';
+        this.copyCredText(email, 'تم نسخ البريد');
+    }
+
+    copyBuyerPassword() {
+        const pwd = (this.deal && this.deal.credentials && (this.deal.credentials.rawPassword || this.deal.credentials.password)) || '';
+        this.copyCredText(pwd, 'تم نسخ كلمة المرور');
+    }
+
+    copyBuyerBackup() {
+        const creds = (this.deal && this.deal.credentials) || {};
+        const backup = creds.backupCodes || creds.recoveryEmail || creds.notes || '';
+        this.copyCredText(backup, 'تم نسخ الملاحظات');
+    }
+
+    copyAllCredentialsFromDeal() {
+        const creds = (this.deal && this.deal.credentials) || {};
+        const loginType = creds.loginType || 'جوجل Gmail';
+        const email = creds.email || '';
+        const pwd = creds.rawPassword || creds.password || '';
+        const backup = creds.backupCodes || creds.recoveryEmail || creds.notes || 'لا توجد أكواد إضافية';
+        this.copyAllCredentials(loginType, email, pwd, backup);
     }
 
     async copyCredText(text, successMsg = 'تم النسخ بنجاح') {

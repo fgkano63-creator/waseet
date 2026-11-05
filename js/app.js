@@ -182,31 +182,14 @@ class WaseetApp {
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         }
 
-        // إظهار زر إشراف الوساطة الأنيق للوسيط الإقليمي في الشريط العلوي الموحد
-        if (userNavMiddle) {
-            let brokerBtn = document.getElementById('broker-supervision-nav-btn');
-            if (isBroker) {
-                if (!brokerBtn) {
-                    brokerBtn = document.createElement('a');
-                    brokerBtn.id = 'broker-supervision-nav-btn';
-                    brokerBtn.href = 'pending-accounts.html';
-                    brokerBtn.className = 'btn-nav-middle btn-broker-supervision';
-                    brokerBtn.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;';
-                    brokerBtn.title = 'لوحة فحص الحسابات وإشراف الوساطة الإقليمية';
-                    const countryBadge = (user && user.country) ? ` (${String(user.country).toUpperCase()})` : '';
-                    brokerBtn.innerHTML = `<i class="fas fa-user-shield text-emerald"></i> <span>إشراف الوساطة${countryBadge}</span>`;
-                    userNavMiddle.appendChild(brokerBtn);
-                } else {
-                    brokerBtn.style.display = 'inline-flex';
-                }
-            } else if (brokerBtn) {
-                brokerBtn.style.display = 'none';
-            }
-        }
-
-        // شريط إشراف الوسيط الإقليمي المعتمد
-        if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+        // دمج أزرار الإشراف في الشريط العلوي الأساسي الموحد (Navbar Unification)
+        if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
+            window.waseetRenderUnifiedBrokerNavLinks(user);
+        } else if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
             window.waseetRenderBrokerSupervisionBanner(user);
+        } else {
+            const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
+            if (existingSubBar) existingSubBar.remove();
         }
 
         // شارات المدير والوسيط في الشريط العلوي (تختفي تماماً إذا كان العدد 0)
@@ -1247,7 +1230,7 @@ class WaseetApp {
                             <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم الحساب:</span>
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                                 <code style="color: #fff; font-size: 0.95rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && acc.credentials.email_or_phone) || 'غير مدخل'}</code>
-                                <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.email_or_phone) || ''}', 'تم نسخ البريد / رقم الحساب')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckEmail('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -1278,7 +1261,7 @@ class WaseetApp {
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                                     <code style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && acc.credentials.recovery_email) || 'غير مضاف'}</code>
-                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${(acc.credentials && acc.credentials.recovery_email) || ''}', 'تم نسخ حساب الاسترداد')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                    <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckRecoveryEmail('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -2510,6 +2493,7 @@ class WaseetApp {
 
         const pricing = calculateWaseetFee(acc.sellerPrice);
         const creds = acc.credentials || {};
+        this.currentInspectCredentials = creds;
 
         let statusText = 'قيد الفحص (أقل من 24 ساعة)';
         let statusColor = '#f59e0b';
@@ -2590,7 +2574,7 @@ class WaseetApp {
                         <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم الحساب:</span>
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                             <code style="color: #fff; font-size: 0.95rem; font-weight: 700; word-break: break-all; font-family: monospace;">${creds.email_or_phone || 'غير مسجل'}</code>
-                            <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${creds.email_or_phone || ''}', 'تم نسخ البريد / رقم الحساب')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                            <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectEmail()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -2600,10 +2584,10 @@ class WaseetApp {
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                             <span id="inspect-modal-pw" style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
                             <div style="display: flex; gap: 0.3rem;">
-                                <button class="btn-3d btn-outline" id="btn-toggle-inspect-pw" onclick="window.waseetApp.toggleInspectPassword('${creds.password || ''}')" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
+                                <button class="btn-3d btn-outline" id="btn-toggle-inspect-pw" onclick="window.waseetApp.toggleInspectPassword()" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn-3d btn-outline" onclick="window.waseetApp.copyToClipboard('${creds.password || ''}', 'تم نسخ كلمة المرور')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectPassword()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -2712,7 +2696,7 @@ class WaseetApp {
         if (lightbox) lightbox.classList.add('active');
     }
 
-    toggleInspectPassword(password) {
+    toggleInspectPassword(explicitPassword) {
         const pwEl = document.getElementById('inspect-modal-pw');
         const btn = document.getElementById('btn-toggle-inspect-pw');
         if (!pwEl) return;
@@ -2722,11 +2706,34 @@ class WaseetApp {
             pwEl.setAttribute('data-shown', 'false');
             if (btn) btn.innerHTML = '<i class="fas fa-eye"></i>';
         } else {
-            pwEl.innerText = password || 'غير مسجل';
+            const pwd = explicitPassword || (this.currentInspectCredentials && this.currentInspectCredentials.password) || 'غير مسجل';
+            pwEl.innerText = pwd;
             pwEl.style.letterSpacing = 'normal';
             pwEl.setAttribute('data-shown', 'true');
             if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
         }
+    }
+
+    copyInspectEmail() {
+        const email = (this.currentInspectCredentials && this.currentInspectCredentials.email_or_phone) || '';
+        this.copyToClipboard(email, 'تم نسخ البريد / رقم الحساب');
+    }
+
+    copyInspectPassword() {
+        const pwd = (this.currentInspectCredentials && this.currentInspectCredentials.password) || '';
+        this.copyToClipboard(pwd, 'تم نسخ كلمة المرور');
+    }
+
+    copyDeckEmail(accId) {
+        const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accId));
+        const email = (acc && acc.credentials && acc.credentials.email_or_phone) || '';
+        this.copyToClipboard(email, 'تم نسخ البريد / رقم الحساب');
+    }
+
+    copyDeckRecoveryEmail(accId) {
+        const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accId));
+        const rec = (acc && acc.credentials && acc.credentials.recovery_email) || '';
+        this.copyToClipboard(rec, 'تم نسخ حساب الاسترداد');
     }
 
     copyToClipboard(text, successMsg = 'تم النسخ بنجاح!') {

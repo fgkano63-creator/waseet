@@ -563,19 +563,20 @@
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
                 if (drawerDeposits) drawerDeposits.style.display = 'flex';
             } else if (isBroker) {
-                if (userNavMiddle) userNavMiddle.style.display = 'none';
-                if (adminNavMiddle) adminNavMiddle.style.display = 'flex';
-                if (defaultWalletPill && window.innerWidth > 900) defaultWalletPill.style.display = 'none';
-                if (adminWalletPill) adminWalletPill.style.display = 'inline-flex';
+                if (userNavMiddle) userNavMiddle.style.display = 'flex';
+                if (adminNavMiddle) adminNavMiddle.style.display = 'none';
+                if (defaultWalletPill) defaultWalletPill.style.display = user ? 'inline-flex' : 'none';
+                if (adminWalletPill) adminWalletPill.style.display = 'none';
 
-                document.querySelectorAll('.btn-nav-admin').forEach(el => {
-                    const href = String(el.getAttribute('href') || '');
-                    const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
-                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
-                });
-                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
+                if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
+                    window.waseetRenderUnifiedBrokerNavLinks(user);
+                }
+                const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
+                if (existingSubBar) existingSubBar.remove();
+
                 const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
                 if (drawerBrokers) drawerBrokers.style.display = 'flex';
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');

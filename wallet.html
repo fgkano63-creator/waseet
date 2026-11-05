@@ -2938,18 +2938,19 @@
                     loadAdminPaymentMethods();
                 }
             } else if (isBroker) {
-                if (userNav) userNav.style.display = 'none';
-                if (adminNav) adminNav.style.display = 'flex';
+                if (userNav) userNav.style.display = 'flex';
+                if (adminNav) adminNav.style.display = 'none';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'none';
                 if (drawerBrokersLink) drawerBrokersLink.style.display = 'flex';
-                document.querySelectorAll('.btn-nav-admin').forEach(el => {
-                    const href = String(el.getAttribute('href') || '');
-                    const isStrictAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
-                    el.style.display = isStrictAdminOnly ? 'none' : (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '');
-                });
-                document.querySelectorAll('[data-admin-only]').forEach(el => {
+                document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
+                if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
+                    window.waseetRenderUnifiedBrokerNavLinks(user);
+                }
+                const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
+                if (existingSubBar) existingSubBar.remove();
+
                 // الوسيط: إخفاء شاشة الشحن العادية وتفعيل لوحة تحكم وتغيير البطاقات الخاصة به فوراً
                 if (userDepositPanel) userDepositPanel.style.display = 'none';
                 if (adminManagerPanel) {

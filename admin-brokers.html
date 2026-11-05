@@ -29,7 +29,7 @@
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
     <!-- EmailJS SDK for Broker Automated Notifications -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css?v=20261026_v1">
@@ -355,9 +355,9 @@
             <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 2.2rem; color: #ef4444;">
                 <i class="fas fa-user-lock"></i>
             </div>
-            <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 0.6rem;">صلاحية مخصصة للمدير العام فقط</h2>
+            <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 0.6rem;">صلاحية مخصصة للمدير العام والوسطاء المعتمدين</h2>
             <p style="color: var(--silver-muted); font-size: 0.95rem; line-height: 1.8; max-width: 520px; margin: 0 auto 1.8rem;">
-                عذراً، هذه الصفحة تتطلب صلاحيات المدير العام (Admin) لإدارة وتعيين الوسطاء الإقليميين وضبط تقسيم العمولات.
+                عذراً، تتطلب هذه الصفحة صلاحيات المدير العام (Admin) أو رتبة وسيط إقليمي معتمد (Regional Broker).
             </p>
             <a href="index.html" class="btn-3d btn-orange" style="text-decoration: none; padding: 0.75rem 1.6rem;">
                 <i class="fas fa-store"></i> العودة للمتجر الرئيسي
@@ -1234,8 +1234,9 @@
             // 1. فحص وجود عميل Supabase
             const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
             if (!client || !client.auth) {
-                console.warn('[RBAC] Supabase client not available. Redirecting to home...');
-                window.location.href = 'index.html';
+                console.warn('[RBAC] Supabase client not available.');
+                if (deniedBox) deniedBox.style.display = 'block';
+                if (mainContainer) mainContainer.style.display = 'block';
                 return false;
             }
 
@@ -1243,41 +1244,89 @@
                 // 2. التحقق من وجود جلسة نشطة للمستخدم
                 const { data: { session }, error: sessionError } = await client.auth.getSession();
                 if (sessionError || !session || !session.user) {
-                    console.warn('[RBAC] No active session found. Redirecting to home...');
-                    window.location.href = 'index.html';
+                    console.warn('[RBAC] No active session found.');
+                    if (deniedBox) deniedBox.style.display = 'block';
+                    if (mainContainer) mainContainer.style.display = 'block';
                     return false;
                 }
 
                 const userId = session.user.id;
                 const userEmail = (session.user.email || '').toLowerCase().trim();
 
-                // 3. الاستعلام المباشر والصارم عن دور المستخدم (role) من جدول profiles في Supabase
-                const { data: profile, error: profileError } = await client
-                    .from('profiles')
-                    .select('id, email, role, is_admin')
-                    .eq('id', userId)
-                    .maybeSingle();
+                // 3. الاستعلام الشامل عن دور المستخدم من جدول profiles
+                let profile = null;
+                try {
+                    const { data: profData } = await client
+                        .from('profiles')
+                        .select('id, email, name, role, is_admin, avatar_url, country')
+                        .eq('id', userId)
+                        .maybeSingle();
+                    profile = profData;
+                } catch (pErr) {
+                    console.warn('[RBAC] profiles fetch error:', pErr);
+                }
 
-                const role = (profile && profile.role) ? profile.role : (session.user.role || 'user');
-                const isAdminFlag = (profile && (profile.is_admin === true || profile.role === 'admin')) || session.user.isAdmin === true;
+                const rawRole = (profile && profile.role) ? String(profile.role).toLowerCase().trim() : '';
+                const sessionMetaRole = String(session.user.user_metadata?.role || session.user.role || '').toLowerCase().trim();
+                const isAdminFlag = (profile && (profile.is_admin === true || profile.role === 'admin')) ||
+                    session.user.isAdmin === true ||
+                    Boolean(session.user.user_metadata && session.user.user_metadata.is_admin === true);
                 const isEmailAdmin = (userEmail === 'fgkano63@gmail.com' || userEmail === 'saadani2009@gmail.com' || userEmail === 'mediator@waseet.com');
-                const isBrokerUser = (role === 'broker' || role === 'regional_broker' || (profile && (profile.is_broker === true || profile.isBroker === true)) || session.user.isBroker === true);
-                const isRealAdmin = isAdminFlag || role === 'admin' || isEmailAdmin;
+                const isRealAdmin = isAdminFlag || rawRole === 'admin' || isEmailAdmin;
 
-                // السماح للمدير العام وللوسيط الإقليمي المعتمد بالدخول إلى لوحة الوساطة الإقليمية
+                // التحقق الشامل والصريح من رتبة الوسيط المعتمد (broker / regional_broker)
+                const avatarMeta = (typeof parseBrokerAvatarMeta === 'function')
+                    ? parseBrokerAvatarMeta(profile?.avatar_url || session.user.user_metadata?.avatar_url)
+                    : { isBrokerTagged: false };
+
+                let isCachedBroker = false;
+                try {
+                    const cachedBrokers = (typeof getCachedRegionalBrokersList === 'function')
+                        ? getCachedRegionalBrokersList()
+                        : JSON.parse(localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE') || '[]');
+                    if (Array.isArray(cachedBrokers)) {
+                        isCachedBroker = cachedBrokers.some(b => b && b.is_active !== false && (
+                            (b.id && String(b.id) === String(userId)) ||
+                            (b.email && String(b.email).toLowerCase().trim() === userEmail)
+                        ));
+                    }
+                } catch (cErr) {}
+
+                const stateUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+                const isStateBroker = stateUser && (stateUser.role === 'broker' || stateUser.role === 'regional_broker' || stateUser.isBroker === true);
+
+                const isBrokerUser = !isRealAdmin && (
+                    rawRole === 'broker' ||
+                    rawRole === 'regional_broker' ||
+                    sessionMetaRole === 'broker' ||
+                    sessionMetaRole === 'regional_broker' ||
+                    (profile && (profile.is_broker === true || profile.isBroker === true)) ||
+                    session.user.isBroker === true ||
+                    avatarMeta.isBrokerTagged ||
+                    isCachedBroker ||
+                    isStateBroker
+                );
+
+                // السماح للمدير العام وللوسيط الإقليمي بالبقاء بالصفحة وإلغاء أمر الطرد التلقائي تماماً
                 if (!isRealAdmin && !isBrokerUser) {
-                    console.warn('[RBAC] Access denied: User is neither an admin nor a broker. Role:', role);
+                    console.warn('[RBAC] Access denied: User is neither an admin nor a broker. Role:', rawRole || 'user');
                     if (deniedBox) deniedBox.style.display = 'block';
                     if (mainContent) mainContent.style.display = 'none';
-                    window.location.href = 'index.html';
+                    if (mainContainer) mainContainer.style.display = 'block';
+                    // تم إلغاء window.location.href = 'index.html' نهائياً لمنع طرد الوسيط أو التوجيه القسري
                     return false;
                 }
 
-                // 4. تطبيق الأنماط وعرض عناصر التحكم حسب الصلاحية
+                // 4. تطبيق الأنماط وعرض عناصر التحكم حسب الصلاحية بدقة
                 document.body.classList.toggle('is-admin-mode', isRealAdmin);
-                document.body.classList.toggle('is-broker-mode', isBrokerUser && !isRealAdmin);
+                document.body.classList.toggle('is-broker-mode', isBrokerUser);
+
                 const adminNav = document.getElementById('nav-admin-middle-group');
-                if (adminNav) adminNav.style.display = 'flex';
+                if (adminNav) adminNav.style.display = isRealAdmin ? 'flex' : 'none';
+
+                const userNav = document.getElementById('nav-user-middle-group');
+                if (userNav) userNav.style.display = isRealAdmin ? 'none' : 'flex';
+
                 document.querySelectorAll('.btn-nav-admin').forEach(el => {
                     const href = String(el.getAttribute('href') || '');
                     const isStrictSuperAdminOnly = href.includes('admin-deposits') || href.includes('admin-withdrawals');
@@ -1288,7 +1337,7 @@
                     }
                 });
 
-                // إخفاء عناصر الإدارة العليا عن الوسيط الإقليمي (تخص المدير فقط)
+                // إخفاء عناصر الإدارة العليا عن الوسيط الإقليمي (تخص المدير العام فقط)
                 const promoteSection = document.getElementById('promote-broker-panel-card');
                 if (promoteSection) {
                     promoteSection.style.display = isRealAdmin ? 'block' : 'none';
@@ -1304,8 +1353,9 @@
 
                 return true;
             } catch (err) {
-                console.error('[RBAC] Error verifying admin access:', err);
-                window.location.href = 'index.html';
+                console.error('[RBAC] Error verifying access:', err);
+                if (deniedBox) deniedBox.style.display = 'block';
+                if (mainContainer) mainContainer.style.display = 'block';
                 return false;
             }
         }

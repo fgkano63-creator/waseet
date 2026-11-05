@@ -42,10 +42,31 @@
     function isBrokerUser(user) {
         if (!user) return false;
         if (isAdminUser(user)) return false;
+        if (user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker') return true;
         try {
             if (typeof isRegionalBroker === 'function' && isRegionalBroker(user)) return true;
         } catch (e) { /* تجاهل */ }
-        return user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker';
+        try {
+            var rawAvatar = String(user.avatar || (user.user_metadata && user.user_metadata.avatar_url) || '');
+            if (rawAvatar.indexOf('#waseet_broker=') !== -1) return true;
+        } catch (e) {}
+        try {
+            var rawCache = localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE');
+            if (rawCache) {
+                var list = JSON.parse(rawCache);
+                if (Array.isArray(list)) {
+                    var uId = String(user.id || '').trim();
+                    var uEmail = String(user.email || '').toLowerCase().trim();
+                    return list.some(function (b) {
+                        return b && b.is_active !== false && (
+                            (uId && String(b.id || b.user_id || '') === uId) ||
+                            (uEmail && String(b.email || '').toLowerCase().trim() === uEmail)
+                        );
+                    });
+                }
+            }
+        } catch (e) {}
+        return false;
     }
 
     var COUNTRY_NAMES_AR = {
@@ -56,63 +77,66 @@
         DJ: 'جيبوتي', KM: 'جزر القمر'
     };
 
-    function renderBrokerSupervisionBanner(user) {
-        var existing = byId('waseet-broker-supervision-bar');
-        if (!isBrokerUser(user)) {
-            if (existing) existing.style.display = 'none';
+    /**
+     * دمج أزرار الإشراف في الشريط العلوي الأساسي (Navbar Unification)
+     * إزالة أي شريط إشراف إضافي منفصل ودمج أدوات الوسيط مباشرة داخل الشريط العلوي الموحد
+     */
+    function renderUnifiedBrokerNavLinks(user) {
+        var userGroup = byId('nav-user-middle-group');
+        var isBroker = isBrokerUser(user);
+
+        // إزالة أي شريط إشراف منفصل تحت الـ Navbar نهائياً
+        var existingSubBar = byId('waseet-broker-supervision-bar');
+        if (existingSubBar) {
+            existingSubBar.remove();
+        }
+
+        if (!userGroup) return;
+
+        var existingBrokerWrap = byId('unified-broker-nav-items');
+        var oldBrokerBtn = byId('broker-supervision-nav-btn');
+        if (oldBrokerBtn) oldBrokerBtn.remove();
+
+        if (!isBroker) {
+            if (existingBrokerWrap) existingBrokerWrap.remove();
+            userGroup.querySelectorAll('.btn-nav-broker').forEach(function (el) { el.remove(); });
             return;
         }
-        var header = document.querySelector('.header-navbar');
-        if (!header) return;
 
-        var code = String(user.country || 'DZ').toUpperCase();
-        var countryAr = COUNTRY_NAMES_AR[code] || code;
-        var flagSvg = 'assets/flags/' + code.toLowerCase() + '.svg';
-        var pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
-
-        if (!existing) {
-            existing = document.createElement('div');
-            existing.id = 'waseet-broker-supervision-bar';
-            existing.style.cssText = 'background: linear-gradient(90deg, rgba(16,185,129,0.16), rgba(13,17,26,0.96), rgba(197,160,89,0.14)); border-bottom: 1px solid rgba(16,185,129,0.45); padding: 0.55rem 1rem; position: relative; z-index: 90;';
-            header.insertAdjacentElement('afterend', existing);
+        if (!existingBrokerWrap) {
+            existingBrokerWrap = document.createElement('div');
+            existingBrokerWrap.id = 'unified-broker-nav-items';
+            existingBrokerWrap.className = 'unified-broker-nav-group';
+            existingBrokerWrap.style.cssText = 'display: inline-flex; align-items: center; gap: 0.35rem;';
+            userGroup.appendChild(existingBrokerWrap);
         }
 
-        existing.style.display = 'block';
-        existing.innerHTML =
-            '<div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;">' +
-                '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">' +
-                    '<span style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.55);color:#34d399;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.78rem;font-weight:800;">' +
-                        '<i class="fas fa-user-shield"></i> شريط إشراف الوسيط الإقليمي المعتمد' +
-                    '</span>' +
-                    '<span style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#f8fafc;padding:0.22rem 0.6rem;border-radius:8px;font-size:0.76rem;font-weight:700;">' +
-                        '<img src="' + esc(flagSvg) + '" alt="' + esc(code) + '" style="width:18px;height:13px;border-radius:2px;object-fit:cover;" onerror="this.style.display=\'none\'">' +
-                        '<span>إقليم الوساطة: ' + esc(countryAr) + ' (' + esc(code) + ')</span>' +
-                    '</span>' +
-                    '<span style="color:var(--gold-light);font-size:0.76rem;font-weight:700;"><i class="fas fa-percentage"></i> عمولتك: 66.6% من صفقات دولتك (رصيدك: ' + pts + ' نقطة)</span>' +
-                '</div>' +
-                '<div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">' +
-                    '<a href="admin-brokers.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#38bdf8;color:#38bdf8;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-globe-africa"></i> لوحة الوساطة الإقليمية' +
-                    '</a>' +
-                    '<a href="wallet.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#eab308;color:#facc15;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-credit-card"></i> تغيير البطاقات' +
-                    '</a>' +
-                    '<a href="deals.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:#10b981;color:#34d399;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-handshake"></i> إدارة صفقات الوساطة' +
-                    '</a>' +
-                    '<a href="pending-accounts.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:var(--orange-bright);color:var(--orange-bright);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-clipboard-check"></i> فحص الحسابات المعلقة' +
-                    '</a>' +
-                    '<a href="chat.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:var(--gold-primary);color:var(--gold-light);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-comments"></i> غرفة الوساطة المباشرة' +
-                    '</a>' +
-                    '<a href="admin-chats.html" class="btn-3d btn-outline" style="padding:0.28rem 0.68rem;font-size:0.75rem;border-color:rgba(255,255,255,0.25);color:#e2e8f0;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">' +
-                        '<i class="fas fa-headset"></i> محادثات المشترين' +
-                    '</a>' +
-                '</div>' +
-            '</div>';
+        var curPath = (window.location.pathname || '').toLowerCase();
+        var isBrokersPage = curPath.indexOf('admin-brokers') !== -1;
+        var isPendingPage = curPath.indexOf('pending-accounts') !== -1;
+        var isChatsPage = curPath.indexOf('admin-chats') !== -1;
+        var countryCode = (user && user.country) ? String(user.country).toUpperCase() : 'DZ';
+
+        existingBrokerWrap.innerHTML =
+            '<a href="admin-brokers.html" class="btn-nav-middle btn-nav-broker' + (isBrokersPage ? ' active' : '') + '" style="border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;" title="لوحة إدارة الوساطة الإقليمية">' +
+                '<i class="fas fa-globe-africa text-emerald"></i> <span>الوساطة (' + esc(countryCode) + ')</span>' +
+            '</a>' +
+            '<a href="pending-accounts.html" class="btn-nav-middle btn-nav-broker' + (isPendingPage ? ' active' : '') + '" style="border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); color: #fbbf24; font-weight: 700;" title="فحص الحسابات المعلقة">' +
+                '<i class="fas fa-clipboard-check text-orange"></i> <span>فحص الحسابات</span>' +
+                '<span class="deals-badge-count admin-pending-badge" id="broker-unified-pending-badge" style="display: none;">0</span>' +
+            '</a>' +
+            '<a href="admin-chats.html" class="btn-nav-middle btn-nav-broker' + (isChatsPage ? ' active' : '') + '" style="border: 1px solid rgba(14, 165, 233, 0.45); background: rgba(14, 165, 233, 0.12); color: #38bdf8; font-weight: 700;" title="محادثات الدعم والوساطة">' +
+                '<i class="fas fa-headset text-gold"></i> <span>محادثات الوساطة</span>' +
+                '<span class="deals-badge-count chats-unread-badge" style="display: none;"></span>' +
+            '</a>';
+    }
+
+    function renderBrokerSupervisionBanner(user) {
+        // تفكيك وإزالة أي شريط إشراف إضافي تحت الـ Navbar ودمج كافة الأزرار داخل الشريط العلوي الأساسي
+        renderUnifiedBrokerNavLinks(user);
     }
     window.waseetRenderBrokerSupervisionBanner = renderBrokerSupervisionBanner;
+    window.waseetRenderUnifiedBrokerNavLinks = renderUnifiedBrokerNavLinks;
 
     function userAvatar(user) {
         return (user && ((user.user_metadata && user.user_metadata.avatar_url) || user.avatar)) || DEFAULT_AVATAR;
@@ -215,27 +239,8 @@
         if (userGroup) userGroup.style.display = admin ? 'none' : '';
         if (adminGroup) adminGroup.style.display = admin ? 'flex' : 'none';
 
-        // إظهار زر إشراف الوساطة الخاص للوسيط الإقليمي في الشريط العلوي الموحد
-        if (userGroup) {
-            var brokerBtn = byId('broker-supervision-nav-btn');
-            if (broker) {
-                if (!brokerBtn) {
-                    brokerBtn = document.createElement('a');
-                    brokerBtn.id = 'broker-supervision-nav-btn';
-                    brokerBtn.href = 'pending-accounts.html';
-                    brokerBtn.className = 'btn-nav-middle btn-broker-supervision';
-                    brokerBtn.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;';
-                    brokerBtn.title = 'لوحة فحص الحسابات وإشراف الوساطة الإقليمية';
-                    var countryCode = (user && user.country) ? ' (' + String(user.country).toUpperCase() + ')' : '';
-                    brokerBtn.innerHTML = '<i class="fas fa-user-shield text-emerald"></i> <span>إشراف الوساطة' + countryCode + '</span>';
-                    userGroup.appendChild(brokerBtn);
-                } else {
-                    brokerBtn.style.display = 'inline-flex';
-                }
-            } else if (brokerBtn) {
-                brokerBtn.style.display = 'none';
-            }
-        }
+        // دمج أزرار الإشراف في الشريط العلوي الأساسي الموحد (Navbar Unification)
+        renderUnifiedBrokerNavLinks(user);
 
         ['wallet-total-pts', 'admin-wallet-total-pts'].forEach(function (id) {
             var el = byId(id);
@@ -300,7 +305,7 @@
         // روابط القائمة الجانبية والشريط المخصصة للمدير والوسيط الإقليمي
         document.querySelectorAll('.btn-nav-admin').forEach(function (el) {
             var href = String(el.getAttribute('href') || '');
-            var isStrictAdminOnlyLink = href.indexOf('admin-brokers') !== -1 || href.indexOf('admin-deposits') !== -1 || href.indexOf('admin-withdrawals') !== -1;
+            var isStrictAdminOnlyLink = href.indexOf('admin-deposits') !== -1 || href.indexOf('admin-withdrawals') !== -1;
             var canShow = admin || (broker && !isStrictAdminOnlyLink);
             el.style.display = canShow ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
         });

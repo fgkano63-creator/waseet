@@ -478,8 +478,10 @@
                 });
             }
 
-            // إظهار زر إشراف الوساطة الأنيق للوسيط الإقليمي داخل الشريط العلوي الموحد
-            if (userNavMiddle) {
+            // دمج أزرار الإشراف في الشريط العلوي الأساسي الموحد (Navbar Unification)
+            if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
+                window.waseetRenderUnifiedBrokerNavLinks(user);
+            } else if (userNavMiddle) {
                 let brokerBtn = document.getElementById('broker-supervision-nav-btn');
                 if (isBroker) {
                     if (!brokerBtn) {
@@ -499,6 +501,9 @@
                     brokerBtn.style.display = 'none';
                 }
             }
+
+            const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
+            if (existingSubBar) existingSubBar.remove();
 
             const adminTotalEl = document.getElementById('admin-wallet-total-pts');
             if (adminTotalEl) adminTotalEl.innerText = `${pts} نقطة`;

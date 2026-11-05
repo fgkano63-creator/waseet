@@ -495,26 +495,14 @@ function waseetApplyLiveRoleUpdateToUI(user) {
             });
         }
 
-        // إظهار زر إشراف الوساطة الأنيق للوسيط الإقليمي داخل الشريط العلوي الموحد دون المساس بالروابط الأساسية
-        if (userNavMiddle) {
-            let brokerBtn = document.getElementById('broker-supervision-nav-btn');
-            if (isBroker) {
-                if (!brokerBtn) {
-                    brokerBtn = document.createElement('a');
-                    brokerBtn.id = 'broker-supervision-nav-btn';
-                    brokerBtn.href = 'pending-accounts.html';
-                    brokerBtn.className = 'btn-nav-middle btn-broker-supervision';
-                    brokerBtn.style.cssText = 'border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;';
-                    brokerBtn.title = 'لوحة فحص الحسابات وإشراف الوساطة الإقليمية';
-                    const countryBadge = (user && user.country) ? ` (${String(user.country).toUpperCase()})` : '';
-                    brokerBtn.innerHTML = `<i class="fas fa-user-shield text-emerald"></i> <span>إشراف الوساطة${countryBadge}</span>`;
-                    userNavMiddle.appendChild(brokerBtn);
-                } else {
-                    brokerBtn.style.display = 'inline-flex';
-                }
-            } else if (brokerBtn) {
-                brokerBtn.style.display = 'none';
-            }
+        // دمج أزرار الإشراف في الشريط العلوي الأساسي الموحد (Navbar Unification)
+        if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
+            window.waseetRenderUnifiedBrokerNavLinks(user);
+        } else if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
+            window.waseetRenderBrokerSupervisionBanner(user);
+        } else {
+            const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
+            if (existingSubBar) existingSubBar.remove();
         }
 
         // تحديث روابط القائمة الجانبية للمدير والوسيط
@@ -528,11 +516,6 @@ function waseetApplyLiveRoleUpdateToUI(user) {
         if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? 'flex' : 'none';
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
         if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = isAdmin ? 'flex' : 'none';
-
-        // تحديث شريط إشراف الوسيط الإقليمي المعتمد
-        if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
-            window.waseetRenderBrokerSupervisionBanner(user);
-        }
 
         // استدعاء دوال التحديث الخاصة بكل صفحة
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();
@@ -3604,7 +3587,16 @@ async function waseetDemoteBroker(targetId, targetEmail) {
         }
     } catch (bErr) {}
 
-    // 7. إذا كان المستخدم الحالي هو الوسيط المحذوف، تحديث حالته فوراً وإلغاء صلاحية الوسيط
+    // بث الحدث عبر التخزين المحلي للمزامنة الفورية بين تبويبات المتصفح
+    try {
+        localStorage.setItem('WASEET_LAST_DEMOTE_EVENT', JSON.stringify({
+            id: cleanTargetId,
+            email: cleanTargetEmail,
+            time: Date.now()
+        }));
+    } catch (e) {}
+
+    // 7. إذا كان المستخدم الحالي هو الوسيط المحذوف، تحديث حالته فوراً وتجريده من صلاحية الوسيط
     if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
         const myId = String(WASEET_STATE.user.id || '').trim();
         const myEmail = String(WASEET_STATE.user.email || '').trim().toLowerCase();
@@ -3617,7 +3609,9 @@ async function waseetDemoteBroker(targetId, targetEmail) {
             }
             try {
                 localStorage.setItem('WASEET_CURRENT_USER', JSON.stringify(WASEET_STATE.user));
+                localStorage.setItem('WASEET_SAVED_USER_PERMANENT', JSON.stringify(WASEET_STATE.user));
             } catch (e) {}
+            waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
             await waseetSyncAuthState({ force: true, refreshToken: true, profileOnly: true });
         }
     }
@@ -3666,6 +3660,7 @@ async function waseetFetchRegionalBrokers() {
                 });
             }
         } catch (rbEx) {}
+    }
 
     // 3. دمج نتائج قاعدة البيانات مع الكاش المحلي لضمان عدم ضياع أي وسيط تمت ترقيته
     const cachedBrokers = getCachedRegionalBrokersList();
@@ -3838,16 +3833,64 @@ function waseetInitLiveRoleAndSessionSync() {
         try {
             let rtDebounceTimer = null;
             const triggerRealtimeRoleCheck = (payload) => {
-                // تحديث قسم الوسطاء الإقليميين في المتجر لجميع الزوار والمستخدمين فوراً
+                // 1. تحديث قائمة الوسطاء في المتجر دائماً لجميع المستخدمين والزوار
                 if (window.waseetApp && typeof window.waseetApp.loadStoreRegionalBrokers === 'function') {
                     setTimeout(() => {
                         try { window.waseetApp.loadStoreRegionalBrokers(); } catch (e) {}
-                    }, 200);
+                    }, 150);
+                }
+
+                const rawData = (payload && (payload.payload || payload.new || payload)) || {};
+                const action = rawData.action || (rawData.role === 'user' ? 'demote' : null);
+                const targetId = String(rawData.id || rawData.user_id || '').trim();
+                const targetEmail = String(rawData.email || '').toLowerCase().trim();
+
+                // 2. عند إلغاء أو حذف وسيط: تطهير الكاش المحلي فوراً في جميع التبويبات المفتوحة
+                if (action === 'demote') {
+                    try {
+                        const cachedList = getCachedRegionalBrokersList();
+                        const updatedCached = cachedList.filter(b => {
+                            if (!b) return false;
+                            const bId = String(b.id || b.user_id || '').trim();
+                            const bEmail = String(b.email || '').toLowerCase().trim();
+                            if (targetId && (bId === targetId || (b.user_id && String(b.user_id) === targetId))) return false;
+                            if (targetEmail && bEmail === targetEmail) return false;
+                            return true;
+                        });
+                        saveCachedRegionalBrokersList(updatedCached);
+                    } catch (e) {}
                 }
 
                 if (typeof WASEET_STATE === 'undefined' || !WASEET_STATE.user || WASEET_STATE.user.isGuest) return;
                 const curId = String(WASEET_STATE.user.id || '').trim();
                 const curEmail = String(WASEET_STATE.user.email || '').toLowerCase().trim();
+
+                // 3. فحص ما إذا كان المستخدم الحالي هو الوسيط الملغى / المحذوف
+                const isTargetOfDemote = action === 'demote' && ((targetId && curId === targetId) || (targetEmail && curEmail === targetEmail));
+
+                if (isTargetOfDemote) {
+                    console.warn('[Live Session Sync] Instant demotion & role strip for current user:', curEmail);
+                    WASEET_STATE.user.role = 'user';
+                    WASEET_STATE.user.isBroker = false;
+                    WASEET_STATE.user.brokerRole = 'user';
+                    if (WASEET_STATE.user.avatar) {
+                        WASEET_STATE.user.avatar = String(WASEET_STATE.user.avatar).replace(/#waseet_broker=[^&]*/g, '');
+                    }
+                    try {
+                        localStorage.setItem('WASEET_CURRENT_USER', JSON.stringify(WASEET_STATE.user));
+                        localStorage.setItem('WASEET_SAVED_USER_PERMANENT', JSON.stringify(WASEET_STATE.user));
+                    } catch (e) {}
+
+                    // تجريد فوري لكافة عناصر الوساطة من واجهة المستخدم
+                    waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
+
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تم تعديل رتبتك في المنصة وإعادتك لمستخدم عادي من قبل الإدارة.', 'تحديث الصلاحيات', 'info');
+                    }
+                    waseetSyncAuthState({ force: true, refreshToken: true, profileOnly: true });
+                    return;
+                }
+
                 const newRow = (payload && (payload.new || payload.payload)) || {};
                 const oldRow = (payload && payload.old) || {};
                 const rowId = String(newRow.id || newRow.user_id || oldRow.id || oldRow.user_id || '').trim();
@@ -3907,6 +3950,13 @@ function waseetInitLiveRoleAndSessionSync() {
                     if (prevRole !== updatedUser.role) {
                         waseetShowRoleUpgradeToast(updatedUser);
                     }
+                }
+            } catch (e) {}
+        } else if (event.key === 'WASEET_LAST_DEMOTE_EVENT' && event.newValue) {
+            try {
+                const demoteInfo = JSON.parse(event.newValue);
+                if (demoteInfo && typeof triggerRealtimeRoleCheck === 'function') {
+                    triggerRealtimeRoleCheck({ payload: { action: 'demote', id: demoteInfo.id, email: demoteInfo.email } });
                 }
             } catch (e) {}
         } else if (event.key === 'WASEET_REGIONAL_BROKERS_CACHE') {
