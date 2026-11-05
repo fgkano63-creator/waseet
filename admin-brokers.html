@@ -250,6 +250,21 @@
             padding: 1.2rem;
             margin-top: 1rem;
         }
+
+        @media (max-width: 768px) {
+            #commission-simulator-section,
+            .split-simulator-box,
+            #promote-broker-panel-card {
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                overscroll-behavior: contain !important;
+                padding: 0.85rem !important;
+            }
+            .admin-stat-card {
+                padding: 0.85rem 1rem !important;
+            }
+        }
     </style>
 </head>
 <body class="admin-brokers-page">
@@ -490,7 +505,7 @@
             </section>
 
             <!-- 4. حاسبة محاكاة تقسيم العمولات المباشرة -->
-            <section class="admin-panel-card">
+            <section class="admin-panel-card" id="commission-simulator-section">
                 <div class="admin-panel-header">
                     <div style="display: flex; align-items: center; gap: 0.6rem;">
                         <i class="fas fa-calculator text-gold" style="font-size: 1.3rem;"></i>

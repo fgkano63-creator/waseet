@@ -4237,13 +4237,153 @@ html, body {
     }
 
 
-    /* Calculator & Sell Form on Mobile */
-    .calc-card-3d {
-        padding: 1.4rem 1rem;
+    /* ==========================================================================
+       حاسبة العمولات الآلية في الهواتف المحمولة: تصميم مدمج وخفيف لا يتجاوز 60vh مع تمرير داخلي
+       ========================================================================== */
+    .calc-section {
+        padding: 0.8rem 0 !important;
     }
+
+    .calc-card,
+    .calc-card-3d,
+    #fee-calculator .calc-card {
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding: 0.75rem 0.85rem !important;
+        border-radius: 14px !important;
+        box-sizing: border-box !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(197, 160, 89, 0.4) transparent !important;
+    }
+
+    .calc-card::-webkit-scrollbar {
+        width: 4px !important;
+    }
+    .calc-card::-webkit-scrollbar-thumb {
+        background: rgba(197, 160, 89, 0.4) !important;
+        border-radius: 4px !important;
+    }
+
     .calc-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
     }
+
+    .calc-title {
+        font-size: 1rem !important;
+        margin-bottom: 0.25rem !important;
+        gap: 0.4rem !important;
+    }
+
+    .calc-title i {
+        font-size: 0.95rem !important;
+    }
+
+    .calc-desc {
+        font-size: 0.75rem !important;
+        line-height: 1.35 !important;
+        margin-bottom: 0.45rem !important;
+    }
+
+    .calc-card .input-group {
+        margin-bottom: 0.4rem !important;
+    }
+
+    .calc-card .input-label {
+        font-size: 0.74rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    .calc-card .luxury-stepper-container {
+        height: 38px !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    .calc-card .stepper-btn {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .calc-card .stepper-number-input {
+        font-size: 1.1rem !important;
+    }
+
+    .calc-card small {
+        font-size: 0.68rem !important;
+        line-height: 1.35 !important;
+        padding: 0.35rem 0.5rem !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        border-radius: 8px !important;
+        display: block !important;
+        margin-top: 0.3rem !important;
+    }
+
+    /* لوحة النتائج مثبتة ومدمجة في الأسفل لتكون دائماً مرئية وسهلة الوصول */
+    .calc-results-panel {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 5 !important;
+        background: rgba(10, 13, 20, 0.96) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(197, 160, 89, 0.45) !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 0.8rem !important;
+        gap: 0.35rem !important;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6) !important;
+        margin-top: 0.5rem !important;
+    }
+
+    .calc-results-panel .res-row {
+        padding-bottom: 0.3rem !important;
+    }
+
+    .calc-results-panel .res-row:last-child {
+        margin-top: 0.2rem !important;
+        padding-top: 0.25rem !important;
+        border-top: 1px solid rgba(197, 160, 89, 0.3) !important;
+    }
+
+    .calc-results-panel .res-label {
+        font-size: 0.74rem !important;
+        gap: 0.3rem !important;
+    }
+
+    .calc-results-panel .res-val {
+        font-size: 0.92rem !important;
+    }
+
+    .calc-results-panel .res-val.big {
+        font-size: 1.25rem !important;
+    }
+
+    /* تقليص النوافذ والمربعات الطويلة على الهواتف (Compact Modals <= 60vh) */
+    #modal-login .modal-box-3d,
+    #modal-wallet .modal-box-3d,
+    #modal-withdrawal-request .modal-dialog,
+    #modal-payment-method .modal-dialog,
+    #modal-emailjs-config .modal-dialog {
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding: 0.9rem 0.8rem !important;
+    }
+
+    #modal-inspect-account .cards-deck-modal-box,
+    #modal-pending-accounts .modal-box-3d,
+    #modal-seller-listings .modal-box-3d,
+    #modal-mediator-deals .modal-box-3d {
+        max-height: 65vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 0.85rem 0.75rem !important;
+    }
+
     .form-grid-2 {
         grid-template-columns: 1fr;
     }

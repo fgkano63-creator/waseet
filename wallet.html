@@ -946,6 +946,21 @@
         }
 
         @media (max-width: 640px) {
+            #modal-withdrawal-request .modal-dialog,
+            #modal-payment-method .modal-dialog {
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                overscroll-behavior: contain !important;
+                padding: 0.85rem 0.8rem !important;
+                border-radius: 14px !important;
+            }
+            #escrow-locked-details-section .wallet-panel-card {
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 0.85rem 0.8rem !important;
+            }
             .wallet-panel-card {
                 padding: 1.1rem 0.95rem;
             }
