@@ -4164,7 +4164,7 @@ window.getKycTypeShortLabel = getKycTypeShortLabel;
 
 /**
  * توليد وعرض بطاقة تعريفية أنيقة للوسيط الإقليمي المعتمد لبلد المستخدم (Regional Broker Card)
- * البطاقة قابلة للنقر وتفتح نافذة الملف التعريفي للوسيط (Broker Profile)
+ * الفلترة الذكية: تطابق دولة المستخدم الحالي فقط. إذا لم يتوفر وسيط لبلده، تعرض بطاقة الإدارة العامة (المدير).
  */
 async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
     try {
@@ -4180,25 +4180,77 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
             brokers = getCachedRegionalBrokersList();
         }
 
+        // 1. قراءة دولة المستخدم الحالي من الجلسة أو الكاش أو Supabase
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
-        const userCountry = (currentUser && currentUser.country) ? String(currentUser.country).toUpperCase().trim() : 'DZ';
-
-        // مطابقة الوسيط حسب بلد المستخدم أو اعتماد أول وسيط نشط مسجل
-        let activeBroker = brokers.find(b => b && b.is_active !== false && String(b.country || '').toUpperCase().trim() === userCountry);
-        if (!activeBroker && brokers.length > 0) {
-            activeBroker = brokers.find(b => b && b.is_active !== false) || brokers[0];
+        let userCountry = '';
+        if (currentUser && currentUser.country) {
+            userCountry = String(currentUser.country).toUpperCase().trim();
+        }
+        if (!userCountry) {
+            try {
+                userCountry = String(localStorage.getItem('waseet_user_country') || localStorage.getItem('WASEET_USER_COUNTRY') || '').toUpperCase().trim();
+            } catch (e) {}
+        }
+        if (!userCountry && currentUser && currentUser.id) {
+            try {
+                const client = initWaseetSupabase();
+                if (client) {
+                    const { data: p } = await client.from('profiles').select('country').eq('id', currentUser.id).maybeSingle();
+                    if (p && p.country) {
+                        userCountry = String(p.country).toUpperCase().trim();
+                        currentUser.country = userCountry;
+                        try { localStorage.setItem('WASEET_CURRENT_USER', JSON.stringify(currentUser)); } catch (e) {}
+                    }
+                }
+            } catch (e) {}
         }
 
+        // 2. الفلترة الذكية الصارمة: جلب وسيط إقليمي يطابق دولة المستخدم الحالي فقط (role = 'regional_broker' AND country = user_country)
+        let activeBroker = null;
+        if (userCountry) {
+            activeBroker = brokers.find(b =>
+                b && b.is_active !== false &&
+                (b.role === 'regional_broker' || b.role === 'broker') &&
+                String(b.country || '').toUpperCase().trim() === userCountry
+            );
+        }
+
+        const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        // 3. إذا لم يتوفر وسيط لبلد المستخدم بعد، يتم إخفاء بطاقة الوسيط الإقليمي وعرض بطاقة الإدارة العامة (المدير)
         if (!activeBroker) {
-            activeBroker = {
-                id: 'default_regional_broker',
-                name: 'الوسيط المعتمد',
-                country: userCountry || 'DZ',
-                avatar_url: 'assets/logo.png',
-                email: 'mediator@waseet.com',
-                kyc_type: 'national_id',
-                is_fully_verified: true
-            };
+            container.innerHTML = `
+                <div class="regional-broker-identity-card general-admin-identity-card is-clickable-broker-card"
+                     role="button"
+                     tabindex="0"
+                     onclick="window.location.href='contact-support.html';"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='contact-support.html';}"
+                     title="الإدارة العامة لمنصة وسيط - إشراف وحماية الصفقات المباشرة">
+                    <div class="broker-avatar-wrap">
+                        <img src="assets/logo.png" alt="الإدارة العامة للمنصة" class="broker-avatar-img admin-avatar-img" onerror="this.src='assets/logo.png'">
+                        <span class="broker-avatar-badge admin-badge" title="الإدارة العامة والضمان المباشر">
+                            <i class="fas fa-crown text-gold"></i>
+                        </span>
+                    </div>
+                    <div class="broker-info-col">
+                        <div class="broker-name-row">
+                            <h4 class="broker-name">الإدارة العامة للمنصة</h4>
+                            <span class="broker-country-badge admin-country-badge">
+                                <span>🌐 إشراف مباشر</span>
+                            </span>
+                        </div>
+                        <p class="broker-role-desc">
+                            <i class="fas fa-shield-alt text-gold"></i>
+                            <span>حماية وإشراف مباشر على الصفقات</span>
+                        </p>
+                        <div class="broker-card-click-hint">
+                            <span>تواصل مع الإدارة للدعم والوساطة</span>
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
         }
 
         const countryCode = String(activeBroker.country || userCountry || 'DZ').toUpperCase().trim();
@@ -4217,10 +4269,8 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
         }
 
         const isFullyVerified = activeBroker.is_fully_verified !== false;
-        const kycShort = getKycTypeShortLabel(activeBroker.kyc_type || 'national_id');
+        const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(activeBroker.kyc_type || 'national_id') : 'بطاقة وطنية';
         const brokerIdentifier = activeBroker.id || activeBroker.email || countryCode;
-
-        const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
         // حفظ نسخة من الوسيط النشط للوصول السريع عند فتح نافذة الملف التعريفي
         window._waseetLastRenderedDrawerBroker = {
@@ -4270,6 +4320,120 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
     }
 }
 window.waseetRenderRegionalBrokerCard = waseetRenderRegionalBrokerCard;
+
+/**
+ * توليد وعرض قسم "جميع الوسطاء الإقليميين" في أسفل الموقع (Global Brokers Section)
+ * يعرض كافة المستخدمين الذين يملكون رتبة regional_broker من جميع الدول (بدون فلترة) لتعزيز موثوقية المنصة
+ */
+async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brokers-grid') {
+    try {
+        const container = document.getElementById(targetContainerId);
+        if (!container) return;
+
+        let brokers = [];
+        if (typeof waseetFetchRegionalBrokers === 'function') {
+            const res = await waseetFetchRegionalBrokers();
+            if (res && res.ok && Array.isArray(res.data)) brokers = res.data;
+        }
+        if (brokers.length === 0 && typeof getCachedRegionalBrokersList === 'function') {
+            brokers = getCachedRegionalBrokersList();
+        }
+
+        // فلترة الوسطاء النشطين فقط (بدون أي فلترة على الدولة)
+        const activeBrokers = brokers.filter(b => b && b.is_active !== false && (b.role === 'regional_broker' || b.role === 'broker'));
+
+        if (activeBrokers.length === 0) {
+            container.innerHTML = `
+                <div class="global-brokers-empty" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: rgba(13, 18, 31, 0.6); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px;">
+                    <i class="fas fa-user-shield text-gold" style="font-size: 2.5rem; margin-bottom: 0.8rem; display: block; opacity: 0.8;"></i>
+                    <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.3rem;">الإشراف المباشر للإدارة العامة للمنصة</h4>
+                    <p style="color: var(--silver-muted); font-size: 0.88rem; margin: 0;">كافة صفقات البيع والشراء في الدول غير المسجلة حالياً تدار وتشرف عليها الإدارة العامة للمنصة مباشرة بنظام Escrow 100%.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const countryNamesMap = {
+            DZ: 'الجزائر', EG: 'مصر', SA: 'السعودية', MA: 'المغرب', TN: 'تونس',
+            SY: 'سوريا', IQ: 'العراق', LY: 'ليبيا', JO: 'الأردن', AE: 'الإمارات',
+            KW: 'الكويت', QA: 'قطر', OM: 'عُمان', BH: 'البحرين', YE: 'اليمن',
+            PS: 'فلسطين', LB: 'لبنان', SD: 'السودان', MR: 'موريتانيا'
+        };
+
+        const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        container.innerHTML = activeBrokers.map(broker => {
+            const countryCode = String(broker.country || 'DZ').toUpperCase().trim();
+            const countryName = countryNamesMap[countryCode] || countryCode;
+            const flagSvg = (countryCode === 'DZ') ? 'assets/flags/dz.svg' : `assets/flags/${countryCode.toLowerCase()}.svg`;
+            const brokerName = broker.name || (broker.email ? broker.email.split('@')[0] : 'وسيط معتمد');
+            let avatarUrl = broker.avatar_url || 'assets/logo.png';
+            if (avatarUrl.includes('#waseet_broker=')) {
+                avatarUrl = avatarUrl.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
+            }
+
+            const isFullyVerified = broker.is_fully_verified !== false;
+            const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(broker.kyc_type || 'national_id') : 'بطاقة وطنية';
+            const rating = Number(broker.rating || 5.0).toFixed(1);
+            const dealsCount = Number(broker.completed_deals || 28);
+            const brokerId = broker.id || broker.email || countryCode;
+
+            return `
+                <div class="global-broker-card" onclick="window.waseetOpenBrokerProfileModal('${escapeHtmlSafe(brokerId)}')" role="button" tabindex="0">
+                    <div class="global-broker-card-glow"></div>
+                    <div class="global-broker-header">
+                        <div class="global-broker-avatar-wrap">
+                            <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="global-broker-avatar" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                            <span class="global-broker-online-dot" title="متصل وجاهز للوساطة"></span>
+                        </div>
+                        <div class="global-broker-country-badge">
+                            <img src="${escapeHtmlSafe(flagSvg)}" alt="${escapeHtmlSafe(countryName)}" class="global-broker-flag" onerror="this.src='assets/flags/dz.svg'">
+                            <span>${escapeHtmlSafe(countryName)}</span>
+                        </div>
+                    </div>
+
+                    <div class="global-broker-body">
+                        <h3 class="global-broker-name">${escapeHtmlSafe(brokerName)}</h3>
+                        <div class="global-broker-role-pill">
+                            <i class="fas fa-shield-alt text-emerald"></i>
+                            <span>الوسيط المعتمد لدولة ${escapeHtmlSafe(countryName)} (${escapeHtmlSafe(countryCode)})</span>
+                        </div>
+
+                        <div class="global-broker-kyc-badge ${isFullyVerified ? 'is-verified' : ''}">
+                            <i class="fas ${isFullyVerified ? 'fa-check-circle text-emerald' : 'fa-clock text-silver'}"></i>
+                            <span>${isFullyVerified ? 'موثق بالكامل: ' + escapeHtmlSafe(kycShort) : 'قيد المراجعة'}</span>
+                        </div>
+
+                        <div class="global-broker-stats-row">
+                            <div class="broker-mini-stat">
+                                <span class="mini-stat-val">${dealsCount}+</span>
+                                <span class="mini-stat-lbl">صفقة ناجحة</span>
+                            </div>
+                            <div class="broker-mini-stat">
+                                <span class="mini-stat-val text-gold">${rating} ★</span>
+                                <span class="mini-stat-lbl">التقييم</span>
+                            </div>
+                            <div class="broker-mini-stat">
+                                <span class="mini-stat-val text-emerald">66%</span>
+                                <span class="mini-stat-lbl">عمولة الوسيط</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="global-broker-footer">
+                        <button type="button" class="btn-view-broker-profile" onclick="event.stopPropagation(); window.waseetOpenBrokerProfileModal('${escapeHtmlSafe(brokerId)}');">
+                            <i class="fas fa-user-shield"></i>
+                            <span>عرض التوثيق والملف التعريفي</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (gErr) {
+        console.warn('[Global Brokers Section] Error rendering brokers grid:', gErr);
+    }
+}
+window.waseetRenderGlobalBrokersSection = waseetRenderGlobalBrokersSection;
 
 /**
  * جلب بيانات الملف التعريفي العام للوسيط مع إحصائيات الثقة وحالة التوثيق

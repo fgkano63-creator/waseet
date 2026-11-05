@@ -567,6 +567,85 @@
         </div>
     </div>
 
+    <!-- ================= Broker KYC Verification Modal (لوحة إدارة التوثيق الآمن للمدير) ================= -->
+    <div class="modal" id="modal-broker-kyc" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 10030; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);">
+        <div class="modal-dialog" style="max-width: 540px; width: 92%; background: linear-gradient(145deg, #0e1526, #090d18); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 20px; padding: 1.6rem; box-shadow: 0 25px 60px rgba(0,0,0,0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <h3 style="color: #fff; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
+                    <i class="fas fa-shield-check text-emerald"></i> إدارة التوثيق الرسمي للوسيط (KYC)
+                </h3>
+                <button type="button" class="btn-close-modal" onclick="closeBrokerKycModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <div id="kyc-modal-broker-info" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <strong id="kyc-broker-target-name" style="color: #fff; font-size: 1rem; display: block;">—</strong>
+                    <span id="kyc-broker-target-email" style="color: var(--silver-muted); font-size: 0.82rem;">—</span>
+                </div>
+                <span class="broker-country-badge" id="kyc-broker-target-badge"><i class="fas fa-user-shield"></i> وسيط إقليمي</span>
+            </div>
+
+            <form id="broker-kyc-form" onsubmit="handleSaveBrokerKyc(event)">
+                <input type="hidden" id="kyc-target-broker-id" value="">
+                <input type="hidden" id="kyc-target-broker-email" value="">
+
+                <!-- 1. نوع التوثيق -->
+                <div class="form-group-custom" style="margin-bottom: 1.1rem;">
+                    <label class="form-label-custom" for="kyc-type-select">
+                        <i class="fas fa-file-contract text-gold"></i> نوع وثيقة التوثيق المعتمدة:
+                    </label>
+                    <select id="kyc-type-select" class="form-select-custom">
+                        <option value="national_id">بطاقة هوية وطنية (National ID)</option>
+                        <option value="passport">جواز سفر رسمي (Passport)</option>
+                        <option value="live_video">توثيق فيديو حي (Live Video)</option>
+                    </select>
+                    <span style="color: var(--silver-muted); font-size: 0.78rem;">سيظهر نوع التوثيق كنص فقط للجمهور في الملف التعريفي للوسيط.</span>
+                </div>
+
+                <!-- 2. رفع صورة الوثيقة مع المعاينة الفورية -->
+                <div class="form-group-custom" style="margin-bottom: 1.2rem;">
+                    <label class="form-label-custom" for="kyc-document-file">
+                        <i class="fas fa-upload text-orange"></i> صورة الوثيقة الرسمية (KYC Document):
+                    </label>
+                    <input type="file" id="kyc-document-file" accept="image/*" class="form-input-custom" onchange="handleKycFileSelect(event)">
+                    <span style="color: #34d399; font-size: 0.76rem; display: block; margin-top: 0.2rem;">
+                        <i class="fas fa-lock"></i> ملاحظة أمنية: صورة الوثيقة مشفرة ومحفوظة لخزينة الإدارة فقط ولا تعرض للجمهور نهائياً.
+                    </span>
+
+                    <!-- Preview box -->
+                    <div id="kyc-doc-preview-wrap" style="margin-top: 0.8rem; display: none; background: rgba(0,0,0,0.4); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 0.8rem; text-align: center;">
+                        <img id="kyc-doc-preview-img" src="" alt="معاينة وثيقة التوثيق" style="max-height: 160px; max-width: 100%; border-radius: 8px; object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                        <div style="margin-top: 0.5rem; font-size: 0.76rem; color: #34d399;">
+                            <i class="fas fa-check-circle"></i> تم تحميل الوثيقة وجاهزة للاعتماد
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. تفعيل حالة موثق بالكامل -->
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                    <div>
+                        <strong style="color: #34d399; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">
+                            <i class="fas fa-shield-alt"></i> اعتماد حالة "موثق بالكامل" (Fully Verified)
+                        </strong>
+                        <span style="color: var(--silver-muted); font-size: 0.78rem;">تفعيل الشارة الخضراء في القائمة الجانبية وملف الوسيط التعريفي.</span>
+                    </div>
+                    <label class="kyc-toggle-switch">
+                        <input type="checkbox" id="kyc-fully-verified-toggle" checked>
+                        <span class="kyc-toggle-slider"></span>
+                    </label>
+                </div>
+
+                <!-- الأزرار -->
+                <div style="display: flex; gap: 0.8rem; justify-content: flex-end; align-items: center;">
+                    <button type="button" class="btn-3d btn-secondary" onclick="closeBrokerKycModal()" style="padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">إلغاء</button>
+                    <button type="submit" id="btn-save-kyc-submit" class="btn-3d btn-emerald" style="padding: 0.6rem 1.6rem; background: #10b981; color: #fff;">
+                        <i class="fas fa-save"></i> حفظ التوثيق والبيانات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/purify.min.js"></script>
@@ -949,22 +1028,32 @@
                             <strong style="color: #10b981;">66% من كل صفقة</strong>
                         </div>
                         <div class="broker-details-row">
-                            <span style="color: var(--silver-muted);"><i class="fas fa-id-card text-gold"></i> المعرف:</span>
+                            <span style="color: var(--silver-muted);"><i class="fas fa-id-card text-emerald"></i> التوثيق الرسمي KYC:</span>
+                            <span class="kyc-admin-status-pill ${b.is_fully_verified !== false ? 'verified' : 'pending'}">
+                                <i class="fas ${b.is_fully_verified !== false ? 'fa-check-circle' : 'fa-clock'}"></i>
+                                ${b.is_fully_verified !== false ? 'موثق بالكامل (' + (typeof getKycTypeShortLabel === 'function' ? getKycTypeShortLabel(b.kyc_type) : 'هوية وطنية') + ')' : 'غير موثق'}
+                            </span>
+                        </div>
+                        <div class="broker-details-row">
+                            <span style="color: var(--silver-muted);"><i class="fas fa-fingerprint text-gold"></i> المعرف:</span>
                             <code style="color: var(--silver-muted); font-size: 0.72rem;">${String(b.id).slice(0, 13)}...</code>
                         </div>
 
                         ${isSuperAdmin ? `
-                        <div style="margin-top: 1rem; display: flex; gap: 0.6rem;">
-                            <button type="button" class="btn-3d btn-gold" onclick="handleChangeCountryPrompt('${b.id}', '${countryCode}')" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">
-                                <i class="fas fa-edit"></i> تغيير الدولة
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn-3d btn-emerald" onclick="openBrokerKycModal('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="flex: 1; padding: 0.5rem 0.7rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399;" title="إدارة ملف التوثيق والوثائق الرسمية">
+                                <i class="fas fa-id-card"></i> إدارة التوثيق
                             </button>
-                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="padding: 0.5rem 0.9rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
+                            <button type="button" class="btn-3d btn-gold" onclick="handleChangeCountryPrompt('${b.id}', '${countryCode}')" style="padding: 0.5rem 0.8rem; font-size: 0.8rem;">
+                                <i class="fas fa-edit"></i> الدولة
+                            </button>
+                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="padding: 0.5rem 0.8rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
                                 <i class="fas fa-user-minus"></i> إلغاء
                             </button>
                         </div>
                         ` : `
                         <div style="margin-top: 1rem; padding: 0.5rem; text-align: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; color: #34d399; font-size: 0.78rem; font-weight: 700;">
-                            <i class="fas fa-shield-alt"></i> وسيط إقليمي معتمد وموثق
+                            <i class="fas fa-shield-alt"></i> وسيط إقليمي معتمد وموثق (${typeof getKycTypeShortLabel === 'function' ? getKycTypeShortLabel(b.kyc_type) : 'هوية وطنية'})
                         </div>
                         `}
                     </div>
@@ -1202,6 +1291,145 @@
                 }
             }
         }
+
+        // ==========================================================================
+        // وظائف إدارة وتحديث التوثيق الرسمي للوسيط (KYC Management Functions)
+        // ==========================================================================
+        let selectedKycFile = null;
+
+        async function openBrokerKycModal(brokerId, brokerName = '', brokerEmail = '') {
+            const modal = document.getElementById('modal-broker-kyc');
+            if (!modal) return;
+
+            const nameEl = document.getElementById('kyc-broker-target-name');
+            const emailEl = document.getElementById('kyc-broker-target-email');
+            const idInput = document.getElementById('kyc-target-broker-id');
+            const emailInput = document.getElementById('kyc-target-broker-email');
+            const typeSelect = document.getElementById('kyc-type-select');
+            const verifiedToggle = document.getElementById('kyc-fully-verified-toggle');
+            const fileInput = document.getElementById('kyc-document-file');
+            const previewWrap = document.getElementById('kyc-doc-preview-wrap');
+            const previewImg = document.getElementById('kyc-doc-preview-img');
+
+            selectedKycFile = null;
+            if (fileInput) fileInput.value = '';
+            if (previewWrap) previewWrap.style.display = 'none';
+
+            if (idInput) idInput.value = brokerId || '';
+            if (emailInput) emailInput.value = brokerEmail || '';
+            if (nameEl) nameEl.textContent = brokerName || 'الوسيط الإقليمي';
+            if (emailEl) emailEl.textContent = brokerEmail || brokerId || '';
+
+            // جلب بيانات التوثيق المحفوظة سابقاً
+            if (typeof window.waseetAdminGetBrokerKyc === 'function') {
+                try {
+                    const kycData = await window.waseetAdminGetBrokerKyc(brokerId, brokerEmail);
+                    if (kycData) {
+                        if (typeSelect && kycData.kyc_type) typeSelect.value = kycData.kyc_type;
+                        if (verifiedToggle) verifiedToggle.checked = (kycData.is_fully_verified !== false);
+                        if (previewWrap && previewImg && kycData.signed_preview_url) {
+                            previewImg.src = kycData.signed_preview_url;
+                            previewWrap.style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Admin KYC] Error fetching previous KYC data:', e);
+                }
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeBrokerKycModal() {
+            const modal = document.getElementById('modal-broker-kyc');
+            if (modal) modal.style.display = 'none';
+            selectedKycFile = null;
+        }
+
+        function handleKycFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            selectedKycFile = file;
+
+            const previewWrap = document.getElementById('kyc-doc-preview-wrap');
+            const previewImg = document.getElementById('kyc-doc-preview-img');
+            if (previewWrap && previewImg) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewWrap.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function handleSaveBrokerKyc(event) {
+            event.preventDefault();
+            const brokerId = document.getElementById('kyc-target-broker-id')?.value.trim();
+            const brokerEmail = document.getElementById('kyc-target-broker-email')?.value.trim();
+            const kycType = document.getElementById('kyc-type-select')?.value.trim() || 'national_id';
+            const isFullyVerified = document.getElementById('kyc-fully-verified-toggle')?.checked ?? true;
+            const submitBtn = document.getElementById('btn-save-kyc-submit');
+
+            if (!brokerId && !brokerEmail) {
+                alert('تعذر تحديد الوسيط المطلوب');
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري حفظ التوثيق...';
+            }
+
+            try {
+                let docPath = null;
+                // إذا تم اختيار ملف جديد، يتم رفعه إلى الخزينة الخاصة
+                if (selectedKycFile && typeof window.waseetAdminUploadKycDocument === 'function') {
+                    const upRes = await window.waseetAdminUploadKycDocument(brokerId, selectedKycFile);
+                    if (upRes && upRes.ok && upRes.path) {
+                        docPath = upRes.path;
+                    }
+                }
+
+                if (typeof window.waseetAdminSaveBrokerKyc === 'function') {
+                    const saveRes = await window.waseetAdminSaveBrokerKyc({
+                        brokerId,
+                        brokerEmail,
+                        kycType,
+                        documentUrl: docPath,
+                        isFullyVerified
+                    });
+
+                    if (saveRes && saveRes.ok) {
+                        closeBrokerKycModal();
+                        if (typeof waseetAlert === 'function') {
+                            await waseetAlert('تم تحديث وتثبيت إعدادات التوثيق الآمن للوسيط بنجاح ✅', 'تم التوثيق', 'success');
+                        } else {
+                            alert('تم حفظ إعدادات التوثيق بنجاح.');
+                        }
+                        await loadBrokersData();
+                    } else {
+                        throw new Error(saveRes?.error?.message || 'فشل حفظ التوثيق');
+                    }
+                }
+            } catch (err) {
+                console.error('[Admin KYC] Save Error:', err);
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('حدث خطأ أثناء حفظ التوثيق: ' + (err.message || err), 'خطأ', 'danger');
+                } else {
+                    alert('خطأ في حفظ التوثيق: ' + (err.message || err));
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ التوثيق والبيانات';
+                }
+            }
+        }
+        window.openBrokerKycModal = openBrokerKycModal;
+        window.closeBrokerKycModal = closeBrokerKycModal;
+        window.handleKycFileSelect = handleKycFileSelect;
+        window.handleSaveBrokerKyc = handleSaveBrokerKyc;
 
         async function checkAdminAccess() {
             const mainContainer = document.getElementById('admin-brokers-main');

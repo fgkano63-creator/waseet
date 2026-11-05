@@ -9369,5 +9369,698 @@ html.lenis body {
     50% { opacity: 0.8; }
 }
 
+/* ==========================================================================
+   REGIONAL BROKER DRAWER CARD (SMART FILTERING & CLICKABLE LUXURY)
+   ========================================================================== */
+.regional-broker-identity-card.is-clickable-broker-card {
+    cursor: pointer;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+    user-select: none;
+}
+
+.regional-broker-identity-card.is-clickable-broker-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.45);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(16, 185, 129, 0.15);
+}
+
+.regional-broker-identity-card.general-admin-identity-card {
+    border-color: rgba(197, 160, 89, 0.35);
+    background: linear-gradient(135deg, rgba(13, 18, 31, 0.95), rgba(20, 15, 26, 0.92));
+}
+
+.regional-broker-identity-card.general-admin-identity-card:hover {
+    border-color: rgba(197, 160, 89, 0.65);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(197, 160, 89, 0.2);
+}
+
+.broker-card-click-hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--silver-muted);
+    margin-top: 0.4rem;
+    padding-top: 0.35rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    transition: color 0.2s ease;
+}
+
+.regional-broker-identity-card.is-clickable-broker-card:hover .broker-card-click-hint {
+    color: var(--gold-light);
+}
+
+.drawer-kyc-mini-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.68rem;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    padding: 0.1rem 0.4rem;
+    border-radius: 6px;
+    margin-right: 0.4rem;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   GLOBAL REGIONAL BROKERS SECTION (FOOTER AREA - ALL COUNTRIES)
+   ========================================================================== */
+.global-brokers-section {
+    padding: 3.5rem 0 2rem;
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+}
+
+.global-brokers-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 2.2rem;
+}
+
+.global-brokers-badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(197, 160, 89, 0.12);
+    border: 1px solid rgba(197, 160, 89, 0.35);
+    color: var(--gold-light);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    margin-bottom: 0.8rem;
+}
+
+.global-brokers-title {
+    color: #fff;
+    font-size: 1.55rem;
+    font-weight: 900;
+    margin: 0 0 0.6rem;
+    line-height: 1.35;
+}
+
+.global-brokers-subtitle {
+    color: var(--silver-muted);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.global-brokers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.4rem;
+    margin-bottom: 2rem;
+}
+
+.global-broker-card {
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(10, 14, 23, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+    padding: 1.3rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.global-broker-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(16, 185, 129, 0.12);
+}
+
+.global-broker-card-glow {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.global-broker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.global-broker-avatar-wrap {
+    position: relative;
+    width: 58px;
+    height: 58px;
+}
+
+.global-broker-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(16, 185, 129, 0.4);
+    background: #090d18;
+}
+
+.global-broker-online-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 13px;
+    height: 13px;
+    background: #10b981;
+    border: 2px solid #0b0f19;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.global-broker-country-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.global-broker-flag {
+    width: 20px;
+    height: 14px;
+    border-radius: 3px;
+    object-fit: cover;
+}
+
+.global-broker-name {
+    color: #fff;
+    font-size: 1.12rem;
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.global-broker-role-pill {
+    font-size: 0.78rem;
+    color: var(--silver-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+}
+
+.global-broker-kyc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.74rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--silver-muted);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.global-broker-kyc-badge.is-verified {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #34d399;
+}
+
+.global-broker-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 0.65rem 0.4rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.broker-mini-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.mini-stat-val {
+    font-size: 0.95rem;
+    font-weight: 900;
+    font-family: var(--font-en);
+    color: #fff;
+}
+
+.mini-stat-lbl {
+    font-size: 0.68rem;
+    color: var(--silver-muted);
+}
+
+.btn-view-broker-profile {
+    width: 100%;
+    padding: 0.65rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 10px;
+    color: #34d399;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-view-broker-profile:hover {
+    background: rgba(16, 185, 129, 0.3);
+    color: #fff;
+    border-color: #10b981;
+}
+
+.global-brokers-footer-note {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.broker-network-guarantee-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+}
+
+/* ==========================================================================
+   PUBLIC BROKER PROFILE MODAL (LUXURY MODAL UI)
+   ========================================================================== */
+.broker-profile-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    padding: 1rem;
+}
+
+.broker-profile-modal-overlay.active {
+    opacity: 1;
+}
+
+.broker-profile-luxury-card {
+    background: linear-gradient(150deg, #111827 0%, #0a0d16 100%);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem 1.6rem;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.15);
+    overflow: hidden;
+    animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalPopIn {
+    from { transform: scale(0.92) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.broker-profile-glow-bg {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 75%);
+    pointer-events: none;
+}
+
+.broker-profile-close-btn {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.broker-profile-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #fff;
+}
+
+.broker-profile-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.broker-profile-avatar-ring {
+    position: relative;
+    width: 86px;
+    height: 86px;
+    margin: 0 auto 0.9rem;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
+.broker-profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #090d18;
+}
+
+.broker-online-dot {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #111827;
+}
+
+.broker-online-dot.online {
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+}
+
+.broker-online-dot.offline {
+    background: #64748b;
+}
+
+.broker-profile-name {
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 900;
+    margin: 0 0 0.4rem;
+}
+
+.broker-profile-country-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+}
+
+.broker-profile-flag {
+    width: 20px;
+    height: 14px;
+    border-radius: 3px;
+}
+
+.broker-kyc-verification-banner {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1.4rem;
+}
+
+.kyc-badge-main {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.6rem;
+}
+
+.kyc-shield-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #10b981;
+}
+
+.kyc-shield-icon-box.pending {
+    background: rgba(234, 179, 8, 0.2);
+    border-color: rgba(234, 179, 8, 0.4);
+    color: #eab308;
+}
+
+.kyc-badge-text-col {
+    flex: 1;
+}
+
+.kyc-fully-verified-tag {
+    color: #34d399;
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.kyc-type-text-row {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    margin-top: 0.2rem;
+}
+
+.kyc-privacy-note {
+    font-size: 0.72rem;
+    color: var(--silver-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.broker-trust-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+}
+
+.broker-trust-stat-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 0.9rem 0.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.stat-icon-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.stat-icon-circle.emerald {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.stat-icon-circle.gold {
+    background: rgba(234, 179, 8, 0.15);
+    color: var(--gold-light);
+}
+
+.stat-icon-circle.online {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.stat-icon-circle.offline {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+}
+
+.stat-val {
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 800;
+    font-family: var(--font-en);
+}
+
+.stars-mini {
+    color: var(--gold-light);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.stat-lbl {
+    color: var(--silver-muted);
+    font-size: 0.72rem;
+}
+
+.broker-guarantees-strip {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    margin-bottom: 1.4rem;
+}
+
+.broker-profile-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.btn-broker-action {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.22s ease;
+}
+
+.btn-request-mediation {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+}
+
+.btn-request-mediation:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(16, 185, 129, 0.5);
+}
+
+.btn-contact-broker {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
+.btn-contact-broker:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--gold-primary);
+    color: var(--gold-light);
+}
+
+/* ==========================================================================
+   ADMIN KYC STATUS PILL & TOGGLE SWITCH
+   ========================================================================== */
+.kyc-admin-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+}
+
+.kyc-admin-status-pill.verified {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+}
+
+.kyc-admin-status-pill.pending {
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    color: #eab308;
+}
+
+.kyc-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    cursor: pointer;
+}
+
+.kyc-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.kyc-toggle-slider {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: 0.3s;
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kyc-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.kyc-toggle-switch input:checked + .kyc-toggle-slider {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.kyc-toggle-switch input:checked + .kyc-toggle-slider:before {
+    transform: translateX(20px);
+}
+
 
 

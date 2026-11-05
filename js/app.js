@@ -55,6 +55,9 @@ class WaseetApp {
         if (typeof waseetRenderLeaderboard === 'function') {
             waseetRenderLeaderboard();
         }
+        if (typeof waseetRenderGlobalBrokersSection === 'function') {
+            waseetRenderGlobalBrokersSection();
+        }
 
         // Non-blocking visitor welcome prompt for first-time visitors (Requirement 1)
         if (!WASEET_STATE.user) {
@@ -116,6 +119,10 @@ class WaseetApp {
                     </div>
                 `;
             }).join('');
+
+            if (typeof waseetRenderGlobalBrokersSection === 'function') {
+                waseetRenderGlobalBrokersSection();
+            }
         } catch (err) {
             console.error('[Store Brokers] Error loading regional brokers:', err);
         }
