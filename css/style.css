@@ -8848,4 +8848,140 @@ html.lenis body {
     transform-style: preserve-3d;
 }
 
+/* ==========================================================================
+   REGIONAL BROKER IDENTITY CARD (بطاقة الوسيط الإقليمي المعتمد)
+   ========================================================================== */
+.regional-broker-identity-card {
+    background: linear-gradient(135deg, rgba(16, 24, 39, 0.96), rgba(10, 15, 26, 0.98));
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    direction: rtl;
+    text-align: right;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.regional-broker-identity-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--gold-primary), #10b981);
+}
+
+.regional-broker-identity-card:hover {
+    border-color: var(--gold-primary);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.2);
+    transform: translateY(-1px);
+}
+
+.regional-broker-identity-card .broker-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+}
+
+.regional-broker-identity-card .broker-avatar-img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold-primary);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    background: rgba(18, 24, 38, 0.9);
+    display: block;
+}
+
+.regional-broker-identity-card .broker-avatar-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 17px;
+    height: 17px;
+    background: #10b981;
+    border: 2px solid #0d1421;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.55rem;
+}
+
+.regional-broker-identity-card .broker-info-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.regional-broker-identity-card .broker-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.regional-broker-identity-card .broker-name {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.regional-broker-identity-card .broker-country-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--silver-light, #e2e8f0);
+    flex-shrink: 0;
+}
+
+.regional-broker-identity-card .broker-flag-img {
+    width: 16px;
+    height: 11px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.regional-broker-identity-card .broker-role-desc {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #34d399;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1.3;
+}
+
+/* إخفاء الشريط العائم القديم أسفل المتجر */
+.store-brokers-bottom-section,
+#regional-brokers-showcase {
+    display: none !important;
+}
+
+
 

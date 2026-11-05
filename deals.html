@@ -284,6 +284,9 @@
                 </p>
             </div>
 
+            <!-- Regional Broker Identity Card (بطاقة الوسيط الإقليمي المعتمد لبلدك) -->
+            <div id="deals-regional-broker-card-container" style="margin-bottom: 1.25rem;"></div>
+
             <!-- Deals List Container -->
             <div id="deals-table-container">
                 <!-- Rendered dynamically by JS -->
@@ -314,6 +317,9 @@
         <div class="drawer-user-card" id="drawer-user-card">
             <!-- Populated dynamically -->
         </div>
+
+        <!-- Regional Broker Identity Card (بطاقة الوسيط الإقليمي المعتمد لبلدك) -->
+        <div id="drawer-regional-broker-card"></div>
 
         <div class="drawer-section">
             <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
@@ -696,6 +702,9 @@
             })();
 
         function renderDealsView(searchQuery = '') {
+            if (typeof window.waseetRenderRegionalBrokerCard === 'function') {
+                window.waseetRenderRegionalBrokerCard('deals-regional-broker-card-container');
+            }
             const container = document.getElementById('deals-table-container');
             if (!container) return;
 

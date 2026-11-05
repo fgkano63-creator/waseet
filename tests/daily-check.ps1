@@ -9,7 +9,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "6. Seller Profile & Store Card Audit"; Script = "tests\test-seller-profile-card.ps1"; Type = "ps1" },
     [PSCustomObject]@{ Name = "7. Master Automated Engine V3.0"; Script = "tests\audit-master-engine.js"; Type = "node" },
     [PSCustomObject]@{ Name = "8. OAuth Callback & Session Lifecycle Audit"; Script = "tests\test-oauth-callback.js"; Type = "node" },
-    [PSCustomObject]@{ Name = "9. Regional Broker Permissions & Filtering Audit"; Script = "tests\test-broker-permissions-and-filtering.js"; Type = "node" }
+    [PSCustomObject]@{ Name = "9. Regional Broker Permissions & Filtering Audit"; Script = "tests\test-broker-permissions-and-filtering.js"; Type = "node" },
+    [PSCustomObject]@{ Name = "10. Regional Broker Card & Real-time Reactivity Audit"; Script = "tests\test-broker-card-and-realtime-reactivity.js"; Type = "node" }
 )
 
 $summary = @()

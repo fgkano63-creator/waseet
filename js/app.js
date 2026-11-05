@@ -103,7 +103,7 @@ class WaseetApp {
             gridEl.innerHTML = brokers.map(b => {
                 const code = String(b.country || 'DZ').toUpperCase().trim();
                 const flagSvg = (code === 'DZ' || !b.country) ? 'assets/flags/dz.svg' : `assets/flags/${code.toLowerCase()}.svg`;
-                const displayName = b.name || (b.email ? b.email.split('@')[0] : 'zaki 0000');
+                const displayName = b.name || (b.email ? b.email.split('@')[0] : 'وسيط معتمد');
 
                 return `
                     <div class="store-mini-broker-rect" title="الوسيط الإقليمي المعتمد: ${escapeHtmlSafe(displayName)}">
@@ -265,15 +265,35 @@ class WaseetApp {
      * تحديث واجهة المستخدم فور تسجيل الدخول أو تغير الجلسة
      */
     updateAuthUI(user = null) {
-        const targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+        let targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
         if (targetUser && typeof WASEET_STATE !== 'undefined') {
-            if (!WASEET_STATE.user || WASEET_STATE.user.id !== targetUser.id) {
+            if (!WASEET_STATE.user || (targetUser.id && WASEET_STATE.user.id !== targetUser.id)) {
                 WASEET_STATE.user = targetUser;
+            } else if (WASEET_STATE.user) {
+                // دمج فوري لأي تحديثات قادمة من Realtime أو Google Auth (مثل الاسم أو الصورة أو الرصيد)
+                if (targetUser.name) WASEET_STATE.user.name = targetUser.name;
+                if (targetUser.avatar_url || targetUser.avatar) {
+                    WASEET_STATE.user.avatar = targetUser.avatar_url || targetUser.avatar;
+                    if (WASEET_STATE.user.user_metadata) {
+                        WASEET_STATE.user.user_metadata.avatar_url = WASEET_STATE.user.avatar;
+                        WASEET_STATE.user.user_metadata.picture = WASEET_STATE.user.avatar;
+                    }
+                }
+                if (targetUser.points_balance !== undefined) {
+                    if (!WASEET_STATE.user.wallet) WASEET_STATE.user.wallet = { available: 0, locked: 0, total: 0 };
+                    WASEET_STATE.user.wallet.available = Number(targetUser.points_balance || 0);
+                    WASEET_STATE.user.wallet.total = WASEET_STATE.user.wallet.available + Number(WASEET_STATE.user.wallet.locked || 0);
+                }
+                targetUser = WASEET_STATE.user;
             }
         }
         this.renderUserProfile();
         this.updateWalletDisplay();
         this.updateMobileDrawer();
+
+        if (typeof window.renderNavbarUser === 'function') {
+            try { window.renderNavbarUser(); } catch (e) {}
+        }
 
         const loginModal = document.getElementById('modal-login');
         if (loginModal && targetUser) {
@@ -474,6 +494,17 @@ class WaseetApp {
                     <i class="fas fa-sign-in-alt text-gold" style="font-size: 1.05rem; opacity: 0.85;"></i>
                 `;
             }
+        }
+
+        // حقن بطاقة الوسيط الإقليمي المعتمد الأنيقة داخل القائمة الجانبية (لوحة المستخدم)
+        let brokerCardSlot = document.getElementById('drawer-regional-broker-card');
+        if (!brokerCardSlot && userCard && userCard.parentNode) {
+            brokerCardSlot = document.createElement('div');
+            brokerCardSlot.id = 'drawer-regional-broker-card';
+            userCard.parentNode.insertBefore(brokerCardSlot, userCard.nextSibling);
+        }
+        if (brokerCardSlot && typeof window.waseetRenderRegionalBrokerCard === 'function') {
+            window.waseetRenderRegionalBrokerCard(brokerCardSlot);
         }
 
         if (authActions) {

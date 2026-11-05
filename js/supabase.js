@@ -202,7 +202,7 @@ function enrichProfileWithBrokerStatus(profileRecord, extraSources = {}) {
         profileRecord.is_admin === true || (userRow && userRow.is_admin === true) ||
         ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'].includes(emailLower);
 
-    const isBroker = !isAdminRole && (
+    const isBroker = !isAdminRole && dbRole !== 'user' && (
         dbRole === 'broker' ||
         dbRole === 'regional_broker' ||
         altUserRole === 'broker' ||
@@ -582,9 +582,19 @@ window.waseetApplyLiveRoleUpdateToUI = waseetApplyLiveRoleUpdateToUI;
 /**
  * إشعار مرئي فوري عند ترقية المستخدم إلى وسيط في قاعدة البيانات أثناء تصفحه للمتجر
  */
-function waseetShowRoleUpgradeToast(user) {
+function waseetShowRoleUpgradeToast(user, isExplicitPromotion = false) {
     try {
         if (!user || typeof document === 'undefined') return;
+
+        // حماية صارمة: استبعاد المستخدمين العاديين والبائعين والمشترين نهائياً من هذا الإشعار (False Positive Guard)
+        const isActuallyBroker = user.role === 'regional_broker' || (user.isBroker === true && user.role !== 'user');
+        const isActuallyAdmin = user.role === 'admin' || user.isAdmin === true;
+        if (!isActuallyBroker && !isActuallyAdmin) return;
+        if (user.role === 'user' || user.role === 'buyer' || user.role === 'seller') return;
+
+        // لا يظهر الإشعار إلا عند استلام حدث ترقية صريح ومؤكد من لوحة الإدارة
+        if (!isExplicitPromotion) return;
+
         const toastKey = 'waseet_upgrade_toast_shown_' + (user.id || user.email || 'user') + '_' + (user.role || 'broker');
         if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(toastKey)) {
             return; // تم عرضه مسبقاً في هذه الجلسة — منع التكرار المزعج
@@ -735,6 +745,47 @@ async function waseetSyncAuthState(options = {}) {
 
         let profile = (profileRes.status === 'fulfilled') ? profileRes.value : null;
 
+        // 2.1 مزامنة بيانات Google (الاسم والصورة) مع جدول public.profiles تلقائياً وتحديث الجدول عند وجود أي تغيير
+        const googleName = String(authUser.user_metadata?.full_name || authUser.user_metadata?.name || '').trim();
+        const googleAvatar = String(authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || '').trim();
+
+        if (client && authUser.id && (googleName || googleAvatar)) {
+            const currentDbName = String(profile?.name || '').trim();
+            const currentDbAvatar = String(profile?.avatar_url || '').trim();
+
+            const nameChanged = Boolean(googleName && googleName !== currentDbName);
+            const avatarChanged = Boolean(googleAvatar && googleAvatar !== currentDbAvatar);
+
+            if (nameChanged || avatarChanged) {
+                console.log('[Google Auth Sync] Updating public.profiles with fresh Google credentials:', {
+                    nameChanged, avatarChanged, googleName, googleAvatar
+                });
+                try {
+                    const updatePayload = {};
+                    if (nameChanged) updatePayload.name = googleName;
+                    if (avatarChanged) updatePayload.avatar_url = googleAvatar;
+                    updatePayload.updated_at = new Date().toISOString();
+
+                    const { error: updErr } = await client
+                        .from('profiles')
+                        .update(updatePayload)
+                        .eq('id', authUser.id);
+
+                    if (!updErr) {
+                        console.log('[Google Auth Sync] Successfully updated profiles table from Google metadata');
+                        if (profile) {
+                            if (updatePayload.name) profile.name = updatePayload.name;
+                            if (updatePayload.avatar_url) profile.avatar_url = updatePayload.avatar_url;
+                        }
+                    } else {
+                        console.warn('[Google Auth Sync] Warning updating profiles table:', updErr.message);
+                    }
+                } catch (syncEx) {
+                    console.warn('[Google Auth Sync] Exception during sync:', syncEx);
+                }
+            }
+        }
+
         // جلب رابط الصورة مباشرة من user.user_metadata.avatar_url كما هو مطلوب
         const avatarUrl = authUser.user_metadata?.avatar_url
             || authUser.user_metadata?.picture
@@ -780,12 +831,12 @@ async function waseetSyncAuthState(options = {}) {
         const explicitRegularUserInDb = (profRole === 'user' && metaRole !== 'broker' && metaRole !== 'regional_broker' && !(profile && profile.isBroker));
 
         const isBroker = !isAdmin && !!(
-            profRole === 'regional_broker' ||
+            (profRole === 'regional_broker' ||
             profRole === 'broker' ||
             metaRole === 'regional_broker' ||
             metaRole === 'broker' ||
             (profile && profile.isBroker === true) ||
-            (!explicitRegularUserInDb && cachedBrokerEntry)
+            (!explicitRegularUserInDb && cachedBrokerEntry)) && profRole !== 'user'
         );
 
         const userRole = isAdmin
@@ -850,8 +901,8 @@ async function waseetSyncAuthState(options = {}) {
             if (!shouldRefreshToken) {
                 try { client.auth.refreshSession(); } catch (e) {}
             }
-            if (!prevWasStaff && nowIsStaff) {
-                waseetShowRoleUpgradeToast(mappedUser);
+            if (!prevWasStaff && nowIsStaff && mappedUser.role !== 'user') {
+                waseetShowRoleUpgradeToast(mappedUser, true);
             }
             try {
                 window.dispatchEvent(new CustomEvent('waseet:role-updated', {
@@ -3944,31 +3995,103 @@ async function waseetFetchRegionalBrokers() {
     const finalBrokers = Array.from(mergedMap.values());
     saveCachedRegionalBrokersList(finalBrokers);
 
-    // إذا كان المستخدم المسجل حالياً ضمن قائمة الوسطاء الإقليميين النشطين، نرقّي صلاحياته فوراً في الجلسة الحالية
-    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.role !== 'admin' && !WASEET_STATE.user.isAdmin) {
+    // إذا كان المستخدم الحالي وسيطاً معتمداً بالفعل، نقوم بمزامنة دولته المسندة في الجلسة الحالية
+    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && (WASEET_STATE.user.role === 'regional_broker' || WASEET_STATE.user.isBroker) && WASEET_STATE.user.role !== 'admin' && !WASEET_STATE.user.isAdmin) {
         const curId = String(WASEET_STATE.user.id || '');
         const curEmail = String(WASEET_STATE.user.email || '').toLowerCase().trim();
         const myBrokerRecord = finalBrokers.find(b =>
             (b.id && curId && String(b.id) === curId) ||
             (b.email && curEmail && String(b.email).toLowerCase().trim() === curEmail)
         );
-        if (myBrokerRecord) {
-            const wasAlreadyBroker = WASEET_STATE.user.role === 'regional_broker' && WASEET_STATE.user.country === myBrokerRecord.country;
-            WASEET_STATE.user.role = 'regional_broker';
-            WASEET_STATE.user.brokerRole = 'broker';
-            WASEET_STATE.user.isBroker = true;
-            WASEET_STATE.user.country = myBrokerRecord.country || 'DZ';
+        if (myBrokerRecord && myBrokerRecord.country && WASEET_STATE.user.country !== myBrokerRecord.country) {
+            WASEET_STATE.user.country = myBrokerRecord.country;
             if (typeof saveWaseetData === 'function') saveWaseetData();
-            if (!wasAlreadyBroker) {
-                waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
-                waseetShowRoleUpgradeToast(WASEET_STATE.user);
-            }
+            waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
         }
     }
 
     console.log('[Regional Brokers] Total active regional brokers loaded:', finalBrokers.length, finalBrokers);
     return { ok: true, data: finalBrokers };
 }
+
+/**
+ * توليد وعرض بطاقة تعريفية أنيقة للوسيط الإقليمي المعتمد لبلد المستخدم (Regional Broker Card)
+ */
+async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
+    try {
+        const container = (typeof targetElOrId === 'string') ? document.getElementById(targetElOrId) : targetElOrId;
+        if (!container) return;
+
+        let brokers = [];
+        if (typeof waseetFetchRegionalBrokers === 'function') {
+            const res = await waseetFetchRegionalBrokers();
+            if (res && res.ok && Array.isArray(res.data)) brokers = res.data;
+        }
+        if (brokers.length === 0 && typeof getCachedRegionalBrokersList === 'function') {
+            brokers = getCachedRegionalBrokersList();
+        }
+
+        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+        const userCountry = (currentUser && currentUser.country) ? String(currentUser.country).toUpperCase().trim() : 'DZ';
+
+        // مطابقة الوسيط حسب بلد المستخدم أو اعتماد أول وسيط نشط مسجل
+        let activeBroker = brokers.find(b => b && b.is_active !== false && String(b.country || '').toUpperCase().trim() === userCountry);
+        if (!activeBroker && brokers.length > 0) {
+            activeBroker = brokers.find(b => b && b.is_active !== false) || brokers[0];
+        }
+
+        if (!activeBroker) {
+            activeBroker = {
+                name: 'الوسيط المعتمد',
+                country: userCountry || 'DZ',
+                avatar_url: 'assets/logo.png',
+                email: 'mediator@waseet.com'
+            };
+        }
+
+        const countryCode = String(activeBroker.country || userCountry || 'DZ').toUpperCase().trim();
+        const countryNamesMap = {
+            DZ: 'الجزائر', EG: 'مصر', SA: 'السعودية', MA: 'المغرب', TN: 'تونس',
+            SY: 'سوريا', IQ: 'العراق', LY: 'ليبيا', JO: 'الأردن', AE: 'الإمارات',
+            KW: 'الكويت', QA: 'قطر', OM: 'عُمان', BH: 'البحرين', YE: 'اليمن',
+            PS: 'فلسطين', LB: 'لبنان', SD: 'السودان', MR: 'موريتانيا'
+        };
+        const countryName = countryNamesMap[countryCode] || countryCode;
+        const flagSvg = (countryCode === 'DZ') ? 'assets/flags/dz.svg' : `assets/flags/${countryCode.toLowerCase()}.svg`;
+        const brokerName = activeBroker.name || (activeBroker.email ? activeBroker.email.split('@')[0] : 'وسيط معتمد');
+        let avatarUrl = activeBroker.avatar_url || 'assets/logo.png';
+        if (avatarUrl.includes('#waseet_broker=')) {
+            avatarUrl = avatarUrl.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
+        }
+
+        const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+        container.innerHTML = `
+            <div class="regional-broker-identity-card" title="الوسيط الإقليمي المعتمد لبلدك: ${escapeHtmlSafe(brokerName)} (${escapeHtmlSafe(countryName)})">
+                <div class="broker-avatar-wrap">
+                    <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="broker-avatar-img" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                    <span class="broker-avatar-badge" title="وسيط معتمد وموثق"><i class="fas fa-shield-alt"></i></span>
+                </div>
+                <div class="broker-info-col">
+                    <div class="broker-name-row">
+                        <h4 class="broker-name">${escapeHtmlSafe(brokerName)}</h4>
+                        <span class="broker-country-badge">
+                            <img src="${escapeHtmlSafe(flagSvg)}" alt="${escapeHtmlSafe(countryName)}" class="broker-flag-img" onerror="this.src='assets/flags/dz.svg'">
+                            <span>${escapeHtmlSafe(countryName)} (${escapeHtmlSafe(countryCode)})</span>
+                        </span>
+                    </div>
+                    <p class="broker-role-desc">
+                        <i class="fas fa-user-shield text-emerald"></i>
+                        <span>الوسيط الإقليمي المعتمد لبلدك</span>
+                    </p>
+                </div>
+            </div>
+        `;
+    } catch (cardErr) {
+        console.warn('[Regional Broker Card] Error rendering broker identity card:', cardErr);
+    }
+}
+window.waseetRenderRegionalBrokerCard = waseetRenderRegionalBrokerCard;
 
 /**
  * البحث عن وسيط إقليمي لدولة معينة (Smart Routing)
@@ -4106,9 +4229,53 @@ function waseetInitLiveRoleAndSessionSync() {
                 }, 200);
             };
 
+            // 2. اشتراك Supabase Realtime فوري على جدول profiles لتحديث الاسم والصورة بالهيدر والقائمة الجانبية فوراً دون تحديث الصفحة
+            const handleProfileRealtimeUpdate = (payload) => {
+                const updatedRow = (payload && (payload.new || payload.payload)) || {};
+                if (!updatedRow || !updatedRow.id) return;
+
+                const curUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+                if (!curUser || String(curUser.id) !== String(updatedRow.id)) return;
+
+                console.log('[Realtime Profiles] Live profile update received for current user:', updatedRow);
+
+                if (updatedRow.name) curUser.name = updatedRow.name;
+                if (updatedRow.avatar_url) {
+                    curUser.avatar = updatedRow.avatar_url;
+                    if (curUser.user_metadata) {
+                        curUser.user_metadata.avatar_url = updatedRow.avatar_url;
+                        curUser.user_metadata.picture = updatedRow.avatar_url;
+                    }
+                }
+                if (updatedRow.points_balance !== undefined) {
+                    if (!curUser.wallet) curUser.wallet = { available: 0, locked: 0, total: 0 };
+                    curUser.wallet.available = Number(updatedRow.points_balance || 0);
+                    curUser.wallet.total = curUser.wallet.available + Number(curUser.wallet.locked || 0);
+                }
+
+                if (typeof saveWaseetData === 'function') saveWaseetData();
+                try {
+                    localStorage.setItem('WASEET_CURRENT_USER', JSON.stringify(curUser));
+                    localStorage.setItem('WASEET_SAVED_USER_PERMANENT', JSON.stringify(curUser));
+                } catch (e) {}
+
+                // استدعاء دالة updateAuthUI(payload.new) فوراً لتحديث الاسم والصورة في الهيدر والقائمة الجانبية في نفس اللحظة (Real-time)
+                if (typeof updateAuthUI === 'function') {
+                    updateAuthUI(updatedRow);
+                } else if (window.waseetApp && typeof window.waseetApp.updateAuthUI === 'function') {
+                    window.waseetApp.updateAuthUI(updatedRow);
+                }
+                if (typeof window.renderNavbarUser === 'function') {
+                    try { window.renderNavbarUser(); } catch (e) {}
+                }
+            };
+
             const roleChannel = client
                 .channel('waseet_live_role_sync_rt')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, triggerRealtimeRoleCheck)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
+                    handleProfileRealtimeUpdate(payload);
+                    triggerRealtimeRoleCheck(payload);
+                })
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'regional_brokers' }, triggerRealtimeRoleCheck)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, triggerRealtimeRoleCheck)
                 .on('broadcast', { event: 'broker_role_changed' }, triggerRealtimeRoleCheck)
@@ -4180,14 +4347,35 @@ window.waseetRefreshSessionRoleNow = function () {
  * دوال تحديث واجهة المستخدم بعد المصادقة (Auth UI Updater)
  */
 function updateAuthUI(user = null) {
-    const targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+    let targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+    if (targetUser && typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+        if (targetUser.name) WASEET_STATE.user.name = targetUser.name;
+        if (targetUser.avatar_url || targetUser.avatar) {
+            WASEET_STATE.user.avatar = targetUser.avatar_url || targetUser.avatar;
+            if (WASEET_STATE.user.user_metadata) {
+                WASEET_STATE.user.user_metadata.avatar_url = WASEET_STATE.user.avatar;
+                WASEET_STATE.user.user_metadata.picture = WASEET_STATE.user.avatar;
+            }
+        }
+        if (targetUser.points_balance !== undefined) {
+            if (!WASEET_STATE.user.wallet) WASEET_STATE.user.wallet = { available: 0, locked: 0, total: 0 };
+            WASEET_STATE.user.wallet.available = Number(targetUser.points_balance || 0);
+            WASEET_STATE.user.wallet.total = WASEET_STATE.user.wallet.available + Number(WASEET_STATE.user.wallet.locked || 0);
+        }
+        targetUser = WASEET_STATE.user;
+    }
+
     waseetApplyLiveRoleUpdateToUI(targetUser);
+
     if (window.waseetApp) {
         if (typeof window.waseetApp.updateAuthUI === 'function') {
             try { window.waseetApp.updateAuthUI(targetUser); } catch (e) {}
         } else if (typeof window.waseetApp.renderUserProfile === 'function') {
             try { window.waseetApp.renderUserProfile(); } catch (e) {}
         }
+    }
+    if (typeof window.renderNavbarUser === 'function') {
+        try { window.renderNavbarUser(); } catch (e) {}
     }
 }
 window.updateAuthUI = updateAuthUI;

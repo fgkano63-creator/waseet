@@ -322,6 +322,17 @@
             }
         }
 
+        // حقن بطاقة الوسيط الإقليمي المعتمد لبلدك داخل القائمة الجانبية الموحدة
+        var brokerCardSlot = byId('drawer-regional-broker-card');
+        if (!brokerCardSlot && card && card.parentNode) {
+            brokerCardSlot = document.createElement('div');
+            brokerCardSlot.id = 'drawer-regional-broker-card';
+            card.parentNode.insertBefore(brokerCardSlot, card.nextSibling);
+        }
+        if (brokerCardSlot && typeof window.waseetRenderRegionalBrokerCard === 'function') {
+            window.waseetRenderRegionalBrokerCard(brokerCardSlot);
+        }
+
         var auth = byId('drawer-auth-actions');
         if (auth) {
             if (user) {
