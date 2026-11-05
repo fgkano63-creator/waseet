@@ -539,9 +539,9 @@ function waseetApplyLiveRoleUpdateToUI(user) {
         const drawerPendingBtn = document.getElementById('drawer-btn-pending-verification');
         if (drawerPendingBtn) drawerPendingBtn.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
         const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-        if (drawerAdminBrokers) drawerAdminBrokers.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-        if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
         if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = isAdmin ? 'flex' : 'none';
 
@@ -1851,21 +1851,44 @@ async function waseetSyncWalletLockedPoints() {
             if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.wallet) {
                 const user = WASEET_STATE.user;
                 const activeDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
-                let realLocked = 0;
+                let dealsLocked = 0;
                 activeDeals.forEach(d => {
                     const isBuyer = (user.id && (String(d.buyer_id) === String(user.id) || (d.buyer && String(d.buyer.id) === String(user.id)))) ||
                                     (user.name && d.buyer && d.buyer.name === user.name);
                     if (isBuyer) {
-                        realLocked += Number(d.totalPoints || d.total_points || 0);
+                        dealsLocked += Number(d.totalPoints || d.total_points || 0);
                     }
                 });
+
+                let withdrawalsLocked = 0;
+                if (typeof waseetFetchMyWithdrawals === 'function') {
+                    try {
+                        const myW = await waseetFetchMyWithdrawals();
+                        if (Array.isArray(myW)) {
+                            withdrawalsLocked = myW
+                                .filter(w => w && w.status === 'pending')
+                                .reduce((sum, w) => sum + Number(w.amount || 0), 0);
+                        }
+                    } catch (we) {}
+                }
+
+                const realLocked = dealsLocked + withdrawalsLocked;
                 const oldLocked = Number(user.wallet.locked || 0);
                 const orphan = Math.max(0, oldLocked - realLocked);
                 user.wallet.locked = realLocked;
                 user.wallet.available = Number(user.wallet.available || 0) + orphan;
                 user.wallet.total = user.wallet.available + user.wallet.locked;
                 if (typeof saveWaseetData === 'function') saveWaseetData();
-                return { ok: true, data: { orphan_released: orphan, new_locked: realLocked, new_available: user.wallet.available } };
+                return {
+                    ok: true,
+                    data: {
+                        orphan_released: orphan,
+                        new_locked: realLocked,
+                        deals_locked: dealsLocked,
+                        withdrawals_locked: withdrawalsLocked,
+                        new_available: user.wallet.available
+                    }
+                };
             }
             return { ok: false, error };
         }
@@ -2015,7 +2038,7 @@ async function waseetAdminFetchDepositRequests() {
         if (userIds.length > 0) {
             const { data: profiles } = await client
                 .from('profiles')
-                .select('id, name, email, avatar_url, points_balance, wallet_balance')
+                .select('id, name, email, avatar_url, points_balance, wallet_balance, country')
                 .in('id', userIds);
 
             if (Array.isArray(profiles)) {
@@ -2025,10 +2048,45 @@ async function waseetAdminFetchDepositRequests() {
             }
         }
 
-        return requests.map(r => ({
+        let mapped = requests.map(r => ({
             ...r,
             userProfile: profilesMap[r.user_id] || null
         }));
+
+        // تصفية البيانات للوسيط الإقليمي: يرى فقط طلبات الشحن الخاصة بدولته أو الموجهة له
+        // أما المدير العام فيرى كافة الطلبات من جميع الدول بدون تصفية
+        const currentUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+        const isAdmin = !!(currentUser && (
+            currentUser.role === 'admin' ||
+            (typeof isStrictAdmin === 'function' ? isStrictAdmin(currentUser) : (currentUser.isAdmin === true || currentUser.is_admin === true))
+        ) && currentUser.role !== 'regional_broker' && currentUser.role !== 'broker' && currentUser.role !== 'user');
+        const isBroker = !isAdmin && !!(currentUser && (
+            currentUser.role === 'regional_broker' ||
+            currentUser.role === 'broker' ||
+            currentUser.isBroker === true ||
+            (typeof isRegionalBroker === 'function' && isRegionalBroker(currentUser))
+        ));
+
+        if (isBroker && !isAdmin) {
+            const brokerCountry = (currentUser && currentUser.country) ? String(currentUser.country).toUpperCase().trim() : 'DZ';
+            mapped = mapped.filter(r => {
+                if (r.assigned_broker_id && currentUser && r.assigned_broker_id === currentUser.id) return true;
+                const uCountry = r.userProfile && r.userProfile.country ? String(r.userProfile.country).toUpperCase().trim() : '';
+                if (uCountry && uCountry === brokerCountry) return true;
+                const reqCountry = r.country ? String(r.country).toUpperCase().trim() : '';
+                if (reqCountry && reqCountry === brokerCountry) return true;
+                const pMethod = String(r.payment_method || '').toUpperCase();
+                const pNotes = String(r.notes || '').toUpperCase();
+                if (pMethod.includes(brokerCountry) || pNotes.includes(brokerCountry)) return true;
+                if (brokerCountry === 'DZ' && (pMethod.includes('بريدي') || pMethod.includes('BARIDIMOB') || pMethod.includes('CCP') || pMethod.includes('الجزائر'))) return true;
+                if (brokerCountry === 'EG' && (pMethod.includes('فودافون') || pMethod.includes('VODAFONE') || pMethod.includes('INSTAPAY') || pMethod.includes('إنستاباي') || pMethod.includes('مصر'))) return true;
+                if (brokerCountry === 'SA' && (pMethod.includes('STC') || pMethod.includes('راجحي') || pMethod.includes('السعودية'))) return true;
+                if (brokerCountry === 'LY' && (pMethod.includes('تداول') || pMethod.includes('سداد') || pMethod.includes('ليبيا'))) return true;
+                return false;
+            });
+        }
+
+        return mapped;
     } catch (err) {
         console.error('[Admin Deposits] استثناء جلب طلبات الشحن:', err);
         return [];

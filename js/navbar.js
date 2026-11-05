@@ -112,24 +112,26 @@
         }
 
         var curPath = (window.location.pathname || '').toLowerCase();
-        var isBrokersPage = curPath.indexOf('admin-brokers') !== -1;
+        var isDealsPage = curPath.indexOf('deals') !== -1;
         var isPendingPage = curPath.indexOf('pending-accounts') !== -1;
+        var isDepositsPage = curPath.indexOf('admin-deposits') !== -1;
         var isChatsPage = curPath.indexOf('admin-chats') !== -1;
-        var countryCode = (user && user.country) ? String(user.country).toUpperCase() : 'DZ';
 
         existingBrokerWrap.innerHTML =
-            '<a href="admin-brokers.html" class="btn-nav-middle btn-nav-broker' + (isBrokersPage ? ' active' : '') + '" style="border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;" title="لوحة إدارة الوساطة الإقليمية">' +
-                '<i class="fas fa-globe-africa text-emerald"></i> <span>الوساطة (' + esc(countryCode) + ')</span>' +
+            '<a href="deals.html" class="btn-nav-middle btn-nav-broker' + (isDealsPage ? ' active' : '') + '" style="border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; font-weight: 700;" title="إدارة صفقات قيد الشراء">' +
+                '<i class="fas fa-shield-alt text-emerald"></i> <span>قيد الشراء</span>' +
+                '<span class="deals-badge-count admin-deals-badge" id="broker-unified-deals-badge" style="display: none;">0</span>' +
             '</a>' +
-            '<a href="wallet.html#admin-payment-manager-panel" class="btn-nav-middle btn-nav-broker" style="border: 1px solid rgba(234, 179, 8, 0.45); background: rgba(234, 179, 8, 0.12); color: #facc15; font-weight: 700;" title="لوحة تحكم وتغيير بطاقات الدفع">' +
-                '<i class="fas fa-credit-card text-gold"></i> <span>تغيير البطاقات</span>' +
-            '</a>' +
-            '<a href="pending-accounts.html" class="btn-nav-middle btn-nav-broker' + (isPendingPage ? ' active' : '') + '" style="border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); color: #fbbf24; font-weight: 700;" title="فحص الحسابات المعلقة">' +
-                '<i class="fas fa-clipboard-check text-orange"></i> <span>فحص الحسابات</span>' +
+            '<a href="pending-accounts.html" class="btn-nav-middle btn-nav-broker' + (isPendingPage ? ' active' : '') + '" style="border: 1px solid rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); color: #fbbf24; font-weight: 700;" title="فحص الحسابات قيد الفحص">' +
+                '<i class="fas fa-clipboard-check text-orange"></i> <span>قيد الفحص</span>' +
                 '<span class="deals-badge-count admin-pending-badge" id="broker-unified-pending-badge" style="display: none;">0</span>' +
             '</a>' +
-            '<a href="admin-chats.html" class="btn-nav-middle btn-nav-broker' + (isChatsPage ? ' active' : '') + '" style="border: 1px solid rgba(14, 165, 233, 0.45); background: rgba(14, 165, 233, 0.12); color: #38bdf8; font-weight: 700;" title="محادثات الدعم والوساطة">' +
-                '<i class="fas fa-headset text-gold"></i> <span>محادثات الوساطة</span>' +
+            '<a href="admin-deposits.html" class="btn-nav-middle btn-nav-broker' + (isDepositsPage ? ' active' : '') + '" style="border: 1px solid rgba(234, 179, 8, 0.45); background: rgba(234, 179, 8, 0.12); color: #facc15; font-weight: 700;" title="إدارة طلبات شحن النقاط">' +
+                '<i class="fas fa-coins text-gold"></i> <span>شحن النقاط</span>' +
+                '<span class="deals-badge-count admin-deposits-badge" id="broker-unified-deposits-badge" style="display: none;">0</span>' +
+            '</a>' +
+            '<a href="admin-chats.html" class="btn-nav-middle btn-nav-broker' + (isChatsPage ? ' active' : '') + '" style="border: 1px solid rgba(14, 165, 233, 0.45); background: rgba(14, 165, 233, 0.12); color: #38bdf8; font-weight: 700;" title="محادثات الإدارة والوساطة">' +
+                '<i class="fas fa-headset text-gold"></i> <span>محادثات الإدارة</span>' +
                 '<span class="deals-badge-count chats-unread-badge" style="display: none;"></span>' +
             '</a>';
     }
@@ -209,8 +211,35 @@
         link.style.display = '';
     }
 
+    function updateDrawerUserCard(user) {
+        var u = user || currentUser();
+        var admin = isAdminUser(u);
+        var broker = !admin && isBrokerUser(u);
+        var pts = (u && u.wallet) ? (Number(u.wallet.available) || 0) : ((u && typeof u.points_balance !== 'undefined') ? Number(u.points_balance) : 0);
+        document.querySelectorAll('.drawer-user-card, #drawer-user-card').forEach(function (card) {
+            if (u && !u.isGuest) {
+                var role = broker
+                    ? '🌍 وسيط إقليمي معتمد (' + (u.country || 'DZ') + ')'
+                    : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
+                card.innerHTML =
+                    '<img src="' + esc(userAvatar(u)) + '" class="drawer-avatar" alt="' + esc(u.name || 'مستخدم') + '" referrerpolicy="no-referrer" ' +
+                    'onerror="this.onerror=null;this.src=\'' + DEFAULT_AVATAR + '\'">' +
+                    '<div class="drawer-user-meta"><span class="drawer-user-name">' + esc(u.name || 'مستخدم') + '</span>' +
+                    '<span class="drawer-user-role">' + role + '</span>' +
+                    '<span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ' + pts + ' نقطة متاحة</span></div>';
+            } else {
+                card.innerHTML =
+                    '<div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">' +
+                    '<i class="fas fa-user-circle text-gold"></i></div>' +
+                    '<div class="drawer-user-meta"><span class="drawer-user-name">زائر غير مسجل</span>' +
+                    '<span class="drawer-user-role" style="color: var(--gold-light);">سجّل دخولك للاستفادة من كل المزايا</span></div>';
+            }
+        });
+    }
+
     function refreshDrawerExtras() {
         var user = currentUser();
+        updateDrawerUserCard(user);
         document.querySelectorAll('.mobile-drawer, .mobile-drawer-sidebar').forEach(function (drawer) {
             var row = ensureWalletRow(drawer);
             if (row) {
@@ -223,6 +252,7 @@
         });
     }
     window.waseetRefreshDrawerExtras = refreshDrawerExtras;
+    window.waseetUpdateDrawerUserCard = updateDrawerUserCard;
 
     /* ======================================================================
        4) الرسم التلقائي للشريط العلوي (للصفحات المعلَّمة data-waseet-nav="auto")
@@ -313,14 +343,22 @@
             el.style.display = canShow ? (el.classList.contains('btn-nav-middle') ? 'inline-flex' : '') : 'none';
         });
         document.querySelectorAll('[data-admin-only]').forEach(function (el) {
-            el.style.display = admin ? '' : 'none';
+            if (el.id === 'drawer-admin-deposits-link' || el.getAttribute('href') === 'admin-deposits.html') {
+                el.style.display = (admin || broker) ? 'flex' : 'none';
+            } else {
+                el.style.display = admin ? '' : 'none';
+            }
         });
         var drawerBrokers = byId('drawer-admin-brokers-link');
         if (drawerBrokers) drawerBrokers.style.display = admin ? 'flex' : 'none';
         var drawerDeposits = byId('drawer-admin-deposits-link');
-        if (drawerDeposits) drawerDeposits.style.display = admin ? 'flex' : 'none';
+        if (drawerDeposits) drawerDeposits.style.display = (admin || broker) ? 'flex' : 'none';
         var drawerWithdrawals = byId('drawer-admin-withdrawals-link');
         if (drawerWithdrawals) drawerWithdrawals.style.display = admin ? 'flex' : 'none';
+        var drawerPending = byId('drawer-btn-pending-verification') || byId('deals-drawer-btn-pending');
+        if (drawerPending) drawerPending.style.display = (admin || broker) ? 'flex' : 'none';
+        var drawerChats = byId('drawer-admin-chats-link') || byId('deals-drawer-admin-chats');
+        if (drawerChats) drawerChats.style.display = (admin || broker) ? 'flex' : 'none';
 
         renderBrokerSupervisionBanner(user);
 

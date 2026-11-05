@@ -1688,6 +1688,10 @@
                         <i class="fas fa-shield-alt text-gold"></i>
                         <span>قيد الشراء</span>
                     </a>
+                    <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-btn-pending-verification" style="display: none;">
+                        <i class="fas fa-clipboard-check text-orange"></i>
+                        <span>قيد الفحص</span>
+                    </a>
                     <a href="my-accounts.html" class="drawer-shortcut-card">
                         <i class="fas fa-boxes text-gold"></i>
                         <span>حساباتي</span>
@@ -1696,13 +1700,17 @@
                         <i class="fas fa-headset text-orange"></i>
                         <span>تواصل مع الوسيط</span>
                     </a>
+                    <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;">
+                        <i class="fas fa-inbox text-gold"></i>
+                        <span>محادثات الإدارة</span>
+                    </a>
                     <a href="admin-withdrawals.html" class="drawer-shortcut-card" id="drawer-admin-withdrawals-link" style="display: none;" data-admin-only>
                         <i class="fas fa-hand-holding-usd text-orange"></i>
                         <span>طلبات السحب (إدارة)</span>
                     </a>
-                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only>
+                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;">
                         <i class="fas fa-coins text-gold"></i>
-                        <span>طلبات الشحن (إدارة)</span>
+                        <span>شحن النقاط</span>
                     </a>
                     <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only>
                         <i class="fas fa-globe-africa text-orange"></i>
@@ -3260,7 +3268,8 @@
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function renderEscrowLockedDeals(user) {
@@ -3390,6 +3399,9 @@
             const userNav = document.getElementById('nav-user-middle-group');
             const adminNav = document.getElementById('nav-admin-middle-group');
             const drawerAdminLink = document.getElementById('drawer-admin-deposits-link');
+            const drawerPendingLink = document.getElementById('drawer-btn-pending-verification');
+            const drawerChatsLink = document.getElementById('drawer-admin-chats-link');
+            const drawerWithdrawalsLink = document.getElementById('drawer-admin-withdrawals-link');
             const userDepositPanel = document.getElementById('user-deposit-panel');
             const adminManagerPanel = document.getElementById('admin-payment-manager-panel');
 
@@ -3398,6 +3410,9 @@
                 if (adminNav) adminNav.style.display = 'flex';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'flex';
                 if (drawerBrokersLink) drawerBrokersLink.style.display = 'flex';
+                if (drawerPendingLink) drawerPendingLink.style.display = 'flex';
+                if (drawerChatsLink) drawerChatsLink.style.display = 'flex';
+                if (drawerWithdrawalsLink) drawerWithdrawalsLink.style.display = 'flex';
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
                 });
@@ -3409,10 +3424,17 @@
             } else if (isBroker) {
                 if (userNav) userNav.style.display = 'flex';
                 if (adminNav) adminNav.style.display = 'none';
-                if (drawerAdminLink) drawerAdminLink.style.display = 'none';
-                if (drawerBrokersLink) drawerBrokersLink.style.display = 'flex';
+                if (drawerAdminLink) drawerAdminLink.style.display = 'flex';
+                if (drawerBrokersLink) drawerBrokersLink.style.display = 'none';
+                if (drawerPendingLink) drawerPendingLink.style.display = 'flex';
+                if (drawerChatsLink) drawerChatsLink.style.display = 'flex';
+                if (drawerWithdrawalsLink) drawerWithdrawalsLink.style.display = 'none';
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
-                    el.style.display = 'none';
+                    if (el.id === 'drawer-admin-deposits-link') {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'none';
+                    }
                 });
                 if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
                     window.waseetRenderUnifiedBrokerNavLinks(user);
@@ -3420,17 +3442,17 @@
                 const existingSubBar = document.getElementById('waseet-broker-supervision-bar');
                 if (existingSubBar) existingSubBar.remove();
 
-                // الوسيط: إخفاء شاشة الشحن العادية وتفعيل لوحة تحكم وتغيير البطاقات الخاصة به فوراً
-                if (userDepositPanel) userDepositPanel.style.display = 'none';
-                if (adminManagerPanel) {
-                    adminManagerPanel.style.display = 'block';
-                    loadAdminPaymentMethods();
-                }
+                // الوسيط: لا يملك صلاحية تغيير بطاقات الدفع -> إخفاء لوحة إدارة البطاقات وعرض شاشة الشحن
+                if (adminManagerPanel) adminManagerPanel.style.display = 'none';
+                if (userDepositPanel) userDepositPanel.style.display = 'block';
             } else {
                 if (userNav) userNav.style.display = '';
                 if (adminNav) adminNav.style.display = 'none';
                 if (drawerAdminLink) drawerAdminLink.style.display = 'none';
                 if (drawerBrokersLink) drawerBrokersLink.style.display = 'none';
+                if (drawerPendingLink) drawerPendingLink.style.display = 'none';
+                if (drawerChatsLink) drawerChatsLink.style.display = 'none';
+                if (drawerWithdrawalsLink) drawerWithdrawalsLink.style.display = 'none';
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
@@ -3440,6 +3462,37 @@
 
             if (typeof window.waseetRenderBrokerSupervisionBanner === 'function') {
                 window.waseetRenderBrokerSupervisionBanner(user);
+            }
+
+            // تحديث بطاقة المستخدم في القائمة الجانبية (لمنع ظهور صندوق فارغ كما في الصورة 2)
+            const drawerUserCard = document.getElementById('drawer-user-card');
+            if (drawerUserCard) {
+                if (user && !user.isGuest) {
+                    const avatar = user.avatar || (user.user_metadata && user.user_metadata.avatar_url) || 'assets/logo.png';
+                    const safeName = escapeSafe(user.name || 'مستخدم');
+                    const pts = (user.wallet && typeof user.wallet.available !== 'undefined') ? user.wallet.available : (user.points_balance || 0);
+                    const roleLabel = isBroker
+                        ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
+                        : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
+                    drawerUserCard.innerHTML = `
+                        <img src="${escapeSafe(avatar)}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">${safeName}</span>
+                            <span class="drawer-user-role">${roleLabel}</span>
+                            <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
+                        </div>
+                    `;
+                } else {
+                    drawerUserCard.innerHTML = `
+                        <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
+                            <i class="fas fa-user-circle text-gold"></i>
+                        </div>
+                        <div class="drawer-user-meta">
+                            <span class="drawer-user-name">زائر غير مسجل</span>
+                            <span class="drawer-user-role" style="color: var(--gold-light);">سجّل دخولك للاستفادة من كل المزايا</span>
+                        </div>
+                    `;
+                }
             }
 
             const navUserContainer = document.getElementById('nav-user-container');

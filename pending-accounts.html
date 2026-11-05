@@ -323,6 +323,10 @@
                         <i class="fas fa-inbox text-gold"></i>
                         <span>محادثات الإدارة</span>
                     </a>
+                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="togglePendingDrawer()">
+                        <i class="fas fa-coins text-gold"></i>
+                        <span>شحن النقاط</span>
+                    </a>
                     <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="togglePendingDrawer()">
                         <i class="fas fa-globe-africa text-orange"></i>
                         <span>الوسطاء الإقليميين</span>
@@ -550,16 +554,24 @@
                 }
             }
 
+            const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+            if (drawerBrokers) drawerBrokers.style.display = isAdmin ? 'flex' : 'none';
+            const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+            if (drawerDeposits) drawerDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+
             if (drawerUser) {
                 if (user) {
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                    const roleLabel = isBroker
+                        ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
+                        : (isAdmin ? '<i class="fas fa-crown text-gold"></i> الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
                     drawerUser.innerHTML = `
                         <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
                             <span class="drawer-user-name">${user.name}</span>
-                            <span class="drawer-user-role"><i class="fas fa-crown text-gold"></i> الوسيط المعتمد (المدير)</span>
+                            <span class="drawer-user-role">${roleLabel}</span>
                             <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
                     `;
@@ -687,7 +699,7 @@
                             try {
                                 const { data: profs } = await client
                                     .from('profiles')
-                                    .select('id, name, email, avatar_url')
+                                    .select('id, name, email, avatar_url, country')
                                     .in('id', sellerIds);
                                 if (Array.isArray(profs)) {
                                     profs.forEach(p => { if (p && p.id) profilesMap[p.id] = p; });
@@ -754,7 +766,32 @@
                 if (acc && acc.id) mergedMap.set(String(acc.id), acc);
             });
 
-            allPendingAccounts = Array.from(mergedMap.values());
+            let rawPending = Array.from(mergedMap.values());
+
+            // تصفية الحسابات المعلقة للوسيط الإقليمي: يرى فقط حسابات دولته أو المعينة له
+            // أما المدير العام فيرى كافة الحسابات المعلقة من جميع الدول دون تصفية
+            const curUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const isStrictAdminUser = typeof isStrictAdmin === 'function' ? isStrictAdmin(curUser) : (curUser && (curUser.role === 'admin' || curUser.isAdmin === true));
+            const isBrokerUserRole = !isStrictAdminUser && !!(curUser && (
+                curUser.role === 'regional_broker' ||
+                curUser.role === 'broker' ||
+                curUser.isBroker === true ||
+                (typeof isRegionalBroker === 'function' && isRegionalBroker(curUser))
+            ));
+            const brokerCountry = (curUser && curUser.country) ? String(curUser.country).toUpperCase().trim() : 'DZ';
+
+            if (isBrokerUserRole && !isStrictAdminUser) {
+                rawPending = rawPending.filter(acc => {
+                    if (!acc) return false;
+                    if (acc.assigned_broker_id && curUser && String(acc.assigned_broker_id) === String(curUser.id)) return true;
+                    if (acc.assignedBrokerId && curUser && String(acc.assignedBrokerId) === String(curUser.id)) return true;
+                    const aCountry = String(acc.country || (acc.details && acc.details.country) || acc.sellerCountry || (acc.seller && acc.seller.country) || (profilesMap[acc.seller_id] && profilesMap[acc.seller_id].country) || '').toUpperCase().trim();
+                    if (aCountry && aCountry === brokerCountry) return true;
+                    return false;
+                });
+            }
+
+            allPendingAccounts = rawPending;
             window._waseetExactPendingCount = allPendingAccounts.length;
             updatePendingStats();
             applyPendingFilters();

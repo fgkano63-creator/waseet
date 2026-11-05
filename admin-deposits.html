@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -450,15 +450,15 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
-                <a href="admin-brokers.html" class="drawer-shortcut-card" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-globe-africa text-orange"></i>
                     <span>الوسطاء الإقليميين</span>
                 </a>
-                <a href="admin-withdrawals.html" class="drawer-shortcut-card" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
+                <a href="admin-withdrawals.html" class="drawer-shortcut-card" id="drawer-admin-withdrawals-link" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-hand-holding-usd text-orange"></i>
                     <span>طلبات السحب</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card active" data-admin-only style="display: none;" onclick="toggleWaseetDrawer(false)">
+                <a href="admin-deposits.html" class="drawer-shortcut-card active" id="drawer-admin-deposits-link" style="display: none;" onclick="toggleWaseetDrawer(false)">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
                 </a>
@@ -787,9 +787,16 @@
                 const isAdmin = !!(user && (
                     user.role === 'admin' ||
                     (typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user.isAdmin === true || user.is_admin === true))
-                ) && user.role !== 'regional_broker' && user.role !== 'user');
+                ) && user.role !== 'regional_broker' && user.role !== 'broker' && user.role !== 'user');
+                const isBroker = !isAdmin && !!(user && (
+                    user.role === 'regional_broker' ||
+                    user.role === 'broker' ||
+                    user.isBroker === true ||
+                    user.brokerRole === 'broker' ||
+                    (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+                ));
 
-                if (!isAdmin) {
+                if (!isAdmin && !isBroker) {
                     document.getElementById('admin-access-denied').style.display = 'block';
                     return;
                 }

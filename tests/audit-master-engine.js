@@ -526,6 +526,20 @@ if (allSqlCombined.includes('cancel_escrow_deal') && allSqlCombined.includes('p_
     recordAudit('databaseRLS', 'DB-AtomicDealCancellation', 'WARN', 'MEDIUM', 'cancel_escrow_deal function missing or incomplete in migrations');
 }
 
+// 4.11 Check wallet locked points sync and audit stored procedure (Migration 24)
+if (allSqlCombined.includes('sync_wallet_locked_points') && allSqlCombined.includes('v_orphan')) {
+    recordAudit('databaseRLS', 'DB-WalletLockedPointsSync', 'PASS', 'INFO', 'Stored procedure sync_wallet_locked_points reconciles deals + withdrawals and releases orphan points (Migration 24)');
+} else {
+    recordAudit('databaseRLS', 'DB-WalletLockedPointsSync', 'WARN', 'MEDIUM', 'sync_wallet_locked_points function missing or incomplete in migrations');
+}
+
+// 4.12 Check deal messages role spoof shield & broker privacy (Migration 25)
+if (allSqlCombined.includes('tr_enforce_deal_message_sender_role') && allSqlCombined.includes('public_regional_brokers')) {
+    recordAudit('databaseRLS', 'DB-RoleSpoofProtectionAndBrokerPrivacy', 'PASS', 'INFO', 'Message role spoof trigger enforces authentic roles and public_regional_brokers view shields financials (Migration 25)');
+} else {
+    recordAudit('databaseRLS', 'DB-RoleSpoofProtectionAndBrokerPrivacy', 'WARN', 'MEDIUM', 'tr_enforce_deal_message_sender_role or public_regional_brokers view missing in migrations');
+}
+
 // ==============================================================================
 // 5. PERFORMANCE, ASSETS & PWA AUDIT
 // ==============================================================================

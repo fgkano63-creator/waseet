@@ -346,6 +346,18 @@
                     <i class="fas fa-inbox text-gold"></i>
                     <span>محادثات الإدارة</span>
                 </a>
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="closeDealsDrawer()">
+                    <i class="fas fa-coins text-gold"></i>
+                    <span>شحن النقاط</span>
+                </a>
+                <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="closeDealsDrawer()">
+                    <i class="fas fa-globe-africa text-orange"></i>
+                    <span>الوسطاء الإقليميين</span>
+                </a>
+                <a href="wallet.html" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
+                    <i class="fas fa-wallet text-gold"></i>
+                    <span>محفظتي والنقاط</span>
+                </a>
                 <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="closeDealsDrawer()">
                     <i class="fas fa-calculator text-silver"></i>
                     <span>حاسبة العمولات</span>
@@ -467,6 +479,17 @@
             const userCard = document.getElementById('drawer-user-card');
             const authActions = document.getElementById('drawer-auth-actions');
             const user = WASEET_STATE.user;
+            const isStrict = typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user && (user.role === 'admin' || user.isAdmin === true));
+            const isBrokerRole = !isStrict && !!(user && (user.role === 'regional_broker' || user.role === 'broker' || user.isBroker === true || user.brokerRole === 'broker' || (typeof isRegionalBroker === 'function' && isRegionalBroker(user))));
+
+            const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+            if (drawerBrokers) drawerBrokers.style.display = isStrict ? 'flex' : 'none';
+            const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+            if (drawerDeposits) drawerDeposits.style.display = (isStrict || isBrokerRole) ? 'flex' : 'none';
+            const drawerPending = document.getElementById('deals-drawer-btn-pending');
+            if (drawerPending) drawerPending.style.display = (isStrict || isBrokerRole) ? 'flex' : 'none';
+            const drawerChats = document.getElementById('deals-drawer-admin-chats');
+            if (drawerChats) drawerChats.style.display = (isStrict || isBrokerRole) ? 'flex' : 'none';
 
             if (userCard) {
                 if (user) {
@@ -869,7 +892,30 @@
             (WASEET_STATE.completedDeals || []).forEach(d => {
                 if (d && d.id && !allDealsMap.has(String(d.id))) allDealsMap.set(String(d.id), d);
             });
-            const allPlatformDeals = Array.from(allDealsMap.values());
+            let allPlatformDeals = Array.from(allDealsMap.values());
+
+            // تصفية الصفقات للوسيط الإقليمي: يرى صفقات دولته أو الصفقات المعينة له فقط
+            // المدير العام يرى كافة الصفقات من جميع الدول دون تصفية
+            const isStrictAdminUser = typeof isStrictAdmin === 'function' ? isStrictAdmin(user) : (user && (user.role === 'admin' || user.isAdmin === true));
+            const isBrokerUserRole = !isStrictAdminUser && !!(user && (
+                user.role === 'regional_broker' ||
+                user.role === 'broker' ||
+                user.isBroker === true ||
+                (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
+            ));
+            const brokerCountry = (user && user.country) ? String(user.country).toUpperCase().trim() : 'DZ';
+
+            if (isBrokerUserRole && !isStrictAdminUser) {
+                allPlatformDeals = allPlatformDeals.filter(d => {
+                    if (!d) return false;
+                    if (d.assigned_broker_id && user && String(d.assigned_broker_id) === String(user.id)) return true;
+                    if (d.assignedBrokerId && user && String(d.assignedBrokerId) === String(user.id)) return true;
+                    if (d.assigned_broker && user && String(d.assigned_broker.id) === String(user.id)) return true;
+                    const dCountry = String(d.country || d.buyer_country || (d.buyer && d.buyer.country) || (d.seller && d.seller.country) || '').toUpperCase().trim();
+                    if (dCountry && dCountry === brokerCountry) return true;
+                    return false;
+                });
+            }
 
             // Active/Pending/In-Progress Deals (all non-completed, non-cancelled statuses: waiting_credentials, mediator_inspecting, buyer_inspecting, pending_middleman, active, pending, created, disputed, etc.)
             const activeDeals = allPlatformDeals.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
@@ -917,7 +963,17 @@
             `;
 
             // Pending Review Accounts Section for Mediator (Requirement 1 & 2)
-            const pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending' || a.status === 'pending_review' || a.status === 'pending_verification');
+            let pendingAccounts = (WASEET_STATE.accounts || []).filter(a => a.status === 'pending' || a.status === 'pending_review' || a.status === 'pending_verification');
+            if (isBrokerUserRole && !isStrictAdminUser) {
+                pendingAccounts = pendingAccounts.filter(a => {
+                    if (!a) return false;
+                    if (a.assigned_broker_id && user && String(a.assigned_broker_id) === String(user.id)) return true;
+                    if (a.assignedBrokerId && user && String(a.assignedBrokerId) === String(user.id)) return true;
+                    const aCountry = String(a.country || (a.details && a.details.country) || a.sellerCountry || (a.seller && a.seller.country) || '').toUpperCase().trim();
+                    if (aCountry && aCountry === brokerCountry) return true;
+                    return false;
+                });
+            }
             if (pendingAccounts.length > 0) {
                 html += `
                     <div style="margin-bottom: 2.5rem; background: rgba(245, 158, 11, 0.07); border: 2px solid rgba(245, 158, 11, 0.4); border-radius: 20px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">

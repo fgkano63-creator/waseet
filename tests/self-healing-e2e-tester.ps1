@@ -348,7 +348,38 @@ $mig20 = (Test-Path 'D:\waseet-app\supabase\20_rls_financial_and_secrets_hardeni
 Check-Result -Flow 'Self-Healing Engine' -Name 'Supabase Migration 20 RLS Financial & Secrets Hardening' -Success $mig20 -Detail 'Database triggers block deal tampering, un-frozen withdrawal injection, and secret mutations'
 
 Write-Host ""
-Write-Host ">>> 11. FLOW 11: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
+Write-Host ">>> 11. FLOW 11: ADVANCED FINANCIAL AUDITING & SPOOF PROTECTION (MIGRATIONS 24 & 25)" -ForegroundColor Yellow
+
+# Migration 24 Checks
+$mig24File = Test-Path 'D:\waseet-app\supabase\24_sync_wallet_locked_points.sql'
+$desktopDirItem = Get-ChildItem 'D:\H P' -Directory -ErrorAction SilentlyContinue | Where-Object { Test-Path (Join-Path $_.FullName 'opencode.exe') } | Select-Object -First 1
+$desktopDir = if ($desktopDirItem) { $desktopDirItem.FullName } else { 'D:\H P\سطح المكتب 2' }
+$mig24Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*24*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+$mig24Content = if ($mig24File) { Get-Content 'D:\waseet-app\supabase\24_sync_wallet_locked_points.sql' -Raw -Encoding UTF8 } else { "" }
+$mig24DbParity = $mig24File -and $mig24Desktop -and $mig24Content.Contains('sync_wallet_locked_points') -and $mig24Content.Contains('v_orphan')
+Check-Result -Flow 'Financial Audit' -Name 'Supabase Migration 24 & Desktop SQL Parity (sync_wallet_locked_points)' -Success $mig24DbParity -Detail 'Syncs locked points against active deals + pending withdrawals with desktop file ready for Supabase'
+
+$walletSyncParity = $supabaseJs.Contains('waseetSyncWalletLockedPoints') -and $supabaseJs.Contains("client.rpc('sync_wallet_locked_points')")
+Check-Result -Flow 'Financial Audit' -Name 'Client waseetSyncWalletLockedPoints RPC & Resilient Fallback' -Success $walletSyncParity -Detail 'RPC integration with local fallback accounting for both deals and pending withdrawals'
+
+$walletModalParity = $walletHtml.Contains('modal-escrow-details') -and $walletHtml.Contains('releaseOrphanLockedPoints') -and $walletHtml.Contains('openEscrowDetailsModal') -and $walletHtml.Contains('btn-release-orphan-points')
+Check-Result -Flow 'Financial Audit' -Name 'Wallet Locked Points Breakdown Modal & Orphan Points Releaser' -Success $walletModalParity -Detail 'Interactive UI modal breaks down locked points by active deals and withdrawals with 1-click orphan refund'
+
+# Migration 25 Checks
+$mig25File = Test-Path 'D:\waseet-app\supabase\25_security_hardening_and_spoof_protection.sql'
+$mig25Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*25*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+$mig25Content = if ($mig25File) { Get-Content 'D:\waseet-app\supabase\25_security_hardening_and_spoof_protection.sql' -Raw -Encoding UTF8 } else { "" }
+$mig25RoleShield = $mig25File -and $mig25Desktop -and $mig25Content.Contains('tr_enforce_deal_message_sender_role') -and $mig25Content.Contains("NEW.sender_role := 'buyer'")
+Check-Result -Flow 'Security Hardening' -Name 'Deal Messages Sender Role Spoof Shield (Migration 25)' -Success $mig25RoleShield -Detail 'Strict BEFORE INSERT trigger blocks buyers/sellers from impersonating mediator or system roles'
+
+$mig25BrokerPrivacy = $mig25Content.Contains('public_regional_brokers') -and $mig25Content.Contains('regional_brokers_select_public_or_admin')
+Check-Result -Flow 'Security Hardening' -Name 'Regional Brokers Privacy Shield & Public View (Migration 25)' -Success $mig25BrokerPrivacy -Detail 'Shields broker financial balances and emails from public inspection via clean public_regional_brokers view'
+
+$mig25LegacyCreds = $mig25Content.Contains('marketplace_accounts') -and $mig25Content.Contains("credentials = '{}'::jsonb")
+Check-Result -Flow 'Security Hardening' -Name 'Marketplace Legacy Credentials Sanitization (Migration 25)' -Success $mig25LegacyCreds -Detail 'Wipes legacy plaintext credentials jsonb column to prevent credential leakage'
+
+Write-Host ""
+Write-Host ">>> 12. FLOW 12: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
 Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, and regional broker journeys in Node runtime'

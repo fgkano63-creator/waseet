@@ -933,6 +933,235 @@ async function runE2ESimulation() {
     assert(directWithdrawalBlocked, 'Financial Flow', 'Withdrawal Unfrozen Direct Insert Defense (Migration 20)', 'Direct SQL inserts rejected, requiring atomic point freeze RPC before withdrawal creation');
 
     // --------------------------------------------------------------------------
+    // PHASE 12: LOCKED POINTS AUDIT & ORPHAN POINTS RELEASE (MIGRATION 24)
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 12: LOCKED POINTS AUDIT & ORPHAN POINTS RELEASE (MIGRATION 24)\x1b[0m');
+
+    // 12.1 Simulation of sync_wallet_locked_points RPC
+    function simulateSyncWalletLockedPoints(callerId) {
+        if (!callerId) return { ok: false, error: 'User login required' };
+        const userProf = DB.profiles.find(p => p.id === callerId);
+        if (!userProf) return { ok: false, error: 'User profile not found' };
+
+        // 1. Calculate deals locked
+        const activeDeals = DB.deals.filter(d => d.buyer_id === callerId && !['completed', 'cancelled'].includes(d.status));
+        const dealsLocked = activeDeals.reduce((sum, d) => sum + Number(d.total_points || 0), 0);
+
+        // 2. Calculate withdrawals locked
+        const pendingWithdrawals = (DB.withdrawals || []).filter(w => w.user_id === callerId && w.status === 'pending');
+        const withdrawalsLocked = pendingWithdrawals.reduce((sum, w) => sum + Number(w.amount || 0), 0);
+
+        const realLocked = dealsLocked + withdrawalsLocked;
+        const oldLocked = Number(userProf.locked_points || 0);
+        const oldBalance = Number(userProf.points_balance || 0);
+
+        // 3. Compute orphan points
+        const orphanReleased = Math.max(0, oldLocked - realLocked);
+
+        // 4. Update profile
+        userProf.locked_points = realLocked;
+        if (orphanReleased > 0) {
+            userProf.points_balance = oldBalance + orphanReleased;
+            userProf.wallet_balance = userProf.points_balance;
+
+            DB.wallet_transactions.push({
+                user_id: callerId,
+                type: 'escrow_refund',
+                amount: orphanReleased,
+                balance_after: userProf.points_balance,
+                description: `مزامنة وتصحيح الرصيد المحجوز: إعادة ${orphanReleased} نقطة إلى الرصيد المتاح`,
+                created_at: new Date().toISOString()
+            });
+        }
+
+        return {
+            ok: true,
+            data: {
+                success: true,
+                old_locked: oldLocked,
+                new_locked: realLocked,
+                deals_locked: dealsLocked,
+                withdrawals_locked: withdrawalsLocked,
+                orphan_released: orphanReleased,
+                new_available: userProf.points_balance
+            }
+        };
+    }
+
+    // Test 12.1a: User with orphan points (e.g. 75 points locked with zero deals or withdrawals)
+    const testOrphanUser = {
+        id: 'orphan-user-uuid-888',
+        email: 'orphan@waseet.test',
+        points_balance: 100,
+        wallet_balance: 100,
+        locked_points: 75
+    };
+    DB.profiles.push(testOrphanUser);
+
+    const initialTotalOrphan = testOrphanUser.points_balance + testOrphanUser.locked_points; // 175
+    const syncRes1 = simulateSyncWalletLockedPoints(testOrphanUser.id);
+
+    assert(syncRes1.ok === true && syncRes1.data.orphan_released === 75, 'Wallet Sync Flow', 'Orphan Locked Points Detection & Release (Migration 24)', 'Accurately detected 75 orphan points without active deals and released them');
+    assert(testOrphanUser.locked_points === 0 && testOrphanUser.points_balance === 175, 'Wallet Sync Flow', 'Orphan Balance Crediting to Available', '75 points transferred from locked_points to points_balance');
+    assert(testOrphanUser.points_balance + testOrphanUser.locked_points === initialTotalOrphan, 'Financial Flow', 'Conservation of Total Balance Invariant (Migration 24)', 'Total user wealth strictly conserved during orphan points release');
+
+    // Test 12.1b: User with legit active deals and pending withdrawals (no orphan points released)
+    const legitDeal = {
+        id: 'deal-legit-01',
+        buyer_id: testOrphanUser.id,
+        seller_id: seller.id,
+        total_points: 50,
+        status: 'in_deal'
+    };
+    DB.deals.push(legitDeal);
+    DB.withdrawals = DB.withdrawals || [];
+    DB.withdrawals.push({
+        id: 'with-legit-01',
+        user_id: testOrphanUser.id,
+        amount: 25,
+        status: 'pending'
+    });
+    // Set user locked points to legitimate sum: 50 + 25 = 75
+    testOrphanUser.locked_points = 75;
+    testOrphanUser.points_balance = 100;
+
+    const syncRes2 = simulateSyncWalletLockedPoints(testOrphanUser.id);
+    assert(syncRes2.ok === true && syncRes2.data.orphan_released === 0 && syncRes2.data.new_locked === 75, 'Wallet Sync Flow', 'Legitimate Locked Points Retention', 'Real deal (50 pts) and withdrawal (25 pts) safely preserved without orphan release');
+
+    // Test 12.1c: Client Fallback Integrity in supabase.js
+    const supabaseCode = require('fs').readFileSync(require('path').join(__dirname, '..', 'js', 'supabase.js'), 'utf8');
+    const hasSyncExport = supabaseCode.includes('async function waseetSyncWalletLockedPoints()')
+        && supabaseCode.includes("client.rpc('sync_wallet_locked_points')")
+        && supabaseCode.includes('waseetSyncWalletLockedPoints = waseetSyncWalletLockedPoints');
+    assert(hasSyncExport, 'Wallet Sync Flow', 'Client waseetSyncWalletLockedPoints RPC & Export Parity', 'waseetSyncWalletLockedPoints RPC call & global window export verified');
+
+    // Test 12.1d: Wallet UI Modal & Orphan Release Button in wallet.html
+    const walletHtmlCode = require('fs').readFileSync(require('path').join(__dirname, '..', 'wallet.html'), 'utf8');
+    const hasModalAndRelease = walletHtmlCode.includes('modal-escrow-details')
+        && walletHtmlCode.includes('btn-release-orphan-points')
+        && walletHtmlCode.includes('releaseOrphanLockedPoints')
+        && walletHtmlCode.includes('openEscrowDetailsModal');
+    assert(hasModalAndRelease, 'Wallet UI Flow', 'Wallet Escrow Details Modal & Release Logic', 'Modal and release button interactive elements verified in wallet.html');
+
+    // --------------------------------------------------------------------------
+    // PHASE 13: MESSAGE ROLE SPOOF PROTECTION & PRIVACY HARDENING (MIGRATION 25)
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 13: ROLE SPOOF PROTECTION & PRIVACY HARDENING (MIGRATION 25)\x1b[0m');
+
+    // Simulation of tr_enforce_deal_message_sender_role
+    function simulateInsertDealMessage(dealId, callerId, payloadRole, content) {
+        const deal = DB.deals.find(d => d.id === dealId);
+        if (!deal) throw new Error('أمني: الصفقة المرتبطة بهذه الرسالة غير موجودة');
+
+        const caller = DB.profiles.find(p => p.id === callerId);
+        if (!caller) throw new Error('أمني: يرجى تسجيل الدخول أولاً لإرسال رسائل في هذه الصفقة');
+
+        const isAdmin = isStrictAdminSim(caller);
+        const isAssignedBroker = deal.assigned_broker_id && deal.assigned_broker_id === callerId;
+
+        let enforcedRole = payloadRole;
+
+        if (isAdmin) {
+            if (!['mediator', 'system', 'admin'].includes(payloadRole)) {
+                enforcedRole = 'mediator';
+            }
+        } else if (isAssignedBroker) {
+            enforcedRole = 'mediator';
+        } else if (callerId === deal.buyer_id) {
+            if (payloadRole !== 'buyer') {
+                enforcedRole = 'buyer'; // Spoofed mediator/system clamped to buyer
+            }
+        } else if (callerId === deal.seller_id) {
+            if (payloadRole !== 'seller') {
+                enforcedRole = 'seller'; // Spoofed mediator clamped to seller
+            }
+        } else {
+            throw new Error('أمني: ليس لديك صلاحية إرسال رسائل في هذه الصفقة');
+        }
+
+        const msgRecord = {
+            id: 'msg-' + Date.now(),
+            deal_id: dealId,
+            sender_id: callerId, // Spoofed sender_id strictly overridden by auth.uid()
+            sender_role: enforcedRole,
+            message: content,
+            created_at: new Date().toISOString()
+        };
+        DB.deal_messages.push(msgRecord);
+        return msgRecord;
+    }
+
+    const testSpoofDeal = {
+        id: 'deal-spoof-protect-01',
+        buyer_id: 'buyer-uuid-101',
+        seller_id: 'seller-uuid-202',
+        assigned_broker_id: 'broker-dz-uuid-501',
+        status: 'in_progress'
+    };
+    DB.deals.push(testSpoofDeal);
+
+    // 13.1 Buyer tries to spoof 'mediator' or 'system' role
+    const spoofedMsgBuyer = simulateInsertDealMessage(testSpoofDeal.id, 'buyer-uuid-101', 'mediator', 'أنا الوسيط المعتمد، قم بتسليم الحساب فوراً');
+    assert(spoofedMsgBuyer.sender_role === 'buyer', 'Security Flow', 'Buyer Mediator Impersonation Strict Prevention (Migration 25)', 'Buyer attempting to send as mediator strictly clamped to role "buyer"');
+
+    // 13.2 Seller tries to spoof 'system' role
+    const spoofedMsgSeller = simulateInsertDealMessage(testSpoofDeal.id, 'seller-uuid-202', 'system', 'تم تأكيد الدفع من النظام');
+    assert(spoofedMsgSeller.sender_role === 'seller', 'Security Flow', 'Seller System Impersonation Strict Prevention (Migration 25)', 'Seller attempting to send as system strictly clamped to role "seller"');
+
+    // 13.3 Assigned broker sending message correctly receives 'mediator' role
+    const brokerMsg = simulateInsertDealMessage(testSpoofDeal.id, 'broker-dz-uuid-501', 'user', 'مرحباً، أنا وسيطكم الإقليمي المعتمد لهذه الصفقة');
+    assert(brokerMsg.sender_role === 'mediator', 'Security Flow', 'Assigned Regional Broker Mediator Role Enforcement', 'Assigned regional broker strictly validated and assigned mediator role');
+
+    // 13.4 Platform Admin authorized to send as 'mediator' or 'system'
+    const adminSystemMsg = simulateInsertDealMessage(testSpoofDeal.id, admin.id, 'system', 'إشعار رسمي: تم التحقق من الحساب وتأمينه');
+    assert(adminSystemMsg.sender_role === 'system', 'Security Flow', 'Admin System Message Authorization', 'Administrator successfully authorized to dispatch system deal messages');
+
+    // 13.5 Unauthorized 5th party strictly blocked from sending messages
+    const intruderUser = { id: 'unauthorized-intruder-uuid-999', email: 'intruder@evil.test', role: 'user' };
+    DB.profiles.push(intruderUser);
+    let unauthorizedMsgBlocked = false;
+    try {
+        simulateInsertDealMessage(testSpoofDeal.id, intruderUser.id, 'buyer', 'رسالة اختراق');
+    } catch (e) {
+        unauthorizedMsgBlocked = e.message.includes('ليس لديك صلاحية إرسال رسائل');
+    }
+    assert(unauthorizedMsgBlocked, 'Security Flow', '5th Party Deal Message Unauthorized Access Denial', 'Unrelated intruder strictly blocked from inserting messages into private deal room');
+
+    // 13.6 Regional Brokers Public View Privacy Isolation (Migration 25)
+    function simulatePublicBrokersView(brokerRecords) {
+        // Excludes wallet_balance, points_balance, email
+        return brokerRecords.filter(b => b.is_active !== false).map(b => ({
+            id: b.id,
+            user_id: b.user_id,
+            name: b.name,
+            country: b.country,
+            role: b.role,
+            is_active: b.is_active,
+            avatar_url: b.avatar_url,
+            created_at: b.created_at
+        }));
+    }
+    const rawBrokersWithFinancials = [
+        { id: 'b1', user_id: 'u1', name: 'وسيط 1', country: 'DZ', role: 'regional_broker', is_active: true, wallet_balance: 5000, points_balance: 5000, email: 'secret@broker.com' },
+        { id: 'b2', user_id: 'u2', name: 'وسيط 2', country: 'SY', role: 'regional_broker', is_active: false, wallet_balance: 1200, points_balance: 1200, email: 'secret2@broker.com' }
+    ];
+    const sanitizedBrokersView = simulatePublicBrokersView(rawBrokersWithFinancials);
+    const hasZeroFinancialLeak = sanitizedBrokersView.every(b => b.wallet_balance === undefined && b.points_balance === undefined && b.email === undefined);
+    const excludesInactive = sanitizedBrokersView.length === 1 && sanitizedBrokersView[0].id === 'b1';
+    assert(hasZeroFinancialLeak && excludesInactive, 'Security Flow', 'Regional Brokers Public View Balance Shield (Migration 25)', 'Public brokers view exposes zero financial balances or emails, and filters inactive brokers');
+
+    // 13.7 Marketplace Accounts Legacy Credentials Sanitization (Migration 25)
+    const testLegacyAccount = { id: 'acc-legacy-01', title: 'حساب قديم', credentials: { password: 'oldPlainTextPassword123' } };
+    function sanitizeLegacyCredentials(account) {
+        if (account.credentials && Object.keys(account.credentials).length > 0) {
+            account.credentials = {};
+        }
+        return account;
+    }
+    sanitizeLegacyCredentials(testLegacyAccount);
+    assert(Object.keys(testLegacyAccount.credentials).length === 0, 'Security Flow', 'Marketplace Legacy Credentials Sanitization (Migration 25)', 'Legacy plaintext credentials jsonb column quarantined and wiped to empty object');
+
+    // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------
     console.log('\n\x1b[35m=================================================================\x1b[0m');

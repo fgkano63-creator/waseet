@@ -30,6 +30,21 @@ BEGIN
         RAISE EXCEPTION 'أمني: الصفقة المرتبطة بهذه الرسالة غير موجودة';
     END IF;
 
+    -- السماح لعمليات الخادم والخدمات الداخلية (service_role) بإرسال إشعارات ورسائل النظام
+    IF auth.uid() IS NULL AND (
+        current_setting('role', true) = 'service_role' 
+        OR current_setting('request.jwt.claim.role', true) = 'service_role'
+    ) THEN
+        IF NEW.sender_role IS NULL THEN
+            NEW.sender_role := 'system';
+        END IF;
+        RETURN NEW;
+    END IF;
+
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'أمني: يرجى تسجيل الدخول أولاً لإرسال رسائل في هذه الصفقة';
+    END IF;
+
     -- التحقق إذا كان المرسل وسيطاً إقليمياً معيناً
     IF v_deal.assigned_broker_id IS NOT NULL AND v_deal.assigned_broker_id = auth.uid() THEN
         v_is_brk := true;

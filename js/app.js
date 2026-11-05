@@ -176,9 +176,9 @@ class WaseetApp {
                 el.style.display = 'none';
             });
             const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-            if (drawerAdminBrokers) drawerAdminBrokers.style.display = isBroker ? 'flex' : 'none';
+            if (drawerAdminBrokers) drawerAdminBrokers.style.display = 'none';
             const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-            if (drawerAdminDeposits) drawerAdminDeposits.style.display = 'none';
+            if (drawerAdminDeposits) drawerAdminDeposits.style.display = isBroker ? 'flex' : 'none';
             const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
             if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = 'none';
         }
@@ -210,11 +210,15 @@ class WaseetApp {
 
         // روابط القائمة الجانبية للمدير والوسيط
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? '' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-        if (drawerAdminDeposits) drawerAdminDeposits.style.display = isAdmin ? '' : 'none';
+        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
+        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
         const drawerAdminWithdrawalsLink = document.getElementById('drawer-admin-withdrawals-link');
-        if (drawerAdminWithdrawalsLink) drawerAdminWithdrawalsLink.style.display = isAdmin ? '' : 'none';
+        if (drawerAdminWithdrawalsLink) drawerAdminWithdrawalsLink.style.display = isAdmin ? 'flex' : 'none';
+        const drawerPendingVerification = document.getElementById('drawer-btn-pending-verification');
+        if (drawerPendingVerification) drawerPendingVerification.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
 
         if (isAdmin && typeof window.waseetUpdateAdminPendingDepositsBadge === 'function') {
             window.waseetUpdateAdminPendingDepositsBadge();
@@ -417,6 +421,20 @@ class WaseetApp {
             user.brokerRole === 'broker' ||
             (typeof isRegionalBroker === 'function' && isRegionalBroker(user))
         ));
+
+        // ضبط صلاحيات أزرار القائمة الجانبية (3 خطوط ☰) بدقة:
+        // المدير العام: يرى كافة الأزرار بدون استثناء
+        // الوسيط الإقليمي: يرى قيد الشراء، قيد الفحص، شحن النقاط، ومحادثات الإدارة ويُحجب عنه الوسطاء الإقليميين
+        const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
+        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
+        const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
+        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
+        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        const drawerPendingVerification = document.getElementById('drawer-btn-pending-verification');
+        if (drawerPendingVerification) drawerPendingVerification.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
+        if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = isAdmin ? 'flex' : 'none';
 
         if (userCard) {
             userCard.style.cursor = 'pointer';
