@@ -447,68 +447,8 @@
 
         </main>
 
-        <!-- ================= Sliding Drawer ================= -->
-        <div class="mobile-drawer-overlay drawer-overlay" id="drawer-overlay" onclick="toggleWaseetDrawer(false)"></div>
-        <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer">
-            <div class="drawer-header">
-                <div class="drawer-brand">
-                    <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
-                    <span class="drawer-title" style="color: #fff; font-weight: 800; font-size: 1.1rem; margin-right: 0.5rem;">WASEET</span>
-                </div>
-                <button class="drawer-close-btn" onclick="toggleWaseetDrawer(false)">&times;</button>
-            </div>
-
-            <div class="drawer-user-card" id="drawer-user-card"></div>
-            <div class="drawer-auth-actions" id="drawer-auth-actions" style="padding: 0 1.25rem 0.75rem;"></div>
-
-            <div class="drawer-section">
-                <h4 class="drawer-section-title">لوحة الإدارة والتحكم</h4>
-                <div class="drawer-shortcuts-grid">
-                    <a href="admin-withdrawals.html" class="drawer-shortcut-card active" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-hand-holding-usd text-orange"></i>
-                        <span>طلبات السحب</span>
-                    </a>
-                    <a href="admin-deposits.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-coins text-gold"></i>
-                        <span>طلبات الشحن</span>
-                    </a>
-                    <a href="admin-brokers.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-globe-africa text-orange"></i>
-                        <span>الوسطاء الإقليميين</span>
-                    </a>
-                    <a href="pending-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-clipboard-check text-orange"></i>
-                        <span>قيد الفحص</span>
-                    </a>
-                    <a href="deals.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-crown text-gold"></i>
-                        <span>قيد الشراء</span>
-                    </a>
-                    <a href="admin-chats.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-inbox text-gold"></i>
-                        <span>محادثات الدعم</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="drawer-section">
-                <h4 class="drawer-section-title">اختصارات الموقع</h4>
-                <div class="drawer-shortcuts-grid">
-                    <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-store text-gold"></i>
-                        <span>سوق الحسابات</span>
-                    </a>
-                    <a href="wallet.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-wallet text-orange"></i>
-                        <span>المحفظة</span>
-                    </a>
-                    <a href="my-accounts.html" class="drawer-shortcut-card" onclick="toggleWaseetDrawer(false)">
-                        <i class="fas fa-boxes text-gold"></i>
-                        <span>حساباتي</span>
-                    </a>
-                </div>
-            </div>
-        </aside>
+    <!-- Unified Mobile Drawer Container (Componentized via renderMobileDrawer) -->
+    <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"><!-- id="drawer-regional-broker-card" --></div>
 
         <!-- ================= Mobile Bottom Nav ================= -->
         <nav class="mobile-bottom-nav">

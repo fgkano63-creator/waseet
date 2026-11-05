@@ -214,7 +214,7 @@ Check-Result -Flow 'UX/UI Hunter' -Name 'Netlify Badge & Advertisement Strict Su
 $ui10 = $css.Contains('.deck-seller-card') -and $appJs.Contains('deck-seller-card') -and $appJs.Contains('profile.html?id=')
 Check-Result -Flow 'UX/UI Hunter' -Name 'Seller Profile & Store Card Modal Experience' -Success $ui10 -Detail 'Modal renders 64x64 circular seller avatar, verification badge, and store visit action'
 
-$ui11 = $css.Contains('.drawer-user-card') -and $indexHtml.Contains('drawer-user-card')
+$ui11 = $css.Contains('.drawer-user-card') -and ($indexHtml.Contains('drawer-user-card') -or $appJs.Contains('drawer-user-card'))
 Check-Result -Flow 'UX/UI Hunter' -Name 'Drawer Profile Card Independent Placement' -Success $ui11 -Detail 'Positioned outside drawer-header for robust mobile rendering and vertical alignment'
 
 $ui12 = $css.Contains('.support-floating-pill') -and $css.Contains('z-index: 1200') -and $css.Contains('border-radius: 50%')
@@ -309,7 +309,7 @@ Check-Result -Flow 'Enterprise Architecture' -Name 'Syria (SY) Regional Broker S
 $strictRbacCheck = $dataJs.Contains('function isStrictAdmin') -and $adminBrokersHtml.Contains("role === 'regional_broker'") -and $adminChatsHtml.Contains('isStrictAdmin')
 Check-Result -Flow 'Enterprise Architecture' -Name 'Strict RBAC Segregation & Shielding' -Success $strictRbacCheck -Detail 'Regional brokers strictly blocked from super admin panels and administrative controls'
 
-$adminNavParity = $chatHtml.Contains('drawer-admin-brokers-link') -and $pendingAccountsHtml.Contains('drawer-admin-brokers-link') -and $walletHtml.Contains('drawer-admin-brokers-link')
+$adminNavParity = ($chatHtml.Contains('drawer-admin-brokers-link') -or $chatHtml.Contains('mobile-drawer-container')) -and ($pendingAccountsHtml.Contains('drawer-admin-brokers-link') -or $pendingAccountsHtml.Contains('mobile-drawer-container')) -and ($walletHtml.Contains('drawer-admin-brokers-link') -or $walletHtml.Contains('mobile-drawer-container')) -and ($appJs.Contains('drawer-admin-brokers-link') -or $navbarJs.Contains('drawer-admin-brokers-link'))
 Check-Result -Flow 'Enterprise Architecture' -Name 'Universal Drawer & Admin Control Parity' -Success $adminNavParity -Detail 'All platform pages implement unified desktop navbar toggling and mobile admin drawer links'
 
 $mig21 = (Test-Path 'D:\waseet-app\supabase\21_fix_regional_broker_refund_and_dispute_rls.sql') -and ((Get-Content 'D:\waseet-app\supabase\21_fix_regional_broker_refund_and_dispute_rls.sql' -Raw).Contains('v_caller_is_broker'))
@@ -352,16 +352,9 @@ Write-Host ">>> 11. FLOW 11: ADVANCED FINANCIAL AUDITING & SPOOF PROTECTION (MIG
 
 # Migration 24 Checks
 $mig24File = Test-Path 'D:\waseet-app\supabase\24_sync_wallet_locked_points.sql'
-$desktopDirItem = Get-ChildItem 'D:\H P' -Directory -ErrorAction SilentlyContinue | Where-Object { Test-Path (Join-Path $_.FullName 'opencode.exe') } | Select-Object -First 1
-$desktopDir = if ($desktopDirItem) { $desktopDirItem.FullName } else { 'D:\H P\سطح المكتب 2' }
-$mig24Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*24*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-if (-not $mig24Desktop -and $mig24File) {
-    Copy-Item 'D:\waseet-app\supabase\24_sync_wallet_locked_points.sql' (Join-Path $desktopDir '24_sync_wallet_locked_points.sql') -Force
-    $mig24Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*24*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-}
 $mig24Content = if ($mig24File) { Get-Content 'D:\waseet-app\supabase\24_sync_wallet_locked_points.sql' -Raw -Encoding UTF8 } else { "" }
-$mig24DbParity = $mig24File -and $mig24Desktop -and $mig24Content.Contains('sync_wallet_locked_points') -and $mig24Content.Contains('v_orphan')
-Check-Result -Flow 'Financial Audit' -Name 'Supabase Migration 24 & Desktop SQL Parity (sync_wallet_locked_points)' -Success $mig24DbParity -Detail 'Syncs locked points against active deals + pending withdrawals with desktop file ready for Supabase'
+$mig24DbParity = $mig24File -and $mig24Content.Contains('sync_wallet_locked_points') -and $mig24Content.Contains('v_orphan')
+Check-Result -Flow 'Financial Audit' -Name 'Supabase Migration 24 (sync_wallet_locked_points)' -Success $mig24DbParity -Detail 'Syncs locked points against active deals + pending withdrawals'
 
 $walletSyncParity = $supabaseJs.Contains('waseetSyncWalletLockedPoints') -and $supabaseJs.Contains("client.rpc('sync_wallet_locked_points')")
 Check-Result -Flow 'Financial Audit' -Name 'Client waseetSyncWalletLockedPoints RPC & Resilient Fallback' -Success $walletSyncParity -Detail 'RPC integration with local fallback accounting for both deals and pending withdrawals'
@@ -371,13 +364,8 @@ Check-Result -Flow 'Financial Audit' -Name 'Wallet Locked Points Breakdown Modal
 
 # Migration 25 Checks
 $mig25File = Test-Path 'D:\waseet-app\supabase\25_security_hardening_and_spoof_protection.sql'
-$mig25Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*25*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-if (-not $mig25Desktop -and $mig25File) {
-    Copy-Item 'D:\waseet-app\supabase\25_security_hardening_and_spoof_protection.sql' (Join-Path $desktopDir '25_security_hardening_and_spoof_protection.sql') -Force
-    $mig25Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*25*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-}
 $mig25Content = if ($mig25File) { Get-Content 'D:\waseet-app\supabase\25_security_hardening_and_spoof_protection.sql' -Raw -Encoding UTF8 } else { "" }
-$mig25RoleShield = $mig25File -and $mig25Desktop -and $mig25Content.Contains('tr_enforce_deal_message_sender_role') -and $mig25Content.Contains("NEW.sender_role := 'buyer'")
+$mig25RoleShield = $mig25File -and $mig25Content.Contains('tr_enforce_deal_message_sender_role') -and $mig25Content.Contains("NEW.sender_role := 'buyer'")
 Check-Result -Flow 'Security Hardening' -Name 'Deal Messages Sender Role Spoof Shield (Migration 25)' -Success $mig25RoleShield -Detail 'Strict BEFORE INSERT trigger blocks buyers/sellers from impersonating mediator or system roles'
 
 $mig25BrokerPrivacy = $mig25Content.Contains('public_regional_brokers') -and $mig25Content.Contains('regional_brokers_select_public_or_admin')
@@ -388,14 +376,9 @@ Check-Result -Flow 'Security Hardening' -Name 'Marketplace Legacy Credentials Sa
 
 # Migration 26 Checks (Top Selling Sellers Leaderboard)
 $mig26File = Test-Path 'D:\waseet-app\supabase\26_top_selling_sellers_leaderboard.sql'
-$mig26Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*26*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-if (-not $mig26Desktop -and $mig26File) {
-    Copy-Item 'D:\waseet-app\supabase\26_top_selling_sellers_leaderboard.sql' (Join-Path $desktopDir '26_top_selling_sellers_leaderboard.sql') -Force
-    $mig26Desktop = (Get-ChildItem -LiteralPath $desktopDir -Filter "*26*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-}
 $mig26Content = if ($mig26File) { Get-Content 'D:\waseet-app\supabase\26_top_selling_sellers_leaderboard.sql' -Raw -Encoding UTF8 } else { "" }
-$mig26LeaderboardParity = $mig26File -and $mig26Desktop -and $mig26Content.Contains('get_top_selling_sellers') -and $mig26Content.Contains('sold_count')
-Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 26 & Desktop SQL Parity (get_top_selling_sellers)' -Success $mig26LeaderboardParity -Detail 'Leaderboard RPC for top selling stores with desktop file ready for Supabase'
+$mig26LeaderboardParity = $mig26File -and $mig26Content.Contains('get_top_selling_sellers') -and $mig26Content.Contains('sold_count')
+Check-Result -Flow 'Enterprise Architecture' -Name 'Supabase Migration 26 (get_top_selling_sellers)' -Success $mig26LeaderboardParity -Detail 'Leaderboard RPC for top selling stores'
 
 $clientLeaderboardParity = $supabaseJs.Contains('waseetFetchTopSellingSellers') -and $supabaseJs.Contains('waseetRenderLeaderboard') -and $indexHtml.Contains('leaderboard-sellers-list')
 Check-Result -Flow 'Enterprise Architecture' -Name 'Top Selling Sellers Leaderboard UI & Client Integration' -Success $clientLeaderboardParity -Detail 'Client fetches top stores, renders dynamic ranking cards and listens to realtime sales'

@@ -50,6 +50,7 @@ class WaseetApp {
         this.bindSellForm();
         this.updateWalletDisplay();
         this.loadStoreRegionalBrokers();
+        this.renderMobileDrawer();
         this.initAuthSession();
         if (typeof waseetRenderLeaderboard === 'function') {
             waseetRenderLeaderboard();
@@ -407,24 +408,150 @@ class WaseetApp {
     }
 
 
+    renderMobileDrawer(force = false) {
+        let container = document.getElementById('mobile-drawer-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'mobile-drawer-container';
+            document.body.appendChild(container);
+        }
+        if (!container.querySelector('.mobile-drawer-sidebar') || force) {
+            container.innerHTML = this.getMobileDrawerTemplate();
+        }
+        this.updateMobileDrawer();
+    }
+
+    getMobileDrawerTemplate() {
+        return `
+            <div class="mobile-drawer-overlay drawer-overlay" id="mobile-drawer-overlay" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()"></div>
+            <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer-sidebar">
+                <div class="drawer-header">
+                    <div class="drawer-brand">
+                        <img src="assets/icons/icon-192.png" alt="منصة وسيط" class="drawer-logo" onerror="this.onerror=null; this.src='assets/logo.png'">
+                        <span class="drawer-title">منصة وسيط</span>
+                    </div>
+                    <button class="drawer-close-btn" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()" aria-label="إغلاق">&times;</button>
+                </div>
+
+                <div class="drawer-user-card" id="drawer-user-card">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Regional Broker Identity Card (بطاقة الوسيط الإقليمي المعتمد لبلدك) -->
+                <div id="drawer-regional-broker-card"></div>
+
+                <a href="wallet.html" class="drawer-wallet-row" id="drawer-wallet-row" title="محفظتي وشحن النقاط" style="display: none;">
+                    <span class="dw-label"><i class="fas fa-wallet"></i> رصيد المحفظة</span>
+                    <span class="dw-amount" id="drawer-wallet-pts">0 نقطة</span>
+                </a>
+
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">اختصاراتك والخدمات</h4>
+                    <div class="drawer-shortcuts-grid">
+                        <a href="index.html#marketplace" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-store text-gold"></i>
+                            <span>سوق الحسابات</span>
+                        </a>
+                        <a href="chat.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-comments text-orange"></i>
+                            <span>غرفة الوساطة</span>
+                        </a>
+                        <a href="deals.html" class="drawer-shortcut-card" id="drawer-deals-link" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-shield-alt text-gold"></i>
+                            <span>قيد الشراء</span>
+                            <span class="deals-badge-count admin-deals-badge" id="drawer-deals-badge" style="display: none;">0</span>
+                        </a>
+                        <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-btn-pending-verification" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="display: none;">
+                            <i class="fas fa-clipboard-check text-orange"></i>
+                            <span>حسابات قيد الفحص</span>
+                            <span class="deals-badge-count admin-pending-badge" id="drawer-pending-count" style="display: none;">0</span>
+                        </a>
+                        <a href="index.html#open-sell" class="drawer-shortcut-card" id="drawer-btn-sell-modal" onclick="if (typeof window.waseetApp !== 'undefined' && typeof window.waseetApp.openSellModal === 'function') { window.waseetApp.openSellModal(); } window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();">
+                            <i class="fas fa-plus-circle text-orange"></i>
+                            <span>بيع حساب</span>
+                        </a>
+                        <a href="my-accounts.html" class="drawer-shortcut-card" id="drawer-btn-seller-listings" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-boxes text-gold"></i>
+                            <span>حساباتي</span>
+                        </a>
+                        <a href="contact-support.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-headset text-orange"></i>
+                            <span>تواصل مع الوسيط</span>
+                        </a>
+                        <a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-inbox text-gold"></i>
+                            <span>محادثات الإدارة</span>
+                            <span class="deals-badge-count chats-unread-badge" id="drawer-chats-badge" style="display: none;">0</span>
+                        </a>
+                        <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-money-check-alt text-gold"></i>
+                            <span>شحن النقاط</span>
+                            <span class="deals-badge-count admin-deposits-badge" id="drawer-deposits-badge" style="display: none;">0</span>
+                        </a>
+                        <a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-globe-africa text-orange"></i>
+                            <span>الوسطاء الإقليميين</span>
+                        </a>
+                        <a href="admin-withdrawals.html" class="drawer-shortcut-card" id="drawer-admin-withdrawals-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-hand-holding-usd text-gold"></i>
+                            <span>طلبات السحب</span>
+                        </a>
+                        <a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-calculator text-silver"></i>
+                            <span>حاسبة العمولات</span>
+                        </a>
+                        <a href="wallet.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-wallet text-gold"></i>
+                            <span>محفظتي والنقاط</span>
+                        </a>
+                        <a href="profile.html" class="drawer-shortcut-card" id="drawer-my-store-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">
+                            <i class="fas fa-store-alt text-gold"></i>
+                            <span>ملفي ومتجري</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">الحساب وتسجيل الدخول</h4>
+                    <div class="drawer-auth-actions" id="drawer-auth-actions">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">المساعدة والدعم</h4>
+                    <ul class="drawer-links-list">
+                        <li><a href="#" onclick="if(typeof waseetAlert==='function') waseetAlert('ضمان WASEET الذهبي', 'منصة WASEET تضمن الحساب بنسبة 100% لمدة 48 ساعة ضد أي محاولة استرجاع، وتتحمل المسؤولية الكاملة في حال حدوث أي خلل.', 'success'); return false;"><i class="fas fa-shield-check text-gold"></i> شروط الضمان والأمان</a></li>
+                        <li><a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" title="واتساب الدعم المباشر: +2180931467923"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم المباشر (<span dir="ltr">+2180931467923</span>)</a></li>
+                    </ul>
+                </div>
+            </aside>
+        `;
+    }
+
     toggleMobileDrawer() {
-        const overlay = document.getElementById('mobile-drawer-overlay');
-        const drawer = document.getElementById('mobile-drawer-sidebar');
-        if (overlay && drawer) {
-            const isActive = drawer.classList.contains('active');
+        const overlay = document.getElementById('mobile-drawer-overlay') || document.getElementById('drawer-overlay');
+        const drawer = document.getElementById('mobile-drawer-sidebar') || document.getElementById('mobile-drawer');
+        if (!drawer && typeof this.renderMobileDrawer === 'function') {
+            this.renderMobileDrawer();
+        }
+        const activeOverlay = document.getElementById('mobile-drawer-overlay') || document.getElementById('drawer-overlay');
+        const activeDrawer = document.getElementById('mobile-drawer-sidebar') || document.getElementById('mobile-drawer');
+        if (activeOverlay && activeDrawer) {
+            const isActive = activeDrawer.classList.contains('active');
             if (isActive) {
                 this.closeMobileDrawer();
             } else {
-                overlay.classList.add('active');
-                drawer.classList.add('active');
+                activeOverlay.classList.add('active');
+                activeDrawer.classList.add('active');
                 this.updateMobileDrawer();
             }
         }
     }
 
     closeMobileDrawer() {
-        const overlay = document.getElementById('mobile-drawer-overlay');
-        const drawer = document.getElementById('mobile-drawer-sidebar');
+        const overlay = document.getElementById('mobile-drawer-overlay') || document.getElementById('drawer-overlay');
+        const drawer = document.getElementById('mobile-drawer-sidebar') || document.getElementById('mobile-drawer');
         if (overlay) overlay.classList.remove('active');
         if (drawer) drawer.classList.remove('active');
     }
@@ -459,23 +586,43 @@ class WaseetApp {
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
         if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
 
+        // تحديث بطاقة المحفظة في القائمة الجانبية
+        const drawerWalletRow = document.getElementById('drawer-wallet-row');
+        const drawerWalletPts = document.getElementById('drawer-wallet-pts');
+        const currentPts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : ((user && typeof user.points_balance !== 'undefined') ? Number(user.points_balance) : 0);
+        if (drawerWalletRow) {
+            drawerWalletRow.style.display = (user && !user.isGuest) ? 'flex' : 'none';
+            if (drawerWalletPts) drawerWalletPts.textContent = currentPts + ' نقطة';
+        }
+
+        // تحديث رابط ملفي ومتجري
+        const myStoreLink = document.getElementById('drawer-my-store-link');
+        if (myStoreLink) {
+            if (user && user.id && !user.isGuest) {
+                myStoreLink.href = 'profile.html?id=' + encodeURIComponent(user.id);
+                myStoreLink.style.display = 'flex';
+            } else {
+                myStoreLink.style.display = 'none';
+            }
+        }
+
         if (userCard) {
             userCard.style.cursor = 'pointer';
-            if (user) {
+            if (user && !user.isGuest) {
                 userCard.title = 'إدارة الحساب الشخصي وتسجيل الخروج';
-                userCard.onclick = () => { this.closeMobileDrawer(); this.openLoginModal(); };
+                userCard.onclick = () => { window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe(); this.openLoginModal(); };
                 const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                     || user.avatar 
                     || (isMediatorUser(user) 
-                        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' 
-                        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
+                        ? 'assets/logo.png' 
+                        : 'assets/logo.png');
                 const roleLabel = isBroker
                     ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
                     : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
-                const pts = user.wallet ? user.wallet.available : 0;
-                const safeName = this.escapeHtml(user.name);
+                const pts = currentPts;
+                const safeName = this.escapeHtml(user.name || 'مستخدم');
                 userCard.innerHTML = `
-                    <img src="${avatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                    <img src="${avatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/logo.png'">
                     <div class="drawer-user-meta">
                         <span class="drawer-user-name">${safeName}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
@@ -485,7 +632,7 @@ class WaseetApp {
                 `;
             } else {
                 userCard.title = 'تسجيل الدخول أو إنشاء حساب';
-                userCard.onclick = () => { this.closeMobileDrawer(); this.openLoginModal(); };
+                userCard.onclick = () => { window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe(); this.openLoginModal(); };
                 userCard.innerHTML = `
                     <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
                         <i class="fas fa-user-circle text-gold"></i>
@@ -511,38 +658,43 @@ class WaseetApp {
         }
 
         if (authActions) {
-            if (user) {
+            if (user && !user.isGuest) {
                 authActions.innerHTML = `
-                    <a href="wallet.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: var(--gold-light); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <a href="wallet.html" class="btn-3d btn-outline" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: var(--gold-light); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                         <i class="fas fa-wallet text-gold"></i> محفظتي وشحن النقاط
                     </a>
                     ${(!isAdmin && !isBroker) ? `
-                        <button class="btn-3d btn-outline" onclick="window.waseetApp.openSellerListingsModal(); window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: #fff;">
+                        <button class="btn-3d btn-outline" onclick="window.waseetApp.openSellerListingsModal(); window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: #fff;">
                             <i class="fas fa-boxes text-gold"></i> حساباتي المعروضة للبيع
                         </button>
                     ` : `
                         ${isBroker ? `
-                        <a href="deals.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <a href="deals.html" class="btn-3d btn-outline" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-handshake"></i> إدارة صفقات الوساطة الإقليمية
                         </a>
                         ` : ''}
-                        <a href="admin-deposits.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        ${isAdmin ? `
+                        <a href="admin-brokers.html" class="btn-3d btn-outline" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--gold-primary); color: var(--gold-light); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-globe-africa text-orange"></i> لوحة إدارة الوسطاء
+                        </a>
+                        ` : ''}
+                        <a href="admin-deposits.html" class="btn-3d btn-outline" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-coins text-gold"></i> إدارة طلبات شحن النقاط
                         </a>
-                        <a href="pending-accounts.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <a href="pending-accounts.html" class="btn-3d btn-outline" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص والمراجعة
                         </a>
                     `}
-                    <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetApp.closeMobileDrawer();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
+                    <button class="btn-3d btn-outline" onclick="window.waseetApp.logoutUser(); window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="width: 100%; border-color: #ef4444; color: #ef4444;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج (العودة كزائر)
                     </button>
                 `;
             } else {
                 authActions.innerHTML = `
-                    <button class="btn-social-login btn-social-google" onclick="window.waseetApp.loginWithProvider('google'); window.waseetApp.closeMobileDrawer();">
+                    <button class="btn-social-login btn-social-google" onclick="window.waseetApp.loginWithProvider('google'); window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();">
                         <i class="fab fa-google" style="color: #ea4335;"></i> المتابعة باستخدام Google
                     </button>
-                    <button class="btn-social-login btn-social-facebook" onclick="window.waseetApp.loginWithProvider('facebook'); window.waseetApp.closeMobileDrawer();">
+                    <button class="btn-social-login btn-social-facebook" onclick="window.waseetApp.loginWithProvider('facebook'); window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();">
                         <i class="fab fa-facebook-f" style="color: #1877f2;"></i> المتابعة باستخدام Facebook
                     </button>
                 `;
@@ -3213,6 +3365,35 @@ if (typeof window !== 'undefined') {
         }
     };
     window.updateUI = window.updateAuthUI;
+
+    window.renderMobileDrawer = function (force = false) {
+        if (window.waseetApp && typeof window.waseetApp.renderMobileDrawer === 'function') {
+            window.waseetApp.renderMobileDrawer(force);
+        } else if (typeof window.waseetRenderMobileDrawerUniversal === 'function') {
+            window.waseetRenderMobileDrawerUniversal(force);
+        }
+    };
+
+    window.updateMobileDrawer = function () {
+        if (window.waseetApp && typeof window.waseetApp.updateMobileDrawer === 'function') {
+            window.waseetApp.updateMobileDrawer();
+        } else if (typeof window.waseetUpdateDrawerUserCard === 'function') {
+            window.waseetUpdateDrawerUserCard();
+        }
+    };
+
+    window.waseetCloseDrawerSafe = function () {
+        if (window.waseetApp && typeof window.waseetApp.closeMobileDrawer === 'function') {
+            window.waseetApp.closeMobileDrawer();
+        }
+        if (typeof window.toggleWaseetDrawer === 'function') {
+            window.toggleWaseetDrawer(false);
+        }
+        const drawer = document.getElementById('mobile-drawer-sidebar') || document.getElementById('mobile-drawer') || document.querySelector('.mobile-drawer-sidebar') || document.querySelector('.mobile-drawer');
+        const overlay = document.getElementById('mobile-drawer-overlay') || document.getElementById('drawer-overlay') || document.querySelector('.mobile-drawer-overlay') || document.querySelector('.drawer-overlay');
+        if (drawer) drawer.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+    };
 }
 
 

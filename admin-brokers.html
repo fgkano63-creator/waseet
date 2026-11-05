@@ -321,46 +321,8 @@
         </div>
     </header>
 
-    <!-- ================= Mobile Drawer Navigation ================= -->
-    <div class="mobile-drawer-overlay drawer-overlay" id="mobile-drawer-overlay" onclick="toggleWaseetDrawer()"></div>
-    <aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer-sidebar">
-        <div class="drawer-header">
-            <div class="drawer-brand">
-                <img src="assets/logo.png?v=20261027_orig" alt="WASEET" class="drawer-logo" style="width: 36px; height: 36px; object-fit: contain;">
-                <div class="drawer-titles">
-                    <span class="drawer-title-main">WASEET</span>
-                    <span class="drawer-title-sub">الوساطة الآمنة • لوحة الإدارة</span>
-                </div>
-            </div>
-            <button type="button" class="drawer-close-btn" onclick="toggleWaseetDrawer()">&times;</button>
-        </div>
-        <div class="drawer-user-card" id="drawer-user-card">
-            <!-- Populated dynamically -->
-        </div>
-        <nav class="drawer-links-nav">
-            <a href="admin-withdrawals.html" class="drawer-nav-item" data-admin-only style="display: none;">
-                <i class="fas fa-hand-holding-usd text-orange"></i> <span>طلبات سحب الأرباح</span>
-            </a>
-            <a href="admin-deposits.html" class="drawer-nav-item" data-admin-only style="display: none;">
-                <i class="fas fa-coins text-gold"></i> <span>طلبات الشحن والإيداعات</span>
-            </a>
-            <a href="admin-brokers.html" class="drawer-nav-item active" data-admin-only style="display: none;">
-                <i class="fas fa-globe-africa text-orange"></i> <span>إدارة الوسطاء الإقليميين</span>
-            </a>
-            <a href="pending-accounts.html" class="drawer-nav-item" data-admin-only style="display: none;">
-                <i class="fas fa-clipboard-check text-orange"></i> <span>الحسابات قيد الفحص</span>
-            </a>
-            <a href="admin-chats.html" class="drawer-nav-item" data-admin-only style="display: none;">
-                <i class="fas fa-inbox text-gold"></i> <span>محادثات الإدارة والدعم</span>
-            </a>
-            <a href="deals.html" class="drawer-nav-item" data-admin-only style="display: none;">
-                <i class="fas fa-crown text-gold"></i> <span>كافة الصفقات الجارية</span>
-            </a>
-            <a href="index.html" class="drawer-nav-item">
-                <i class="fas fa-store text-gold"></i> <span>العودة للمتجر الرئيسي</span>
-            </a>
-        </nav>
-    </aside>
+    <!-- Unified Mobile Drawer Container (Componentized via renderMobileDrawer) -->
+    <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"><!-- id="drawer-regional-broker-card" --></div>
 
     <!-- ================= Main Content Container (مخفي افتراضياً لحين إثبات صلاحية المدير) ================= -->
     <main class="admin-brokers-container" id="admin-brokers-main" style="display: none;">

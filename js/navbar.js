@@ -148,17 +148,131 @@
     }
 
     function getDrawer() {
-        return byId('mobile-drawer') || byId('mobile-drawer-sidebar') || document.querySelector('.mobile-drawer');
+        return byId('mobile-drawer-sidebar') || byId('mobile-drawer') || document.querySelector('.mobile-drawer-sidebar') || document.querySelector('.mobile-drawer');
     }
 
     function getOverlay() {
-        return byId('drawer-overlay') || byId('mobile-drawer-overlay') || document.querySelector('.drawer-overlay');
+        return byId('mobile-drawer-overlay') || byId('drawer-overlay') || document.querySelector('.mobile-drawer-overlay') || document.querySelector('.drawer-overlay');
     }
+
+    function getUniversalDrawerHtml() {
+        return '<div class="mobile-drawer-overlay drawer-overlay" id="mobile-drawer-overlay" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()"></div>' +
+            '<aside class="mobile-drawer-sidebar mobile-drawer" id="mobile-drawer-sidebar">' +
+                '<div class="drawer-header">' +
+                    '<div class="drawer-brand">' +
+                        '<img src="assets/icons/icon-192.png" alt="منصة وسيط" class="drawer-logo" onerror="this.onerror=null; this.src=\'assets/logo.png\'">' +
+                        '<span class="drawer-title">منصة وسيط</span>' +
+                    '</div>' +
+                    '<button class="drawer-close-btn" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()" aria-label="إغلاق">&times;</button>' +
+                '</div>' +
+                '<div class="drawer-user-card" id="drawer-user-card"></div>' +
+                '<div id="drawer-regional-broker-card"></div>' +
+                '<a href="wallet.html" class="drawer-wallet-row" id="drawer-wallet-row" title="محفظتي وشحن النقاط" style="display: none;">' +
+                    '<span class="dw-label"><i class="fas fa-wallet"></i> رصيد المحفظة</span>' +
+                    '<span class="dw-amount" id="drawer-wallet-pts">0 نقطة</span>' +
+                '</a>' +
+                '<div class="drawer-section">' +
+                    '<h4 class="drawer-section-title">اختصاراتك والخدمات</h4>' +
+                    '<div class="drawer-shortcuts-grid">' +
+                        '<a href="index.html#marketplace" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-store text-gold"></i><span>سوق الحسابات</span>' +
+                        '</a>' +
+                        '<a href="chat.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-comments text-orange"></i><span>غرفة الوساطة</span>' +
+                        '</a>' +
+                        '<a href="deals.html" class="drawer-shortcut-card" id="drawer-deals-link" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-shield-alt text-gold"></i><span>قيد الشراء</span>' +
+                            '<span class="deals-badge-count admin-deals-badge" id="drawer-deals-badge" style="display: none;">0</span>' +
+                        '</a>' +
+                        '<a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-btn-pending-verification" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();" style="display: none;">' +
+                            '<i class="fas fa-clipboard-check text-orange"></i><span>حسابات قيد الفحص</span>' +
+                            '<span class="deals-badge-count admin-pending-badge" id="drawer-pending-count" style="display: none;">0</span>' +
+                        '</a>' +
+                        '<a href="index.html#open-sell" class="drawer-shortcut-card" id="drawer-btn-sell-modal" onclick="if(window.waseetApp && window.waseetApp.openSellModal){window.waseetApp.openSellModal();} window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe();">' +
+                            '<i class="fas fa-plus-circle text-orange"></i><span>بيع حساب</span>' +
+                        '</a>' +
+                        '<a href="my-accounts.html" class="drawer-shortcut-card" id="drawer-btn-seller-listings" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-boxes text-gold"></i><span>حساباتي</span>' +
+                        '</a>' +
+                        '<a href="contact-support.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-headset text-orange"></i><span>تواصل مع الوسيط</span>' +
+                        '</a>' +
+                        '<a href="admin-chats.html" class="drawer-shortcut-card" id="drawer-admin-chats-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-inbox text-gold"></i><span>محادثات الإدارة</span>' +
+                            '<span class="deals-badge-count chats-unread-badge" id="drawer-chats-badge" style="display: none;">0</span>' +
+                        '</a>' +
+                        '<a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-money-check-alt text-gold"></i><span>شحن النقاط</span>' +
+                            '<span class="deals-badge-count admin-deposits-badge" id="drawer-deposits-badge" style="display: none;">0</span>' +
+                        '</a>' +
+                        '<a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-globe-africa text-orange"></i><span>الوسطاء الإقليميين</span>' +
+                        '</a>' +
+                        '<a href="admin-withdrawals.html" class="drawer-shortcut-card" id="drawer-admin-withdrawals-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-hand-holding-usd text-gold"></i><span>طلبات السحب</span>' +
+                        '</a>' +
+                        '<a href="index.html#fee-calculator" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-calculator text-silver"></i><span>حاسبة العمولات</span>' +
+                        '</a>' +
+                        '<a href="wallet.html" class="drawer-shortcut-card" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-wallet text-gold"></i><span>محفظتي والنقاط</span>' +
+                        '</a>' +
+                        '<a href="profile.html" class="drawer-shortcut-card" id="drawer-my-store-link" style="display: none;" onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-store-alt text-gold"></i><span>ملفي ومتجري</span>' +
+                        '</a>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="drawer-section">' +
+                    '<h4 class="drawer-section-title">الحساب وتسجيل الدخول</h4>' +
+                    '<div class="drawer-auth-actions" id="drawer-auth-actions"></div>' +
+                '</div>' +
+                '<div class="drawer-section">' +
+                    '<h4 class="drawer-section-title">المساعدة والدعم</h4>' +
+                    '<ul class="drawer-links-list">' +
+                        '<li><a href="#" onclick="if(typeof waseetAlert===\'function\') waseetAlert(\'ضمان WASEET الذهبي\', \'منصة WASEET تضمن الحساب بنسبة 100% لمدة 48 ساعة ضد أي محاولة استرجاع، وتتحمل المسؤولية الكاملة في حال حدوث أي خلل.\', \'success\'); return false;"><i class="fas fa-shield-check text-gold"></i> شروط الضمان والأمان</a></li>' +
+                        '<li><a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" title="واتساب الدعم المباشر: +2180931467923"><i class="fab fa-whatsapp" style="color: #25D366;"></i> الدعم المباشر (<span dir="ltr">+2180931467923</span>)</a></li>' +
+                    '</ul>' +
+                '</div>' +
+            '</aside>';
+    }
+
+    function waseetRenderMobileDrawerUniversal(force) {
+        if (typeof window.waseetApp !== 'undefined' && typeof window.waseetApp.renderMobileDrawer === 'function') {
+            window.waseetApp.renderMobileDrawer(force);
+            return;
+        }
+        var container = byId('mobile-drawer-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'mobile-drawer-container';
+            document.body.appendChild(container);
+        }
+        var existingDrawer = container.querySelector('.mobile-drawer-sidebar') || container.querySelector('.mobile-drawer');
+        if (!existingDrawer || force) {
+            container.innerHTML = getUniversalDrawerHtml();
+        }
+        refreshDrawerExtras();
+    }
+    window.renderMobileDrawer = window.renderMobileDrawer || waseetRenderMobileDrawerUniversal;
+    window.waseetRenderMobileDrawerUniversal = waseetRenderMobileDrawerUniversal;
+
+    function waseetCloseDrawerSafe() {
+        if (typeof window.waseetApp !== 'undefined' && typeof window.waseetApp.closeMobileDrawer === 'function') {
+            try { window.waseetApp.closeMobileDrawer(); } catch (e) {}
+        }
+        toggleWaseetDrawer(false);
+        var drawer = getDrawer();
+        var overlay = getOverlay();
+        if (drawer) drawer.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+    }
+    window.waseetCloseDrawerSafe = waseetCloseDrawerSafe;
 
     /* ======================================================================
        1) فتح / إغلاق القائمة الجانبية
        ====================================================================== */
     function toggleWaseetDrawer(force) {
+        waseetRenderMobileDrawerUniversal();
         var drawer = getDrawer();
         var overlay = getOverlay();
         if (!drawer) return;
@@ -390,6 +504,9 @@
        التهيئة
        ====================================================================== */
     function init() {
+        // حقن القائمة الجانبية المركزية فوراً في أي صفحة تحمل navbar.js
+        waseetRenderMobileDrawerUniversal();
+
         var auto = document.body && document.body.getAttribute('data-waseet-nav') === 'auto';
 
         if (auto) {
@@ -421,6 +538,22 @@
             }
         });
     }
+
+    // أسماء بديلة شائعة عبر الصفحات للتوافق التام 100%
+    window.toggleDealsDrawer = window.toggleDealsDrawer || toggleWaseetDrawer;
+    window.closeDealsDrawer = window.closeDealsDrawer || waseetCloseDrawerSafe;
+    window.toggleWalletDrawer = window.toggleWalletDrawer || toggleWaseetDrawer;
+    window.closeWalletDrawer = window.closeWalletDrawer || waseetCloseDrawerSafe;
+    window.toggleChatDrawer = window.toggleChatDrawer || toggleWaseetDrawer;
+    window.closeChatDrawer = window.closeChatDrawer || waseetCloseDrawerSafe;
+    window.toggleSupportDrawer = window.toggleSupportDrawer || toggleWaseetDrawer;
+    window.closeSupportDrawer = window.closeSupportDrawer || waseetCloseDrawerSafe;
+    window.toggleMyAccountsDrawer = window.toggleMyAccountsDrawer || toggleWaseetDrawer;
+    window.closeMyAccountsDrawer = window.closeMyAccountsDrawer || waseetCloseDrawerSafe;
+    window.togglePendingDrawer = window.togglePendingDrawer || toggleWaseetDrawer;
+    window.closePendingDrawer = window.closePendingDrawer || waseetCloseDrawerSafe;
+    window.toggleMobileDrawer = window.toggleMobileDrawer || toggleWaseetDrawer;
+    window.closeMobileDrawer = window.closeMobileDrawer || waseetCloseDrawerSafe;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

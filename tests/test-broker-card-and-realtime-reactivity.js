@@ -105,9 +105,10 @@ const tests = [
     {
         name: 'Drawer Regional Broker Card Slots Exist in HTML Files',
         assert: () => {
-            return indexHtml.includes('id="drawer-regional-broker-card"') &&
-                   dealsHtml.includes('id="drawer-regional-broker-card"') &&
-                   walletHtml.includes('id="drawer-regional-broker-card"');
+            return (indexHtml.includes('id="drawer-regional-broker-card"') || indexHtml.includes('mobile-drawer-container')) &&
+                   (dealsHtml.includes('id="drawer-regional-broker-card"') || dealsHtml.includes('mobile-drawer-container')) &&
+                   (walletHtml.includes('id="drawer-regional-broker-card"') || walletHtml.includes('mobile-drawer-container')) &&
+                   (appJs.includes("id = 'drawer-regional-broker-card'") || navbarJs.includes("id=\"drawer-regional-broker-card\""));
         }
     }
 ];
