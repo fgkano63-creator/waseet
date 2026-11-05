@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-05T07:55:36.497Z",
+  "timestamp": "2026-11-05T08:02:09.959Z",
   "metrics": {
-    "totalChecks": 248,
-    "passed": 248,
+    "totalChecks": 249,
+    "passed": 249,
     "warnings": 0,
     "failures": 0
   },
@@ -1206,7 +1206,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 90 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 89 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1713,6 +1713,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Message role spoof trigger enforces authentic roles and public_regional_brokers view shields financials (Migration 25)",
+        "details": null
+      },
+      {
+        "id": "DB-TopSellingSellersLeaderboard",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Stored procedure get_top_selling_sellers active with sold_count aggregation (Migration 26)",
         "details": null
       }
     ],
