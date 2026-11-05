@@ -619,6 +619,7 @@ async function waseetSyncAuthState(options = {}) {
 
     const forceSync = !!(options && options.force);
     const shouldRefreshToken = !!(options && options.refreshToken);
+    let session = (options && options.session) || null;
 
     if (window._waseetSyncAuthInFlight) {
         if (!forceSync) return window._waseetSyncAuthInFlight;
@@ -627,9 +628,42 @@ async function waseetSyncAuthState(options = {}) {
 
     window._waseetSyncAuthInFlight = (async () => {
     try {
-        // 1. إذا طُلب تحديث التوكن أو الجلسة من الخادم، نحدث الجلسة أولاً مع fallback آمن
-        let session = null;
-        if (shouldRefreshToken) {
+        // 1. معالجة فورية لاستقبال OAuth Callback إذا كان هناك كود تفويض (code) في الرابط
+        if (!session && typeof window !== 'undefined' && window.location) {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const authCode = urlParams.get('code');
+                if (authCode && client.auth && typeof client.auth.exchangeCodeForSession === 'function') {
+                    console.log('[Supabase Auth] Exchanging OAuth authorization code from callback URL...');
+                    const { data: codeData, error: codeErr } = await client.auth.exchangeCodeForSession(authCode);
+                    if (!codeErr && codeData && codeData.session) {
+                        session = codeData.session;
+                        console.log('[Supabase Auth] OAuth code successfully exchanged for session:', session.user?.email);
+                    } else if (codeErr) {
+                        console.warn('[Supabase Auth] exchangeCodeForSession returned error:', codeErr.message);
+                    }
+                }
+            } catch (ce) {
+                console.warn('[Supabase Auth] OAuth code exchange exception:', ce);
+            }
+        }
+
+        // 2. إذا لم تتوفر الجلسة بعد، نجلبها مباشرة عبر getSession
+        if (!session) {
+            try {
+                const { data: sessionData, error: gsError } = await client.auth.getSession();
+                if (!gsError && sessionData && sessionData.session) {
+                    session = sessionData.session;
+                } else if (gsError) {
+                    console.warn('[Supabase Auth] getSession error:', gsError.message);
+                }
+            } catch (gsEx) {
+                console.warn('[Supabase Auth] getSession exception:', gsEx);
+            }
+        }
+
+        // 3. إذا طُلب تحديث التوكن وكانت هناك جلسة نشطة بالفعل (دون محاولة التحديث على جلسة فارغة)
+        if (shouldRefreshToken && session) {
             try {
                 const { data: refreshedData } = await client.auth.refreshSession();
                 if (refreshedData && refreshedData.session) {
@@ -638,18 +672,37 @@ async function waseetSyncAuthState(options = {}) {
             } catch (rfErr) {}
         }
 
-        if (!session) {
-            const { data: sessionData, error } = await client.auth.getSession();
-            if (!error && sessionData && sessionData.session) {
-                session = sessionData.session;
-            }
-        }
+        const isOAuthCallbackPending = typeof window !== 'undefined' && window.location && (
+            (window.location.hash && (window.location.hash.includes('access_token=') || window.location.hash.includes('refresh_token='))) ||
+            (window.location.search && window.location.search.includes('code='))
+        );
 
         if (!session || !session.user) {
+            // إذا كان المتصفح عائداً من OAuth والرابط يحتوي توكن أو كود، لا نمسح الجلسة بل ننتظر اكتمال معالجة المستمع
+            if (isOAuthCallbackPending) {
+                console.log('[Supabase Auth] OAuth callback pending in URL, awaiting onAuthStateChange event...');
+                return;
+            }
             WASEET_STATE.user = null;
             try { localStorage.removeItem('WASEET_SAVED_USER_PERMANENT'); } catch (e) {}
             waseetApplyLiveRoleUpdateToUI(null);
+            if (typeof window.updateAuthUI === 'function') {
+                try { window.updateAuthUI(null); } catch (e) {}
+            }
             return;
+        }
+
+        // تنظيف الرابط من كود وتوكنات OAuth الحساسة بعد استلام الجلسة بنجاح
+        if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+            try {
+                if (window.location.hash && window.location.hash.includes('access_token=')) {
+                    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                }
+                if (window.location.search && window.location.search.includes('code=')) {
+                    const cleanSearch = window.location.search.replace(/[?&]code=[^&]+/, '').replace(/^[?&]/, '?');
+                    window.history.replaceState({}, document.title, window.location.pathname + (cleanSearch === '?' ? '' : cleanSearch));
+                }
+            } catch (histErr) {}
         }
 
         // جلب أحدث بيانات المستخدم من خادم Auth إن أمكن لضمان التقاط أي تحديث في user_metadata / app_metadata
@@ -822,12 +875,18 @@ async function waseetSyncAuthState(options = {}) {
 
         // تحديث عناصر الواجهة النهائية بعد جلب الحسابات والصفقات
         waseetApplyLiveRoleUpdateToUI(mappedUser);
+        if (typeof window.updateAuthUI === 'function') {
+            try { window.updateAuthUI(mappedUser); } catch (uErr) {}
+        } else if (typeof window.updateUI === 'function') {
+            try { window.updateUI(mappedUser); } catch (uErr) {}
+        }
         if (window.waseetApp && typeof window.waseetApp.renderMarketplace === 'function' && (!options || !options.profileOnly)) {
             window.waseetApp.renderMarketplace();
         }
         if (typeof loadMyAccountsData === 'function' && (!options || !options.profileOnly)) {
             loadMyAccountsData();
         }
+        return mappedUser;
     } catch (err) {
         console.warn('[Supabase Auth] استثناء مزامنة الجلسة:', err);
     } finally {
@@ -4009,24 +4068,49 @@ window.waseetRefreshSessionRoleNow = function () {
 };
 
 /**
+ * دوال تحديث واجهة المستخدم بعد المصادقة (Auth UI Updater)
+ */
+function updateAuthUI(user = null) {
+    const targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+    waseetApplyLiveRoleUpdateToUI(targetUser);
+    if (window.waseetApp) {
+        if (typeof window.waseetApp.updateAuthUI === 'function') {
+            try { window.waseetApp.updateAuthUI(targetUser); } catch (e) {}
+        } else if (typeof window.waseetApp.renderUserProfile === 'function') {
+            try { window.waseetApp.renderUserProfile(); } catch (e) {}
+        }
+    }
+}
+window.updateAuthUI = updateAuthUI;
+window.updateUI = updateAuthUI;
+
+/**
  * الاستماع لتغيرات الجلسة وتحديث الواجهة تلقائياً
  */
-
 function initWaseetAuthListener() {
     const client = initWaseetSupabase();
-    if (!client) return;
+    if (!client || !client.auth) return;
+
+    if (window._waseetAuthListenerRegistered) return;
+    window._waseetAuthListenerRegistered = true;
 
     client.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-            await waseetSyncAuthState();
-            await waseetUpdateAdminPendingDepositsBadge();
-            await waseetUpdateAdminPendingWithdrawalsBadge();
-            waseetSyncAllNavBadges();
+        console.log(`[Supabase Auth Listener] Event: ${event}`, session ? session.user?.email : 'no-session');
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            if (session && session.user) {
+                await waseetSyncAuthState({ session, force: true });
+                updateAuthUI(WASEET_STATE?.user || session.user);
+                await waseetUpdateAdminPendingDepositsBadge();
+                await waseetUpdateAdminPendingWithdrawalsBadge();
+                waseetSyncAllNavBadges();
+            }
         } else if (event === 'SIGNED_OUT') {
             if (typeof WASEET_STATE !== 'undefined') {
                 WASEET_STATE.user = null;
                 if (typeof saveWaseetData === 'function') saveWaseetData();
             }
+            try { localStorage.removeItem('WASEET_SAVED_USER_PERMANENT'); } catch (e) {}
+            updateAuthUI(null);
             if (window.waseetNotifications && typeof window.waseetNotifications.syncWithUser === 'function') {
                 window.waseetNotifications.syncWithUser(null);
             }
@@ -4049,7 +4133,7 @@ if (typeof window !== 'undefined') {
         waseetInitLiveRoleAndSessionSync();
         waseetSyncAllNavBadges();
         waseetInitGlobalNavRealtimeBadges();
-        waseetSyncAuthState({ force: true, refreshToken: true });
+        waseetSyncAuthState({ force: true });
         setTimeout(waseetUpdateAdminPendingDepositsBadge, 800);
         setTimeout(waseetUpdateAdminPendingWithdrawalsBadge, 850);
     }

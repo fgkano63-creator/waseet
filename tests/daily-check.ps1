@@ -7,7 +7,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "4. Self-Healing E2E Simulation Suite"; Script = "tests\self-healing-e2e-tester.ps1"; Type = "ps1" },
     [PSCustomObject]@{ Name = "5. Mobile Drawer Profile Header Audit"; Script = "tests\test-drawer-profile-header.ps1"; Type = "ps1" },
     [PSCustomObject]@{ Name = "6. Seller Profile & Store Card Audit"; Script = "tests\test-seller-profile-card.ps1"; Type = "ps1" },
-    [PSCustomObject]@{ Name = "7. Master Automated Engine V3.0"; Script = "tests\audit-master-engine.js"; Type = "node" }
+    [PSCustomObject]@{ Name = "7. Master Automated Engine V3.0"; Script = "tests\audit-master-engine.js"; Type = "node" },
+    [PSCustomObject]@{ Name = "8. OAuth Callback & Session Lifecycle Audit"; Script = "tests\test-oauth-callback.js"; Type = "node" }
 )
 
 $summary = @()
@@ -36,6 +37,8 @@ foreach ($t in $tests) {
     } elseif ($outStr -match 'Total Elements Scanned\s*:\s*([0-9]+)' -or $outStr -match 'Total Buttons & Links Scanned:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'Total Tests\s*:\s*([0-9]+)') {
+        $checksCount = [int]$Matches[1]
+    } elseif ($outStr -match '\[OAUTH TEST RESULTS SUMMARY\] Passed:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'ALL DRAWER PROFILE HEADER AUDITS PASSED') {
         $checksCount = 19

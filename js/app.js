@@ -50,6 +50,7 @@ class WaseetApp {
         this.bindSellForm();
         this.updateWalletDisplay();
         this.loadStoreRegionalBrokers();
+        this.initAuthSession();
 
         // Non-blocking visitor welcome prompt for first-time visitors (Requirement 1)
         if (!WASEET_STATE.user) {
@@ -254,6 +255,82 @@ class WaseetApp {
         }
 
         this.updateMobileDrawer();
+    }
+
+    /**
+     * تحديث واجهة المستخدم فور تسجيل الدخول أو تغير الجلسة
+     */
+    updateAuthUI(user = null) {
+        const targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+        if (targetUser && typeof WASEET_STATE !== 'undefined') {
+            if (!WASEET_STATE.user || WASEET_STATE.user.id !== targetUser.id) {
+                WASEET_STATE.user = targetUser;
+            }
+        }
+        this.renderUserProfile();
+        this.updateWalletDisplay();
+        this.updateMobileDrawer();
+
+        const loginModal = document.getElementById('modal-login');
+        if (loginModal && targetUser) {
+            loginModal.classList.remove('active');
+        }
+
+        const currentStatusBox = document.getElementById('login-current-status-box');
+        if (currentStatusBox && targetUser) {
+            currentStatusBox.style.display = 'block';
+        }
+    }
+
+    /**
+     * اسم بديل متوافق مع متطلبات الواجهة updateUI
+     */
+    updateUI(user = null) {
+        return this.updateAuthUI(user);
+    }
+
+    /**
+     * معالجة الجلسة عند تحميل الصفحة وتثبيت مستمع onAuthStateChange
+     */
+    async initAuthSession() {
+        console.log('[WaseetApp] Initializing Auth Session & Listener...');
+        const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : (window.waseetSupabaseClient || null);
+        if (!client || !client.auth) {
+            console.warn('[WaseetApp] Supabase auth client not ready during initAuthSession');
+            return;
+        }
+
+        try {
+            // 1. معالجة الـ Session عند تحميل الصفحة عبر getSession()
+            const { data: sessionRes, error } = await client.auth.getSession();
+            if (error) {
+                console.warn('[WaseetApp] Error retrieving session on page load:', error.message);
+            }
+            if (sessionRes && sessionRes.session && sessionRes.session.user) {
+                console.log('[WaseetApp] Active session loaded successfully on page start:', sessionRes.session.user.email);
+                if (typeof waseetSyncAuthState === 'function') {
+                    await waseetSyncAuthState({ session: sessionRes.session, force: true });
+                }
+                this.updateAuthUI(WASEET_STATE?.user || sessionRes.session.user);
+            }
+
+            // 2. مستمع الأحداث onAuthStateChange لاستدعاء updateAuthUI فور اكتشاف SIGNED_IN
+            client.auth.onAuthStateChange(async (event, session) => {
+                console.log(`[WaseetApp] Auth state changed event: ${event}`);
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                    if (session && session.user) {
+                        if (typeof waseetSyncAuthState === 'function') {
+                            await waseetSyncAuthState({ session, force: true });
+                        }
+                        this.updateAuthUI(WASEET_STATE?.user || session.user);
+                    }
+                } else if (event === 'SIGNED_OUT') {
+                    this.updateAuthUI(null);
+                }
+            });
+        } catch (err) {
+            console.error('[WaseetApp] Error initializing auth session:', err);
+        }
     }
 
     async updatePendingAccountsCounter(force = false) {
@@ -3070,5 +3147,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 120);
     }
 });
+
+// تعريف وتأكيد دوال تحديث الواجهة العامة على نطاق window
+if (typeof window !== 'undefined') {
+    window.updateAuthUI = function (user = null) {
+        const targetUser = user || (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null);
+        if (window.waseetApp && typeof window.waseetApp.updateAuthUI === 'function') {
+            try { window.waseetApp.updateAuthUI(targetUser); } catch (e) {}
+        }
+        if (typeof waseetApplyLiveRoleUpdateToUI === 'function') {
+            try { waseetApplyLiveRoleUpdateToUI(targetUser); } catch (e) {}
+        }
+    };
+    window.updateUI = window.updateAuthUI;
+}
 
 
