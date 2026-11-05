@@ -210,15 +210,15 @@ class WaseetApp {
 
         // روابط القائمة الجانبية للمدير والوسيط
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminDeposits) drawerAdminDeposits.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminBrokers) drawerAdminBrokers.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
         const drawerAdminWithdrawalsLink = document.getElementById('drawer-admin-withdrawals-link');
-        if (drawerAdminWithdrawalsLink) drawerAdminWithdrawalsLink.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminWithdrawalsLink) drawerAdminWithdrawalsLink.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
         const drawerPendingVerification = document.getElementById('drawer-btn-pending-verification');
-        if (drawerPendingVerification) drawerPendingVerification.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerPendingVerification) drawerPendingVerification.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
 
         if (isAdmin && typeof window.waseetUpdateAdminPendingDepositsBadge === 'function') {
             window.waseetUpdateAdminPendingDepositsBadge();
@@ -426,15 +426,15 @@ class WaseetApp {
         // المدير العام: يرى كافة الأزرار بدون استثناء
         // الوسيط الإقليمي: يرى قيد الشراء، قيد الفحص، شحن النقاط، ومحادثات الإدارة ويُحجب عنه الوسطاء الإقليميين
         const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminBrokers) drawerAdminBrokers.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminDeposits) drawerAdminDeposits.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerPendingVerification = document.getElementById('drawer-btn-pending-verification');
-        if (drawerPendingVerification) drawerPendingVerification.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerPendingVerification) drawerPendingVerification.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
-        if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
 
         if (userCard) {
             userCard.style.cursor = 'pointer';
@@ -487,15 +487,14 @@ class WaseetApp {
                             <i class="fas fa-boxes text-gold"></i> حساباتي المعروضة للبيع
                         </button>
                     ` : `
-                        ${isAdmin ? `
-                        <a href="admin-deposits.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="fas fa-money-check-alt"></i> إدارة طلبات شحن النقاط
-                        </a>
-                        ` : `
+                        ${isBroker ? `
                         <a href="deals.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-handshake"></i> إدارة صفقات الوساطة الإقليمية
                         </a>
-                        `}
+                        ` : ''}
+                        <a href="admin-deposits.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: #10b981; color: #34d399; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-coins text-gold"></i> إدارة طلبات شحن النقاط
+                        </a>
                         <a href="pending-accounts.html" class="btn-3d btn-outline" onclick="window.waseetApp.closeMobileDrawer();" style="width: 100%; margin-bottom: 0.6rem; border-color: var(--orange-bright); color: var(--orange-bright); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <i class="fas fa-clipboard-check text-orange"></i> الحسابات قيد الفحص والمراجعة
                         </a>

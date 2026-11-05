@@ -647,7 +647,7 @@
                         <i class="fas fa-clipboard-check text-orange"></i>
                         <span>قيد الفحص</span>
                     </a>
-                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="toggleSupportDrawer()">
+                    <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="toggleSupportDrawer()">
                         <i class="fas fa-money-check-alt text-gold"></i>
                         <span>شحن النقاط</span>
                     </a>
@@ -866,6 +866,14 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = el.classList.contains('btn-nav-middle') ? 'inline-flex' : '';
                 });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.setProperty('display', 'flex', 'important');
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.setProperty('display', 'flex', 'important');
+                const drawerPending = document.getElementById('drawer-pending-link');
+                if (drawerPending) drawerPending.style.setProperty('display', 'flex', 'important');
+                const drawerChats = document.getElementById('drawer-admin-chats-link');
+                if (drawerChats) drawerChats.style.setProperty('display', 'flex', 'important');
             } else if (isBroker) {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
@@ -875,6 +883,14 @@
                 document.querySelectorAll('.btn-nav-admin, [data-admin-only]').forEach(el => {
                     el.style.display = 'none';
                 });
+                const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
+                if (drawerBrokers) drawerBrokers.style.setProperty('display', 'none', 'important');
+                const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
+                if (drawerDeposits) drawerDeposits.style.setProperty('display', 'flex', 'important');
+                const drawerPending = document.getElementById('drawer-pending-link');
+                if (drawerPending) drawerPending.style.setProperty('display', 'flex', 'important');
+                const drawerChats = document.getElementById('drawer-admin-chats-link');
+                if (drawerChats) drawerChats.style.setProperty('display', 'flex', 'important');
                 if (typeof window.waseetRenderUnifiedBrokerNavLinks === 'function') {
                     window.waseetRenderUnifiedBrokerNavLinks(user);
                 }

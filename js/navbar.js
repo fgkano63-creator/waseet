@@ -350,15 +350,15 @@
             }
         });
         var drawerBrokers = byId('drawer-admin-brokers-link');
-        if (drawerBrokers) drawerBrokers.style.display = admin ? 'flex' : 'none';
+        if (drawerBrokers) drawerBrokers.style.setProperty('display', admin ? 'flex' : 'none', 'important');
         var drawerDeposits = byId('drawer-admin-deposits-link');
-        if (drawerDeposits) drawerDeposits.style.display = (admin || broker) ? 'flex' : 'none';
+        if (drawerDeposits) drawerDeposits.style.setProperty('display', (admin || broker) ? 'flex' : 'none', 'important');
         var drawerWithdrawals = byId('drawer-admin-withdrawals-link');
-        if (drawerWithdrawals) drawerWithdrawals.style.display = admin ? 'flex' : 'none';
+        if (drawerWithdrawals) drawerWithdrawals.style.setProperty('display', admin ? 'flex' : 'none', 'important');
         var drawerPending = byId('drawer-btn-pending-verification') || byId('deals-drawer-btn-pending');
-        if (drawerPending) drawerPending.style.display = (admin || broker) ? 'flex' : 'none';
+        if (drawerPending) drawerPending.style.setProperty('display', (admin || broker) ? 'flex' : 'none', 'important');
         var drawerChats = byId('drawer-admin-chats-link') || byId('deals-drawer-admin-chats');
-        if (drawerChats) drawerChats.style.display = (admin || broker) ? 'flex' : 'none';
+        if (drawerChats) drawerChats.style.setProperty('display', (admin || broker) ? 'flex' : 'none', 'important');
 
         renderBrokerSupervisionBanner(user);
 

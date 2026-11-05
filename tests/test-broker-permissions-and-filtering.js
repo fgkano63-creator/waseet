@@ -37,16 +37,17 @@ const tests = [
     {
         name: 'Regional Broker Hides "الوسطاء الإقليميين" in app.js & supabase.js',
         assert: () => {
-            return appJs.includes("drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none'") &&
-                   supabaseJs.includes("drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none'");
+            return (appJs.includes("drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none'") || appJs.includes("drawerAdminBrokers.style.setProperty('display', isAdmin ? 'flex' : 'none'")) &&
+                   (supabaseJs.includes("drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none'") || supabaseJs.includes("drawerAdminBrokers.style.setProperty('display', isAdmin ? 'flex' : 'none'"));
         }
     },
     {
         name: 'Regional Broker Shows "شحن النقاط" in app.js, navbar.js & supabase.js',
         assert: () => {
-            return appJs.includes("drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none'") &&
-                   supabaseJs.includes("drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none'") &&
-                   navbarJs.includes("drawerDeposits.style.display = (admin || broker) ? 'flex' : 'none'");
+            return (appJs.includes("drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none'") || appJs.includes("drawerAdminDeposits.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none'")) &&
+                   (supabaseJs.includes("drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none'") || supabaseJs.includes("drawerAdminDeposits.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none'")) &&
+                   (navbarJs.includes("drawerDeposits.style.display = (admin || broker) ? 'flex' : 'none'") || navbarJs.includes("drawerDeposits.style.setProperty('display', (admin || broker) ? 'flex' : 'none'")) &&
+                   styleCss.includes('body.is-broker-mode #drawer-admin-deposits-link');
         }
     },
     {

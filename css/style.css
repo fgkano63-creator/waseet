@@ -108,7 +108,10 @@ body.is-admin-mode .nav-admin-middle-group {
 body.is-admin-mode [data-admin-only].drawer-shortcut-card,
 body.is-admin-mode [data-admin-only].drawer-nav-item,
 body.is-admin-mode #drawer-admin-brokers-link,
-body.is-admin-mode #drawer-admin-deposits-link {
+body.is-admin-mode #drawer-admin-deposits-link,
+body.is-broker-mode #drawer-admin-deposits-link,
+body.is-broker-mode #drawer-btn-pending-verification,
+body.is-broker-mode #drawer-admin-chats-link {
     display: flex !important;
 }
 

@@ -86,6 +86,75 @@
         .gallery-thumb-item img {
             width: 100%; height: 100%; object-fit: cover;
         }
+
+        /* ── Copper Level Styling ── */
+        html, body {
+            overflow-x: hidden !important;
+            scrollbar-gutter: stable;
+        }
+        .profile-hero-card.tier-copper-card {
+            background: linear-gradient(135deg, rgba(184, 115, 51, 0.3) 0%, rgba(24, 18, 14, 0.95) 45%, rgba(10, 13, 20, 0.99) 100%) !important;
+            border: 1.5px solid rgba(184, 115, 51, 0.68) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(184, 115, 51, 0.28) !important;
+        }
+        .profile-hero-card.tier-copper-card::before {
+            background: linear-gradient(90deg, #b87333, #d9823b, #b87333) !important;
+        }
+        .profile-avatar-wrap.tier-copper-wrap .profile-avatar-img {
+            border: 3.5px solid #b87333 !important;
+            box-shadow: 0 0 22px rgba(184, 115, 51, 0.8), inset 0 0 10px rgba(184, 115, 51, 0.4) !important;
+            outline: 2.5px solid rgba(217, 130, 59, 0.45);
+            outline-offset: 3px;
+        }
+        .seller-tier-badge.tier-copper {
+            background: linear-gradient(135deg, #b87333 0%, #7d4416 100%) !important;
+            border: 1px solid #d9823b !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 15px rgba(184, 115, 51, 0.5) !important;
+            font-weight: 800;
+        }
+
+        /* ── Sold Out Badge & Card Dimming ── */
+        .account-card-3d.is-sold {
+            opacity: 0.74 !important;
+            filter: grayscale(18%) !important;
+            border-color: rgba(220, 38, 38, 0.38) !important;
+        }
+        .sold-out-stamp-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.94), rgba(153, 27, 27, 0.98));
+            border: 2px dashed rgba(254, 202, 202, 0.95);
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 900;
+            padding: 0.45rem 1.3rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.85), 0 0 16px rgba(220, 38, 38, 0.6);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            z-index: 10;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            animation: pulse-sold 2.5s infinite ease-in-out;
+        }
+        @keyframes pulse-sold {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(-12deg) scale(1.04); }
+        }
+        .account-card-3d.is-sold .btn-3d {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: var(--silver-muted) !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body data-waseet-nav="auto">
@@ -382,7 +451,7 @@
 
     <!-- ================= Modal: تفاصيل الحساب والصور ================= -->
     <div class="store-modal-overlay" id="store-account-modal" onclick="if(event.target===this) ProfileStore.closeModal()">
-        <div class="store-modal-card">
+        <div class="store-modal-card" data-lenis-prevent style="overflow-y: auto !important; overscroll-behavior: contain;">
             <button type="button" class="store-modal-close" onclick="ProfileStore.closeModal()">&times;</button>
             
             <div class="gallery-main-img-box">
@@ -418,6 +487,9 @@
 
     <!-- Scripts -->
     <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/vendor/gsap.min.js"></script>
+    <script src="js/vendor/ScrollTrigger.min.js"></script>
+    <script src="js/vendor/lenis.min.js"></script>
     <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
     <script src="js/data.js?v=20261104_v6"></script>
@@ -477,20 +549,43 @@
                     description: 'بائع نشط وموثوق بأكثر من 10 مبيعات'
                 };
             }
-            if (n >= 1) {
-                return {
-                    name: 'المستوى النحاسي 🥉',
-                    badgeClass: 'tier-copper',
-                    icon: 'fa-award',
-                    description: 'بائع واعد في بداية مسيرته'
-                };
-            }
             return {
-                name: 'بائع جديد 🌱',
-                badgeClass: 'tier-new',
-                icon: 'fa-seedling',
-                description: 'عضو مسجل وجديد في منصة وسيط'
+                name: 'المستوى النحاسي 🥉',
+                badgeClass: 'tier-copper',
+                icon: 'fa-award',
+                description: 'بائع معتمد في المستوى النحاسي (Copper Tier)'
             };
+        }
+
+        /* ── تهيئة التمرير السلس Lenis ── */
+        function initStoreLenis() {
+            if (typeof window.Lenis !== 'undefined' && !window.waseetProfileLenis) {
+                try {
+                    const lenis = new window.Lenis({
+                        duration: 1.2,
+                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                        orientation: 'vertical',
+                        gestureOrientation: 'vertical',
+                        smoothWheel: true,
+                        wheelMultiplier: 1.0
+                    });
+                    window.waseetProfileLenis = lenis;
+                    if (window.gsap && window.gsap.ticker) {
+                        window.gsap.ticker.add((time) => {
+                            lenis.raf(time * 1000);
+                        });
+                        window.gsap.ticker.lagSmoothing(0);
+                    } else {
+                        function raf(time) {
+                            lenis.raf(time);
+                            requestAnimationFrame(raf);
+                        }
+                        requestAnimationFrame(raf);
+                    }
+                } catch (e) {
+                    console.warn('[Lenis Profile] Init warn:', e);
+                }
+            }
         }
 
         /* ── جلب البيانات من Supabase ── */
@@ -623,7 +718,7 @@
                     } catch (e) {}
                 }
 
-                // 4. جلب الحسابات المعروضة للبيع حالياً لهذا المستخدم
+                // 4. جلب الحسابات المعروضة للبيع حالياً لهذا المستخدم (المتاحة والمباعة معاً لعرض تاريخ المتجر)
                 let rawListings = [];
                 if (client) {
                     try {
@@ -631,7 +726,7 @@
                             .from('marketplace_accounts')
                             .select('*')
                             .eq('seller_id', targetUserId)
-                            .in('status', ['available', 'approved'])
+                            .in('status', ['available', 'approved', 'sold'])
                             .order('created_at', { ascending: false });
                         if (!listErr && Array.isArray(listData)) {
                             rawListings = listData;

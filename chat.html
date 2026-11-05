@@ -212,7 +212,7 @@
                     <i class="fas fa-shield-alt text-gold"></i>
                     <span>قيد الشراء</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="closeChatDrawer()">
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="closeChatDrawer()">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
                 </a>
@@ -448,9 +448,9 @@
                 if (existingSubBar) existingSubBar.remove();
 
                 const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
-                if (drawerBrokers) drawerBrokers.style.display = 'flex';
+                if (drawerBrokers) drawerBrokers.style.setProperty('display', 'none', 'important');
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
-                if (drawerDeposits) drawerDeposits.style.display = 'none';
+                if (drawerDeposits) drawerDeposits.style.setProperty('display', 'flex', 'important');
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';

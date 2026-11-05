@@ -535,15 +535,15 @@ function waseetApplyLiveRoleUpdateToUI(user) {
 
         // تحديث روابط القائمة الجانبية للمدير والوسيط
         const drawerAdminChats = document.getElementById('drawer-admin-chats-link');
-        if (drawerAdminChats) drawerAdminChats.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminChats) drawerAdminChats.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerPendingBtn = document.getElementById('drawer-btn-pending-verification');
-        if (drawerPendingBtn) drawerPendingBtn.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerPendingBtn) drawerPendingBtn.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminBrokers = document.getElementById('drawer-admin-brokers-link');
-        if (drawerAdminBrokers) drawerAdminBrokers.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminBrokers) drawerAdminBrokers.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
         const drawerAdminDeposits = document.getElementById('drawer-admin-deposits-link');
-        if (drawerAdminDeposits) drawerAdminDeposits.style.display = (isAdmin || isBroker) ? 'flex' : 'none';
+        if (drawerAdminDeposits) drawerAdminDeposits.style.setProperty('display', (isAdmin || isBroker) ? 'flex' : 'none', 'important');
         const drawerAdminWithdrawals = document.getElementById('drawer-admin-withdrawals-link');
-        if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.display = isAdmin ? 'flex' : 'none';
+        if (drawerAdminWithdrawals) drawerAdminWithdrawals.style.setProperty('display', isAdmin ? 'flex' : 'none', 'important');
 
         // استدعاء دوال التحديث الخاصة بكل صفحة
         if (typeof updateDrawerProfile === 'function') updateDrawerProfile();

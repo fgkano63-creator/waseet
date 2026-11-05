@@ -341,7 +341,7 @@
                     <i class="fas fa-headset text-orange"></i>
                     <span>تواصل مع الوسيط</span>
                 </a>
-                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
+                <a href="admin-deposits.html" class="drawer-shortcut-card" id="drawer-admin-deposits-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
                     <i class="fas fa-money-check-alt text-gold"></i>
                     <span>شحن النقاط</span>
                 </a>
@@ -349,7 +349,7 @@
                     <i class="fas fa-globe-africa text-orange"></i>
                     <span>الوسطاء الإقليميين</span>
                 </a>
-                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-accounts-link" style="display: none;" data-admin-only onclick="toggleMyAccountsDrawer()">
+                <a href="pending-accounts.html" class="drawer-shortcut-card" id="drawer-pending-accounts-link" style="display: none;" onclick="toggleMyAccountsDrawer()">
                     <i class="fas fa-clipboard-check text-orange"></i>
                     <span>حسابات قيد الفحص</span>
                 </a>
@@ -578,9 +578,11 @@
                 if (existingSubBar) existingSubBar.remove();
 
                 const drawerBrokers = document.getElementById('drawer-admin-brokers-link');
-                if (drawerBrokers) drawerBrokers.style.display = 'flex';
+                if (drawerBrokers) drawerBrokers.style.setProperty('display', 'none', 'important');
                 const drawerDeposits = document.getElementById('drawer-admin-deposits-link');
-                if (drawerDeposits) drawerDeposits.style.display = 'none';
+                if (drawerDeposits) drawerDeposits.style.setProperty('display', 'flex', 'important');
+                const drawerPending = document.getElementById('drawer-pending-accounts-link');
+                if (drawerPending) drawerPending.style.setProperty('display', 'flex', 'important');
             } else {
                 if (userNavMiddle) userNavMiddle.style.display = 'flex';
                 if (adminNavMiddle) adminNavMiddle.style.display = 'none';
