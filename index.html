@@ -380,92 +380,134 @@
                     </span>
                 </div>
 
-                <!-- Search Bar with Live Filter (Requirement 2) -->
-                <div class="search-bar-wrapper" style="margin-bottom: 1.2rem;">
-                    <div style="position: relative; max-width: 520px;">
-                        <i class="fas fa-search" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
-                        <input type="text" id="marketplace-search" class="input-3d" placeholder="ابحث برقم الحساب (مثال: 1001) أو اسم الحساب أو اسم المستخدم أو البريد..." style="padding-right: 44px; width: 100%; font-size: 0.95rem; border-radius: 12px;" oninput="window.waseetApp && window.waseetApp.handleSearch(this.value)">
-                    </div>
-                </div>
+                <!-- ================= Main Marketplace Layout (Flex Layout: Sidebar + Main Content) ================= -->
+                <div class="marketplace-main-layout">
 
-                <!-- Dynamic Multi-Game Filter Bar (Clean & Borderless) -->
-                <div class="filter-bar">
-                    <!-- 1. Game Filter -->
-                    <div class="filter-item" style="max-width: 170px;">
-                        <label class="filter-label"><i class="fas fa-gamepad text-gold"></i> اللعبة</label>
-                        <select id="filter-game" class="filter-select">
-                            <option value="all">كل الألعاب</option>
-                            <option value="free_fire" selected>فري فاير (Free Fire)</option>
-                            <option value="pubg">ببجي موبايل (PUBG)</option>
-                            <option value="brawl_stars">براول ستارز (Brawl)</option>
-                        </select>
-                    </div>
+                    <!-- ================= Top Selling Stores Leaderboard Sidebar (Desktop Only) ================= -->
+                    <aside class="marketplace-leaderboard-sidebar" id="marketplace-leaderboard-sidebar" aria-label="لوحة شرف المتاجر الأكثر مبيعاً">
+                        <div class="leaderboard-card-3d">
+                            <div class="leaderboard-header">
+                                <div class="leaderboard-header-title">
+                                    <div class="leaderboard-icon-box">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="leaderboard-title">المتاجر الأكثر مبيعاً</h3>
+                                        <span class="leaderboard-subtitle">Top Selling Stores</span>
+                                    </div>
+                                </div>
+                                <span class="leaderboard-live-pill" title="تحديث تلقائي لحظي">
+                                    <span class="live-pulse-dot"></span> مباشر
+                                </span>
+                            </div>
 
-                    <!-- Dynamic sub-filters for Free Fire: 1. Prime, 2. Level, 3. Evo Guns -->
-                    <div id="dynamic-game-filters" style="display: contents;">
-                        <div class="filter-item">
-                            <label class="filter-label"><i class="fas fa-crown text-gold"></i> مستوى البرايم (Prime)</label>
-                            <select id="filter-prime" class="filter-select">
-                                <option value="all">كل الرتب</option>
-                                <option value="8">برايم 8 (الحد الأقصى)</option>
-                                <option value="7">برايم 7</option>
-                                <option value="6">برايم 6</option>
-                                <option value="5">برايم 5</option>
-                            </select>
+                            <div class="leaderboard-list" id="leaderboard-sellers-list">
+                                <!-- Populated dynamically by JS -->
+                                <div class="leaderboard-skeleton-wrap">
+                                    <div class="leaderboard-skeleton-row"></div>
+                                    <div class="leaderboard-skeleton-row"></div>
+                                    <div class="leaderboard-skeleton-row"></div>
+                                </div>
+                            </div>
+
+                            <div class="leaderboard-footer">
+                                <a href="index.html#open-sell" class="btn-leaderboard-action" onclick="if(window.waseetApp && window.waseetApp.openSellModal) { event.preventDefault(); window.waseetApp.openSellModal(); }">
+                                    <i class="fas fa-plus-circle"></i> اعرض حسابك وتصدر القائمة
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Main Marketplace Content Area -->
+                    <div class="marketplace-content-main">
+                        <!-- Search Bar with Live Filter (Requirement 2) -->
+                        <div class="search-bar-wrapper" style="margin-bottom: 1.2rem;">
+                            <div style="position: relative; max-width: 520px;">
+                                <i class="fas fa-search" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
+                                <input type="text" id="marketplace-search" class="input-3d" placeholder="ابحث برقم الحساب (مثال: 1001) أو اسم الحساب أو اسم المستخدم أو البريد..." style="padding-right: 44px; width: 100%; font-size: 0.95rem; border-radius: 12px;" oninput="window.waseetApp && window.waseetApp.handleSearch(this.value)">
+                            </div>
                         </div>
 
-                        <div class="filter-item">
-                            <label class="filter-label"><i class="fas fa-bolt text-orange"></i> ليفل الحساب (Level)</label>
-                            <select id="filter-level" class="filter-select">
-                                <option value="all">كل المستويات</option>
-                                <option value="75">ليفل 75 فما فوق</option>
-                                <option value="65">ليفل 65 فما فوق</option>
-                                <option value="55">ليفل 55 فما فوق</option>
-                            </select>
+                        <!-- Dynamic Multi-Game Filter Bar (Clean & Borderless) -->
+                        <div class="filter-bar">
+                            <!-- 1. Game Filter -->
+                            <div class="filter-item" style="max-width: 170px;">
+                                <label class="filter-label"><i class="fas fa-gamepad text-gold"></i> اللعبة</label>
+                                <select id="filter-game" class="filter-select">
+                                    <option value="all">كل الألعاب</option>
+                                    <option value="free_fire" selected>فري فاير (Free Fire)</option>
+                                    <option value="pubg">ببجي موبايل (PUBG)</option>
+                                    <option value="brawl_stars">براول ستارز (Brawl)</option>
+                                </select>
+                            </div>
+
+                            <!-- Dynamic sub-filters for Free Fire: 1. Prime, 2. Level, 3. Evo Guns -->
+                            <div id="dynamic-game-filters" style="display: contents;">
+                                <div class="filter-item">
+                                    <label class="filter-label"><i class="fas fa-crown text-gold"></i> مستوى البرايم (Prime)</label>
+                                    <select id="filter-prime" class="filter-select">
+                                        <option value="all">كل الرتب</option>
+                                        <option value="8">برايم 8 (الحد الأقصى)</option>
+                                        <option value="7">برايم 7</option>
+                                        <option value="6">برايم 6</option>
+                                        <option value="5">برايم 5</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-item">
+                                    <label class="filter-label"><i class="fas fa-bolt text-orange"></i> ليفل الحساب (Level)</label>
+                                    <select id="filter-level" class="filter-select">
+                                        <option value="all">كل المستويات</option>
+                                        <option value="75">ليفل 75 فما فوق</option>
+                                        <option value="65">ليفل 65 فما فوق</option>
+                                        <option value="55">ليفل 55 فما فوق</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-item" style="display: none !important;">
+                                    <label class="filter-label"><i class="fas fa-crosshairs text-orange"></i> أسلحة إيفو المطورة</label>
+                                    <select id="filter-evo" class="filter-select">
+                                        <option value="all">الكل</option>
+                                        <option value="5">5+ أسلحة إيفو ماكس</option>
+                                        <option value="3">3-4 أسلحة إيفو</option>
+                                        <option value="1">1-2 أسلحة إيفو</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Universal Filters -->
+                            <div class="filter-item" style="max-width: 170px;">
+                                <label class="filter-label"><i class="fas fa-link text-silver"></i> نوع الربط</label>
+                                <select id="filter-login" class="filter-select">
+                                    <option value="all">الكل (جوجل وفيسبوك)</option>
+                                    <option value="google">جوجل Gmail فقط</option>
+                                    <option value="facebook">فيسبوك</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-item" style="max-width: 170px;">
+                                <label class="filter-label"><i class="fas fa-sort-amount-down text-gold"></i> ترتيب حسب</label>
+                                <select id="filter-sort" class="filter-select">
+                                    <option value="default">المميز أولاً</option>
+                                    <option value="price-asc">الأقل سعراً</option>
+                                    <option value="price-desc">الأعلى سعراً</option>
+                                    <option value="level">أعلى ليفل</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="filter-item" style="display: none !important;">
-                            <label class="filter-label"><i class="fas fa-crosshairs text-orange"></i> أسلحة إيفو المطورة</label>
-                            <select id="filter-evo" class="filter-select">
-                                <option value="all">الكل</option>
-                                <option value="5">5+ أسلحة إيفو ماكس</option>
-                                <option value="3">3-4 أسلحة إيفو</option>
-                                <option value="1">1-2 أسلحة إيفو</option>
-                            </select>
+                        <!-- 3D Accounts Grid Wrapper (With 3D Phone Screen / Door Transition) -->
+                        <div class="accounts-grid-wrapper">
+                            <div class="accounts-grid" id="accounts-grid">
+                                <!-- Populated by JS (Max 30 accounts per page) -->
+                            </div>
+                        </div>
+
+                        <!-- Pagination Bar (30 accounts per page limit) -->
+                        <div class="pagination-bar" id="marketplace-pagination">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
-
-                    <!-- Universal Filters -->
-                    <div class="filter-item" style="max-width: 170px;">
-                        <label class="filter-label"><i class="fas fa-link text-silver"></i> نوع الربط</label>
-                        <select id="filter-login" class="filter-select">
-                            <option value="all">الكل (جوجل وفيسبوك)</option>
-                            <option value="google">جوجل Gmail فقط</option>
-                            <option value="facebook">فيسبوك</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item" style="max-width: 170px;">
-                        <label class="filter-label"><i class="fas fa-sort-amount-down text-gold"></i> ترتيب حسب</label>
-                        <select id="filter-sort" class="filter-select">
-                            <option value="default">المميز أولاً</option>
-                            <option value="price-asc">الأقل سعراً</option>
-                            <option value="price-desc">الأعلى سعراً</option>
-                            <option value="level">أعلى ليفل</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 3D Accounts Grid Wrapper (With 3D Phone Screen / Door Transition) -->
-                <div class="accounts-grid-wrapper">
-                    <div class="accounts-grid" id="accounts-grid">
-                        <!-- Populated by JS (Max 30 accounts per page) -->
-                    </div>
-                </div>
-
-                <!-- Pagination Bar (30 accounts per page limit) -->
-                <div class="pagination-bar" id="marketplace-pagination">
-                    <!-- Populated by JS -->
                 </div>
 
             </div>

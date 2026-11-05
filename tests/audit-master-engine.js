@@ -540,6 +540,13 @@ if (allSqlCombined.includes('tr_enforce_deal_message_sender_role') && allSqlComb
     recordAudit('databaseRLS', 'DB-RoleSpoofProtectionAndBrokerPrivacy', 'WARN', 'MEDIUM', 'tr_enforce_deal_message_sender_role or public_regional_brokers view missing in migrations');
 }
 
+// 4.13 Check top selling sellers leaderboard stored procedure (Migration 26)
+if (allSqlCombined.includes('get_top_selling_sellers') && allSqlCombined.includes('sold_count')) {
+    recordAudit('databaseRLS', 'DB-TopSellingSellersLeaderboard', 'PASS', 'INFO', 'Stored procedure get_top_selling_sellers active with sold_count aggregation (Migration 26)');
+} else {
+    recordAudit('databaseRLS', 'DB-TopSellingSellersLeaderboard', 'WARN', 'MEDIUM', 'get_top_selling_sellers function missing or incomplete in migrations');
+}
+
 // ==============================================================================
 // 5. PERFORMANCE, ASSETS & PWA AUDIT
 // ==============================================================================

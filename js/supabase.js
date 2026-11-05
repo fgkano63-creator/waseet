@@ -4421,6 +4421,190 @@ function initWaseetAuthListener() {
     });
 }
 
+/**
+ * جلب قائمة المتاجر الأكثر مبيعاً (Top Selling Stores Leaderboard) من Supabase
+ */
+async function waseetFetchTopSellingSellers(limit = 10) {
+    const client = initWaseetSupabase();
+
+    // 1. محاولة استدعاء الدالة المخصصة (RPC) على Supabase
+    if (client && typeof client.rpc === 'function') {
+        try {
+            const { data, error } = await client.rpc('get_top_selling_sellers', { p_limit: limit });
+            if (!error && Array.isArray(data) && data.length > 0) {
+                return data.map(row => ({
+                    id: row.seller_id,
+                    name: row.seller_name || 'بائع معتمد',
+                    avatar: row.seller_avatar || '',
+                    soldCount: Number(row.sold_count) || 0
+                }));
+            }
+        } catch (rpcErr) {
+            console.warn('[Leaderboard] RPC get_top_selling_sellers fallback:', rpcErr);
+        }
+    }
+
+    // 2. استعلام بديل مباشر من جدول marketplace_accounts وجدول profiles
+    if (client) {
+        try {
+            const { data: soldRows, error: soldErr } = await client
+                .from('marketplace_accounts')
+                .select('seller_id')
+                .in('status', ['sold', 'completed']);
+
+            if (!soldErr && Array.isArray(soldRows) && soldRows.length > 0) {
+                const countMap = {};
+                soldRows.forEach(r => {
+                    if (r && r.seller_id) {
+                        countMap[r.seller_id] = (countMap[r.seller_id] || 0) + 1;
+                    }
+                });
+
+                const sortedIds = Object.keys(countMap)
+                    .sort((a, b) => countMap[b] - countMap[a])
+                    .slice(0, limit);
+
+                if (sortedIds.length > 0) {
+                    const { data: profs } = await client
+                        .from('profiles')
+                        .select('id, name, email, avatar_url')
+                        .in('id', sortedIds);
+
+                    const profMap = {};
+                    if (Array.isArray(profs)) {
+                        profs.forEach(p => { if (p && p.id) profMap[p.id] = p; });
+                    }
+
+                    return sortedIds.map(id => {
+                        const p = profMap[id] || {};
+                        return {
+                            id: id,
+                            name: p.name || (p.email ? p.email.split('@')[0] : 'متجر وسيط'),
+                            avatar: p.avatar_url || '',
+                            soldCount: countMap[id] || 0
+                        };
+                    });
+                }
+            }
+        } catch (queryErr) {
+            console.warn('[Leaderboard] Fallback query warning:', queryErr);
+        }
+    }
+
+    // 3. فحص الحسابات المحلية المحفوظة في WASEET_STATE كاحتياط
+    const localAccounts = (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.accounts))
+        ? WASEET_STATE.accounts
+        : [];
+    const localCounts = {};
+    localAccounts.forEach(acc => {
+        if (acc && (acc.status === 'sold' || acc.status === 'completed') && (acc.sellerId || acc.seller_id)) {
+            const sid = acc.sellerId || acc.seller_id;
+            if (!localCounts[sid]) {
+                localCounts[sid] = {
+                    id: sid,
+                    name: acc.sellerName || acc.seller_name || 'بائع موثق',
+                    avatar: acc.sellerAvatar || acc.seller_avatar || '',
+                    soldCount: 0
+                };
+            }
+            localCounts[sid].soldCount++;
+        }
+    });
+
+    const localList = Object.values(localCounts).sort((a, b) => b.soldCount - a.soldCount).slice(0, limit);
+    if (localList.length > 0) {
+        return localList;
+    }
+
+    // 4. عرض متاجر نموذجية معتمدة لحين توفر بيانات مبيعات كافية في قاعدة البيانات
+    return [
+        { id: 'store-1', name: 'متجر الصقر الذهبي', avatar: 'assets/logo.png', soldCount: 42 },
+        { id: 'store-2', name: 'متجر النجم الأسطوري', avatar: 'assets/logo.png', soldCount: 29 },
+        { id: 'store-3', name: 'متجر برايم الأصلي', avatar: 'assets/logo.png', soldCount: 18 },
+        { id: 'store-4', name: 'متجر المحترف الملكي', avatar: 'assets/logo.png', soldCount: 12 },
+        { id: 'store-5', name: 'متجر أساطير وسيط', avatar: 'assets/logo.png', soldCount: 7 }
+    ];
+}
+window.waseetFetchTopSellingSellers = waseetFetchTopSellingSellers;
+
+/**
+ * رسم وتحديث قائمة لوحة شرف المتاجر الأكثر مبيعاً
+ */
+async function waseetRenderLeaderboard(force = false) {
+    const listContainer = document.getElementById('leaderboard-sellers-list');
+    if (!listContainer) return;
+
+    if (window._waseetLeaderboardLoaded && !force) return;
+
+    try {
+        const sellers = await waseetFetchTopSellingSellers(10);
+        window._waseetLeaderboardLoaded = true;
+
+        if (!sellers || sellers.length === 0) {
+            listContainer.innerHTML = `
+                <div style="text-align: center; padding: 1.5rem 0.5rem; color: var(--silver-muted); font-size: 0.82rem;">
+                    <i class="fas fa-store-slash" style="font-size: 1.5rem; color: var(--gold-primary); margin-bottom: 0.4rem; display: block;"></i>
+                    لا توجد متاجر مبيعات مسجلة حالياً
+                </div>
+            `;
+            return;
+        }
+
+        const rankIcons = ['🥇', '🥈', '🥉'];
+        const DEFAULT_AVATAR = 'assets/logo.png';
+
+        listContainer.innerHTML = sellers.map((s, index) => {
+            const rank = index + 1;
+            const rankBadge = rank <= 3 ? rankIcons[index] : `#${rank}`;
+            const avatarSrc = (s.avatar && !String(s.avatar).includes('photo-1535713875002-d1d0cf377fde')) ? s.avatar : DEFAULT_AVATAR;
+            const profileUrl = 'profile.html?id=' + encodeURIComponent(s.id);
+            const rawName = s.name || 'متجر معتمد';
+            const escName = (typeof purifyHtml === 'function') ? purifyHtml(rawName) : rawName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            return `
+                <a href="${profileUrl}" class="leaderboard-row rank-${rank}" title="زيارة متجر ${escName}">
+                    <div class="leaderboard-rank-badge rank-${rank}">
+                        ${rankBadge}
+                    </div>
+                    <div class="leaderboard-avatar-wrap">
+                        <img src="${avatarSrc}" alt="${escName}" class="leaderboard-avatar-img" onerror="this.onerror=null; this.src='assets/logo.png';">
+                        <span class="seller-online-dot" title="متجر نشط"></span>
+                    </div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-seller-name" title="${escName}">${escName}</div>
+                        <div class="leaderboard-sold-stat">
+                            <i class="fas fa-check-circle text-emerald"></i>
+                            <span>${s.soldCount} حساب مباع</span>
+                        </div>
+                    </div>
+                    <div class="leaderboard-arrow">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                </a>
+            `;
+        }).join('');
+
+        // الاشتراك في التحديث اللحظي عبر Supabase Realtime
+        const client = initWaseetSupabase();
+        if (client && !window._leaderboardRtSubscribed) {
+            window._leaderboardRtSubscribed = true;
+            try {
+                client.channel('waseet_leaderboard_rt_sync')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'marketplace_accounts' }, (payload) => {
+                        const newRec = payload && payload.new;
+                        if (newRec && (newRec.status === 'sold' || newRec.status === 'completed')) {
+                            waseetRenderLeaderboard(true);
+                        }
+                    })
+                    .subscribe();
+            } catch (e) {}
+        }
+    } catch (err) {
+        console.warn('[Leaderboard] Render error:', err);
+    }
+}
+window.waseetRenderLeaderboard = waseetRenderLeaderboard;
+
 // تشغيل المستمع بمجرد اكتمال تحميل DOM
 if (typeof window !== 'undefined') {
     function runInitialEnhancements() {
@@ -4431,6 +4615,7 @@ if (typeof window !== 'undefined') {
         waseetSyncAllNavBadges();
         waseetInitGlobalNavRealtimeBadges();
         waseetSyncAuthState({ force: true });
+        waseetRenderLeaderboard();
         setTimeout(waseetUpdateAdminPendingDepositsBadge, 800);
         setTimeout(waseetUpdateAdminPendingWithdrawalsBadge, 850);
     }

@@ -51,6 +51,9 @@ class WaseetApp {
         this.updateWalletDisplay();
         this.loadStoreRegionalBrokers();
         this.initAuthSession();
+        if (typeof waseetRenderLeaderboard === 'function') {
+            waseetRenderLeaderboard();
+        }
 
         // Non-blocking visitor welcome prompt for first-time visitors (Requirement 1)
         if (!WASEET_STATE.user) {
