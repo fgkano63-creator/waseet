@@ -12,7 +12,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "9. Regional Broker Permissions & Filtering Audit"; Script = "tests\test-broker-permissions-and-filtering.js"; Type = "node" },
     [PSCustomObject]@{ Name = "10. Regional Broker Card & Real-time Reactivity Audit"; Script = "tests\test-broker-card-and-realtime-reactivity.js"; Type = "node" },
     [PSCustomObject]@{ Name = "11. Dynamic Broker Rating, Credentials & Fake Broker Purge Audit"; Script = "tests\test-dynamic-rating-and-credentials.js"; Type = "node" },
-    [PSCustomObject]@{ Name = "12. Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-deep-scan.ps1"; Type = "ps1" }
+    [PSCustomObject]@{ Name = "12. Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-deep-scan.ps1"; Type = "ps1" },
+    [PSCustomObject]@{ Name = "13. Profile Dashboard & UI Libraries Integration Audit"; Script = "tests\test-profile-dashboard-and-ui-libraries.js"; Type = "node" }
 )
 
 $summary = @()
@@ -50,6 +51,8 @@ foreach ($t in $tests) {
         $checksCount = 19
     } elseif ($outStr -match 'ALL SELLER PROFILE CARD AUDITS PASSED') {
         $checksCount = 18
+    } elseif ($outStr -match 'ALL PROFILE DASHBOARD & UI LIBRARIES AUDITS PASSED') {
+        $checksCount = 22
     } elseif ($outStr -match 'Summary:\s*([0-9]+)/') {
         $checksCount = [int]$Matches[1]
     }
