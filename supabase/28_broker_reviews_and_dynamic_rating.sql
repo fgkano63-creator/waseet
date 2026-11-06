@@ -79,9 +79,14 @@ GRANT EXECUTE ON FUNCTION public.delete_marketplace_account(uuid) TO authenticat
 -- 3. جدول تقييمات الوسطاء (broker_reviews)
 -- لحفظ تقييمات البائع والمشتري لكل وسيط بعد اكتمال الصفقات
 -- ---------------------------------------------------------------------------------
+-- التأكد من وجود الأعمدة اللازمة في الجداول المرتبطة
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS last_seen_at timestamptz;
+ALTER TABLE public.deals ADD COLUMN IF NOT EXISTS mediator_id uuid REFERENCES public.profiles(id);
+
+DROP TABLE IF EXISTS public.broker_reviews CASCADE;
 CREATE TABLE IF NOT EXISTS public.broker_reviews (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    deal_id uuid REFERENCES public.deals(id) ON DELETE CASCADE,
+    deal_id text REFERENCES public.deals(id) ON DELETE CASCADE,
     broker_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     reviewer_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     reviewer_role text NOT NULL CHECK (reviewer_role IN ('buyer', 'seller')),
@@ -117,8 +122,11 @@ WITH CHECK (
 -- ---------------------------------------------------------------------------------
 -- 4. دالة إرسال تقييم الوسيط بعد اكتمال الصفقة (submit_broker_review)
 -- ---------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.submit_broker_review(uuid, uuid, integer, text);
+DROP FUNCTION IF EXISTS public.submit_broker_review(text, uuid, integer, text);
+
 CREATE OR REPLACE FUNCTION public.submit_broker_review(
-    p_deal_id uuid,
+    p_deal_id text,
     p_broker_id uuid,
     p_rating integer,
     p_comment text DEFAULT ''
@@ -188,7 +196,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.submit_broker_review(uuid, uuid, integer, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.submit_broker_review(text, uuid, integer, text) TO authenticated;
 
 -- ---------------------------------------------------------------------------------
 -- 5. دالة جلب إحصائيات تقييم الوسيط الحقيقية وعدد الصفقات الفعلية المكتملة

@@ -11,7 +11,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "8. OAuth Callback & Session Lifecycle Audit"; Script = "tests\test-oauth-callback.js"; Type = "node" },
     [PSCustomObject]@{ Name = "9. Regional Broker Permissions & Filtering Audit"; Script = "tests\test-broker-permissions-and-filtering.js"; Type = "node" },
     [PSCustomObject]@{ Name = "10. Regional Broker Card & Real-time Reactivity Audit"; Script = "tests\test-broker-card-and-realtime-reactivity.js"; Type = "node" },
-    [PSCustomObject]@{ Name = "11. Dynamic Broker Rating, Credentials & Fake Broker Purge Audit"; Script = "tests\test-dynamic-rating-and-credentials.js"; Type = "node" }
+    [PSCustomObject]@{ Name = "11. Dynamic Broker Rating, Credentials & Fake Broker Purge Audit"; Script = "tests\test-dynamic-rating-and-credentials.js"; Type = "node" },
+    [PSCustomObject]@{ Name = "12. Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-deep-scan.ps1"; Type = "ps1" }
 )
 
 $summary = @()
@@ -34,6 +35,8 @@ foreach ($t in $tests) {
     if ($outStr -match '\[E2E SIMULATION AND VERIFICATION SUMMARY\][\s\S]*?Total Tests\s*:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'Total Checks Conducted\s*:\s*([0-9]+)') {
+        $checksCount = [int]$Matches[1]
+    } elseif ($outStr -match 'Total Automated Checks\s*:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'Total Checks\s*:\s*([0-9]+)') {
         $checksCount = [int]$Matches[1]

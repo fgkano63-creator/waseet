@@ -623,13 +623,24 @@ class WaseetApp {
                     || (isMediatorUser(user) 
                         ? 'assets/logo.png' 
                         : 'assets/logo.png');
+                const safeAvatar = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) 
+                    ? DOMPurify.sanitize(avatar) 
+                    : this.escapeHtml(avatar);
                 const roleLabel = isBroker
-                    ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
+                    ? `🌍 وسيط إقليمي معتمد (${this.escapeHtml(user.country || 'DZ')})`
                     : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
-                const pts = currentPts;
+                const pts = this.escapeHtml(String(currentPts));
                 const safeName = this.escapeHtml(user.name || 'مستخدم');
-                userCard.innerHTML = `
-                    <img src="${avatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/logo.png'">
+                userCard.innerHTML = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(`
+                    <img src="${safeAvatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/logo.png'">
+                    <div class="drawer-user-meta">
+                        <span class="drawer-user-name">${safeName}</span>
+                        <span class="drawer-user-role">${roleLabel}</span>
+                        <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
+                    </div>
+                    <i class="fas fa-user-cog text-gold" style="font-size: 1.05rem; opacity: 0.85;" title="إدارة الحساب"></i>
+                `) : `
+                    <img src="${safeAvatar}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/logo.png'">
                     <div class="drawer-user-meta">
                         <span class="drawer-user-name">${safeName}</span>
                         <span class="drawer-user-role">${roleLabel}</span>
@@ -1413,11 +1424,20 @@ class WaseetApp {
 
         if (titleEl) titleEl.innerText = acc.title;
         if (badgesEl) {
-            const accNumTag = `<span class="badge-acc-number" style="background: rgba(197, 160, 89, 0.2); border: 1px solid var(--gold-primary); color: var(--gold-light); font-weight: 800; padding: 2px 8px; border-radius: 6px; font-family: var(--font-en);"><i class="fas fa-hashtag"></i> #${acc.accountNumber || ''}</span> • `;
-            badgesEl.innerHTML = `
+            const safeAccNum = this.escapeHtml(String(acc.accountNumber || ''));
+            const safePrime = this.escapeHtml(String(acc.primeLevel || 1));
+            const safeLevel = this.escapeHtml(String(acc.level || 1));
+            const accNumTag = `<span class="badge-acc-number" style="background: rgba(197, 160, 89, 0.2); border: 1px solid var(--gold-primary); color: var(--gold-light); font-weight: 800; padding: 2px 8px; border-radius: 6px; font-family: var(--font-en);"><i class="fas fa-hashtag"></i> #${safeAccNum}</span> • `;
+            badgesEl.innerHTML = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(`
                 ${accNumTag}
-                <span class="text-gold"><i class="fas fa-crown"></i> برايم ${acc.primeLevel}</span> • 
-                <span><i class="fas fa-bolt text-orange"></i> ليفل ${acc.level}</span> • 
+                <span class="text-gold"><i class="fas fa-crown"></i> برايم ${safePrime}</span> • 
+                <span><i class="fas fa-bolt text-orange"></i> ليفل ${safeLevel}</span> • 
+                <span><i class="fas fa-shield-alt text-gold"></i> حماية الوساطة</span> • 
+                <span class="text-orange">${acc.game === 'free_fire' ? 'فري فاير' : (acc.game === 'pubg' ? 'ببجي' : 'ألعاب')}</span>
+            `) : `
+                ${accNumTag}
+                <span class="text-gold"><i class="fas fa-crown"></i> برايم ${safePrime}</span> • 
+                <span><i class="fas fa-bolt text-orange"></i> ليفل ${safeLevel}</span> • 
                 <span><i class="fas fa-shield-alt text-gold"></i> حماية الوساطة</span> • 
                 <span class="text-orange">${acc.game === 'free_fire' ? 'فري فاير' : (acc.game === 'pubg' ? 'ببجي' : 'ألعاب')}</span>
             `;
@@ -1657,11 +1677,14 @@ class WaseetApp {
         }
 
         if (thumbsContainer) {
-            thumbsContainer.innerHTML = images.map((src, idx) => `
+            thumbsContainer.innerHTML = images.map((src, idx) => {
+                const safeSrc = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(src) : this.escapeHtml(src);
+                return `
                 <div class="deck-thumb-item ${idx === this.currentDeckIndex ? 'active' : ''}" onclick="window.waseetApp.selectDeckImage(${idx})">
-                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
+                    <img src="${safeSrc}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
     }
 
@@ -2726,7 +2749,7 @@ class WaseetApp {
                             statusNote = '<div style="background: rgba(245, 158, 11, 0.08); border-right: 3px solid #f59e0b; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: var(--silver-light); margin-top: 0.6rem;"><i class="fas fa-info-circle text-orange"></i> الحساب قيد المراجعة والتدقيق الأمني من قبل الوسيط المعتمد للتأكد من نظافة الروابط وخلوه من المشاكل قبل عرضه للمشترين.</div>';
                         } else if (acc.status === 'rejected') {
                             statusBadge = '<span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-times-circle"></i> تم رفض الحساب</span>';
-                            const reasonText = acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لشروط المنصة.';
+                            const reasonText = this.escapeHtml(acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لشروط المنصة.');
                             statusNote = `<div style="background: rgba(239, 68, 68, 0.12); border-right: 3px solid #ef4444; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; color: #fca5a5; margin-top: 0.6rem;"><i class="fas fa-exclamation-triangle"></i> <strong>سبب الرفض:</strong> ${reasonText}</div>`;
                         } else {
                             statusBadge = '<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;"><i class="fas fa-check-circle"></i> معروض ومتاح في السوق</span>';
@@ -2734,18 +2757,22 @@ class WaseetApp {
                         }
 
                         const img = (acc.images && acc.images[0]) || acc.image || 'assets/logo.png';
-                        const accNum = acc.accountNumber || acc.id;
+                        const safeImg = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(img) : this.escapeHtml(img);
+                        const accNum = this.escapeHtml(String(acc.accountNumber || acc.id));
+                        const safeTitle = this.escapeHtml(acc.title || 'حساب وساطة');
+                        const safeServer = this.escapeHtml(acc.server || 'الشرق الأوسط');
+                        const safePrice = this.escapeHtml(String(acc.sellerPrice || 0));
 
                         return `
                             <div style="background: rgba(16, 20, 32, 0.85); border: 1px solid var(--border-metal); border-radius: 12px; padding: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                                <img src="${img}" alt="${acc.title}" style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary);" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
+                                <img src="${safeImg}" alt="${safeTitle}" style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-primary);" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                                 <div style="flex: 1; min-width: 240px;">
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
-                                        <h4 style="color: #fff; font-size: 0.98rem; margin: 0;">${acc.title} <span style="color: var(--gold-primary); font-size: 0.85rem;">#${accNum}</span></h4>
+                                        <h4 style="color: #fff; font-size: 0.98rem; margin: 0;">${safeTitle} <span style="color: var(--gold-primary); font-size: 0.85rem;">#${accNum}</span></h4>
                                         ${statusBadge}
                                     </div>
                                     <div style="font-size: 0.85rem; color: var(--silver-muted);">
-                                        السعر الصافي لك: <strong style="color: var(--gold-light);">${acc.sellerPrice} نقطة</strong> • السيرفر: ${acc.server || 'الشرق الأوسط'} • طريقة الدخول: ${acc.loginType === 'google' ? 'Google' : 'Facebook'}
+                                        السعر الصافي لك: <strong style="color: var(--gold-light);">${safePrice} نقطة</strong> • السيرفر: ${safeServer} • طريقة الدخول: ${acc.loginType === 'google' ? 'Google' : 'Facebook'}
                                     </div>
                                     ${statusNote}
                                 </div>
@@ -2800,17 +2827,22 @@ class WaseetApp {
             statusColor = '#ef4444';
         }
 
+        const safeInspectTitle = this.escapeHtml(acc.title || 'حساب وساطة');
+        const safeInspectAccNum = this.escapeHtml(String(acc.accountNumber || acc.id || ''));
+        const safeInspectSeller = this.escapeHtml(acc.sellerName || 'متجر البائع');
+        const safeInspectServer = this.escapeHtml(acc.server || 'الشرق الأوسط');
+
         body.innerHTML = `
             <!-- Top Summary Card -->
             <div style="background: rgba(197, 160, 89, 0.08); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-                    <span style="font-size: 1.05rem; font-weight: 800; color: #fff;">#${acc.accountNumber || acc.id} - ${acc.title}</span>
+                    <span style="font-size: 1.05rem; font-weight: 800; color: #fff;">#${safeInspectAccNum} - ${safeInspectTitle}</span>
                     <span style="background: ${statusColor}22; color: ${statusColor}; border: 1px solid ${statusColor}; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">
                         ${statusText}
                     </span>
                 </div>
                 <div style="font-size: 0.88rem; color: var(--silver-muted); line-height: 1.6;">
-                    البائع: <strong style="color: #fff;">${acc.sellerName}</strong> • اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong> • الرتبة: <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong> • السيرفر: ${acc.server || 'الشرق الأوسط'}
+                    البائع: <strong style="color: #fff;">${safeInspectSeller}</strong> • اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong> • الرتبة: <strong style="color: var(--gold-light);">برايم ${acc.primeLevel || 1}</strong> • السيرفر: ${safeInspectServer}
                 </div>
                 <div style="font-size: 0.88rem; color: var(--silver-muted); margin-top: 0.3rem;">
                     صافي البائع: <strong style="color: #fff;">${pricing.sellerPrice} نقطة</strong> | عمولة المنصة: <strong style="color: var(--gold-light);">${pricing.fee} نقطة</strong> | سعر المشتري: <strong style="color: var(--orange-bright);">${pricing.buyerPrice} نقطة</strong>
@@ -2941,11 +2973,14 @@ class WaseetApp {
         }
 
         if (thumbsContainer) {
-            thumbsContainer.innerHTML = images.map((src, idx) => `
+            thumbsContainer.innerHTML = images.map((src, idx) => {
+                const safeSrc = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(src) : this.escapeHtml(src);
+                return `
                 <div class="deck-thumb-item ${idx === this.currentInspectIndex ? 'active' : ''}" onclick="window.waseetApp.selectInspectImage(${idx})">
-                    <img src="${src}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
+                    <img src="${safeSrc}" alt="Thumb ${idx + 1}" onerror="this.onerror=null; this.src='assets/favicon-512.png'; this.style.objectFit='contain';">
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
     }
 
