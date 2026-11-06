@@ -844,14 +844,20 @@ async function waseetSyncAuthState(options = {}) {
             : (isBroker ? 'regional_broker' : (profRole || 'user'));
 
         const avatarMeta = parseBrokerAvatarMeta(profile?.avatar_url || authUser.user_metadata?.avatar_url);
-        const userCountry = String(
-            avatarMeta.countryCode ||
-            (cachedBrokerEntry && cachedBrokerEntry.country) ||
-            (profile && profile.country && profile.country !== 'DZ' ? profile.country : '') ||
-            authUser.user_metadata?.country ||
-            (profile && profile.country) ||
-            'DZ'
-        ).toUpperCase().trim();
+        // دولة المستخدم: للوسيط تُحسم من وسم الترقية/الكاش، أما المستخدم العادي فتُقرأ من profiles.country حرفياً
+        // بدون أي قيمة افتراضية ('DZ') حتى لا يُطابَق كل المستخدمين مع وسيط الجزائر بالخطأ
+        const userCountry = isBroker
+            ? String(
+                avatarMeta.countryCode ||
+                (cachedBrokerEntry && cachedBrokerEntry.country) ||
+                (profile && profile.country) ||
+                'DZ'
+            ).toUpperCase().trim()
+            : String(
+                (profile && profile.country) ||
+                authUser.user_metadata?.country ||
+                ''
+            ).toUpperCase().trim();
 
         const rawAvail = profile
             ? (profile.points_balance !== undefined && profile.points_balance !== null
@@ -1342,6 +1348,67 @@ async function waseetGetAccountCredentialsSecure(accountId) {
     }
 }
 window.waseetGetAccountCredentialsSecure = waseetGetAccountCredentialsSecure;
+
+/**
+ * حذف الحساب نهائياً من قاعدة بيانات Supabase ومنع ظهوره مجدداً كـ Ghost Listing
+ */
+async function waseetDeleteMarketplaceAccount(accountId) {
+    const client = initWaseetSupabase();
+    if (!accountId) return { ok: false, error: { message: 'معرف الحساب غير صالح' } };
+
+    console.log('[Delete Account] Permanently deleting account from Supabase:', accountId);
+
+    let deletedFromDb = false;
+    let lastError = null;
+
+    if (client) {
+        // 1. محاولة الحذف عبر الـ RPC الآمن delete_marketplace_account
+        try {
+            const { data: rpcRes, error: rpcErr } = await client.rpc('delete_marketplace_account', {
+                p_account_id: accountId
+            });
+            if (!rpcErr && rpcRes && rpcRes.ok) {
+                deletedFromDb = true;
+            } else if (rpcErr) {
+                lastError = rpcErr;
+                console.warn('[Delete Account RPC Notice]', rpcErr.message || rpcErr);
+            }
+        } catch (rpcEx) {
+            console.warn('[Delete Account RPC Exception]', rpcEx);
+        }
+
+        // 2. محاولة الحذف المباشر (الأسرار ثم الحساب) كإجراء مؤكد
+        try {
+            await client.from('marketplace_account_secrets').delete().eq('account_id', accountId);
+            const { error: delErr } = await client.from('marketplace_accounts').delete().eq('id', accountId);
+            if (!delErr) {
+                deletedFromDb = true;
+            } else if (!deletedFromDb) {
+                lastError = delErr;
+            }
+        } catch (directDelEx) {
+            console.warn('[Delete Account Direct Delete Exception]', directDelEx);
+        }
+    }
+
+    // 3. تطهير الحساب جذرياً من كافة الذاكرات المؤقتة
+    try {
+        if (typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.accounts)) {
+            WASEET_STATE.accounts = WASEET_STATE.accounts.filter(a => String(a.id) !== String(accountId));
+            if (typeof saveWaseetData === 'function') saveWaseetData();
+        }
+        const savedAccs = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
+        const filteredAccs = savedAccs.filter(a => String(a.id) !== String(accountId));
+        localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(filteredAccs));
+
+        const generalAccs = JSON.parse(localStorage.getItem('waseet_accounts') || '[]');
+        const filteredGeneral = generalAccs.filter(a => String(a.id) !== String(accountId));
+        localStorage.setItem('waseet_accounts', JSON.stringify(filteredGeneral));
+    } catch (e) {}
+
+    return { ok: true, deleted: deletedFromDb, error: lastError };
+}
+window.waseetDeleteMarketplaceAccount = waseetDeleteMarketplaceAccount;
 
 /**
  * جلب الحسابات المعتمدة للمتجر العام من جدول marketplace_accounts مع ربط آمن (Left Join) لجدول profiles
@@ -4164,96 +4231,96 @@ window.getKycTypeShortLabel = getKycTypeShortLabel;
 
 /**
  * توليد وعرض بطاقة تعريفية أنيقة للوسيط الإقليمي المعتمد لبلد المستخدم (Regional Broker Card)
- * الفلترة الذكية: تطابق دولة المستخدم الحالي فقط. إذا لم يتوفر وسيط لبلده، تعرض بطاقة الإدارة العامة (المدير).
+ * فلترة صارمة 100%: role = 'regional_broker' AND country = user_country مباشرة من Supabase.
+ * إذا لم يوجد وسيط لبلد المستخدم (أو كانت دولته غير معروفة) تُخفى البطاقة بالكامل — بدون أي وسيط احتياطي.
  */
+async function waseetResolveCurrentUserCountry() {
+    const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+    if (!currentUser || currentUser.isGuest || !currentUser.id) return '';
+
+    // المصدر الموثوق: عمود profiles.country للمستخدم الحالي
+    try {
+        const client = initWaseetSupabase();
+        if (client) {
+            const { data: p, error } = await client
+                .from('profiles')
+                .select('country')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+            if (!error) {
+                const dbCountry = (p && p.country) ? String(p.country).toUpperCase().trim() : '';
+                currentUser.country = dbCountry;
+                return dbCountry;
+            }
+        }
+    } catch (e) {}
+
+    // احتياط عند تعذر الاتصال: دولة الجلسة الحالية (لا تحمل أي قيمة افتراضية للمستخدم العادي)
+    return currentUser.country ? String(currentUser.country).toUpperCase().trim() : '';
+}
+window.waseetResolveCurrentUserCountry = waseetResolveCurrentUserCountry;
+
+async function waseetFetchBrokerForCountry(userCountry) {
+    const cleanCountry = String(userCountry || '').toUpperCase().trim();
+    if (!cleanCountry) return null;
+    const client = initWaseetSupabase();
+    if (!client) return null;
+
+    const columnSets = ['id, name, avatar_url, role, country, kyc_type, is_fully_verified', 'id, name, avatar_url, role, country'];
+    // العرض العام أولاً (متاح لكل المستخدمين بدون كشف الأرصدة)، ثم جدول profiles كاحتياط
+    for (const source of ['public_profiles', 'profiles']) {
+        for (const columns of columnSets) {
+            try {
+                const { data, error } = await client
+                    .from(source)
+                    .select(columns)
+                    .eq('role', 'regional_broker')
+                    .eq('country', cleanCountry)
+                    .limit(1);
+                if (error) continue;
+                const row = Array.isArray(data) ? data[0] : null;
+                // تحقق مزدوج على مستوى العميل لضمان التطابق التام 100%
+                if (row && row.role === 'regional_broker' && String(row.country || '').toUpperCase().trim() === cleanCountry) {
+                    return row;
+                }
+                return null;
+            } catch (e) {}
+        }
+    }
+    return null;
+}
+window.waseetFetchBrokerForCountry = waseetFetchBrokerForCountry;
+
+function waseetHideRegionalBrokerCard(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    container.style.display = 'none';
+    container.setAttribute('aria-hidden', 'true');
+    window._waseetLastRenderedDrawerBroker = null;
+}
+
 async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
     try {
         const container = (typeof targetElOrId === 'string') ? document.getElementById(targetElOrId) : targetElOrId;
         if (!container) return;
 
-        let brokers = [];
-        if (typeof waseetFetchRegionalBrokers === 'function') {
-            const res = await waseetFetchRegionalBrokers();
-            if (res && res.ok && Array.isArray(res.data)) brokers = res.data;
-        }
-        if (brokers.length === 0 && typeof getCachedRegionalBrokersList === 'function') {
-            brokers = getCachedRegionalBrokersList();
-        }
+        // 1. قراءة دولة المستخدم الحالي من profiles (أو الجلسة عند تعذر الاتصال)
+        const userCountry = await waseetResolveCurrentUserCountry();
 
-        // 1. قراءة دولة المستخدم الحالي من الجلسة أو الكاش أو Supabase
-        const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
-        let userCountry = '';
-        if (currentUser && currentUser.country) {
-            userCountry = String(currentUser.country).toUpperCase().trim();
-        }
-        if (!userCountry) {
-            try {
-                userCountry = String(localStorage.getItem('waseet_user_country') || localStorage.getItem('WASEET_USER_COUNTRY') || '').toUpperCase().trim();
-            } catch (e) {}
-        }
-        if (!userCountry && currentUser && currentUser.id) {
-            try {
-                const client = initWaseetSupabase();
-                if (client) {
-                    const { data: p } = await client.from('profiles').select('country').eq('id', currentUser.id).maybeSingle();
-                    if (p && p.country) {
-                        userCountry = String(p.country).toUpperCase().trim();
-                        currentUser.country = userCountry;
-                        try { localStorage.setItem('WASEET_CURRENT_USER', JSON.stringify(currentUser)); } catch (e) {}
-                    }
-                }
-            } catch (e) {}
-        }
-
-        // 2. الفلترة الذكية الصارمة: جلب وسيط إقليمي يطابق دولة المستخدم الحالي فقط (role = 'regional_broker' AND country = user_country)
-        let activeBroker = null;
-        if (userCountry) {
-            activeBroker = brokers.find(b =>
-                b && b.is_active !== false &&
-                (b.role === 'regional_broker' || b.role === 'broker') &&
-                String(b.country || '').toUpperCase().trim() === userCountry
-            );
-        }
+        // 2. استعلام صارم: role = 'regional_broker' AND country = user_country
+        const activeBroker = userCountry ? await waseetFetchBrokerForCountry(userCountry) : null;
 
         const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-        // 3. إذا لم يتوفر وسيط لبلد المستخدم بعد، يتم إخفاء بطاقة الوسيط الإقليمي وعرض بطاقة الإدارة العامة (المدير)
+        // 3. لا يوجد وسيط لبلد المستخدم: إخفاء البطاقة بالكامل (بدون أي وسيط أو بطاقة احتياطية)
         if (!activeBroker) {
-            container.innerHTML = `
-                <div class="regional-broker-identity-card general-admin-identity-card is-clickable-broker-card"
-                     role="button"
-                     tabindex="0"
-                     onclick="window.location.href='contact-support.html';"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='contact-support.html';}"
-                     title="الإدارة العامة لمنصة وسيط - إشراف وحماية الصفقات المباشرة">
-                    <div class="broker-avatar-wrap">
-                        <img src="assets/logo.png" alt="الإدارة العامة للمنصة" class="broker-avatar-img admin-avatar-img" onerror="this.src='assets/logo.png'">
-                        <span class="broker-avatar-badge admin-badge" title="الإدارة العامة والضمان المباشر">
-                            <i class="fas fa-crown text-gold"></i>
-                        </span>
-                    </div>
-                    <div class="broker-info-col">
-                        <div class="broker-name-row">
-                            <h4 class="broker-name">الإدارة العامة للمنصة</h4>
-                            <span class="broker-country-badge admin-country-badge">
-                                <span>🌐 إشراف مباشر</span>
-                            </span>
-                        </div>
-                        <p class="broker-role-desc">
-                            <i class="fas fa-shield-alt text-gold"></i>
-                            <span>حماية وإشراف مباشر على الصفقات</span>
-                        </p>
-                        <div class="broker-card-click-hint">
-                            <span>تواصل مع الإدارة للدعم والوساطة</span>
-                            <i class="fas fa-chevron-left"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
+            waseetHideRegionalBrokerCard(container);
             return;
         }
+        container.style.display = '';
+        container.removeAttribute('aria-hidden');
 
-        const countryCode = String(activeBroker.country || userCountry || 'DZ').toUpperCase().trim();
+        const countryCode = String(activeBroker.country).toUpperCase().trim();
         const countryNamesMap = {
             DZ: 'الجزائر', EG: 'مصر', SA: 'السعودية', MA: 'المغرب', TN: 'تونس',
             SY: 'سوريا', IQ: 'العراق', LY: 'ليبيا', JO: 'الأردن', AE: 'الإمارات',
@@ -4268,7 +4335,7 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
             avatarUrl = avatarUrl.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
         }
 
-        const isFullyVerified = activeBroker.is_fully_verified !== false;
+        const isFullyVerified = activeBroker.is_fully_verified === true;
         const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(activeBroker.kyc_type || 'national_id') : 'بطاقة وطنية';
         const brokerIdentifier = activeBroker.id || activeBroker.email || countryCode;
 

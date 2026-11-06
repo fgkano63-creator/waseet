@@ -109,6 +109,24 @@ const tests = [
                    pendingAccountsHtml.includes("!isStrictAdminUser") &&
                    supabaseJs.includes("if (isBroker && !isAdmin)");
         }
+    },
+    {
+        name: 'Drawer Regional Broker Card Strict Filtering: role = regional_broker AND country = user_country',
+        assert: () => {
+            return supabaseJs.includes("waseetResolveCurrentUserCountry") &&
+                   supabaseJs.includes("waseetFetchBrokerForCountry") &&
+                   supabaseJs.includes(".eq('role', 'regional_broker')") &&
+                   supabaseJs.includes(".eq('country', cleanCountry)");
+        }
+    },
+    {
+        name: 'Drawer Regional Broker Card Complete Hidden State on No Match (Zero Fallback)',
+        assert: () => {
+            return supabaseJs.includes("waseetHideRegionalBrokerCard") &&
+                   supabaseJs.includes("container.style.display = 'none'") &&
+                   supabaseJs.includes("container.innerHTML = ''") &&
+                   !supabaseJs.includes("general-admin-identity-card");
+        }
     }
 ];
 
