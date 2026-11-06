@@ -264,14 +264,11 @@ async function waseetFetchUserProfile(userId, userEmail = null) {
     try {
         const cleanEmail = userEmail ? String(userEmail).toLowerCase().trim() : '';
 
-        // جلب متوازٍ من الجداول الثلاثة لضمان التقاط أي ترقية في قاعدة البيانات فوراً
-        const [profByIdRes, userTableRes, rbTableRes] = await Promise.allSettled([
+        // جلب آمن ومباشر من جدول profiles و regional_brokers فقط (تجنب الاستعلام الخاطئ لجدول users غير الموجود الذي يسبب 404)
+        const [profByIdRes, rbTableRes] = await Promise.allSettled([
             userId
                 ? client.from('profiles').select('*').eq('id', userId).maybeSingle()
                 : Promise.resolve({ data: null, error: null }),
-            userId
-                ? client.from('users').select('*').eq('id', userId).maybeSingle()
-                : (cleanEmail ? client.from('users').select('*').ilike('email', cleanEmail).maybeSingle() : Promise.resolve({ data: null, error: null })),
             cleanEmail
                 ? client.from('regional_brokers').select('*').ilike('email', cleanEmail).maybeSingle()
                 : (userId ? client.from('regional_brokers').select('*').eq('id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }))
@@ -295,25 +292,11 @@ async function waseetFetchUserProfile(userId, userEmail = null) {
             } catch (e) {}
         }
 
-        let userRow = (userTableRes.status === 'fulfilled' && userTableRes.value && !userTableRes.value.error)
-            ? userTableRes.value.data
-            : null;
-        if (!userRow && cleanEmail && userId) {
-            try {
-                const { data: uByEmail, error: uErr } = await client
-                    .from('users')
-                    .select('*')
-                    .ilike('email', cleanEmail)
-                    .maybeSingle();
-                if (!uErr && uByEmail) userRow = uByEmail;
-            } catch (e) {}
-        }
-
         let brokerRow = (rbTableRes.status === 'fulfilled' && rbTableRes.value && !rbTableRes.value.error)
             ? rbTableRes.value.data
             : null;
 
-        const baseRecord = profileRow || userRow || (brokerRow ? {
+        const baseRecord = profileRow || (brokerRow ? {
             id: userId || brokerRow.id,
             email: cleanEmail || brokerRow.email,
             name: brokerRow.name || (cleanEmail ? cleanEmail.split('@')[0] : 'وسيط معتمد'),
@@ -325,7 +308,7 @@ async function waseetFetchUserProfile(userId, userEmail = null) {
         } : null);
 
         if (baseRecord) {
-            return enrichProfileWithBrokerStatus(baseRecord, { userRow, brokerRow });
+            return enrichProfileWithBrokerStatus(baseRecord, { userRow: null, brokerRow });
         }
 
         return null;
@@ -3661,18 +3644,17 @@ async function waseetPromoteUserToBroker(targetUser, country = 'DZ') {
             console.warn('[Broker Promotion] RPC Exception:', rpcErr);
         }
 
-        // 2. محاولة التحديث في جدول users (role = 'broker') إن وجد
+        // 2. تحديث جدول profiles (role = 'regional_broker')
         try {
             const isUuidUser = waseetIsValidUuid(cleanTarget);
-            const userUpdateQuery = isUuidUser
-                ? client.from('users').update({ role: 'broker', country: cleanCountry }).eq('id', cleanTarget)
-                : client.from('users').update({ role: 'broker', country: cleanCountry }).ilike('email', cleanTarget);
-            const { data: uData, error: uErr } = await userUpdateQuery.select('*').maybeSingle();
-            if (!uErr && uData) {
-                console.log('[Broker Promotion] Updated users table role = broker:', uData);
-                resolvedBrokerRecord = uData;
+            const profUpdateQuery = isUuidUser
+                ? client.from('profiles').update({ role: 'regional_broker', country: cleanCountry }).eq('id', cleanTarget)
+                : client.from('profiles').update({ role: 'regional_broker', country: cleanCountry }).ilike('email', cleanTarget);
+            const { data: pData, error: pErr } = await profUpdateQuery.select('*').maybeSingle();
+            if (!pErr && pData) {
+                resolvedBrokerRecord = pData;
             }
-        } catch (uEx) {}
+        } catch (pEx) {}
 
         // 2b. محاولة الحفظ في جدول regional_brokers إن وجد
         try {
@@ -3924,15 +3906,7 @@ async function waseetDemoteBroker(targetId, targetEmail) {
             console.warn('[Broker Demotion] profiles update notice:', profErr);
         }
 
-        // 4. تحديث جدول users إن وُجد
-        try {
-            if (waseetIsValidUuid(cleanTargetId)) {
-                await client.from('users').update({ role: 'user' }).eq('id', cleanTargetId);
-            }
-            if (cleanTargetEmail) {
-                await client.from('users').update({ role: 'user' }).ilike('email', cleanTargetEmail);
-            }
-        } catch (uErr) {}
+
     }
 
     // 5. التطهير الجذري للكاش المحلي WASEET_REGIONAL_BROKERS_CACHE
@@ -4767,6 +4741,7 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
         const flagSvg = (countryCode === 'DZ') ? 'assets/flags/dz.svg' : `assets/flags/${countryCode.toLowerCase()}.svg`;
 
         const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const isFullyVerified = Boolean(profile && profile.is_fully_verified !== false);
         const safeName = escapeHtmlSafe(profile.name || 'الوسيط الإقليمي المعتمد');
         const safeAvatar = escapeHtmlSafe(waseetSanitizeAvatarUrl(profile.avatar_url, 'assets/default-avatar.png'));
         const safeKycText = escapeHtmlSafe(profile.kyc_type_label || 'بطاقة وطنية (National ID)');
@@ -4890,6 +4865,20 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
         `;
     } catch (err) {
         console.error('[Broker Profile Modal] Error opening modal:', err);
+        const modal = document.getElementById('modal-public-broker-profile');
+        if (modal) {
+            modal.innerHTML = `
+                <div class="broker-profile-luxury-card" onclick="event.stopPropagation()">
+                    <button type="button" class="broker-profile-close-btn" onclick="window.waseetCloseBrokerProfileModal()" aria-label="إغلاق">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div style="padding: 2.5rem 1.5rem; text-align: center; color: #cbd5e1;">
+                        <i class="fas fa-exclamation-triangle text-gold" style="font-size: 2.2rem; margin-bottom: 0.8rem; display: block;"></i>
+                        <span>تعذر تحميل تفاصيل الملف التعريفي في الوقت الحالي. يرجى المحاولة مرة أخرى.</span>
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 window.waseetOpenBrokerProfileModal = waseetOpenBrokerProfileModal;
@@ -5531,7 +5520,6 @@ function waseetInitLiveRoleAndSessionSync() {
                     triggerRealtimeRoleCheck(payload);
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'regional_brokers' }, triggerRealtimeRoleCheck)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, triggerRealtimeRoleCheck)
                 .on('broadcast', { event: 'broker_role_changed' }, triggerRealtimeRoleCheck)
                 .subscribe();
             window._waseetLiveRoleChannel = roleChannel;

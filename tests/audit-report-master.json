@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-06T07:04:53.994Z",
+  "timestamp": "2026-11-06T07:23:40.479Z",
   "metrics": {
     "totalChecks": 248,
     "passed": 248,
@@ -278,7 +278,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (63 async, 150 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (63 async, 148 catch)",
         "details": null
       },
       {
