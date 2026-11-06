@@ -547,11 +547,12 @@
         }
 
         refreshDrawerExtras();
-        // مزامنة دورية خفيفة لرصيد المحفظة وشريط إشراف الوسيط الإقليمي
+        // مزامنة دورية خفيفة كل 30 ثانية لتحديث شريط الإشراف والرصيد دون استهلاك موارد المعالج أو الشبكة
         setInterval(function () {
+            if (document.hidden) return;
             refreshDrawerExtras();
             renderBrokerSupervisionBanner(currentUser());
-        }, 2500);
+        }, 30000);
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {

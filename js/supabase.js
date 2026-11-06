@@ -3531,10 +3531,43 @@ async function waseetAdminDeletePaymentMethod(methodId) {
     return { ok: true };
 }
 
+function waseetSanitizeAvatarUrl(url, fallback = 'assets/default-avatar.png') {
+    if (!url || typeof url !== 'string') return fallback;
+    let clean = url.trim();
+    if (!clean || clean === 'null' || clean === 'undefined' || clean === 'none') return fallback;
+
+    // إزالة وسوم الوسيط الإقليمي من الرابط
+    if (clean.includes('#waseet_broker=')) {
+        clean = clean.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '').trim();
+    }
+    if (!clean) return fallback;
+
+    // إذا كانت القيمة بريداً إلكترونياً أو معرفاً مجرداً بدون بروتوكول أو مسار
+    if (clean.includes('@') && !clean.startsWith('http://') && !clean.startsWith('https://')) {
+        return fallback;
+    }
+    if (!clean.includes('/') && !clean.startsWith('data:image')) {
+        return fallback;
+    }
+
+    // فحص روابط Supabase Storage لسلة avatars لمنع أخطاء 404/403
+    if (clean.includes('/storage/v1/object/public/avatars/') || clean.includes('/storage/v1/object/avatars/')) {
+        const parts = clean.split('?')[0].split('/');
+        const filename = parts[parts.length - 1] || '';
+        const hasValidExt = /\.(jpe?g|png|webp|gif|svg)$/i.test(filename);
+        if (filename.includes('@') || !hasValidExt) {
+            return fallback;
+        }
+    }
+
+    return clean;
+}
+window.waseetSanitizeAvatarUrl = waseetSanitizeAvatarUrl;
+
 function parseBrokerAvatarMeta(avatarUrl) {
     const raw = String(avatarUrl || '').trim();
     const match = raw.match(/#waseet_broker=([A-Za-z]{2,6})/i);
-    const cleanAvatar = raw.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '') || 'assets/logo.png';
+    const cleanAvatar = waseetSanitizeAvatarUrl(raw, 'assets/default-avatar.png');
     return {
         isBrokerTagged: Boolean(match),
         countryCode: match ? match[1].toUpperCase() : '',
@@ -3589,7 +3622,11 @@ function saveCachedRegionalBrokersList(list) {
         WASEET_STATE.brokers = cleanList;
     }
     try {
-        localStorage.setItem('WASEET_REGIONAL_BROKERS_CACHE', JSON.stringify(cleanList));
+        const nextRaw = JSON.stringify(cleanList);
+        const curRaw = localStorage.getItem('WASEET_REGIONAL_BROKERS_CACHE');
+        if (curRaw !== nextRaw) {
+            localStorage.setItem('WASEET_REGIONAL_BROKERS_CACHE', nextRaw);
+        }
     } catch (e) {}
 }
 
@@ -3963,243 +4000,259 @@ async function waseetDemoteBroker(targetId, targetEmail) {
     return { ok: true, data: { success: true } };
 }
 
+let _waseetBrokersInFlightPromise = null;
+let _waseetBrokersMemoryCache = null;
+let _waseetBrokersLastFetchedAt = 0;
+const WASEET_BROKERS_TTL_MS = 60000;
+
 /**
- * جلب قائمة كافة الوسطاء الإقليميين النشطين من Supabase + الذاكرة المحلية
+ * جلب قائمة كافة الوسطاء الإقليميين النشطين من Supabase + الذاكرة المحلية (مع memoization وكاش 60 ثانية)
  */
-async function waseetFetchRegionalBrokers() {
-    const client = initWaseetSupabase();
-    const dbBrokers = [];
-
-    console.log('[Regional Brokers] Fetching active regional brokers from Supabase...');
-
-    if (client) {
-        // 1. محاولة الجلب من جدول regional_brokers إن كان موجوداً
-        try {
-            const { data: rbRows, error: rbError } = await client
-                .from('regional_brokers')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (!rbError && Array.isArray(rbRows) && rbRows.length > 0) {
-                console.log('[Regional Brokers] Found rows in regional_brokers table:', rbRows.length);
-                rbRows.forEach(r => {
-                    if (r.is_active !== false && !isFakeBrokerRecord(r)) {
-                        dbBrokers.push({
-                            id: r.id || r.user_id || ('broker_' + Date.now()),
-                            name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
-                            email: r.email || '',
-                            avatar_url: parseBrokerAvatarMeta(r.avatar_url).cleanAvatarUrl,
-                            role: 'regional_broker',
-                            country: String(r.country || 'DZ').toUpperCase(),
-                            is_active: true,
-                            wallet_balance: Number(r.wallet_balance) || 0,
-                            points_balance: Number(r.points_balance) || 0,
-                            created_at: r.created_at || new Date().toISOString()
-                        });
-                    }
-                });
-            }
-        } catch (rbEx) {}
+async function waseetFetchRegionalBrokers(force = false) {
+    const now = Date.now();
+    if (!force && _waseetBrokersMemoryCache && (now - _waseetBrokersLastFetchedAt < WASEET_BROKERS_TTL_MS)) {
+        return { ok: true, data: _waseetBrokersMemoryCache };
+    }
+    if (!force && _waseetBrokersInFlightPromise) {
+        return _waseetBrokersInFlightPromise;
     }
 
-    // 3. دمج نتائج قاعدة البيانات مع الكاش المحلي لضمان عدم ضياع أي وسيط تمت ترقيته
-    const cachedBrokers = getCachedRegionalBrokersList();
-    const kycPublicCache = getBrokerPublicKycCacheMap();
-
-    // 2. الجلب الآمن من جدول profiles عبر select('*') لتجنب خطأ غياب عمود country
-    if (client) {
+    _waseetBrokersInFlightPromise = (async () => {
         try {
-            const { data: profileRows, error: profError } = await client
-                .from('profiles')
-                .select('*')
-                .order('created_at', { ascending: false });
+            const client = initWaseetSupabase();
+            const dbBrokers = [];
 
-            if (!profError && Array.isArray(profileRows)) {
-                profileRows.forEach(row => {
-                    // إذا تم إرجاع رتبة المستخدم إلى 'user' أو كان وسيطاً وهمياً، يتم استبعاده فوراً
-                    if (row.role === 'user' || isFakeBrokerRecord(row)) return;
-
-                    const avatarMeta = parseBrokerAvatarMeta(row.avatar_url);
-                    const isBrokerRole = row.role === 'regional_broker' || row.role === 'broker';
-                    if (isBrokerRole || (avatarMeta.isBrokerTagged && row.role !== 'user')) {
-                        const cachedMatch = cachedBrokers.find(cb =>
-                            cb && (
-                                (cb.id && row.id && String(cb.id) === String(row.id)) ||
-                                (cb.email && row.email && String(cb.email).toLowerCase().trim() === String(row.email).toLowerCase().trim())
-                            )
-                        );
-                        // أولوية الدولة: وسم الصورة avatarMeta ثم الكاش المحلي ثم عمود profiles إذا لم يكن DZ الافتراضي
-                        const resolvedCountry = String(
-                            avatarMeta.countryCode ||
-                            (cachedMatch && cachedMatch.country) ||
-                            (row.country && row.country !== 'DZ' ? row.country : '') ||
-                            row.country ||
-                            'DZ'
-                        ).toUpperCase().trim();
-
-                        // فحص إضافي بعد استخراج الدولة لتصفية الحسابات الوهمية
-                        if (isFakeBrokerRecord({ ...row, country: resolvedCountry })) return;
-
-                        const kycCached = getBrokerPublicKycFromMap(kycPublicCache, row.id, row.email);
-                        const hasDbKyc = row.kyc_type !== undefined && row.kyc_type !== null && String(row.kyc_type).trim() !== '';
-                        const resolvedKycType = hasDbKyc
-                            ? String(row.kyc_type).trim()
-                            : (kycCached && kycCached.kyc_type ? kycCached.kyc_type : (cachedMatch && cachedMatch.kyc_type ? cachedMatch.kyc_type : 'national_id'));
-                        const resolvedVerified = (row.is_fully_verified === true)
-                            ? true
-                            : (kycCached && typeof kycCached.is_fully_verified === 'boolean')
-                                ? kycCached.is_fully_verified
-                                : (hasDbKyc ? Boolean(row.is_fully_verified) : true);
-
-                        // ملاحظة أمنية صارمة: لا يتم إرفاق kyc_document_url أبداً في كائن الوسيط العام
-                        dbBrokers.push({
-                            id: row.id,
-                            name: row.name || (row.email ? row.email.split('@')[0] : 'وسيط إقليمي معتمد'),
-                            email: row.email || '',
-                            avatar_url: avatarMeta.cleanAvatarUrl,
-                            role: 'regional_broker',
-                            country: resolvedCountry,
-                            is_active: true,
-                            wallet_balance: Number(row.wallet_balance) || 0,
-                            points_balance: Number(row.points_balance) || 0,
-                            kyc_type: resolvedKycType,
-                            is_fully_verified: resolvedVerified,
-                            last_seen_at: row.last_seen_at || (kycCached && kycCached.last_seen_at) || null,
-                            completed_deals: Number(row.completed_deals || (kycCached && kycCached.completed_deals) || (cachedMatch && cachedMatch.completed_deals) || 0),
-                            rating: Number(row.rating || 0.0),
-                            created_at: row.created_at || new Date().toISOString()
+            // 1. القراءة من العرض العام public_regional_brokers أولاً لمنع أخطاء 403 للزوار
+            if (client) {
+                try {
+                    const { data: pubRbRows, error: pubRbErr } = await client
+                        .from('public_regional_brokers')
+                        .select('*');
+                    if (!pubRbErr && Array.isArray(pubRbRows) && pubRbRows.length > 0) {
+                        pubRbRows.forEach(r => {
+                            if (r.is_active !== false && !isFakeBrokerRecord(r)) {
+                                dbBrokers.push({
+                                    id: r.id || r.user_id || ('broker_' + Date.now()),
+                                    name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
+                                    email: r.email || '',
+                                    avatar_url: waseetSanitizeAvatarUrl(r.avatar_url, 'assets/default-avatar.png'),
+                                    role: 'regional_broker',
+                                    country: String(r.country || 'DZ').toUpperCase().trim(),
+                                    is_active: true,
+                                    wallet_balance: Number(r.wallet_balance) || 0,
+                                    points_balance: Number(r.points_balance) || 0,
+                                    kyc_type: r.kyc_type || 'national_id',
+                                    is_fully_verified: r.is_fully_verified !== false,
+                                    last_seen_at: r.last_seen_at || null,
+                                    completed_deals: Number(r.completed_deals || 0),
+                                    rating: Number(r.rating || 0.0),
+                                    created_at: r.created_at || new Date().toISOString()
+                                });
+                            }
                         });
                     }
-                });
-            } else if (profError) {
-                console.warn('[Regional Brokers] Supabase profiles query warning:', profError.message || profError);
-            }
-        } catch (err) {
-            console.warn('[Regional Brokers] Fetch Supabase Exception:', err);
-        }
+                } catch (e) {}
 
-        // 2-ب. تعزيز بيانات التوثيق العامة من العرض الآمن public_profiles للزوار غير المسجلين (دون جلب kyc_document_url إطلاقاً)
-        try {
-            const { data: pubRows, error: pubErr } = await client
-                .from('public_profiles')
-                .select('id, name, avatar_url, role, country, kyc_type, is_fully_verified, last_seen_at, created_at');
-            if (!pubErr && Array.isArray(pubRows)) {
-                pubRows.forEach(pRow => {
-                    if (!pRow || pRow.role === 'user' || isFakeBrokerRecord(pRow)) return;
-                    const avatarMeta = parseBrokerAvatarMeta(pRow.avatar_url);
-                    const isBrokerRole = pRow.role === 'regional_broker' || pRow.role === 'broker' || avatarMeta.isBrokerTagged;
-                    if (!isBrokerRole) return;
-                    const resolvedCountry = String(avatarMeta.countryCode || pRow.country || 'DZ').toUpperCase().trim();
-                    if (isFakeBrokerRecord({ ...pRow, country: resolvedCountry })) return;
+                // إذا لم نجد في العرض العام، نحاول من regional_brokers إن كان متاحاً
+                if (dbBrokers.length === 0) {
+                    try {
+                        const { data: rbRows, error: rbError } = await client
+                            .from('regional_brokers')
+                            .select('id, name, email, avatar_url, role, country, is_active, wallet_balance, points_balance, created_at')
+                            .eq('is_active', true);
 
-                    const existing = dbBrokers.find(b => b.id && pRow.id && String(b.id) === String(pRow.id));
-                    if (existing) {
-                        if (pRow.kyc_type) existing.kyc_type = pRow.kyc_type;
-                        if (typeof pRow.is_fully_verified === 'boolean' && (pRow.kyc_type || pRow.is_fully_verified)) {
-                            existing.is_fully_verified = pRow.is_fully_verified;
+                        if (!rbError && Array.isArray(rbRows) && rbRows.length > 0) {
+                            rbRows.forEach(r => {
+                                if (r.is_active !== false && !isFakeBrokerRecord(r)) {
+                                    dbBrokers.push({
+                                        id: r.id || r.user_id || ('broker_' + Date.now()),
+                                        name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
+                                        email: r.email || '',
+                                        avatar_url: waseetSanitizeAvatarUrl(r.avatar_url, 'assets/default-avatar.png'),
+                                        role: 'regional_broker',
+                                        country: String(r.country || 'DZ').toUpperCase().trim(),
+                                        is_active: true,
+                                        wallet_balance: Number(r.wallet_balance) || 0,
+                                        points_balance: Number(r.points_balance) || 0,
+                                        created_at: r.created_at || new Date().toISOString()
+                                    });
+                                }
+                            });
                         }
-                        if (pRow.last_seen_at) existing.last_seen_at = pRow.last_seen_at;
-                    } else {
-                        const kycCached = getBrokerPublicKycFromMap(kycPublicCache, pRow.id, '');
-                        const hasDbKyc = pRow.kyc_type !== undefined && pRow.kyc_type !== null && String(pRow.kyc_type).trim() !== '';
-                        dbBrokers.push({
-                            id: pRow.id,
-                            name: pRow.name || 'وسيط إقليمي معتمد',
-                            email: '',
-                            avatar_url: avatarMeta.cleanAvatarUrl,
-                            role: 'regional_broker',
-                            country: resolvedCountry,
-                            is_active: true,
-                            wallet_balance: 0,
-                            points_balance: 0,
-                            kyc_type: hasDbKyc ? String(pRow.kyc_type).trim() : (kycCached?.kyc_type || 'national_id'),
-                            is_fully_verified: (pRow.is_fully_verified === true)
-                                ? true
-                                : (kycCached && typeof kycCached.is_fully_verified === 'boolean')
-                                    ? kycCached.is_fully_verified
-                                    : (hasDbKyc ? Boolean(pRow.is_fully_verified) : true),
-                            last_seen_at: pRow.last_seen_at || null,
-                            completed_deals: Number(kycCached?.completed_deals || 0),
-                            rating: 0.0,
-                            created_at: pRow.created_at || new Date().toISOString()
-                        });
-                    }
-                });
-            }
-        } catch (pubEx) {}
-    }
-    const mergedMap = new Map();
-
-    dbBrokers.forEach(b => {
-        if (isFakeBrokerRecord(b)) return;
-        const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
-        if (kycCached) {
-            if (kycCached.kyc_type) b.kyc_type = kycCached.kyc_type;
-            if (typeof kycCached.is_fully_verified === 'boolean') b.is_fully_verified = kycCached.is_fully_verified;
-        }
-        if (!b.kyc_type) b.kyc_type = 'national_id';
-        if (typeof b.is_fully_verified !== 'boolean') b.is_fully_verified = true;
-        // ضمان حذف أي حقل وثيقة سري من الكائن العام
-        delete b.kyc_document_url;
-
-        const key = (b.email || b.id || '').toLowerCase();
-        if (key) mergedMap.set(key, b);
-    });
-
-    cachedBrokers.forEach(b => {
-        if (b && b.is_active !== false && !isFakeBrokerRecord(b)) {
-            const key = (b.email || b.id || '').toLowerCase();
-            const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
-            if (key) {
-                if (!mergedMap.has(key)) {
-                    const cleanObj = {
-                        ...b,
-                        role: 'regional_broker',
-                        country: String(b.country || 'DZ').toUpperCase().trim(),
-                        kyc_type: (kycCached && kycCached.kyc_type) || b.kyc_type || 'national_id',
-                        is_fully_verified: (kycCached && typeof kycCached.is_fully_verified === 'boolean')
-                            ? kycCached.is_fully_verified
-                            : (typeof b.is_fully_verified === 'boolean' ? b.is_fully_verified : true)
-                    };
-                    delete cleanObj.kyc_document_url;
-                    if (!isFakeBrokerRecord(cleanObj)) {
-                        mergedMap.set(key, cleanObj);
-                    }
-                } else {
-                    // إذا كان السجل موجوداً في قاعدة البيانات لكن دولته DZ بينما الكاش يحمل دولة محددة مسندة (مثل SY أو LY)، يتم اعتماد الدولة المسندة
-                    const existing = mergedMap.get(key);
-                    if (existing && (!existing.country || existing.country === 'DZ') && b.country && b.country !== 'DZ') {
-                        existing.country = String(b.country).toUpperCase().trim();
-                    }
-                    if (existing && kycCached) {
-                        if (kycCached.kyc_type) existing.kyc_type = kycCached.kyc_type;
-                        if (typeof kycCached.is_fully_verified === 'boolean') existing.is_fully_verified = kycCached.is_fully_verified;
-                    }
+                    } catch (rbEx) {}
                 }
             }
+
+            // 2. الجلب من العرض الآمن public_profiles أولاً بفلترة role = regional_broker
+            if (client) {
+                try {
+                    const { data: pubRows, error: pubErr } = await client
+                        .from('public_profiles')
+                        .select('id, name, avatar_url, role, country, kyc_type, is_fully_verified, last_seen_at, created_at')
+                        .eq('role', 'regional_broker');
+                    if (!pubErr && Array.isArray(pubRows)) {
+                        pubRows.forEach(pRow => {
+                            if (!pRow || pRow.role === 'user' || isFakeBrokerRecord(pRow)) return;
+                            const avatarMeta = parseBrokerAvatarMeta(pRow.avatar_url);
+                            const resolvedCountry = String(avatarMeta.countryCode || pRow.country || 'DZ').toUpperCase().trim();
+                            if (isFakeBrokerRecord({ ...pRow, country: resolvedCountry })) return;
+
+                            const existing = dbBrokers.find(b => b.id && pRow.id && String(b.id) === String(pRow.id));
+                            if (existing) {
+                                if (pRow.kyc_type) existing.kyc_type = pRow.kyc_type;
+                                if (typeof pRow.is_fully_verified === 'boolean') {
+                                    existing.is_fully_verified = pRow.is_fully_verified;
+                                }
+                                if (pRow.last_seen_at) existing.last_seen_at = pRow.last_seen_at;
+                            } else {
+                                dbBrokers.push({
+                                    id: pRow.id,
+                                    name: pRow.name || 'وسيط إقليمي معتمد',
+                                    email: '',
+                                    avatar_url: avatarMeta.cleanAvatarUrl,
+                                    role: 'regional_broker',
+                                    country: resolvedCountry,
+                                    is_active: true,
+                                    wallet_balance: 0,
+                                    points_balance: 0,
+                                    kyc_type: pRow.kyc_type || 'national_id',
+                                    is_fully_verified: pRow.is_fully_verified !== false,
+                                    last_seen_at: pRow.last_seen_at || null,
+                                    completed_deals: 0,
+                                    rating: 0.0,
+                                    created_at: pRow.created_at || new Date().toISOString()
+                                });
+                            }
+                        });
+                    }
+                } catch (pubEx) {}
+
+                // فحص profiles للمستخدمين المسجلين فقط إذا كانت القائمة لا تزال فارغة
+                if (dbBrokers.length === 0) {
+                    try {
+                        const { data: profileRows, error: profError } = await client
+                            .from('profiles')
+                            .select('id, name, email, avatar_url, role, country, wallet_balance, points_balance, kyc_type, is_fully_verified, last_seen_at, completed_deals, rating, created_at')
+                            .eq('role', 'regional_broker');
+
+                        if (!profError && Array.isArray(profileRows)) {
+                            profileRows.forEach(row => {
+                                if (row.role === 'user' || isFakeBrokerRecord(row)) return;
+                                const avatarMeta = parseBrokerAvatarMeta(row.avatar_url);
+                                const resolvedCountry = String(avatarMeta.countryCode || row.country || 'DZ').toUpperCase().trim();
+                                if (isFakeBrokerRecord({ ...row, country: resolvedCountry })) return;
+
+                                dbBrokers.push({
+                                    id: row.id,
+                                    name: row.name || (row.email ? row.email.split('@')[0] : 'وسيط إقليمي معتمد'),
+                                    email: row.email || '',
+                                    avatar_url: avatarMeta.cleanAvatarUrl,
+                                    role: 'regional_broker',
+                                    country: resolvedCountry,
+                                    is_active: true,
+                                    wallet_balance: Number(row.wallet_balance) || 0,
+                                    points_balance: Number(row.points_balance) || 0,
+                                    kyc_type: row.kyc_type || 'national_id',
+                                    is_fully_verified: row.is_fully_verified !== false,
+                                    last_seen_at: row.last_seen_at || null,
+                                    completed_deals: Number(row.completed_deals || 0),
+                                    rating: Number(row.rating || 0.0),
+                                    created_at: row.created_at || new Date().toISOString()
+                                });
+                            });
+                        }
+                    } catch (err) {}
+                }
+            }
+
+            // 3. دمج نتائج قاعدة البيانات مع الكاش المحلي لضمان استقرار العرض
+            const cachedBrokers = getCachedRegionalBrokersList();
+            const kycPublicCache = getBrokerPublicKycCacheMap();
+            const mergedMap = new Map();
+
+            dbBrokers.forEach(b => {
+                if (isFakeBrokerRecord(b)) return;
+                const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
+                if (kycCached) {
+                    if (kycCached.kyc_type) b.kyc_type = kycCached.kyc_type;
+                    if (typeof kycCached.is_fully_verified === 'boolean') b.is_fully_verified = kycCached.is_fully_verified;
+                }
+                if (!b.kyc_type) b.kyc_type = 'national_id';
+                if (typeof b.is_fully_verified !== 'boolean') b.is_fully_verified = true;
+                delete b.kyc_document_url;
+                b.avatar_url = waseetSanitizeAvatarUrl(b.avatar_url, 'assets/default-avatar.png');
+
+                const key = (b.email || b.id || '').toLowerCase();
+                if (key) mergedMap.set(key, b);
+            });
+
+            cachedBrokers.forEach(b => {
+                if (b && b.is_active !== false && !isFakeBrokerRecord(b)) {
+                    const key = (b.email || b.id || '').toLowerCase();
+                    const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
+                    if (key) {
+                        if (!mergedMap.has(key)) {
+                            const cleanObj = {
+                                ...b,
+                                role: 'regional_broker',
+                                country: String(b.country || 'DZ').toUpperCase().trim(),
+                                avatar_url: waseetSanitizeAvatarUrl(b.avatar_url, 'assets/default-avatar.png'),
+                                kyc_type: (kycCached && kycCached.kyc_type) || b.kyc_type || 'national_id',
+                                is_fully_verified: (kycCached && typeof kycCached.is_fully_verified === 'boolean')
+                                    ? kycCached.is_fully_verified
+                                    : (typeof b.is_fully_verified === 'boolean' ? b.is_fully_verified : true)
+                            };
+                            delete cleanObj.kyc_document_url;
+                            if (!isFakeBrokerRecord(cleanObj)) {
+                                mergedMap.set(key, cleanObj);
+                            }
+                        } else {
+                            const existing = mergedMap.get(key);
+                            if (existing && (!existing.country || existing.country === 'DZ') && b.country && b.country !== 'DZ') {
+                                existing.country = String(b.country).toUpperCase().trim();
+                            }
+                            if (existing && kycCached) {
+                                if (kycCached.kyc_type) existing.kyc_type = kycCached.kyc_type;
+                                if (typeof kycCached.is_fully_verified === 'boolean') existing.is_fully_verified = kycCached.is_fully_verified;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const finalBrokers = Array.from(mergedMap.values()).filter(b => !isFakeBrokerRecord(b));
+            saveCachedRegionalBrokersList(finalBrokers);
+
+            // تحديث الكاش في الذاكرة ووقت الجلب
+            _waseetBrokersMemoryCache = finalBrokers;
+            _waseetBrokersLastFetchedAt = Date.now();
+
+            // إذا كان المستخدم الحالي وسيطاً معتمداً بالفعل، نقوم بمزامنة دولته المسندة في الجلسة الحالية
+            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && (WASEET_STATE.user.role === 'regional_broker' || WASEET_STATE.user.isBroker) && WASEET_STATE.user.role !== 'admin' && !WASEET_STATE.user.isAdmin) {
+                const curId = String(WASEET_STATE.user.id || '');
+                const curEmail = String(WASEET_STATE.user.email || '').toLowerCase().trim();
+                const myBrokerRecord = finalBrokers.find(b =>
+                    (b.id && curId && String(b.id) === curId) ||
+                    (b.email && curEmail && String(b.email).toLowerCase().trim() === curEmail)
+                );
+                if (myBrokerRecord && myBrokerRecord.country && WASEET_STATE.user.country !== myBrokerRecord.country) {
+                    WASEET_STATE.user.country = myBrokerRecord.country;
+                    if (typeof saveWaseetData === 'function') saveWaseetData();
+                    waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
+                }
+            }
+
+            console.log('[Regional Brokers] Total active regional brokers loaded:', finalBrokers.length);
+            return { ok: true, data: finalBrokers };
+        } catch (globalEx) {
+            console.warn('[Regional Brokers] Fetch Exception:', globalEx);
+            return { ok: false, data: getCachedRegionalBrokersList() };
+        } finally {
+            _waseetBrokersInFlightPromise = null;
         }
-    });
+    })();
 
-    const finalBrokers = Array.from(mergedMap.values()).filter(b => !isFakeBrokerRecord(b));
-    saveCachedRegionalBrokersList(finalBrokers);
-
-    // إذا كان المستخدم الحالي وسيطاً معتمداً بالفعل، نقوم بمزامنة دولته المسندة في الجلسة الحالية
-    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && (WASEET_STATE.user.role === 'regional_broker' || WASEET_STATE.user.isBroker) && WASEET_STATE.user.role !== 'admin' && !WASEET_STATE.user.isAdmin) {
-        const curId = String(WASEET_STATE.user.id || '');
-        const curEmail = String(WASEET_STATE.user.email || '').toLowerCase().trim();
-        const myBrokerRecord = finalBrokers.find(b =>
-            (b.id && curId && String(b.id) === curId) ||
-            (b.email && curEmail && String(b.email).toLowerCase().trim() === curEmail)
-        );
-        if (myBrokerRecord && myBrokerRecord.country && WASEET_STATE.user.country !== myBrokerRecord.country) {
-            WASEET_STATE.user.country = myBrokerRecord.country;
-            if (typeof saveWaseetData === 'function') saveWaseetData();
-            waseetApplyLiveRoleUpdateToUI(WASEET_STATE.user);
-        }
-    }
-
-    console.log('[Regional Brokers] Total active regional brokers loaded:', finalBrokers.length, finalBrokers);
-    return { ok: true, data: finalBrokers };
+    return _waseetBrokersInFlightPromise;
 }
 
 /**
@@ -4273,6 +4326,10 @@ async function waseetResolveCurrentUserCountry() {
     const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
     if (!currentUser || currentUser.isGuest || !currentUser.id) return '';
 
+    if (currentUser.country && typeof currentUser.country === 'string' && currentUser.country.trim().length === 2) {
+        return currentUser.country.toUpperCase().trim();
+    }
+
     // المصدر الموثوق: عمود profiles.country للمستخدم الحالي
     try {
         const client = initWaseetSupabase();
@@ -4282,8 +4339,8 @@ async function waseetResolveCurrentUserCountry() {
                 .select('country')
                 .eq('id', currentUser.id)
                 .maybeSingle();
-            if (!error) {
-                const dbCountry = (p && p.country) ? String(p.country).toUpperCase().trim() : '';
+            if (!error && p && p.country) {
+                const dbCountry = String(p.country).toUpperCase().trim();
                 currentUser.country = dbCountry;
                 return dbCountry;
             }
@@ -4298,28 +4355,33 @@ window.waseetResolveCurrentUserCountry = waseetResolveCurrentUserCountry;
 async function waseetFetchBrokerForCountry(userCountry) {
     const cleanCountry = String(userCountry || '').toUpperCase().trim();
     if (!cleanCountry) return null;
-    const client = initWaseetSupabase();
-    if (!client) return null;
 
-    const columnSets = ['id, name, avatar_url, role, country, kyc_type, is_fully_verified', 'id, name, avatar_url, role, country'];
-    // العرض العام أولاً (متاح لكل المستخدمين بدون كشف الأرصدة)، ثم جدول profiles كاحتياط
-    for (const source of ['public_profiles', 'profiles']) {
-        for (const columns of columnSets) {
+    // 1. استعلام محلي فوري من كاش الوسطاء المحفوظ لسرعة الأداء ومنع تكرار الطلبات
+    try {
+        const res = await waseetFetchRegionalBrokers();
+        const brokers = (res && Array.isArray(res.data)) ? res.data : getCachedRegionalBrokersList();
+        const match = brokers.find(b => b && b.is_active !== false && String(b.country || '').toUpperCase().trim() === cleanCountry);
+        if (match) return match;
+    } catch (e) {}
+
+    // 2. استعلام مباشر ومحدد من Supabase: role = 'regional_broker' AND country = user_country
+    const client = initWaseetSupabase();
+    if (client) {
+        for (const source of ['public_regional_brokers', 'public_profiles', 'regional_brokers']) {
             try {
                 const { data, error } = await client
                     .from(source)
-                    .select(columns)
+                    .select('id, name, avatar_url, role, country, kyc_type, is_fully_verified')
                     .eq('role', 'regional_broker')
                     .eq('country', cleanCountry)
                     .limit(1);
-                if (error) continue;
-                const row = Array.isArray(data) ? data[0] : null;
-                // تحقق مزدوج على مستوى العميل لضمان التطابق التام 100%
-                if (row && row.role === 'regional_broker' && String(row.country || '').toUpperCase().trim() === cleanCountry) {
-                    return row;
+                if (!error && Array.isArray(data) && data[0]) {
+                    const row = data[0];
+                    if (row.role === 'regional_broker' && String(row.country || '').toUpperCase().trim() === cleanCountry) {
+                        return row;
+                    }
                 }
-                return null;
-            } catch (e) {}
+            } catch (err) {}
         }
     }
     return null;
@@ -4331,6 +4393,7 @@ function waseetHideRegionalBrokerCard(container) {
     container.innerHTML = '';
     container.style.display = 'none';
     container.setAttribute('aria-hidden', 'true');
+    container.removeAttribute('data-rendered-broker');
     window._waseetLastRenderedDrawerBroker = null;
 }
 
@@ -4352,6 +4415,13 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
             waseetHideRegionalBrokerCard(container);
             return;
         }
+
+        const brokerIdentifier = activeBroker.id || activeBroker.email || String(activeBroker.country || '').toUpperCase().trim();
+        // تجنب إعادة بناء الـ DOM إذا كانت البطاقة معروضة بالفعل لنفس الوسيط
+        if (container.getAttribute('data-rendered-broker') === String(brokerIdentifier) && container.children.length > 0) {
+            return;
+        }
+        container.setAttribute('data-rendered-broker', String(brokerIdentifier));
         container.style.display = '';
         container.removeAttribute('aria-hidden');
 
@@ -4365,14 +4435,10 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
         const countryName = countryNamesMap[countryCode] || countryCode;
         const flagSvg = (countryCode === 'DZ') ? 'assets/flags/dz.svg' : `assets/flags/${countryCode.toLowerCase()}.svg`;
         const brokerName = activeBroker.name || (activeBroker.email ? activeBroker.email.split('@')[0] : 'وسيط معتمد');
-        let avatarUrl = activeBroker.avatar_url || 'assets/logo.png';
-        if (avatarUrl.includes('#waseet_broker=')) {
-            avatarUrl = avatarUrl.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
-        }
+        const avatarUrl = waseetSanitizeAvatarUrl(activeBroker.avatar_url, 'assets/default-avatar.png');
 
         const isFullyVerified = activeBroker.is_fully_verified === true;
         const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(activeBroker.kyc_type || 'national_id') : 'بطاقة وطنية';
-        const brokerIdentifier = activeBroker.id || activeBroker.email || countryCode;
 
         // حفظ نسخة من الوسيط النشط للوصول السريع عند فتح نافذة الملف التعريفي
         window._waseetLastRenderedDrawerBroker = {
@@ -4392,7 +4458,7 @@ async function waseetRenderRegionalBrokerCard(targetElOrId, options = {}) {
                  onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.waseetOpenBrokerProfileModal('${escapeHtmlSafe(brokerIdentifier)}');}"
                  title="اضغط لعرض الملف التعريفي وتفاصيل التوثيق للوسيط: ${escapeHtmlSafe(brokerName)} (${escapeHtmlSafe(countryName)})">
                 <div class="broker-avatar-wrap">
-                    <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="broker-avatar-img" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                    <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="broker-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/default-avatar.png';">
                     <span class="broker-avatar-badge ${isFullyVerified ? 'is-kyc-verified' : ''}" title="${isFullyVerified ? 'موثق بالكامل (' + escapeHtmlSafe(kycShort) + ')' : 'وسيط معتمد'}">
                         <i class="fas ${isFullyVerified ? 'fa-check-circle' : 'fa-shield-alt'}"></i>
                     </span>
@@ -4469,10 +4535,7 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
             const countryName = countryNamesMap[countryCode] || countryCode;
             const flagSvg = (countryCode === 'DZ') ? 'assets/flags/dz.svg' : `assets/flags/${countryCode.toLowerCase()}.svg`;
             const brokerName = broker.name || (broker.email ? broker.email.split('@')[0] : 'وسيط معتمد');
-            let avatarUrl = broker.avatar_url || 'assets/logo.png';
-            if (avatarUrl.includes('#waseet_broker=')) {
-                avatarUrl = avatarUrl.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
-            }
+            const avatarUrl = waseetSanitizeAvatarUrl(broker.avatar_url, 'assets/default-avatar.png');
 
             const isFullyVerified = broker.is_fully_verified !== false;
             const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(broker.kyc_type || 'national_id') : 'بطاقة وطنية';
@@ -4490,7 +4553,7 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
                     <div class="global-broker-card-glow"></div>
                     <div class="global-broker-header">
                         <div class="global-broker-avatar-wrap">
-                            <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="global-broker-avatar" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                            <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="global-broker-avatar" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/default-avatar.png';">
                             <span class="global-broker-online-dot ${isOnline ? 'online' : 'offline'}" title="${isOnline ? 'متصل الآن وجاهز للوساطة' : 'غير متصل حالياً'}"></span>
                         </div>
                         <div class="global-broker-country-badge">
@@ -4611,10 +4674,7 @@ async function waseetFetchBrokerPublicProfile(brokerIdOrHint) {
         finalVerified = baseBroker.is_fully_verified;
     }
 
-    let cleanAvatar = (rpcData && rpcData.avatar_url) || (baseBroker && baseBroker.avatar_url) || 'assets/logo.png';
-    if (cleanAvatar.includes('#waseet_broker=')) {
-        cleanAvatar = cleanAvatar.replace(/#waseet_broker=[A-Za-z]{2,6}/gi, '');
-    }
+    let cleanAvatar = waseetSanitizeAvatarUrl((rpcData && rpcData.avatar_url) || (baseBroker && baseBroker.avatar_url), 'assets/default-avatar.png');
 
     const countryCode = String(
         (baseBroker && baseBroker.country) ||
@@ -4708,7 +4768,7 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
 
         const escapeHtmlSafe = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const safeName = escapeHtmlSafe(profile.name || 'الوسيط الإقليمي المعتمد');
-        const safeAvatar = escapeHtmlSafe(profile.avatar_url || 'assets/logo.png');
+        const safeAvatar = escapeHtmlSafe(waseetSanitizeAvatarUrl(profile.avatar_url, 'assets/default-avatar.png'));
         const safeKycText = escapeHtmlSafe(profile.kyc_type_label || 'بطاقة وطنية (National ID)');
         const safeKycShort = escapeHtmlSafe(profile.kyc_type_short || 'بطاقة وطنية');
         const ratingFormatted = Number(profile.rating || 0.0).toFixed(1);
@@ -4730,7 +4790,7 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
                 <!-- رأس البطاقة: صورة الوسيط + حالة الاتصال + الاسم + علم الدولة -->
                 <div class="broker-profile-header">
                     <div class="broker-profile-avatar-ring ${isFullyVerified ? 'is-verified-ring' : ''}">
-                        <img src="${safeAvatar}" alt="${safeName}" class="broker-profile-avatar-img" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                        <img src="${safeAvatar}" alt="${safeName}" class="broker-profile-avatar-img" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='assets/default-avatar.png';">
                         <span class="broker-online-dot ${isOnline ? 'online' : 'offline'}" title="${isOnline ? 'متصل الآن' : 'غير متصل'}"></span>
                     </div>
 
@@ -5517,9 +5577,15 @@ function waseetInitLiveRoleAndSessionSync() {
                 }
             } catch (e) {}
         } else if (event.key === 'WASEET_REGIONAL_BROKERS_CACHE') {
-            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && !WASEET_STATE.user.isGuest) {
-                waseetSyncAuthState({ force: true, profileOnly: true });
-            }
+            // تحديث الذاكرة المحلية فقط دون إعادة استدعاء waseetSyncAuthState لمنع حلقة التكرار بين التبويبات
+            try {
+                if (event.newValue && typeof WASEET_STATE !== 'undefined') {
+                    const parsed = JSON.parse(event.newValue);
+                    if (Array.isArray(parsed)) {
+                        WASEET_STATE.brokers = parsed;
+                    }
+                }
+            } catch (e) {}
         }
     });
 

@@ -52,6 +52,7 @@ $adminChatsHtml = Get-Content 'D:\waseet-app\admin-chats.html' -Raw -Encoding UT
 $adminBrokersHtml = Get-Content 'D:\waseet-app\admin-brokers.html' -Raw -Encoding UTF8
 $contactSupportHtml = Get-Content 'D:\waseet-app\contact-support.html' -Raw -Encoding UTF8
 $profileHtml = Get-Content 'D:\waseet-app\profile.html' -Raw -Encoding UTF8
+$navbarJs = if (Test-Path 'D:\waseet-app\js\navbar.js') { Get-Content 'D:\waseet-app\js\navbar.js' -Raw -Encoding UTF8 } else { "" }
 $vercelJson = Get-Content 'D:\waseet-app\vercel.json' -Raw -Encoding UTF8
 $sitemapXml = Get-Content 'D:\waseet-app\sitemap.xml' -Raw -Encoding UTF8
 $robotsTxt = Get-Content 'D:\waseet-app\robots.txt' -Raw -Encoding UTF8
@@ -384,10 +385,58 @@ $clientLeaderboardParity = $supabaseJs.Contains('waseetFetchTopSellingSellers') 
 Check-Result -Flow 'Enterprise Architecture' -Name 'Top Selling Sellers Leaderboard UI & Client Integration' -Success $clientLeaderboardParity -Detail 'Client fetches top stores, renders dynamic ranking cards and listens to realtime sales'
 
 Write-Host ""
-Write-Host ">>> 12. FLOW 12: MULTI-ROLE HEADLESS RUNTIME SIMULATION" -ForegroundColor Yellow
-$simResult = Start-Process -FilePath "agy-node" -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
+Write-Host ">>> 12. FLOW 12: BROKER SECURE KYC VERIFICATION & DOCUMENT VAULT (MIGRATION 27)" -ForegroundColor Yellow
+$mig27File = Test-Path 'D:\waseet-app\supabase\27_broker_kyc_verification.sql'
+$mig27Content = if ($mig27File) { Get-Content 'D:\waseet-app\supabase\27_broker_kyc_verification.sql' -Raw -Encoding UTF8 } else { "" }
+$mig27KycParity = $mig27File -and $mig27Content.Contains('tr_guard_profile_kyc_fields') -and $mig27Content.Contains('admin_set_broker_kyc') -and $mig27Content.Contains('is_fully_verified')
+Check-Result -Flow 'KYC Verification' -Name 'Supabase Migration 27 Broker KYC Vault & RLS Guard' -Success $mig27KycParity -Detail 'Database triggers block unauthorized profile KYC tampering and enable admin verification'
+
+$brokerKycUi = $adminBrokersHtml.Contains('modal-broker-kyc') -and $adminBrokersHtml.Contains('openBrokerKycModal') -and $adminBrokersHtml.Contains('handleSaveBrokerKyc')
+Check-Result -Flow 'KYC Verification' -Name 'Admin Broker KYC Management Modal & Verification Flow' -Success $brokerKycUi -Detail 'Admin interface enables reviewing KYC documents, updating document status and setting verification badge'
+
+$supabaseKycParity = $supabaseJs.Contains('admin_set_broker_kyc') -and $supabaseJs.Contains('waseetAdminSaveBrokerKyc')
+Check-Result -Flow 'KYC Verification' -Name 'Client waseetAdminSaveBrokerKyc RPC & Fallback Integration' -Success $supabaseKycParity -Detail 'waseetAdminSaveBrokerKyc dispatches RPC admin_set_broker_kyc with resilient table fallback'
+
+$kycPrivacyParity = $mig27Content.Contains('CREATE OR REPLACE VIEW public.public_profiles') -and $supabaseJs.Contains('get_broker_public_profile')
+Check-Result -Flow 'KYC Verification' -Name 'KYC Official Document Privacy Shield' -Success $kycPrivacyParity -Detail 'Public profile view and RPC hide private identity document URLs from non-admin visitors'
+
+Write-Host ""
+Write-Host ">>> 13. FLOW 13: DYNAMIC BROKER RATING & CREDENTIALS VAULT (MIGRATION 28)" -ForegroundColor Yellow
+$mig28File = Test-Path 'D:\waseet-app\supabase\28_broker_reviews_and_dynamic_rating.sql'
+$mig28Content = if ($mig28File) { Get-Content 'D:\waseet-app\supabase\28_broker_reviews_and_dynamic_rating.sql' -Raw -Encoding UTF8 } else { "" }
+$mig28Parity = $mig28File -and $mig28Content.Contains('submit_broker_review') -and $mig28Content.Contains('delete_marketplace_account') -and $mig28Content.Contains('get_broker_rating_stats')
+Check-Result -Flow 'Dynamic Rating' -Name 'Supabase Migration 28 Dynamic Rating & Account Deletion RPC' -Success $mig28Parity -Detail 'submit_broker_review, get_broker_rating_stats, and permanent account deletion RPCs active'
+
+$creds4Field = $myAccountsHtml.Contains('p-modal-rec-email') -and $myAccountsHtml.Contains('p-modal-rec-pwd') -and $escrowJs.Contains('modal-buyer-rec-email') -and $escrowJs.Contains('modal-buyer-rec-pwd')
+Check-Result -Flow 'Credentials Vault' -Name 'Four-Field Comprehensive Credentials Model' -Success $creds4Field -Detail 'Supports primary email/pwd and recovery email/pwd across listing, escrow, and delivery'
+
+$brokerReviewClient = $supabaseJs.Contains('waseetSubmitBrokerReview') -and $supabaseJs.Contains('waseetGetBrokerRatingStats') -and $supabaseJs.Contains('waseetOpenBrokerReviewModal')
+Check-Result -Flow 'Dynamic Rating' -Name 'Broker Review Post-Deal Dialog & Realtime Stats' -Success $brokerReviewClient -Detail 'Post-completion rating dialog and live recalculation starting from 0 verified'
+
+$deleteRpcClient = $supabaseJs.Contains('waseetDeleteMarketplaceAccount') -and $supabaseJs.Contains("client.rpc('delete_marketplace_account'") -and $myAccountsHtml.Contains('waseetDeleteMarketplaceAccount')
+Check-Result -Flow 'Account Lifecycle' -Name 'Client Permanent Account Deletion RPC & State Purge' -Success $deleteRpcClient -Detail 'waseetDeleteMarketplaceAccount invokes delete_marketplace_account RPC and eradicates ghost listings'
+
+Write-Host ""
+Write-Host ">>> 14. FLOW 14: AVATARS STORAGE, PROFILE EDITING & UI LIBRARIES (MIGRATIONS 29 & 30)" -ForegroundColor Yellow
+$mig29File = Test-Path 'D:\waseet-app\supabase\29_avatars_storage_and_profile_editing.sql'
+$mig30File = Test-Path 'D:\waseet-app\supabase\30_fix_avatars_storage_and_public_permissions.sql'
+$mig29Content = if ($mig29File) { Get-Content 'D:\waseet-app\supabase\29_avatars_storage_and_profile_editing.sql' -Raw -Encoding UTF8 } else { "" }
+$mig30Content = if ($mig30File) { Get-Content 'D:\waseet-app\supabase\30_fix_avatars_storage_and_public_permissions.sql' -Raw -Encoding UTF8 } else { "" }
+$avatarsStorageParity = $mig29File -and $mig30File -and $mig30Content.Contains('avatars_public_select') -and $mig30Content.Contains('avatars_authenticated_insert')
+Check-Result -Flow 'Avatars Storage' -Name 'Supabase Migrations 29 & 30 Avatars Bucket & Public RLS' -Success $avatarsStorageParity -Detail 'Avatars bucket created with public SELECT permissions and authenticated user uploads'
+
+$profileAvatarUpload = $supabaseJs.Contains('waseetUploadProfileAvatar') -and $supabaseJs.Contains('waseetUpdateProfileName') -and $profileHtml.Contains('handleAvatarFileSelect')
+Check-Result -Flow 'Profile Experience' -Name 'Client Profile Avatar Upload & Name Editing Pipeline' -Success $profileAvatarUpload -Detail 'Realtime avatar file upload with storage bucket and base64 resilient fallback'
+
+$uiLibrariesParity = $css.Contains('.animata-glow-card') -and $css.Contains('.skiper-bento-grid') -and $css.Contains('.vengeance-stat-card') -and $css.Contains('.animata-shimmer-btn')
+Check-Result -Flow 'UI Design System' -Name 'Luxury UI Libraries Integration (Animata, Skiper, Vengeance)' -Success $uiLibrariesParity -Detail 'Bento grid, animated glow cards, vengeance stat cards, and shimmer buttons active'
+
+Write-Host ""
+Write-Host ">>> 15. FLOW 15: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE)" -ForegroundColor Yellow
+$nodeCmd = if (Get-Command "agy-node" -ErrorAction SilentlyContinue) { "agy-node" } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { "node" } else { "agy-node" }
+$simResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, and regional broker journeys in Node runtime'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, and storage journeys in Node runtime'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

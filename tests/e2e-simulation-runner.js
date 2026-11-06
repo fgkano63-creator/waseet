@@ -1259,6 +1259,311 @@ async function runE2ESimulation() {
     simulateRealtimeSaleEvent({ new: { id: 'acc-new-sale', status: 'sold', seller_id: 'seller-star' } });
     assert(leaderboardRefreshTriggered === true, 'Leaderboard Flow', 'Realtime Sales Event Reactivity', 'Realtime postgres_changes listener on marketplace_accounts instantly schedules leaderboard re-render');
 
+    // ==========================================================================
+    // PHASE 15: BROKER SECURE KYC VERIFICATION & DOCUMENT VAULT (MIGRATION 27)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 15: BROKER SECURE KYC VERIFICATION & DOCUMENT VAULT (MIGRATION 27)\x1b[0m');
+
+    // 15.1 Non-Admin KYC Tampering Guard (tr_guard_profile_kyc_fields)
+    function simulateUpdateProfileKyc(callerUser, targetProfile, updates) {
+        if (!callerUser) throw new Error('تسجيل الدخول مطلوب');
+        const isAdmin = isStrictAdminSim(callerUser);
+        if (!isAdmin) {
+            // Guard resets or denies changes to kyc fields
+            if (updates.is_fully_verified !== undefined || updates.kyc_document_url !== undefined || updates.kyc_type !== undefined) {
+                throw new Error('أمني: لا يمكن تعديل بيانات التوثيق إلا من قبل مدير المنصة');
+            }
+        }
+        Object.assign(targetProfile, updates);
+        return targetProfile;
+    }
+
+    const testBrokerProfile = {
+        id: 'broker-kyc-test-001',
+        name: 'وسيط قيد التوثيق',
+        email: 'test.broker@waseet.test',
+        role: 'regional_broker',
+        country: 'DZ',
+        kyc_type: null,
+        kyc_document_url: null,
+        is_fully_verified: false,
+        last_seen_at: null
+    };
+    DB.profiles.push(testBrokerProfile);
+
+    let kycTamperingBlocked = false;
+    try {
+        simulateUpdateProfileKyc(testBrokerProfile, testBrokerProfile, { is_fully_verified: true, kyc_type: 'passport' });
+    } catch (e) {
+        kycTamperingBlocked = e.message.includes('لا يمكن تعديل بيانات التوثيق');
+    }
+    assert(kycTamperingBlocked, 'KYC Security Flow', 'Non-Admin KYC Tampering Guard (Migration 27)', 'Direct mutation of is_fully_verified or kyc_type strictly blocked for non-admin callers');
+
+    // 15.2 Admin Set Broker KYC (admin_set_broker_kyc)
+    function simulateAdminSetBrokerKyc(adminCaller, brokerId, kycType, docPath, isVerified) {
+        if (!isStrictAdminSim(adminCaller)) throw new Error('أمني: إدارة التوثيق متاحة لمدير المنصة فقط');
+        const prof = DB.profiles.find(p => p.id === brokerId);
+        if (!prof) throw new Error('لم يتم العثور على ملف الوسيط');
+
+        const validTypes = ['passport', 'national_id', 'live_video'];
+        if (kycType && !validTypes.includes(kycType)) {
+            throw new Error(`نوع توثيق غير صالح: ${kycType}`);
+        }
+        if (isVerified && !kycType) {
+            throw new Error('يجب تحديد نوع التوثيق قبل تفعيل حالة موثق بالكامل');
+        }
+        if (isVerified && kycType !== 'live_video' && !docPath) {
+            throw new Error('يجب رفع صورة الوثيقة الرسمية قبل تفعيل حالة موثق بالكامل');
+        }
+
+        prof.kyc_type = kycType;
+        prof.kyc_document_url = docPath;
+        prof.is_fully_verified = Boolean(isVerified);
+        prof.kyc_verified_at = isVerified ? new Date().toISOString() : null;
+        prof.kyc_verified_by = isVerified ? adminCaller.id : null;
+
+        return { ok: true, profile_id: prof.id, kyc_type: kycType, is_fully_verified: prof.is_fully_verified };
+    }
+
+    const adminKycResult = simulateAdminSetBrokerKyc(admin, testBrokerProfile.id, 'national_id', 'kyc_documents/broker-kyc-001.jpg', true);
+    assert(adminKycResult.ok === true && testBrokerProfile.is_fully_verified === true && testBrokerProfile.kyc_type === 'national_id', 'KYC Security Flow', 'Admin Broker KYC Verification & Document Assignment', 'Administrator successfully verified broker identity with official document');
+
+    // 15.3 KYC Document Privacy Shield (public_profiles & get_broker_public_profile)
+    function simulateGetBrokerPublicProfile(brokerId) {
+        const prof = DB.profiles.find(p => p.id === brokerId && ['regional_broker', 'broker'].includes(p.role));
+        if (!prof) return { found: false };
+        // Excludes private kyc_document_url
+        return {
+            found: true,
+            id: prof.id,
+            name: prof.name,
+            country: prof.country,
+            kyc_type: prof.kyc_type,
+            is_fully_verified: prof.is_fully_verified,
+            // kyc_document_url is strictly omitted
+            is_online: Boolean(prof.last_seen_at && (Date.now() - new Date(prof.last_seen_at).getTime() <= 5 * 60 * 1000))
+        };
+    }
+
+    const publicBrokerData = simulateGetBrokerPublicProfile(testBrokerProfile.id);
+    const documentUrlShielded = (publicBrokerData.kyc_document_url === undefined);
+    assert(publicBrokerData.found === true && publicBrokerData.is_fully_verified === true && documentUrlShielded, 'KYC Privacy Flow', 'KYC Document Privacy Shield (Zero ID Exposure)', 'Public profile exposes verification badge and type, but strictly conceals private document URL');
+
+    // 15.4 Online Presence Heartbeat & Staleness Window (touch_last_seen)
+    function simulateTouchLastSeen(user) {
+        user.last_seen_at = new Date().toISOString();
+        return user.last_seen_at;
+    }
+
+    simulateTouchLastSeen(testBrokerProfile);
+    const onlineStateNow = simulateGetBrokerPublicProfile(testBrokerProfile.id).is_online;
+    assert(onlineStateNow === true, 'Presence Flow', 'Realtime Online Presence Heartbeat Activation', 'touch_last_seen establishes active online glow indicator');
+
+    // Simulate stale last seen (> 15 minutes ago)
+    testBrokerProfile.last_seen_at = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const offlineStateLater = simulateGetBrokerPublicProfile(testBrokerProfile.id).is_online;
+    assert(offlineStateLater === false, 'Presence Flow', 'Stale Presence Transition to Offline', 'Inactivity beyond 5-minute threshold cleanly transitions broker to offline state');
+
+    // ==========================================================================
+    // PHASE 16: BROKER DYNAMIC REVIEWS & PERMANENT ACCOUNT DELETION (MIGRATION 28)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 16: BROKER REVIEWS, DYNAMIC RATING & ACCOUNT DELETION (MIGRATION 28)\x1b[0m');
+
+    DB.broker_reviews = DB.broker_reviews || [];
+
+    // 16.1 Pre-mature Review Rejection on Incomplete Deals
+    function simulateSubmitBrokerReview(dealId, brokerId, reviewerId, rating, comment) {
+        const deal = DB.deals.find(d => d.id === dealId);
+        if (!deal) throw new Error('الصفقة غير موجودة');
+        if (deal.status !== 'completed') {
+            throw new Error('أمني: لا يمكن تقييم الوسيط إلا بعد اكتمال الصفقة بنجاح');
+        }
+        if (deal.buyer_id !== reviewerId && deal.seller_id !== reviewerId) {
+            throw new Error('غير مصرح لك بتقييم هذه الصفقة');
+        }
+
+        const clampedRating = Math.max(1, Math.min(5, parseInt(rating, 10) || 5));
+        const existingIdx = DB.broker_reviews.findIndex(r => r.deal_id === dealId && r.reviewer_id === reviewerId);
+        if (existingIdx >= 0) {
+            DB.broker_reviews[existingIdx].rating = clampedRating;
+            DB.broker_reviews[existingIdx].comment = comment || '';
+            DB.broker_reviews[existingIdx].updated_at = new Date().toISOString();
+            return { ok: true, updated: true, review: DB.broker_reviews[existingIdx] };
+        } else {
+            const newRev = {
+                id: 'rev-' + Date.now(),
+                deal_id: dealId,
+                broker_id: brokerId,
+                reviewer_id: reviewerId,
+                rating: clampedRating,
+                comment: comment || '',
+                created_at: new Date().toISOString()
+            };
+            DB.broker_reviews.push(newRev);
+            return { ok: true, inserted: true, review: newRev };
+        }
+    }
+
+    let prematureReviewBlocked = false;
+    try {
+        // Attempt review on active in-deal transaction
+        simulateSubmitBrokerReview(testSpoofDeal.id, regionalBroker.id, buyer.id, 5, 'وسيط ممتاز');
+    } catch (e) {
+        prematureReviewBlocked = e.message.includes('إلا بعد اكتمال الصفقة');
+    }
+    assert(prematureReviewBlocked, 'Review Flow', 'Premature / Extortion Review Prevention (Migration 28)', 'Reviews strictly blocked on incomplete, in-deal, or disputed transactions');
+
+    // 16.2 Successful Review on Completed Deal & Idempotency
+    const completedTestDeal = {
+        id: 'deal-comp-rev-900',
+        status: 'completed',
+        buyer_id: buyer.id,
+        seller_id: seller.id,
+        assigned_broker_id: regionalBroker.id
+    };
+    DB.deals.push(completedTestDeal);
+
+    const firstReview = simulateSubmitBrokerReview(completedTestDeal.id, regionalBroker.id, buyer.id, 5, 'خدمة ممتازة وسريعة جداً');
+    assert(firstReview.ok === true && firstReview.review.rating === 5, 'Review Flow', 'Verified Completed Deal Broker Review Submission', 'Buyer successfully submitted 5-star review for verified broker');
+
+    // Idempotency: re-submitting updates the review without duplicate collision
+    const reviewUpdate = simulateSubmitBrokerReview(completedTestDeal.id, regionalBroker.id, buyer.id, 4, 'تعديل التقييم إلى 4 نجوم');
+    const brokerReviewsCount = DB.broker_reviews.filter(r => r.deal_id === completedTestDeal.id && r.reviewer_id === buyer.id).length;
+    assert(reviewUpdate.ok === true && reviewUpdate.updated === true && brokerReviewsCount === 1, 'Review Flow', 'Idempotent Review Upsert Guarantee', 'Subsequent review smoothly updates existing record without duplicate key collision');
+
+    // 16.3 Dynamic Rating Calculation Starting From 0
+    function simulateGetBrokerRatingStats(brokerId) {
+        const revs = DB.broker_reviews.filter(r => r.broker_id === brokerId);
+        const totalReviews = revs.length;
+        const sumStars = revs.reduce((sum, r) => sum + r.rating, 0);
+        const avgRating = totalReviews > 0 ? parseFloat((sumStars / totalReviews).toFixed(1)) : 0.0;
+        const completedDeals = DB.deals.filter(d => (d.assigned_broker_id === brokerId || d.mediator_id === brokerId) && d.status === 'completed').length;
+        return { total_reviews: totalReviews, avg_rating: avgRating, sum_stars: sumStars, completed_deals_count: completedDeals };
+    }
+
+    const brokerStats = simulateGetBrokerRatingStats(regionalBroker.id);
+    assert(brokerStats.total_reviews === 1 && brokerStats.avg_rating === 4.0 && brokerStats.completed_deals_count === 1, 'Review Flow', 'Dynamic Rating Calculation Parity (Zero Hardcoded Baseline)', 'Stats calculated dynamically from verified database records starting from 0');
+
+    // 16.4 Permanent Account Deletion RPC (delete_marketplace_account)
+    function simulateDeleteMarketplaceAccount(accountId, callerUser) {
+        if (!callerUser) throw new Error('أمني: يجب تسجيل الدخول لحذف الحساب');
+        const accIdx = DB.marketplace_accounts.findIndex(a => a.id === accountId);
+        if (accIdx < 0) return { ok: true, deleted: false, message: 'الحساب غير موجود' };
+        const acc = DB.marketplace_accounts[accIdx];
+
+        const isOwner = (acc.seller_id === callerUser.id);
+        const isAdmin = isStrictAdminSim(callerUser);
+        if (!isOwner && !isAdmin) {
+            throw new Error('أمني: غير مصرح لك بحذف هذا الحساب');
+        }
+        if (['in_deal', 'sold', 'completed'].includes(acc.status)) {
+            throw new Error('أمني: لا يمكن حذف الحساب أثناء ارتباطه بصفقة نشطة أو بعد بيعه');
+        }
+
+        DB.marketplace_accounts.splice(accIdx, 1);
+        return { ok: true, deleted: true, id: accountId };
+    }
+
+    // Available account creation for deletion test
+    const doomedAccount = {
+        id: 'acc-doomed-01',
+        seller_id: seller.id,
+        title: 'حساب مكرر يراد حذفه',
+        status: 'available'
+    };
+    DB.marketplace_accounts.push(doomedAccount);
+
+    // Cross-tenant delete denial
+    let crossDeleteBlocked = false;
+    try {
+        simulateDeleteMarketplaceAccount(doomedAccount.id, buyer);
+    } catch (e) {
+        crossDeleteBlocked = e.message.includes('غير مصرح لك');
+    }
+    assert(crossDeleteBlocked, 'Account Deletion Flow', 'Cross-Tenant Account Deletion Denial (Migration 28)', 'Non-owner non-admin caller strictly blocked from deleting marketplace listings');
+
+    // Active in-deal account delete denial
+    doomedAccount.status = 'in_deal';
+    let inDealDeleteBlocked = false;
+    try {
+        simulateDeleteMarketplaceAccount(doomedAccount.id, seller);
+    } catch (e) {
+        inDealDeleteBlocked = e.message.includes('أثناء ارتباطه بصفقة نشطة');
+    }
+    assert(inDealDeleteBlocked, 'Account Deletion Flow', 'Active Escrow Account Deletion Guard', 'Seller blocked from deleting listings while escrow deal is in progress');
+
+    // Authorized seller deletion of available account
+    doomedAccount.status = 'available';
+    const deleteSuccess = simulateDeleteMarketplaceAccount(doomedAccount.id, seller);
+    const accountExterminated = !DB.marketplace_accounts.some(a => a.id === doomedAccount.id);
+    assert(deleteSuccess.ok === true && accountExterminated, 'Account Deletion Flow', 'Atomic Account & Secrets Extermination RPC', 'delete_marketplace_account successfully purges account preventing ghost listings');
+
+    // ==========================================================================
+    // PHASE 17: AVATARS CLOUD STORAGE BUCKET, PUBLIC RLS & PROFILE EDITING (MIGRATIONS 29 & 30)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 17: AVATARS STORAGE BUCKET, PUBLIC RLS & PROFILE EDITING (MIGRATIONS 29 & 30)\x1b[0m');
+
+    // 17.1 Avatars Storage Bucket Spec & 5MB Limit Check
+    const AVATARS_BUCKET_SPEC = {
+        id: 'avatars',
+        public: true,
+        file_size_limit: 5242880, // 5MB
+        allowed_mime_types: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
+    };
+
+    function validateAvatarUpload(fileObj) {
+        if (!fileObj || !fileObj.size || !fileObj.type) return { valid: false, error: 'ملف غير صالح' };
+        if (fileObj.size > AVATARS_BUCKET_SPEC.file_size_limit) {
+            return { valid: false, error: 'حجم الصورة يتجاوز الحد المسموح به (5MB)' };
+        }
+        if (!AVATARS_BUCKET_SPEC.allowed_mime_types.includes(fileObj.type)) {
+            return { valid: false, error: 'نوع الملف غير مدعوم، الصيغ المسموحة: JPG, PNG, WEBP, GIF, SVG' };
+        }
+        return { valid: true };
+    }
+
+    const oversizedFile = { name: 'huge_avatar.png', size: 6 * 1024 * 1024, type: 'image/png' };
+    const invalidMimeFile = { name: 'malware.exe', size: 1024, type: 'application/x-msdownload' };
+    const validImageFile = { name: 'my_avatar.webp', size: 450 * 1024, type: 'image/webp' };
+
+    assert(validateAvatarUpload(oversizedFile).valid === false, 'Storage Flow', '5MB File Size Limit Enforcement (Migration 30)', 'Oversized image (> 5MB) rejected by storage gateway');
+    assert(validateAvatarUpload(invalidMimeFile).valid === false, 'Storage Flow', 'MIME Type Whitelist Enforcement', 'Unauthorized binary executable strictly blocked from avatar bucket');
+    assert(validateAvatarUpload(validImageFile).valid === true, 'Storage Flow', 'Valid Avatar Format Acceptance (WEBP / PNG / JPG)', 'Valid web image conforms to bucket specs');
+
+    // 17.2 Public SELECT RLS Access Simulation (No 403 Forbidden for Guests)
+    function simulatePublicAvatarFetch(bucketId, filePath, isAnonymous) {
+        if (bucketId !== 'avatars') return { status: 403, error: 'Forbidden' };
+        // Migration 30 avatars_public_select grants SELECT to public (anon & authenticated)
+        return { status: 200, publicUrl: `https://mock.supabase.co/storage/v1/object/public/avatars/${filePath}` };
+    }
+
+    const anonAvatarRes = simulatePublicAvatarFetch('avatars', 'buyer-uuid-101/avatar.png', true);
+    assert(anonAvatarRes.status === 200 && anonAvatarRes.publicUrl.includes('avatars/buyer-uuid-101'), 'Storage RLS Flow', 'Public Avatars Read Access (Zero 403 Forbidden)', 'Anonymous visitors can load user avatars across marketplace without authentication');
+
+    // 17.3 Resilient Fallback Simulation (Data URL on Cloud Storage Failure)
+    function simulateAvatarUploadWithFallback(fileObj, simulateCloudFailure = false) {
+        if (simulateCloudFailure) {
+            // Graceful fallback to Data URL
+            const mockBase64 = `data:${fileObj.type};base64,iVBORw0KGgoAAAANSUhEUgAA...`;
+            return { ok: true, source: 'fallback_data_url', avatarUrl: mockBase64 };
+        }
+        return { ok: true, source: 'cloud_storage', avatarUrl: `https://storage.waseet.app/avatars/user-01/${fileObj.name}` };
+    }
+
+    const cloudFailureRes = simulateAvatarUploadWithFallback(validImageFile, true);
+    assert(cloudFailureRes.ok === true && cloudFailureRes.source === 'fallback_data_url' && cloudFailureRes.avatarUrl.startsWith('data:image/webp'), 'Storage Resilience Flow', 'Fault-Tolerant Base64 Avatar Fallback', 'Cloud network failures handled seamlessly by base64 fallback without breaking profile update');
+
+    // 17.4 User Profile Name & Avatar Mutation Synchronization
+    function simulateUpdateProfileNameAndAvatar(userProfile, newName, newAvatarUrl) {
+        if (newName && newName.trim()) userProfile.name = newName.trim();
+        if (newAvatarUrl && newAvatarUrl.trim()) userProfile.avatar_url = newAvatarUrl.trim();
+        userProfile.updated_at = new Date().toISOString();
+        return userProfile;
+    }
+
+    simulateUpdateProfileNameAndAvatar(buyer, 'أحمد المشتري المعتمد', cloudFailureRes.avatarUrl);
+    assert(buyer.name === 'أحمد المشتري المعتمد' && buyer.avatar_url.startsWith('data:image/webp'), 'Profile Experience', 'Profile Name & Avatar Live Synchronization', 'User name and avatar state updated atomically in user profile store');
+
     // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------

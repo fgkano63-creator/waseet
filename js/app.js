@@ -120,9 +120,7 @@ class WaseetApp {
                 `;
             }).join('');
 
-            if (typeof waseetRenderGlobalBrokersSection === 'function') {
-                waseetRenderGlobalBrokersSection();
-            }
+            // يتم استدعاء waseetRenderGlobalBrokersSection تلقائياً من خلال WaseetApp.init() لمنع التكرار
         } catch (err) {
             console.error('[Store Brokers] Error loading regional brokers:', err);
         }

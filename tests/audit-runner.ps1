@@ -228,12 +228,13 @@ $scannedFiles = Get-ChildItem -Path "D:\waseet-app" -Recurse | Where-Object {
     -not $_.PSIsContainer -and 
     $_.FullName -notmatch '\\\.git\\' -and 
     $_.FullName -notmatch '\\assets\\' -and
+    $_.FullName -notmatch '\\vendor-ui\\' -and
     $_.Name -ne "supabase.min.js"
 }
 
 $secretMatchesFound = 0
 foreach ($f in $scannedFiles) {
-    $content = Get-Content $f.FullName -Raw -Encoding UTF8
+    $content = Get-Content -LiteralPath $f.FullName -Raw -Encoding UTF8
     foreach ($p in $secretPatterns) {
         if ($content -match $p.Regex) {
             $secretMatchesFound++
