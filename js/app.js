@@ -254,9 +254,9 @@ class WaseetApp {
                 : '';
 
             const safeName = this.escapeHtml(user.name);
-            // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي فقط بدون الاسم بجانبها
+            // استبدال زر تسجيل الدخول بعنصر صورة دائرية للملف الشخصي يوجه مباشرة لصفحة الملف الشخصي
             container.innerHTML = `
-                <div class="user-profile-pill" onclick="window.waseetApp.openLoginModal()" title="${safeName} - انقر لإدارة الحساب أو تسجيل الخروج">
+                <div class="user-profile-pill" onclick="window.location.href='profile.html'" role="button" title="${safeName} - عرض الملف الشخصي وإعدادات الحساب">
                     <img src="${avatarUrl}" alt="${safeName}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                 </div>
             `;
@@ -616,8 +616,11 @@ class WaseetApp {
         if (userCard) {
             userCard.style.cursor = 'pointer';
             if (user && !user.isGuest) {
-                userCard.title = 'إدارة الحساب الشخصي وتسجيل الخروج';
-                userCard.onclick = () => { window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe(); this.openLoginModal(); };
+                userCard.title = 'الملف الشخصي وإعدادات الحساب';
+                userCard.onclick = () => {
+                    if (typeof window.waseetCloseDrawerSafe === 'function') window.waseetCloseDrawerSafe();
+                    window.location.href = 'profile.html';
+                };
                 const avatar = (user.user_metadata && user.user_metadata.avatar_url)
                     || user.avatar 
                     || (isMediatorUser(user) 
@@ -737,6 +740,11 @@ class WaseetApp {
     }
 
     openLoginModal() {
+        if (WASEET_STATE.user && !WASEET_STATE.user.isGuest) {
+            window.location.href = 'profile.html';
+            return;
+        }
+
         const modal = document.getElementById('modal-login');
         if (!modal) return;
         

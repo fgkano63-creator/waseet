@@ -10131,6 +10131,199 @@ html.lenis body {
     box-sizing: border-box;
 }
 
+/* ==============================================================================
+   Skiper UI, Vengeance UI & Animata Component Integration for WASEET
+   ============================================================================== */
+
+/* 1. Animata Glowing Card Effect (كروت التوهج التفاعلية) */
+.animata-glow-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(9, 13, 22, 0.98));
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 160, 89, 0.06);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+    overflow: hidden;
+}
+
+.animata-glow-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(197, 160, 89, 0.45);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 30px rgba(197, 160, 89, 0.2);
+}
+
+.animata-glow-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(197, 160, 89, 0.08) 0%, transparent 65%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.animata-glow-card:hover::before {
+    opacity: 1;
+}
+
+/* 2. Skiper UI Bento Grid (شبكة بينتو العصرية) */
+.skiper-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.bento-col-12 { grid-column: span 12; }
+.bento-col-8 { grid-column: span 8; }
+.bento-col-6 { grid-column: span 6; }
+.bento-col-4 { grid-column: span 4; }
+
+@media (max-width: 992px) {
+    .bento-col-8, .bento-col-6, .bento-col-4 {
+        grid-column: span 12;
+    }
+}
+
+/* 3. Skiper UI & Vengeance Points Balance Card (بطاقة الرصيد الفخمة ثلاثية الأبعاد) */
+.skiper-balance-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 60%, rgba(2, 6, 23, 1) 100%);
+    border: 1.5px solid rgba(197, 160, 89, 0.4);
+    border-radius: 20px;
+    padding: 1.75rem;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.skiper-balance-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* 4. Animata Shimmer Button (أزرار المسح الضوئي التفاعلية) */
+.animata-shimmer-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.animata-shimmer-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -100%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent
+    );
+    transform: rotate(25deg);
+    transition: all 0.75s ease;
+}
+
+.animata-shimmer-btn:hover::after {
+    left: 150%;
+}
+
+/* 5. Vengeance Neon Stat Card (بطاقات الإحصائيات المتوهجة) */
+.vengeance-stat-card {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vengeance-stat-card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(59, 130, 246, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 6. Profile Avatar Uploader (محدد ورافع الصورة الشخصية) */
+.profile-avatar-uploader-container {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.profile-avatar-uploader-container .profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--gold-primary);
+    box-shadow: 0 0 25px rgba(197, 160, 89, 0.35);
+    transition: filter 0.3s ease;
+}
+
+.profile-avatar-uploader-container:hover .profile-avatar-img {
+    filter: brightness(0.65);
+}
+
+.avatar-upload-trigger-btn {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+    color: #000;
+    border: 2px solid #0d121f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+}
+
+.avatar-upload-trigger-btn:hover {
+    transform: scale(1.15);
+    background: #fff;
+}
+
+/* 7. Modern Form Input (حقول الإدخال العصرية) */
+.profile-input-modern {
+    background: rgba(10, 15, 26, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.profile-input-modern:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.25);
+}
+
+
 
 
 

@@ -3412,6 +3412,10 @@
                     const roleLabel = isBroker
                         ? `🌍 وسيط إقليمي معتمد (${user.country || 'DZ'})`
                         : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
+                    drawerUserCard.style.cursor = 'pointer';
+                    drawerUserCard.setAttribute('role', 'button');
+                    drawerUserCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    drawerUserCard.onclick = () => { window.location.href = 'profile.html'; };
                     drawerUserCard.innerHTML = `
                         <img src="${escapeSafe(avatar)}" class="drawer-avatar" alt="${safeName}" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
                         <div class="drawer-user-meta">
@@ -3421,6 +3425,10 @@
                         </div>
                     `;
                 } else {
+                    drawerUserCard.style.cursor = 'pointer';
+                    drawerUserCard.setAttribute('role', 'button');
+                    drawerUserCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    drawerUserCard.onclick = () => { window.location.href = 'profile.html'; };
                     drawerUserCard.innerHTML = `
                         <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
                             <i class="fas fa-user-circle text-gold"></i>

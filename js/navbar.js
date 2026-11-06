@@ -332,6 +332,13 @@
         var pts = (u && u.wallet) ? (Number(u.wallet.available) || 0) : ((u && typeof u.points_balance !== 'undefined') ? Number(u.points_balance) : 0);
         document.querySelectorAll('.drawer-user-card, #drawer-user-card').forEach(function (card) {
             if (u && !u.isGuest) {
+                card.style.cursor = 'pointer';
+                card.setAttribute('role', 'button');
+                card.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                card.onclick = function () {
+                    if (typeof window.waseetCloseDrawerSafe === 'function') window.waseetCloseDrawerSafe();
+                    window.location.href = 'profile.html';
+                };
                 var role = broker
                     ? '🌍 وسيط إقليمي معتمد (' + (u.country || 'DZ') + ')'
                     : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
@@ -342,6 +349,10 @@
                     '<span class="drawer-user-role">' + role + '</span>' +
                     '<span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ' + pts + ' نقطة متاحة</span></div>';
             } else {
+                card.onclick = null;
+                card.style.cursor = 'default';
+                card.removeAttribute('role');
+                card.removeAttribute('title');
                 card.innerHTML =
                     '<div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">' +
                     '<i class="fas fa-user-circle text-gold"></i></div>' +
@@ -403,7 +414,7 @@
         if (box) {
             if (user) {
                 box.innerHTML =
-                    '<div class="user-profile-pill" role="button" title="' + esc(user.name) + ' - فتح القائمة" onclick="toggleWaseetDrawer(true)">' +
+                    '<div class="user-profile-pill" role="button" title="' + esc(user.name) + ' - عرض الملف الشخصي وإعدادات الحساب" onclick="window.location.href=\'profile.html\'">' +
                     '<img src="' + esc(userAvatar(user)) + '" alt="' + esc(user.name) + '" class="user-avatar-img" referrerpolicy="no-referrer" ' +
                     'onerror="this.onerror=null;this.src=\'' + DEFAULT_AVATAR + '\'">' +
                     '</div>';
@@ -418,6 +429,13 @@
         var card = byId('drawer-user-card');
         if (card) {
             if (user) {
+                card.style.cursor = 'pointer';
+                card.setAttribute('role', 'button');
+                card.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                card.onclick = function () {
+                    if (typeof window.waseetCloseDrawerSafe === 'function') window.waseetCloseDrawerSafe();
+                    window.location.href = 'profile.html';
+                };
                 var role = broker
                     ? '🌍 وسيط إقليمي معتمد (' + (user.country || 'DZ') + ')'
                     : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
@@ -428,6 +446,10 @@
                     '<span class="drawer-user-role">' + role + '</span>' +
                     '<span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ' + pts + ' نقطة متاحة</span></div>';
             } else {
+                card.onclick = null;
+                card.style.cursor = 'default';
+                card.removeAttribute('role');
+                card.removeAttribute('title');
                 card.innerHTML =
                     '<div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">' +
                     '<i class="fas fa-user-circle text-gold"></i></div>' +

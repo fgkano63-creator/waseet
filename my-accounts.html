@@ -613,6 +613,10 @@
                 if (user) {
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url) || user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
                     const roleBadge = isAdmin ? '👑 الوسيط المعتمد (المدير)' : (isBroker ? '🛡️ وسيط إقليمي معتمد' : '🏷️ بائع موثق');
+                    drawerUser.style.cursor = 'pointer';
+                    drawerUser.setAttribute('role', 'button');
+                    drawerUser.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    drawerUser.onclick = () => { window.location.href = 'profile.html'; };
                     drawerUser.innerHTML = `
                         <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
@@ -622,6 +626,10 @@
                         </div>
                     `;
                 } else {
+                    drawerUser.style.cursor = 'pointer';
+                    drawerUser.setAttribute('role', 'button');
+                    drawerUser.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    drawerUser.onclick = () => { window.location.href = 'profile.html'; };
                     drawerUser.innerHTML = `
                         <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
                             <i class="fas fa-user-circle text-gold"></i>

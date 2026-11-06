@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="الملف التعريفي ومتجر البائع المعتمد في منصة وسيط - استعراض الحسابات المتاحة، شارات التوثيق، وإحصائيات وتقييمات البائع.">
-    <title>WASEET | المتجر والملف الشخصي</title>
+    <meta name="description" content="الملف الشخصي ولوحة تحكم الحساب ومتجر البائع في منصة وسيط - إدارة الحساب، رصيد المحفظة، إحصائيات الصفقات، وشارات التوثيق.">
+    <title>WASEET | الملف الشخصي ولوحة الحساب</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
     <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
@@ -31,9 +31,344 @@
     <meta name="apple-mobile-web-app-title" content="Waseet">
 
     <!-- Custom 3D Design Styles -->
-    <link rel="stylesheet" href="css/style.css?v=20261027_profile">
+    <link rel="stylesheet" href="css/style.css?v=20261106_profile_v2">
 
     <style>
+        html, body {
+            overflow-x: hidden !important;
+            scrollbar-gutter: stable;
+        }
+
+        /* ── Mode Switching Tabs ── */
+        .profile-mode-nav-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto 1.8rem;
+            max-width: 580px;
+        }
+        .profile-mode-nav {
+            display: flex;
+            width: 100%;
+            background: rgba(18, 24, 38, 0.85);
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 0.35rem;
+            gap: 0.4rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+        }
+        .profile-mode-btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--silver-muted);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .profile-mode-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .profile-mode-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.25), rgba(184, 115, 51, 0.2));
+            border-color: rgba(197, 160, 89, 0.55);
+            color: #ffffff;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(197, 160, 89, 0.25);
+        }
+
+        /* ── Copper Level Styling ── */
+        .profile-hero-card.tier-copper-card {
+            background: linear-gradient(135deg, rgba(184, 115, 51, 0.3) 0%, rgba(24, 18, 14, 0.95) 45%, rgba(10, 13, 20, 0.99) 100%) !important;
+            border: 1.5px solid rgba(184, 115, 51, 0.68) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(184, 115, 51, 0.28) !important;
+        }
+        .profile-hero-card.tier-copper-card::before {
+            background: linear-gradient(90deg, #b87333, #d9823b, #b87333) !important;
+        }
+        .profile-avatar-wrap.tier-copper-wrap .profile-avatar-img {
+            border: 3.5px solid #b87333 !important;
+            box-shadow: 0 0 22px rgba(184, 115, 51, 0.8), inset 0 0 10px rgba(184, 115, 51, 0.4) !important;
+            outline: 2.5px solid rgba(217, 130, 59, 0.45);
+            outline-offset: 3px;
+        }
+        .seller-tier-badge.tier-copper {
+            background: linear-gradient(135deg, #b87333 0%, #7d4416 100%) !important;
+            border: 1px solid #d9823b !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 15px rgba(184, 115, 51, 0.5) !important;
+            font-weight: 800;
+        }
+
+        /* ── Avatar Edit Floating Trigger ── */
+        .profile-avatar-edit-trigger {
+            position: absolute;
+            bottom: -4px;
+            left: -4px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            color: #0b0e14;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f1422;
+            transition: all 0.2s;
+        }
+        .profile-avatar-edit-trigger:hover {
+            transform: scale(1.12);
+            color: #000;
+        }
+
+        /* ── Profile Meta Chips ── */
+        .profile-badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+        .badge-chip-kyc-verified {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .badge-chip-kyc-pending {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+        }
+        .badge-chip-country {
+            background: rgba(56, 189, 248, 0.14);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+        .badge-chip-email {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--silver-light);
+        }
+
+        /* ── Wallet Overview Section in Dashboard ── */
+        .profile-wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .profile-wallet-card {
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.95), rgba(12, 16, 26, 0.98));
+            border: 1px solid var(--border-metal);
+            border-radius: 18px;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .profile-wallet-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(197, 160, 89, 0.15);
+        }
+        .profile-wallet-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; left: 0;
+            height: 3px;
+        }
+        .profile-wallet-card.card-available::before {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        .profile-wallet-card.card-escrow::before {
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        }
+        .profile-wallet-card.card-total::before {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+        }
+
+        /* ── Profile Section General Card ── */
+        .profile-section-card {
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.92), rgba(10, 13, 22, 0.96));
+            border: 1px solid var(--border-metal);
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .profile-section-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+        }
+        .profile-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .profile-section-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0;
+        }
+
+        /* ── Profile Settings Form ── */
+        .profile-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.2rem;
+        }
+        .profile-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .profile-field-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--silver-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .profile-field-input, .profile-field-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(10, 13, 22, 0.85);
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .profile-field-input:focus, .profile-field-select:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 12px rgba(197, 160, 89, 0.35);
+        }
+
+        /* ── Shortcuts Hub Grid ── */
+        .profile-shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .profile-shortcut-card {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 1.1rem 1.2rem;
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.78), rgba(12, 16, 26, 0.88));
+            border: 1px solid var(--border-metal);
+            border-radius: 14px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .profile-shortcut-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-primary);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(197, 160, 89, 0.2);
+            color: #fff;
+        }
+        .profile-shortcut-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* ── Danger Zone ── */
+        .profile-danger-zone {
+            background: linear-gradient(145deg, rgba(35, 14, 14, 0.85), rgba(15, 8, 8, 0.95));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 20px;
+            padding: 1.6rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        /* ── Sold Out Badge & Card Dimming ── */
+        .account-card-3d.is-sold {
+            opacity: 0.74 !important;
+            filter: grayscale(18%) !important;
+            border-color: rgba(220, 38, 38, 0.38) !important;
+        }
+        .sold-out-stamp-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.94), rgba(153, 27, 27, 0.98));
+            border: 2px dashed rgba(254, 202, 202, 0.95);
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 900;
+            padding: 0.45rem 1.3rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.85), 0 0 16px rgba(220, 38, 38, 0.6);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            z-index: 10;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            animation: pulse-sold 2.5s infinite ease-in-out;
+        }
+        @keyframes pulse-sold {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(-12deg) scale(1.04); }
+        }
+        .account-card-3d.is-sold .btn-3d {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: var(--silver-muted) !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+            pointer-events: none !important;
+        }
+
+        /* ── Modal & Viewer ── */
         .store-modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88);
             z-index: 10005; display: none; align-items: center; justify-content: center;
@@ -86,75 +421,6 @@
         .gallery-thumb-item img {
             width: 100%; height: 100%; object-fit: cover;
         }
-
-        /* ── Copper Level Styling ── */
-        html, body {
-            overflow-x: hidden !important;
-            scrollbar-gutter: stable;
-        }
-        .profile-hero-card.tier-copper-card {
-            background: linear-gradient(135deg, rgba(184, 115, 51, 0.3) 0%, rgba(24, 18, 14, 0.95) 45%, rgba(10, 13, 20, 0.99) 100%) !important;
-            border: 1.5px solid rgba(184, 115, 51, 0.68) !important;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(184, 115, 51, 0.28) !important;
-        }
-        .profile-hero-card.tier-copper-card::before {
-            background: linear-gradient(90deg, #b87333, #d9823b, #b87333) !important;
-        }
-        .profile-avatar-wrap.tier-copper-wrap .profile-avatar-img {
-            border: 3.5px solid #b87333 !important;
-            box-shadow: 0 0 22px rgba(184, 115, 51, 0.8), inset 0 0 10px rgba(184, 115, 51, 0.4) !important;
-            outline: 2.5px solid rgba(217, 130, 59, 0.45);
-            outline-offset: 3px;
-        }
-        .seller-tier-badge.tier-copper {
-            background: linear-gradient(135deg, #b87333 0%, #7d4416 100%) !important;
-            border: 1px solid #d9823b !important;
-            color: #ffffff !important;
-            box-shadow: 0 0 15px rgba(184, 115, 51, 0.5) !important;
-            font-weight: 800;
-        }
-
-        /* ── Sold Out Badge & Card Dimming ── */
-        .account-card-3d.is-sold {
-            opacity: 0.74 !important;
-            filter: grayscale(18%) !important;
-            border-color: rgba(220, 38, 38, 0.38) !important;
-        }
-        .sold-out-stamp-badge {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-12deg);
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.94), rgba(153, 27, 27, 0.98));
-            border: 2px dashed rgba(254, 202, 202, 0.95);
-            color: #ffffff;
-            font-size: 1.05rem;
-            font-weight: 900;
-            padding: 0.45rem 1.3rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.85), 0 0 16px rgba(220, 38, 38, 0.6);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
-            z-index: 10;
-            pointer-events: none;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            animation: pulse-sold 2.5s infinite ease-in-out;
-        }
-        @keyframes pulse-sold {
-            0%, 100% { transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
-            50% { transform: translate(-50%, -50%) rotate(-12deg) scale(1.04); }
-        }
-        .account-card-3d.is-sold .btn-3d {
-            background: rgba(255, 255, 255, 0.06) !important;
-            border-color: rgba(255, 255, 255, 0.12) !important;
-            color: var(--silver-muted) !important;
-            cursor: not-allowed !important;
-            box-shadow: none !important;
-            transform: none !important;
-            pointer-events: none !important;
-        }
     </style>
 </head>
 <body data-waseet-nav="auto">
@@ -172,7 +438,7 @@
                         <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
                         <div class="brand-text-col">
                             <span class="brand-title">WASEET</span>
-                            <span class="brand-subtitle">وسيط • متجر البائع والملف الشخصي</span>
+                            <span class="brand-subtitle">وسيط • الملف الشخصي وإدارة الحساب</span>
                         </div>
                     </a>
                 </div>
@@ -219,7 +485,7 @@
                     </div>
                 </nav>
 
-                <!-- المجموعة 3 (أقصى اليسار): المحفظة + الحساب + الجرس (يُحقن تلقائياً) + ☰ -->
+                <!-- المجموعة 3 (أقصى اليسار): المحفظة + الحساب + ☰ -->
                 <div class="nav-left-group">
                     <div class="wallet-pill" id="wallet-pill-btn" onclick="window.location.href='wallet.html'" title="رصيد المحفظة">
                         <i class="fas fa-wallet wallet-icon"></i>
@@ -236,17 +502,36 @@
             </div>
         </header>
 
-        <!-- ================= Main Profile & Storefront Content ================= -->
+        <!-- ================= Main Profile & Dashboard Content ================= -->
         <main class="profile-page-container">
 
-            <!-- مؤشر التحميل الأولي -->
+            <!-- 1. مؤشر التحميل الأولي -->
             <div id="profile-loading-state" style="text-align: center; padding: 5rem 1rem; color: var(--silver-muted);">
                 <i class="fas fa-circle-notch fa-spin text-gold" style="font-size: 2.8rem; margin-bottom: 1.2rem;"></i>
-                <h3 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem;">جاري تحميل بيانات المتجر والملف الشخصي...</h3>
-                <p style="font-size: 0.9rem; margin: 0;">يتم جلب سجل المبيعات والمستوى المعتمد من منصة وسيط</p>
+                <h3 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem;">جاري تحميل بيانات الملف الشخصي والحساب...</h3>
+                <p style="font-size: 0.9rem; margin: 0;">يتم الاتصال بقاعدة بيانات وسيط المشفرة وجلب الرصيد والإحصائيات</p>
             </div>
 
-            <!-- رسالة المستخدم غير موجود -->
+            <!-- 2. بطاقة تسجيل الدخول للزوار غير المسجلين -->
+            <div id="profile-guest-view" style="display: none; text-align: center; padding: 4rem 1.5rem; background: rgba(18, 24, 38, 0.95); border: 1.5px solid var(--border-metal); border-radius: 24px; max-width: 540px; margin: 3rem auto; box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(197, 160, 89, 0.12); border: 2px solid var(--gold-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.2rem; color: var(--gold-primary);">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h2 style="color: #fff; font-size: 1.6rem; margin-bottom: 0.6rem;">تسجيل الدخول مطلوب</h2>
+                <p style="color: var(--silver-muted); margin-bottom: 1.8rem; font-size: 0.95rem; line-height: 1.6;">
+                    يرجى تسجيل الدخول بحساب Google للوصول إلى لوحة تحكم ملفك الشخصي، إدارة صفقاتك ومحفظتك، واستعراض حساباتك المشتراة.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; max-width: 320px; margin: 0 auto;">
+                    <button type="button" class="btn-social-login btn-social-google" onclick="if(typeof waseetSignInWithGoogle==='function') waseetSignInWithGoogle();" style="width: 100%;">
+                        <i class="fab fa-google" style="color: #ea4335;"></i> المتابعة باستخدام Google
+                    </button>
+                    <a href="index.html" class="btn-3d btn-outline" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-store"></i> الانتقال لسوق الحسابات
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. رسالة المستخدم غير موجود -->
             <div id="profile-not-found" style="display: none; text-align: center; padding: 4.5rem 1.5rem; background: rgba(18, 24, 38, 0.9); border: 1px solid var(--border-metal); border-radius: 20px; max-width: 600px; margin: 3rem auto;">
                 <i class="fas fa-user-slash text-gold" style="font-size: 3.5rem; margin-bottom: 1.2rem;"></i>
                 <h2 style="color: #fff; margin-bottom: 0.8rem;">الملف الشخصي غير موجود</h2>
@@ -256,103 +541,332 @@
                 <a href="index.html" class="btn-3d btn-gold" style="text-decoration: none;"><i class="fas fa-store"></i> الانتقال لسوق الحسابات</a>
             </div>
 
-            <!-- المحتوى الفعلي للملف والمتجر -->
+            <!-- 4. المحتوى الفعلي للملف الشخصي ولوحة التحكم -->
             <div id="profile-content-area" style="display: none;">
 
-                <!-- 1. بطاقة الهوية والمستوى الشخصي 3D -->
-                <section class="profile-hero-card">
-                    <div class="profile-header-flex">
-                        <div class="profile-identity-col">
-                            <div class="profile-avatar-wrap">
-                                <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="صورة البائع" class="profile-avatar-img" referrerpolicy="no-referrer">
-                                <span class="profile-online-dot" title="متصل الآن على منصة وسيط"></span>
+                <!-- شريط التبديل بين لوحة التحكم ومعاينة المتجر العام (لصاحب الحساب) -->
+                <div class="profile-mode-nav-wrap" id="profile-mode-nav-wrap" style="display: none;">
+                    <div class="profile-mode-nav">
+                        <button type="button" class="profile-mode-btn active" id="tab-btn-dashboard" onclick="ProfileStore.switchTab('dashboard')">
+                            <i class="fas fa-user-shield text-gold"></i>
+                            <span>لوحة حسابي وإعداداتي</span>
+                        </button>
+                        <button type="button" class="profile-mode-btn" id="tab-btn-store" onclick="ProfileStore.switchTab('store')">
+                            <i class="fas fa-store-alt text-gold"></i>
+                            <span>معاينة متجري العام</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════════════════════
+                     VIEW 1: لوحة تحكم الحساب الشخصي (DASHBOARD)
+                     ══════════════════════════════════════════════════════════════ -->
+                <div id="profile-dashboard-view">
+
+                    <!-- 1. بطاقة الهوية والمستوى الشخصي 3D -->
+                    <section class="profile-hero-card tier-copper-card">
+                        <div class="profile-header-flex">
+                            <div class="profile-identity-col">
+                                <div class="profile-avatar-wrap tier-copper-wrap" style="position: relative;">
+                                    <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="الصورة الشخصية" class="profile-avatar-img" referrerpolicy="no-referrer">
+                                    <span class="profile-online-dot" title="متصل الآن على منصة وسيط"></span>
+                                    <button type="button" class="profile-avatar-edit-trigger" onclick="ProfileStore.promptAvatarChange()" title="تغيير صورتك الشخصية">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                    <input type="file" id="profile-avatar-file-input" accept="image/*" style="display: none;" onchange="ProfileStore.handleAvatarFileSelect(this)">
+                                </div>
+                                <div>
+                                    <h1 class="profile-name-title">
+                                        <span id="profile-name">اسم المستخدم</span>
+                                        <span class="profile-verified-badge" id="profile-verified-badge" title="هوية موثقة لدى وسيط"><i class="fas fa-shield-check"></i> موثق</span>
+                                    </h1>
+                                    <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;" id="profile-tier-container">
+                                        <span class="seller-tier-badge tier-copper" id="profile-tier-badge">
+                                            <i class="fas fa-award"></i> <span>المستوى النحاسي 🥉</span>
+                                        </span>
+                                    </div>
+                                    <div class="profile-meta-row" style="margin-top: 0.65rem;">
+                                        <span class="profile-badge-chip badge-chip-country" id="profile-country-chip"><i class="fas fa-globe"></i> <span id="profile-country-name">الجزائر 🇩🇿</span></span>
+                                        <span class="profile-badge-chip badge-chip-kyc-verified" id="profile-kyc-chip"><i class="fas fa-id-card"></i> <span id="profile-kyc-text">موثق بالكامل</span></span>
+                                        <span class="profile-badge-chip badge-chip-email" id="profile-email-chip" style="display: none;"><i class="fab fa-google text-gold"></i> <span id="profile-email-text">user@gmail.com</span></span>
+                                        <span><i class="far fa-calendar-alt text-gold"></i> <span id="profile-join-date">عضو موثق</span></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h1 class="profile-name-title">
-                                    <span id="profile-name">اسم المستخدم</span>
-                                    <span class="profile-verified-badge" title="هوية موثقة لدى وسيط"><i class="fas fa-shield-check"></i> موثق</span>
-                                </h1>
-                                <div style="margin-top: 0.35rem;" id="profile-tier-container">
-                                    <span class="seller-tier-badge tier-new" id="profile-tier-badge">
-                                        <i class="fas fa-seedling"></i> <span>بائع جديد</span>
-                                    </span>
-                                </div>
-                                <div class="profile-meta-row">
-                                    <span><i class="far fa-calendar-alt text-gold"></i> <span id="profile-join-date">عضو حديث</span></span>
-                                    <span><i class="fas fa-shield-alt text-emerald" style="color: #10b981;"></i> وساطة مشفرة 100%</span>
-                                    <span id="profile-role-pill" style="display: none; background: rgba(234, 88, 12, 0.2); border: 1px solid var(--orange-bright); color: var(--orange-bright); font-size: 0.74rem; padding: 2px 8px; border-radius: 999px; font-weight: 800;">الوسيط المعتمد</span>
-                                </div>
+
+                            <div class="profile-actions-col">
+                                <button type="button" class="btn-share-store" onclick="ProfileStore.shareStoreLink()" title="نسخ رابط المتجر العام لمشاركته مع المشترين">
+                                    <i class="fas fa-share-alt"></i> <span>مشاركة متجري</span>
+                                </button>
+                                <button type="button" class="btn-3d btn-outline" onclick="ProfileStore.scrollToSettings()" style="border-color: var(--gold-primary); color: var(--gold-light);" title="تعديل بيانات الحساب">
+                                    <i class="fas fa-user-edit"></i> <span>تعديل بياناتي</span>
+                                </button>
+                                <button type="button" class="btn-3d btn-outline" onclick="ProfileStore.copyAccountId()" style="border-color: rgba(255,255,255,0.2); color: var(--silver-light);" title="نسخ معرّف الحساب (ID)">
+                                    <i class="fas fa-fingerprint text-gold"></i> <span>نسخ ID</span>
+                                </button>
                             </div>
                         </div>
+                    </section>
 
-                        <div class="profile-actions-col">
-                            <button type="button" class="btn-share-store" onclick="ProfileStore.shareStoreLink()" title="نسخ رابط المتجر لمشاركته مع المشترين">
-                                <i class="fas fa-share-alt"></i> <span>مشاركة المتجر</span>
-                            </button>
-                            <a href="https://wa.me/218931467923" target="_blank" rel="noopener noreferrer" class="btn-3d btn-outline" style="border-color: #25D366; color: #25D366; text-decoration: none;" title="الدعم المباشر للوساطة">
-                                <i class="fab fa-whatsapp"></i> <span>وسيط الصفقة</span>
+                    <!-- 2. ملخص المحفظة والضمان المالي (Escrow) -->
+                    <section class="profile-section-card" id="profile-wallet-section">
+                        <div class="profile-section-header">
+                            <h2 class="profile-section-title">
+                                <i class="fas fa-wallet text-gold"></i>
+                                <span>محفظة النقاط والضمان المالي (Escrow)</span>
+                            </h2>
+                            <a href="wallet.html" class="btn-3d btn-outline" style="font-size: 0.8rem; padding: 0.35rem 0.8rem; border-color: var(--gold-primary); color: var(--gold-light);">
+                                <i class="fas fa-external-link-alt"></i> إدارة المحفظة بالكامل
                             </a>
                         </div>
-                    </div>
-                </section>
 
-                <!-- 2. شبكة إحصائيات المبيعات والشراء (3 كروت) -->
-                <section class="profile-stats-grid">
-                    <div class="profile-stat-box" style="border-right: 4px solid #10b981;">
-                        <div>
-                            <div class="stat-box-title">الحسابات المباعة</div>
-                            <div class="stat-box-num" style="color: #34d399;" id="stat-sold-count">0</div>
-                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">صفقات مكتملة وناجحة</div>
+                        <div class="profile-wallet-grid">
+                            <!-- بطاقة 1: الرصيد المتاح -->
+                            <div class="profile-wallet-card card-available">
+                                <div>
+                                    <div style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 0.3rem;">الرصيد المتاح للشراء والسحب</div>
+                                    <div style="font-size: 1.8rem; font-weight: 900; color: #34d399;" id="dash-wallet-available">0 نقطة</div>
+                                    <div style="font-size: 0.74rem; color: var(--silver-muted); margin-top: 0.2rem;">(1 نقطة = 1$ رصيد حقيقي معتمد)</div>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <a href="wallet.html" class="btn-3d btn-gold" style="width: 100%; text-decoration: none; text-align: center; padding: 0.5rem; font-size: 0.85rem; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                        <i class="fas fa-plus-circle"></i> شحن المحفظة
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- بطاقة 2: النقاط المحجوزة -->
+                            <div class="profile-wallet-card card-escrow">
+                                <div>
+                                    <div style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 0.3rem;">النقاط المحجوزة في الصفقات (Escrow)</div>
+                                    <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8;" id="dash-wallet-locked">0 نقطة</div>
+                                    <div style="font-size: 0.74rem; color: var(--silver-muted); margin-top: 0.2rem;">محمية في خزينة المنصة لحين الاستلام</div>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <a href="deals.html" class="btn-3d btn-outline" style="width: 100%; border-color: #38bdf8; color: #38bdf8; text-decoration: none; text-align: center; padding: 0.5rem; font-size: 0.85rem; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                        <i class="fas fa-shield-alt"></i> صفقات قيد الشراء
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- بطاقة 3: إجمالي رصيد المحفظة -->
+                            <div class="profile-wallet-card card-total">
+                                <div>
+                                    <div style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 0.3rem;">إجمالي رصيد المحفظة الكلي</div>
+                                    <div style="font-size: 1.8rem; font-weight: 900; color: var(--gold-light);" id="dash-wallet-total">0 نقطة</div>
+                                    <div style="font-size: 0.74rem; color: var(--silver-muted); margin-top: 0.2rem;">مجموع الرصيد المتاح والمحجوز</div>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <a href="wallet.html#withdraw" class="btn-3d btn-outline" style="width: 100%; border-color: #f59e0b; color: #f59e0b; text-decoration: none; text-align: center; padding: 0.5rem; font-size: 0.85rem; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                        <i class="fas fa-hand-holding-usd"></i> طلب سحب أرباح
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <i class="fas fa-check-double stat-box-icon" style="color: #10b981;"></i>
-                    </div>
+                    </section>
 
-                    <div class="profile-stat-box" style="border-right: 4px solid #06b6d4;">
-                        <div>
-                            <div class="stat-box-title">الحسابات المشتراة</div>
-                            <div class="stat-box-num" style="color: #38bdf8;" id="stat-bought-count">0</div>
-                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">عمليات شراء واستلام آمنة</div>
+                    <!-- 3. إحصائيات المعاملات والنشاط بالمنصة -->
+                    <section class="profile-stats-grid">
+                        <div class="profile-stat-box" style="border-right: 4px solid #10b981; cursor: pointer;" onclick="window.location.href='my-accounts.html'">
+                            <div>
+                                <div class="stat-box-title">الحسابات المباعة</div>
+                                <div class="stat-box-num" style="color: #34d399;" id="stat-sold-count">0</div>
+                                <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">صفقات مكتملة وناجحة</div>
+                            </div>
+                            <i class="fas fa-check-double stat-box-icon" style="color: #10b981;"></i>
                         </div>
-                        <i class="fas fa-shopping-bag stat-box-icon" style="color: #06b6d4;"></i>
-                    </div>
 
-                    <div class="profile-stat-box" style="border-right: 4px solid var(--gold-primary);">
-                        <div>
-                            <div class="stat-box-title">معروضات المتجر النشطة</div>
-                            <div class="stat-box-num" style="color: var(--gold-light);" id="stat-active-count">0</div>
-                            <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">حسابات متاحة للشراء الفوري</div>
+                        <div class="profile-stat-box" style="border-right: 4px solid #06b6d4; cursor: pointer;" onclick="window.location.href='my-accounts.html'">
+                            <div>
+                                <div class="stat-box-title">الحسابات المشتراة</div>
+                                <div class="stat-box-num" style="color: #38bdf8;" id="stat-bought-count">0</div>
+                                <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">بيانات الدخول والاستلام</div>
+                            </div>
+                            <i class="fas fa-shopping-bag stat-box-icon" style="color: #06b6d4;"></i>
                         </div>
-                        <i class="fas fa-store stat-box-icon" style="color: var(--gold-primary);"></i>
-                    </div>
-                </section>
 
-                <!-- 3. قسم معروضات المتجر (Storefront Grid) -->
-                <section class="storefront-section">
-                    <div class="storefront-header">
-                        <h2 class="storefront-title">
-                            <i class="fas fa-gamepad text-gold"></i>
-                            <span id="storefront-owner-heading">معروضات المتجر</span>
-                        </h2>
-                        <span class="storefront-count-pill" id="storefront-counter-pill">0 حساب متاح</span>
-                    </div>
+                        <div class="profile-stat-box" style="border-right: 4px solid var(--gold-primary); cursor: pointer;" onclick="window.location.href='my-accounts.html'">
+                            <div>
+                                <div class="stat-box-title">معروضات المتجر النشطة</div>
+                                <div class="stat-box-num" style="color: var(--gold-light);" id="stat-active-count">0</div>
+                                <div style="font-size: 0.75rem; color: var(--silver-muted); margin-top: 0.2rem;">حسابات متاحة في السوق</div>
+                            </div>
+                            <i class="fas fa-store stat-box-icon" style="color: var(--gold-primary;"></i>
+                        </div>
+                    </section>
 
-                    <!-- شبكة الكروت ثلاثية الأبعاد -->
-                    <div class="accounts-grid" id="storefront-grid"></div>
+                    <!-- 4. اختصارات سريعة لإدارة أنشطتك -->
+                    <section class="profile-shortcuts-grid">
+                        <a href="my-accounts.html" class="profile-shortcut-card">
+                            <div class="profile-shortcut-icon" style="background: rgba(197, 160, 89, 0.15); color: var(--gold-primary);">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 0.95rem; color: #fff;">حساباتي ومبيعاتي</strong>
+                                <span style="font-size: 0.78rem; color: var(--silver-muted);">إدارة الحسابات المعروضة والمشتراة</span>
+                            </div>
+                        </a>
 
-                    <!-- حالة خلو المتجر من المعروضات -->
-                    <div class="storefront-empty" id="storefront-empty-state" style="display: none;">
-                        <i class="fas fa-store-slash"></i>
-                        <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">لا توجد حسابات معروضة حالياً</h3>
-                        <p style="margin: 0; font-size: 0.92rem;">هذا المتجر لا يحتوي على حسابات نشطة للبيع في الوقت الحالي. تحقق مجدداً لاحقاً!</p>
-                    </div>
-                </section>
+                        <a href="deals.html" class="profile-shortcut-card">
+                            <div class="profile-shortcut-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 0.95rem; color: #fff;">قيد الشراء والوساطة</strong>
+                                <span style="font-size: 0.78rem; color: var(--silver-muted);">متابعة صفقاتك النشطة لحظياً</span>
+                            </div>
+                        </a>
+
+                        <a href="wallet.html" class="profile-shortcut-card">
+                            <div class="profile-shortcut-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 0.95rem; color: #fff;">محفظة النقاط</strong>
+                                <span style="font-size: 0.78rem; color: var(--silver-muted);">شحن، سحب، وسجل التحويلات</span>
+                            </div>
+                        </a>
+
+                        <a href="contact-support.html" class="profile-shortcut-card">
+                            <div class="profile-shortcut-icon" style="background: rgba(249, 115, 22, 0.15); color: var(--orange-bright);">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 0.95rem; color: #fff;">محادثة الوسيط والدعم</strong>
+                                <span style="font-size: 0.78rem; color: var(--silver-muted);">تواصل مباشر مع الإدارة والوسيط</span>
+                            </div>
+                        </a>
+                    </section>
+
+                    <!-- 5. تعديل بيانات الحساب والإعدادات الشخصية -->
+                    <section class="profile-section-card" id="profile-settings-section">
+                        <div class="profile-section-header">
+                            <h2 class="profile-section-title">
+                                <i class="fas fa-user-cog text-gold"></i>
+                                <span>إعدادات الحساب والبيانات الشخصية</span>
+                            </h2>
+                            <span style="font-size: 0.8rem; color: var(--silver-muted);">يتم حفظ التعديلات فوراً في حسابك</span>
+                        </div>
+
+                        <form id="profile-edit-form" onsubmit="event.preventDefault(); ProfileStore.saveProfileSettings();">
+                            <div class="profile-form-grid">
+                                <!-- الاسم الكامل / اسم المتجر -->
+                                <div class="profile-field-group">
+                                    <label class="profile-field-label" for="input-profile-name">
+                                        <i class="fas fa-user text-gold"></i> الاسم الظاهر / اسم المتجر
+                                    </label>
+                                    <input type="text" id="input-profile-name" class="profile-field-input" placeholder="مثال: متجر الصقر الملكي" required>
+                                </div>
+
+                                <!-- الدولة -->
+                                <div class="profile-field-group">
+                                    <label class="profile-field-label" for="input-profile-country">
+                                        <i class="fas fa-flag text-gold"></i> الدولة المفضلة
+                                    </label>
+                                    <select id="input-profile-country" class="profile-field-select">
+                                        <option value="DZ">🇩🇿 الجزائر (Algeria)</option>
+                                        <option value="SY">🇸🇾 سوريا (Syria)</option>
+                                        <option value="EG">🇪🇬 مصر (Egypt)</option>
+                                        <option value="SA">🇸🇦 المملكة العربية السعودية (Saudi Arabia)</option>
+                                        <option value="MA">🇲🇦 المغرب (Morocco)</option>
+                                        <option value="IQ">🇮🇶 العراق (Iraq)</option>
+                                        <option value="TN">🇹🇳 تونس (Tunisia)</option>
+                                        <option value="LY">🇱🇾 ليبيا (Libya)</option>
+                                        <option value="AE">🇦🇪 الإمارات (UAE)</option>
+                                        <option value="JO">🇯🇴 الأردن (Jordan)</option>
+                                        <option value="YE">🇾🇪 اليمن (Yemen)</option>
+                                        <option value="KW">🇰🇼 الكويت (Kuwait)</option>
+                                        <option value="QA">🇶🇦 قطر (Qatar)</option>
+                                        <option value="OM">🇴🇲 عمان (Oman)</option>
+                                        <option value="BH">🇧🇭 البحرين (Bahrain)</option>
+                                        <option value="PS">🇵🇸 فلسطين (Palestine)</option>
+                                        <option value="LB">🇱🇧 لبنان (Lebanon)</option>
+                                        <option value="SD">🇸🇩 السودان (Sudan)</option>
+                                        <option value="OTHER">🌍 دولة أخرى</option>
+                                    </select>
+                                </div>
+
+                                <!-- رقم الهاتف / واتساب -->
+                                <div class="profile-field-group">
+                                    <label class="profile-field-label" for="input-profile-phone">
+                                        <i class="fab fa-whatsapp text-emerald" style="color: #25D366;"></i> رقم الهاتف / واتساب
+                                    </label>
+                                    <input type="tel" id="input-profile-phone" class="profile-field-input" placeholder="+213 555 123 456">
+                                </div>
+
+                                <!-- رابط الصورة الشخصية -->
+                                <div class="profile-field-group">
+                                    <label class="profile-field-label" for="input-profile-avatar">
+                                        <i class="fas fa-image text-gold"></i> رابط الصورة الرمزية (Avatar URL)
+                                    </label>
+                                    <input type="url" id="input-profile-avatar" class="profile-field-input" placeholder="https://example.com/my-photo.jpg">
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.8rem; flex-wrap: wrap;">
+                                <button type="button" class="btn-3d btn-outline" onclick="ProfileStore.resetFormValues()" style="padding: 0.65rem 1.4rem;">
+                                    <i class="fas fa-undo"></i> إعادة تعيين
+                                </button>
+                                <button type="submit" class="btn-3d btn-gold" id="btn-save-profile" style="padding: 0.65rem 1.8rem;">
+                                    <i class="fas fa-save"></i> حفظ التعديلات
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 6. إدارة الجلسة وتسجيل الخروج الآمن (Danger Zone) -->
+                    <section class="profile-danger-zone">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.6rem; color: #ef4444; font-weight: 800; font-size: 1.05rem; margin-bottom: 0.3rem;">
+                                <i class="fas fa-sign-out-alt"></i> إدارة الجلسة وتسجيل الخروج
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--silver-muted);" id="danger-user-session-text">
+                                أنت مسجل حالياً بحساب Google آمن. عند الخروج ستعود لتصفح المنصة كزائر.
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-3d btn-outline" onclick="ProfileStore.confirmLogout()" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 1.4rem;">
+                                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج من الحساب
+                            </button>
+                        </div>
+                    </section>
+
+                </div><!-- /#profile-dashboard-view -->
+
+                <!-- ══════════════════════════════════════════════════════════════
+                     VIEW 2: معروضات المتجر العام (STOREFRONT)
+                     ══════════════════════════════════════════════════════════════ -->
+                <div id="profile-storefront-view" style="display: none;">
+
+                    <!-- قسم معروضات المتجر (Storefront Grid) -->
+                    <section class="storefront-section">
+                        <div class="storefront-header">
+                            <h2 class="storefront-title">
+                                <i class="fas fa-gamepad text-gold"></i>
+                                <span id="storefront-owner-heading">معروضات المتجر</span>
+                            </h2>
+                            <span class="storefront-count-pill" id="storefront-counter-pill">0 حساب متاح</span>
+                        </div>
+
+                        <!-- شبكة الكروت ثلاثية الأبعاد -->
+                        <div class="accounts-grid" id="storefront-grid"></div>
+
+                        <!-- حالة خلو المتجر من المعروضات -->
+                        <div class="storefront-empty" id="storefront-empty-state" style="display: none;">
+                            <i class="fas fa-store-slash"></i>
+                            <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">لا توجد حسابات معروضة حالياً</h3>
+                            <p style="margin: 0; font-size: 0.92rem;">هذا المتجر لا يحتوي على حسابات نشطة للبيع في الوقت الحالي. تحقق مجدداً لاحقاً!</p>
+                        </div>
+                    </section>
+
+                </div><!-- /#profile-storefront-view -->
 
             </div>
         </main>
     </div>
 
-    <!-- Unified Mobile Drawer Container (Componentized via renderMobileDrawer) -->
-    <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"><!-- id="drawer-regional-broker-card" --></div>
+    <!-- Unified Mobile Drawer Container -->
+    <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"><!-- drawer-user-card id="drawer-regional-broker-card" --></div>
 
     <!-- ================= Mobile App Bottom Navigation Bar ================= -->
     <nav class="mobile-bottom-nav">
@@ -380,23 +894,24 @@
         </a>
     </nav>
 
-    <!-- ================= Modal: تفاصيل الحساب والصور ================= -->
-    <div class="store-modal-overlay" id="store-account-modal" onclick="if(event.target===this) ProfileStore.closeModal()">
-        <div class="store-modal-card" data-lenis-prevent style="overflow-y: auto !important; overscroll-behavior: contain;">
+    <!-- ================= Modal: 3D Account Details Viewer ================= -->
+    <div class="store-modal-overlay" id="modal-store-details">
+        <div class="store-modal-card">
             <button type="button" class="store-modal-close" onclick="ProfileStore.closeModal()">&times;</button>
-            
-            <div class="gallery-main-img-box">
-                <img id="modal-main-img" src="" alt="صورة الحساب">
-                <button type="button" class="gallery-nav-btn prev-btn" onclick="ProfileStore.prevImage()"><i class="fas fa-chevron-right"></i></button>
-                <button type="button" class="gallery-nav-btn next-btn" onclick="ProfileStore.nextImage()"><i class="fas fa-chevron-left"></i></button>
-            </div>
-            
-            <div class="gallery-thumbs-row" id="modal-thumbs-row"></div>
+            <div id="modal-account-content">
+                <div class="gallery-main-img-box">
+                    <button type="button" class="gallery-nav-btn prev-btn" onclick="ProfileStore.prevImage()"><i class="fas fa-chevron-right"></i></button>
+                    <img id="modal-main-image" src="" alt="صورة الحساب">
+                    <button type="button" class="gallery-nav-btn next-btn" onclick="ProfileStore.nextImage()"><i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div class="gallery-thumbs-row" id="modal-thumbs-row"></div>
 
-            <div style="margin-top: 1.2rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-                    <h2 id="modal-acc-title" style="color: #fff; font-size: 1.25rem; margin: 0;"></h2>
-                    <span id="modal-acc-game" style="background: rgba(197, 160, 89, 0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); font-size: 0.8rem; font-weight: 800; padding: 2px 10px; border-radius: 999px;"></span>
+                <div style="margin-top: 1.2rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                        <h3 style="color: #fff; font-size: 1.35rem; margin: 0;" id="modal-acc-title"></h3>
+                        <span class="card-acc-num" id="modal-acc-num" style="background: rgba(197, 160, 89, 0.15); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 4px 12px; border-radius: 999px; font-weight: 800;"></span>
+                    </div>
+                    <div id="modal-prime-badge-box"></div>
                 </div>
 
                 <div class="card-specs" id="modal-acc-specs" style="margin: 0.9rem 0;"></div>
@@ -440,7 +955,31 @@
         'use strict';
 
         const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+        const COUNTRY_NAMES = {
+            DZ: 'الجزائر 🇩🇿',
+            SY: 'سوريا 🇸🇾',
+            EG: 'مصر 🇪🇬',
+            SA: 'السعودية 🇸🇦',
+            MA: 'المغرب 🇲🇦',
+            IQ: 'العراق 🇮🇶',
+            TN: 'تونس 🇹🇳',
+            LY: 'ليبيا 🇱🇾',
+            AE: 'الإمارات 🇦🇪',
+            JO: 'الأردن 🇯🇴',
+            YE: 'اليمن 🇾🇪',
+            KW: 'الكويت 🇰🇼',
+            QA: 'قطر 🇶🇦',
+            OM: 'عمان 🇴🇲',
+            BH: 'البحرين 🇧🇭',
+            PS: 'فلسطين 🇵🇸',
+            LB: 'لبنان 🇱🇧',
+            SD: 'السودان 🇸🇩',
+            OTHER: 'دولة أخرى 🌍'
+        };
+
         let targetUserId = null;
+        let isMyProfile = false;
+        let currentTab = 'dashboard';
         let profileData = null;
         let activeAccounts = [];
         let modalActiveAccount = null;
@@ -522,50 +1061,44 @@
         /* ── جلب البيانات من Supabase ── */
         async function loadProfileAndStore() {
             const urlParams = new URLSearchParams(window.location.search);
-            targetUserId = urlParams.get('id') || urlParams.get('user');
+            const queryId = urlParams.get('id') || urlParams.get('user');
+            const viewParam = urlParams.get('view') || urlParams.get('tab');
 
-            // إذا لم يتم تمرير ID، يتم التوجيه فوراً للصفحة الرئيسية
-            if (!targetUserId || !targetUserId.trim()) {
-                window.location.replace('index.html');
-                return;
+            // معرف المستخدم الحالي من الجلسة
+            let localUser = null;
+            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && !WASEET_STATE.user.isGuest) {
+                localUser = WASEET_STATE.user;
+            } else {
+                try {
+                    const raw = localStorage.getItem('waseet_user');
+                    if (raw) localUser = JSON.parse(raw);
+                } catch (e) {}
             }
 
-            targetUserId = targetUserId.trim();
+            // تحديد معرّف الحساب المستهدف
+            if (queryId && queryId.trim()) {
+                targetUserId = queryId.trim();
+                isMyProfile = !!(localUser && localUser.id === targetUserId);
+            } else if (localUser && localUser.id) {
+                targetUserId = localUser.id;
+                isMyProfile = true;
+            } else {
+                targetUserId = null;
+                isMyProfile = false;
+            }
+
+            // إذا كان زائراً بدون معرف مستهدف
+            if (!targetUserId) {
+                document.getElementById('profile-loading-state').style.display = 'none';
+                document.getElementById('profile-guest-view').style.display = 'block';
+                return;
+            }
 
             // دعم المعاينة السريعة للمتجر والمستويات (Demo / Preview Mode)
             if (targetUserId === 'demo' || targetUserId === 'preview' || urlParams.get('demo')) {
                 const sampleAccounts = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.accounts && WASEET_STATE.accounts.length)
                     ? WASEET_STATE.accounts.slice(0, 3)
-                    : [
-                        {
-                            id: 'demo-acc-1',
-                            accountNumber: 1088,
-                            title: 'حساب فري فاير برايم 7 أسطوري - سكن الساكورا وبنطلون الجاز',
-                            game: 'free_fire',
-                            level: 74,
-                            primeLevel: 7,
-                            bindStatus: 'single',
-                            sellerPrice: 450,
-                            image: 'assets/logo.png',
-                            images: ['assets/logo.png'],
-                            iconicPants: ['بنطلون الجاز'],
-                            accountNotes: 'حساب مشحون من السيزون الأول، يحتوي على رقصات وسكنات نادرة جداً.'
-                        },
-                        {
-                            id: 'demo-acc-2',
-                            accountNumber: 1092,
-                            title: 'حساب ببجي موبايل - إم فور ثلجي ماكس وسكنات أسطورية',
-                            game: 'pubg',
-                            level: 68,
-                            primeLevel: 5,
-                            badge: 'ميثيك ماكس',
-                            bindStatus: 'single',
-                            sellerPrice: 620,
-                            image: 'assets/logo.png',
-                            images: ['assets/logo.png'],
-                            accountNotes: 'حساب عالمي مشحون RP متعدد، ربط جوجل نظيف.'
-                        }
-                    ];
+                    : [];
                 activeAccounts = sampleAccounts;
                 renderProfileView({
                     profile: {
@@ -573,7 +1106,9 @@
                         name: 'متجر ميمو الأسطوري (Memo Store)',
                         avatar_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200',
                         created_at: '2024-01-15T00:00:00Z',
-                        role: 'user'
+                        role: 'user',
+                        country: 'DZ',
+                        phone: '+213555123456'
                     },
                     soldCount: 114,
                     boughtCount: 42,
@@ -593,9 +1128,7 @@
                     try {
                         const { data: rpcRes, error: rpcErr } = await client.rpc('get_seller_profile_stats', { p_user_id: targetUserId });
                         if (!rpcErr && rpcRes) statsRpc = rpcRes;
-                    } catch (e) {
-                        console.warn('[Profile] RPC error or unmigrated, falling back to direct queries:', e);
-                    }
+                    } catch (e) {}
                 }
 
                 // 2. جلب الملف الشخصي من profiles
@@ -611,7 +1144,31 @@
                     } catch (e) {}
                 }
 
-                // 3. حساب الإحصائيات بالاستعلام المباشر
+                // دمج بيانات المستخدم المحلي إن وُجد
+                if (localUser && localUser.id === targetUserId) {
+                    if (!profileRow) {
+                        profileRow = {
+                            id: localUser.id,
+                            name: localUser.name,
+                            avatar_url: localUser.avatar || localUser.avatar_url,
+                            created_at: localUser.created_at || new Date().toISOString(),
+                            role: localUser.role || 'user',
+                            country: localUser.country || 'DZ',
+                            phone: localUser.phone || '',
+                            is_fully_verified: localUser.is_fully_verified,
+                            kyc_type: localUser.kyc_type
+                        };
+                    } else {
+                        // تحديث بيانات الجلسة المحلية بأحدث بيانات السيرفر
+                        if (profileRow.name) localUser.name = profileRow.name;
+                        if (profileRow.country) localUser.country = profileRow.country;
+                        if (profileRow.phone) localUser.phone = profileRow.phone;
+                        if (profileRow.avatar_url) localUser.avatar = profileRow.avatar_url;
+                        if (typeof saveWaseetData === 'function') saveWaseetData();
+                    }
+                }
+
+                // 3. حساب الإحصائيات
                 let soldCount = 0;
                 let boughtCount = 0;
                 let activeCount = 0;
@@ -620,18 +1177,8 @@
                     soldCount = Number(statsRpc.sold_count) || 0;
                     boughtCount = Number(statsRpc.bought_count) || 0;
                     activeCount = Number(statsRpc.active_count) || 0;
-                    if (!profileRow && statsRpc.name) {
-                        profileRow = {
-                            id: targetUserId,
-                            name: statsRpc.name,
-                            avatar_url: statsRpc.avatar_url,
-                            created_at: statsRpc.created_at,
-                            role: statsRpc.role
-                        };
-                    }
                 } else if (client) {
                     try {
-                        // عدد المباع
                         const { count: sCount } = await client
                             .from('marketplace_accounts')
                             .select('id', { count: 'exact', head: true })
@@ -639,7 +1186,6 @@
                             .in('status', ['sold', 'completed']);
                         soldCount = sCount || 0;
 
-                        // عدد المشترى
                         const { count: bCount } = await client
                             .from('marketplace_accounts')
                             .select('id', { count: 'exact', head: true })
@@ -649,7 +1195,7 @@
                     } catch (e) {}
                 }
 
-                // 4. جلب الحسابات المعروضة للبيع حالياً لهذا المستخدم (المتاحة والمباعة معاً لعرض تاريخ المتجر)
+                // 4. جلب المعروضات
                 let rawListings = [];
                 if (client) {
                     try {
@@ -665,25 +1211,10 @@
                     } catch (e) {}
                 }
 
-                // إذا لم يوجد حساب بروفايل في جدول profiles، نحاول فحصه في البيانات المحلية أو إظهار المستخدم غير موجود
                 if (!profileRow && rawListings.length === 0 && soldCount === 0 && boughtCount === 0) {
-                    // فحص إذا كان المستخدم مسجلاً محلياً
-                    const localUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id === targetUserId)
-                        ? WASEET_STATE.user
-                        : null;
-                    if (localUser) {
-                        profileRow = {
-                            id: localUser.id,
-                            name: localUser.name,
-                            avatar_url: localUser.avatar || localUser.avatar_url,
-                            created_at: new Date().toISOString(),
-                            role: localUser.role || 'user'
-                        };
-                    } else {
-                        document.getElementById('profile-loading-state').style.display = 'none';
-                        document.getElementById('profile-not-found').style.display = 'block';
-                        return;
-                    }
+                    document.getElementById('profile-loading-state').style.display = 'none';
+                    document.getElementById('profile-not-found').style.display = 'block';
+                    return;
                 }
 
                 profileData = profileRow || {
@@ -691,10 +1222,10 @@
                     name: 'مستخدم وسيط',
                     avatar_url: DEFAULT_AVATAR,
                     created_at: new Date().toISOString(),
-                    role: 'user'
+                    role: 'user',
+                    country: 'DZ'
                 };
 
-                // مواءمة معروضات المتجر
                 const profilesMap = {};
                 profilesMap[targetUserId] = profileData;
                 activeAccounts = rawListings.map(r => {
@@ -706,13 +1237,13 @@
 
                 activeCount = activeAccounts.filter(a => a.status === 'available' || a.status === 'approved').length;
 
-                // تحديث الواجهة
                 renderProfileView({
                     profile: profileData,
                     soldCount,
                     boughtCount,
                     activeCount,
-                    listings: activeAccounts
+                    listings: activeAccounts,
+                    view: viewParam
                 });
 
             } catch (err) {
@@ -725,27 +1256,30 @@
         /* ── رسم الواجهة بالكامل ── */
         function renderProfileView(data) {
             document.getElementById('profile-loading-state').style.display = 'none';
+            document.getElementById('profile-guest-view').style.display = 'none';
             document.getElementById('profile-not-found').style.display = 'none';
             document.getElementById('profile-content-area').style.display = 'block';
 
             const p = data.profile;
+            const userName = p.name || p.username || 'مستخدم وسيط';
+
+            // عناصر الهوية
             const nameEl = document.getElementById('profile-name');
             const avatarEl = document.getElementById('profile-avatar');
             const joinDateEl = document.getElementById('profile-join-date');
-            const rolePill = document.getElementById('profile-role-pill');
             const ownerHeading = document.getElementById('storefront-owner-heading');
 
-            const userName = p.name || p.username || 'مستخدم وسيط';
             if (nameEl) nameEl.textContent = userName;
-            const prefix = userName.trim().startsWith('متجر') ? 'معروضات ' : 'معروضات متجر ';
-            if (ownerHeading) ownerHeading.textContent = prefix + userName;
-            document.title = 'WASEET | متجر ' + userName;
-
             if (avatarEl) {
                 avatarEl.src = p.avatar_url || DEFAULT_AVATAR;
                 avatarEl.onerror = function () { this.src = DEFAULT_AVATAR; };
             }
 
+            const prefix = userName.trim().startsWith('متجر') ? 'معروضات ' : 'معروضات متجر ';
+            if (ownerHeading) ownerHeading.textContent = prefix + userName;
+            document.title = isMyProfile ? 'WASEET | لوحة تحكم حسابي' : 'WASEET | متجر ' + userName;
+
+            // تاريخ التسجيل
             if (joinDateEl) {
                 if (p.created_at) {
                     try {
@@ -760,22 +1294,88 @@
                 }
             }
 
-            if (rolePill) {
-                const isAdmin = p.role === 'admin' || p.role === 'mediator';
-                rolePill.style.display = isAdmin ? 'inline-block' : 'none';
+            // شارة الدولة
+            const countryChip = document.getElementById('profile-country-chip');
+            const countryName = document.getElementById('profile-country-name');
+            if (countryName) {
+                const code = (p.country || 'DZ').toUpperCase();
+                countryName.textContent = COUNTRY_NAMES[code] || (code + ' 🌍');
             }
 
-            // تطبيق نظام المستويات
+            // شارة التوثيق KYC
+            const kycChip = document.getElementById('profile-kyc-chip');
+            const kycText = document.getElementById('profile-kyc-text');
+            const isVerified = !!(p.is_fully_verified === true || p.kyc_status === 'approved' || p.role === 'admin' || p.role === 'regional_broker');
+            if (kycChip && kycText) {
+                if (isVerified) {
+                    kycChip.className = 'profile-badge-chip badge-chip-kyc-verified';
+                    const kycTypeLabel = p.kyc_type === 'passport' ? 'جواز سفر' : 'بطاقة هوية وطنية';
+                    kycText.textContent = `موثق بالكامل (${kycTypeLabel})`;
+                } else {
+                    kycChip.className = 'profile-badge-chip badge-chip-kyc-pending';
+                    kycText.textContent = 'حساب قيد التوثيق';
+                }
+            }
+
+            // البريد الإلكتروني
+            const emailChip = document.getElementById('profile-email-chip');
+            const emailText = document.getElementById('profile-email-text');
+            if (isMyProfile && (p.email || (WASEET_STATE.user && WASEET_STATE.user.email))) {
+                const em = p.email || WASEET_STATE.user.email;
+                if (emailText) emailText.textContent = em;
+                if (emailChip) emailChip.style.display = 'inline-flex';
+                const dangerEmail = document.getElementById('danger-user-session-text');
+                if (dangerEmail) dangerEmail.textContent = `أنت مسجل حالياً بالبريد الإلكتروني (${em}) عبر حساب Google الآمن.`;
+            }
+
+            // نظام المستويات (Seller Tier)
             const tier = computeSellerTier(data.soldCount);
             const badgeBox = document.getElementById('profile-tier-container');
             if (badgeBox) {
+                const isAdmin = p.role === 'admin' || p.role === 'mediator';
+                const isBroker = p.role === 'regional_broker' || p.role === 'broker';
+                let roleHtml = '';
+                if (isAdmin) {
+                    roleHtml = `<span class="profile-badge-chip" style="background: rgba(234, 88, 12, 0.25); border: 1px solid var(--orange-bright); color: var(--orange-bright);"><i class="fas fa-crown text-gold"></i> الوسيط المعتمد (المدير)</span>`;
+                } else if (isBroker) {
+                    roleHtml = `<span class="profile-badge-chip" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399;"><i class="fas fa-globe-africa"></i> وسيط إقليمي معتمد (${p.country || 'DZ'})</span>`;
+                }
                 badgeBox.innerHTML = `
                     <span class="seller-tier-badge ${tier.badgeClass}" title="${tier.description}">
                         <i class="fas ${tier.icon}"></i>
                         <span>${tier.name}</span>
                     </span>
+                    ${roleHtml}
                 `;
             }
+
+            // ملء بيانات المحفظة (Dashboard Wallet Overview)
+            let availPts = 0;
+            let lockedPts = 0;
+            let totalPts = 0;
+            if (isMyProfile && WASEET_STATE.user) {
+                const w = WASEET_STATE.user.wallet || {};
+                availPts = Number(w.available) || Number(WASEET_STATE.user.points_balance) || 0;
+                lockedPts = Number(w.locked) || 0;
+                totalPts = Number(w.total) || (availPts + lockedPts);
+            }
+            const dAvail = document.getElementById('dash-wallet-available');
+            const dLocked = document.getElementById('dash-wallet-locked');
+            const dTotal = document.getElementById('dash-wallet-total');
+            if (dAvail) dAvail.textContent = availPts + ' نقطة';
+            if (dLocked) dLocked.textContent = lockedPts + ' نقطة';
+            if (dTotal) dTotal.textContent = totalPts + ' نقطة';
+
+            // ملء حقول نموذج التعديل
+            const nameInput = document.getElementById('input-profile-name');
+            const countryInput = document.getElementById('input-profile-country');
+            const phoneInput = document.getElementById('input-profile-phone');
+            const avatarInput = document.getElementById('input-profile-avatar');
+
+            if (nameInput) nameInput.value = userName;
+            if (countryInput && p.country) countryInput.value = p.country.toUpperCase();
+            if (phoneInput) phoneInput.value = p.phone || '';
+            if (avatarInput) avatarInput.value = p.avatar_url || '';
 
             // أرقام الإحصائيات
             document.getElementById('stat-sold-count').textContent = data.soldCount;
@@ -783,19 +1383,23 @@
             document.getElementById('stat-active-count').textContent = data.activeCount;
             document.getElementById('storefront-counter-pill').textContent = data.activeCount + ' حساب متاح';
 
-            // تطبيق فخامة المستوى النحاسي (Copper Level Styling)
-            const heroCard = document.querySelector('.profile-hero-card');
-            if (heroCard) heroCard.classList.add('tier-copper-card');
-            const avatarWrap = document.querySelector('.profile-avatar-wrap');
-            if (avatarWrap) avatarWrap.classList.add('tier-copper-wrap');
+            // رسم شبكة الحسابات المعروضة
+            renderStorefrontGrid(data.listings);
 
             // تفعيل التمرير السلس Lenis
             initStoreLenis();
 
-            // رسم شبكة الحسابات المعروضة
-            renderStorefrontGrid(data.listings);
+            // ضبط التبويب النشط
+            const modeNav = document.getElementById('profile-mode-nav-wrap');
+            if (isMyProfile) {
+                if (modeNav) modeNav.style.display = 'flex';
+                switchTab(data.view === 'store' ? 'store' : 'dashboard');
+            } else {
+                if (modeNav) modeNav.style.display = 'none';
+                switchTab('store');
+            }
 
-            // تشغيل حركة الدخول الفخمة عبر GSAP
+            // تشغيل حركة الدخول عبر GSAP
             if (window.gsap) {
                 try {
                     gsap.from('.profile-hero-card', {
@@ -812,16 +1416,227 @@
                         ease: 'power2.out',
                         delay: 0.15
                     });
-                    gsap.from('.account-card-3d', {
-                        y: 30,
-                        opacity: 0,
-                        duration: 0.7,
-                        stagger: 0.08,
-                        ease: 'power3.out',
-                        delay: 0.25
-                    });
-                } catch (e) {
-                    console.warn('[GSAP] Error in entrance animation:', e);
+                } catch (e) {}
+            }
+        }
+
+        /* ── التبديل بين تبويب لوحة الحساب والمتجر ── */
+        function switchTab(tab) {
+            currentTab = tab;
+            const dashView = document.getElementById('profile-dashboard-view');
+            const storeView = document.getElementById('profile-storefront-view');
+            const btnDash = document.getElementById('tab-btn-dashboard');
+            const btnStore = document.getElementById('tab-btn-store');
+
+            if (tab === 'store') {
+                if (dashView) dashView.style.display = 'none';
+                if (storeView) storeView.style.display = 'block';
+                if (btnDash) btnDash.classList.remove('active');
+                if (btnStore) btnStore.classList.add('active');
+            } else {
+                if (dashView) dashView.style.display = 'block';
+                if (storeView) storeView.style.display = 'none';
+                if (btnDash) btnDash.classList.add('active');
+                if (btnStore) btnStore.classList.remove('active');
+            }
+        }
+
+        /* ── حفظ تعديلات الملف الشخصي في Supabase ── */
+        async function saveProfileSettings() {
+            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            const nameInput = document.getElementById('input-profile-name');
+            const phoneInput = document.getElementById('input-profile-phone');
+            const countryInput = document.getElementById('input-profile-country');
+            const avatarInput = document.getElementById('input-profile-avatar');
+
+            const newName = nameInput ? nameInput.value.trim() : '';
+            const newPhone = phoneInput ? phoneInput.value.trim() : '';
+            const newCountry = countryInput ? countryInput.value.trim() : 'DZ';
+            const newAvatar = avatarInput ? avatarInput.value.trim() : '';
+
+            if (!newName) {
+                if (typeof waseetAlert === 'function') waseetAlert('خطأ', 'يرجى إدخال اسمك الظاهر أو اسم المتجر.', 'warning');
+                return;
+            }
+
+            const saveBtn = document.getElementById('btn-save-profile');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            }
+
+            try {
+                if (client && targetUserId) {
+                    const updates = {
+                        name: newName,
+                        country: newCountry,
+                        updated_at: new Date().toISOString()
+                    };
+                    if (newPhone) updates.phone = newPhone;
+                    if (newAvatar) updates.avatar_url = newAvatar;
+
+                    const { error } = await client
+                        .from('profiles')
+                        .update(updates)
+                        .eq('id', targetUserId);
+
+                    if (error) throw error;
+                }
+
+                // تحديث الجلسة المحلية WASEET_STATE
+                if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+                    WASEET_STATE.user.name = newName;
+                    WASEET_STATE.user.country = newCountry;
+                    if (newPhone) WASEET_STATE.user.phone = newPhone;
+                    if (newAvatar) {
+                        WASEET_STATE.user.avatar = newAvatar;
+                        if (WASEET_STATE.user.user_metadata) {
+                            WASEET_STATE.user.user_metadata.avatar_url = newAvatar;
+                        }
+                    }
+                    if (typeof saveWaseetData === 'function') saveWaseetData();
+                }
+
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('تم الحفظ بنجاح', 'تم تحديث بيانات ملفك الشخصي وإعدادات حسابك بنجاح!', 'success');
+                } else {
+                    alert('تم تحديث بيانات ملفك الشخصي بنجاح!');
+                }
+
+                // تحديث واجهات الشريط العلوي والاسم
+                const nameEl = document.getElementById('profile-name');
+                if (nameEl) nameEl.textContent = newName;
+                const avatarEl = document.getElementById('profile-avatar');
+                if (avatarEl && newAvatar) avatarEl.src = newAvatar;
+                const countryName = document.getElementById('profile-country-name');
+                if (countryName) countryName.textContent = COUNTRY_NAMES[newCountry.toUpperCase()] || newCountry;
+
+                if (typeof waseetRefreshDrawerExtras === 'function') waseetRefreshDrawerExtras();
+
+            } catch (err) {
+                console.error('[ProfileSettings] Error saving:', err);
+                const msg = err?.message || 'تعذر حفظ البيانات. يرجى المحاولة لاحقاً.';
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert('فشل الحفظ', msg, 'danger');
+                } else {
+                    alert(msg);
+                }
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> حفظ التعديلات';
+                }
+            }
+        }
+
+        function resetFormValues() {
+            if (!profileData) return;
+            const nameInput = document.getElementById('input-profile-name');
+            const countryInput = document.getElementById('input-profile-country');
+            const phoneInput = document.getElementById('input-profile-phone');
+            const avatarInput = document.getElementById('input-profile-avatar');
+
+            if (nameInput) nameInput.value = profileData.name || '';
+            if (countryInput && profileData.country) countryInput.value = profileData.country.toUpperCase();
+            if (phoneInput) phoneInput.value = profileData.phone || '';
+            if (avatarInput) avatarInput.value = profileData.avatar_url || '';
+        }
+
+        function promptAvatarChange() {
+            const fileInput = document.getElementById('profile-avatar-file-input');
+            if (fileInput) {
+                fileInput.click();
+            } else {
+                const current = (profileData && profileData.avatar_url) || '';
+                const newUrl = prompt('أدخل رابط الصورة الشخصية الجديدة (Direct Image URL):', current);
+                if (newUrl && newUrl.trim() && newUrl.trim() !== current) {
+                    const avatarInput = document.getElementById('input-profile-avatar');
+                    if (avatarInput) avatarInput.value = newUrl.trim();
+                    saveProfileSettings();
+                }
+            }
+        }
+
+        async function handleAvatarFileSelect(input) {
+            if (!input || !input.files || !input.files[0]) return;
+            const file = input.files[0];
+            try {
+                if (typeof waseetToast === 'function') {
+                    waseetToast('جاري رفع صورتك الشخصية وتحديث الحساب...', 'info');
+                }
+                let res = null;
+                if (typeof window.waseetUploadProfileAvatar === 'function') {
+                    res = await window.waseetUploadProfileAvatar(file);
+                }
+                if (res && res.success) {
+                    const newUrl = res.avatarUrl;
+                    const avatarEl = document.getElementById('profile-avatar');
+                    if (avatarEl) avatarEl.src = newUrl;
+                    const avatarInput = document.getElementById('input-profile-avatar');
+                    if (avatarInput) avatarInput.value = newUrl;
+                    if (profileData) profileData.avatar_url = newUrl;
+                    if (typeof waseetToast === 'function') {
+                        waseetToast('تم تحديث صورتك الشخصية بنجاح!', 'success');
+                    } else if (typeof waseetAlert === 'function') {
+                        waseetAlert('تم التحديث', 'تم تغيير صورتك الشخصية بنجاح في كامل المنصة!', 'success');
+                    }
+                }
+            } catch (err) {
+                console.error('[Avatar Upload]', err);
+                const msg = err?.message || 'تعذر رفع الصورة الشخصية.';
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('فشل رفع الصورة', msg, 'danger');
+                } else {
+                    alert(msg);
+                }
+            } finally {
+                input.value = '';
+            }
+        }
+
+        function scrollToSettings() {
+            const sec = document.getElementById('profile-settings-section');
+            if (sec) {
+                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        async function copyAccountId() {
+            if (!targetUserId) return;
+            try {
+                await navigator.clipboard.writeText(targetUserId);
+                if (typeof waseetToast === 'function') {
+                    waseetToast('تم نسخ معرّف الحساب إلى الحافظة بنجاح!', 'success');
+                } else if (typeof waseetAlert === 'function') {
+                    waseetAlert('تم النسخ', 'معرّف الحساب (ID): ' + targetUserId, 'success');
+                } else {
+                    alert('تم النسخ: ' + targetUserId);
+                }
+            } catch (e) {
+                prompt('معرّف الحساب:', targetUserId);
+            }
+        }
+
+        async function confirmLogout() {
+            const confirmed = (typeof waseetConfirm === 'function')
+                ? await waseetConfirm(
+                    'تأكيد تسجيل الخروج',
+                    'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك في منصة وسيط؟',
+                    'تسجيل الخروج',
+                    'إلغاء',
+                    'danger'
+                )
+                : confirm('هل أنت متأكد من رغبتك في تسجيل الخروج؟');
+
+            if (confirmed) {
+                if (typeof waseetNavSignOut === 'function') {
+                    await waseetNavSignOut();
+                } else if (typeof waseetSignOut === 'function') {
+                    await waseetSignOut();
+                    window.location.href = 'index.html';
+                } else {
+                    localStorage.removeItem('waseet_user');
+                    window.location.href = 'index.html';
                 }
             }
         }
@@ -858,43 +1673,39 @@
                 if (acc.game === 'free_fire') {
                     primeBadgeHtml = `<div class="prime-badge-3d"><i class="fas fa-crown"></i> برايم ${acc.primeLevel || 1}</div>`;
                 } else if (acc.badge) {
-                    primeBadgeHtml = `<div class="prime-badge-3d" style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(197, 160, 89, 0.95)); color: #fff;"><i class="fas fa-award"></i> ${esc(acc.badge)}</div>`;
+                    primeBadgeHtml = `<div class="prime-badge-3d">${esc(acc.badge)}</div>`;
                 }
 
-                const isSold = acc.status === 'sold' || acc.status === 'completed';
-                const soldStampHtml = isSold
-                    ? `<div class="sold-out-stamp-badge"><i class="fas fa-ban"></i> تم البيع</div>`
-                    : '';
-                const cardClass = isSold ? 'account-card-3d card-3d is-sold' : 'account-card-3d card-3d';
-                const actionBtnHtml = isSold
-                    ? `<button class="btn-3d" disabled style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); color: #94a3b8; cursor: not-allowed; opacity: 0.85;" title="هذا الحساب تم بيعه بالكامل"><i class="fas fa-lock"></i> تم البيع (مغلق)</button>`
-                    : `<button class="btn-3d btn-orange" onclick="ProfileStore.requestEscrow('${acc.id}')"><i class="fas fa-shield-alt"></i> طلب وساطة</button>`;
+                const bindLabel = (acc.bindStatus === 'single' || acc.bindType === 'single')
+                    ? 'ربط أحادي'
+                    : 'ربط متاح';
+
+                const isSold = (acc.status === 'sold' || acc.status === 'completed');
 
                 return `
-                    <div class="${cardClass}">
-                        <div class="card-media" onclick="ProfileStore.openModal('${acc.id}')" style="cursor: pointer;" title="انقر لعرض كامل الصور والمواصفات">
-                            <img src="${esc(imagesList[0])}" alt="${esc(acc.title)}" class="card-img" onerror="this.onerror=null; this.src='assets/logo.png'; this.style.objectFit='contain';">
-                            ${soldStampHtml}
-                            ${primeBadgeHtml}
-                            <div class="account-num-tag"><i class="fas fa-hashtag text-gold"></i> #${accNum}</div>
-                            <div class="level-tag">Lv. ${acc.level || 50}</div>
-                            <button class="btn-gallery-badge" onclick="event.stopPropagation(); ProfileStore.openModal('${acc.id}')">
-                                <i class="fas fa-layer-group"></i> ${imagesList.length} صور
-                            </button>
+                    <div class="account-card-3d ${isSold ? 'is-sold' : ''}" onclick="ProfileStore.openModal(${index})" style="position: relative;">
+                        ${primeBadgeHtml}
+                        ${isSold ? '<div class="sold-out-stamp-badge"><i class="fas fa-check-circle"></i> تم البيع بنجاح</div>' : ''}
+                        <div class="card-img-wrap">
+                            <img src="${esc(imagesList[0])}" alt="${esc(acc.title)}" class="card-img" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.png';">
+                            <span class="card-acc-num">#${accNum}</span>
                         </div>
                         <div class="card-body">
-                            <h3 class="card-title" onclick="ProfileStore.openModal('${acc.id}')" style="cursor: pointer;">${esc(acc.title)}</h3>
+                            <h3 class="card-title">${esc(acc.title)}</h3>
                             <div class="card-specs">
-                                <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
-                                <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي آمن' : 'ثنائي'}</span>
+                                <span class="spec-chip"><i class="fas fa-shield-alt text-emerald"></i> ${bindLabel}</span>
+                                <span class="spec-chip"><i class="fas fa-level-up-alt text-gold"></i> لفل ${acc.level || 50}</span>
                                 ${pantsTag}
                             </div>
-                            <div class="card-footer">
-                                <div class="price-col">
-                                    <span class="price-sub">صافي البائع: ${price.sellerPrice} نقطة</span>
-                                    <span class="price-main">${price.buyerPrice} <small style="font-size: 0.72em;">نقطة</small></span>
+                            <div class="card-price-row">
+                                <div>
+                                    <div class="price-val">${price.buyerPrice} <span class="price-unit">نقطة</span></div>
+                                    <div style="font-size: 0.72rem; color: var(--silver-muted);">${price.sellerPrice} للمالك • وساطة 100%</div>
                                 </div>
-                                ${actionBtnHtml}
+                                <button type="button" class="btn-3d btn-orange" ${isSold ? 'disabled' : ''} onclick="event.stopPropagation(); ProfileStore.openModal(${index})">
+                                    <i class="fas ${isSold ? 'fa-lock' : 'fa-shopping-cart'}"></i>
+                                    <span>${isSold ? 'مُباع' : 'معاينة وشراء'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -904,199 +1715,208 @@
 
         /* ── مشاركة رابط المتجر ── */
         async function shareStoreLink() {
-            const url = window.location.href;
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(url);
-                } else {
-                    const ta = document.createElement('textarea');
-                    ta.value = url;
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(ta);
-                }
-
-                if (window.WaseetNotificationStore && typeof window.WaseetNotificationStore.showToastNotification === 'function') {
-                    window.WaseetNotificationStore.showToastNotification({
-                        title: 'تم نسخ رابط المتجر!',
-                        message: 'يمكنك الآن إرسال الرابط لمشترينك على واتساب ومواقع التواصل.',
-                        type: 'deal'
+            const url = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(targetUserId)}&view=store`;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: `متجر ${profileData?.name || 'البائع'} على منصة وسيط WASEET`,
+                        text: `تصفح حسابات ${profileData?.name || 'البائع'} الموثقة مع حماية الوساطة الذهبية 48 ساعة!`,
+                        url: url
                     });
+                    return;
+                } catch (e) {}
+            }
+            try {
+                await navigator.clipboard.writeText(url);
+                if (typeof waseetToast === 'function') {
+                    waseetToast('تم نسخ رابط المتجر إلى الحافظة بنجاح!', 'success');
                 } else if (typeof waseetAlert === 'function') {
-                    waseetAlert('تم نسخ رابط المتجر!', 'تم نسخ الرابط إلى الحافظة بنجاح، يمكنك مشاركته الآن.', 'success');
+                    waseetAlert('تم نسخ الرابط', 'تم نسخ رابط متجرك إلى الحافظة بنجاح، يمكنك مشاركته مع المشترين الآن!', 'success');
                 } else {
-                    alert('تم نسخ رابط المتجر بنجاح!');
+                    alert('تم نسخ رابط المتجر: ' + url);
                 }
-            } catch (e) {
-                prompt('انسخ رابط متجرك من هنا:', url);
+            } catch (err) {
+                prompt('انسخ رابط المتجر التالي:', url);
             }
         }
 
-        /* ── نافذة فحص وتفاصيل الحساب والصور ── */
-        function openModal(accountId) {
-            const acc = activeAccounts.find(a => a.id === accountId);
+        /* ── تفاصيل الحساب المنبثقة ── */
+        function openModal(index) {
+            const acc = activeAccounts[index];
             if (!acc) return;
             modalActiveAccount = acc;
             modalImageIndex = 0;
 
-            const modal = document.getElementById('store-account-modal');
-            const titleEl = document.getElementById('modal-acc-title');
-            const gameEl = document.getElementById('modal-acc-game');
-            const specsEl = document.getElementById('modal-acc-specs');
-            const notesEl = document.getElementById('modal-acc-notes');
-            const priceNoteEl = document.getElementById('modal-seller-price-note');
-            const totalPriceEl = document.getElementById('modal-total-price');
-            const buyBtn = document.getElementById('modal-buy-btn');
+            const modal = document.getElementById('modal-store-details');
+            if (!modal) return;
 
-            titleEl.textContent = acc.title;
-            gameEl.textContent = acc.game === 'free_fire' ? 'فري فاير Free Fire' : (acc.game || 'ألعاب');
+            const imagesList = (acc.images && acc.images.length > 0) ? acc.images : [acc.image || 'assets/logo.png'];
+            updateModalGallery(imagesList);
+
+            const titleEl = document.getElementById('modal-acc-title');
+            if (titleEl) titleEl.textContent = acc.title;
+
+            const numEl = document.getElementById('modal-acc-num');
+            if (numEl) numEl.textContent = '#' + (acc.accountNumber || (index + 1001));
+
+            const primeBox = document.getElementById('modal-prime-badge-box');
+            if (primeBox) {
+                if (acc.game === 'free_fire') {
+                    primeBox.innerHTML = `<span class="prime-badge-3d" style="display:inline-block; margin-bottom: 0.5rem;"><i class="fas fa-crown"></i> برايم ${acc.primeLevel || 1}</span>`;
+                } else if (acc.badge) {
+                    primeBox.innerHTML = `<span class="prime-badge-3d" style="display:inline-block; margin-bottom: 0.5rem;">${esc(acc.badge)}</span>`;
+                } else {
+                    primeBox.innerHTML = '';
+                }
+            }
+
+            const specsEl = document.getElementById('modal-acc-specs');
+            if (specsEl) {
+                const bindLabel = (acc.bindStatus === 'single' || acc.bindType === 'single') ? 'ربط أحادي آمن' : 'ربط متاح';
+                const pantsTag = (acc.iconicPants && acc.iconicPants.length > 0 && acc.iconicPants[0] !== 'بنطلون مميز')
+                    ? `<span class="spec-chip"><i class="fas fa-tshirt text-gold"></i> ${esc(acc.iconicPants[0])}</span>`
+                    : '';
+                specsEl.innerHTML = `
+                    <span class="spec-chip"><i class="fas fa-shield-alt text-emerald"></i> ${bindLabel}</span>
+                    <span class="spec-chip"><i class="fas fa-level-up-alt text-gold"></i> لفل ${acc.level || 50}</span>
+                    <span class="spec-chip"><i class="fas fa-gamepad text-silver"></i> ${acc.game === 'free_fire' ? 'فري فاير' : (acc.game === 'pubg' ? 'ببجي موبايل' : 'حساب ألعاب')}</span>
+                    ${pantsTag}
+                `;
+            }
+
+            const notesEl = document.getElementById('modal-acc-notes');
+            if (notesEl) {
+                if (acc.accountNotes && acc.accountNotes.trim()) {
+                    notesEl.innerHTML = `<strong><i class="fas fa-info-circle text-gold"></i> ملاحظات البائع:</strong><br>${esc(acc.accountNotes)}`;
+                    notesEl.style.display = 'block';
+                } else {
+                    notesEl.style.display = 'none';
+                }
+            }
 
             const price = typeof calculateWaseetFee === 'function'
-                ? calculateWaseetFee(acc.sellerPrice || 0)
+                ? calculateWaseetFee(acc.sellerPrice || acc.seller_price || 0)
                 : { buyerPrice: acc.sellerPrice || 0, fee: 0, sellerPrice: acc.sellerPrice || 0 };
 
-            priceNoteEl.textContent = `صافي البائع: ${price.sellerPrice} نقطة + عمولة الوساطة ${price.fee} نقطة`;
-            totalPriceEl.textContent = `${price.buyerPrice} نقطة`;
+            const priceNoteEl = document.getElementById('modal-seller-price-note');
+            if (priceNoteEl) priceNoteEl.textContent = `صافي للبائع: ${price.sellerPrice} نقطة • عمولة الوساطة: ${price.fee} نقطة`;
 
-            specsEl.innerHTML = `
-                <span class="spec-chip"><i class="fas fa-globe-asia text-gold"></i> الشرق الأوسط</span>
-                <span class="spec-chip"><i class="fas fa-link text-orange"></i> ربط ${acc.bindStatus === 'single' ? 'أحادي' : 'ثنائي'}</span>
-                <span class="spec-chip"><i class="fas fa-layer-group text-gold"></i> المستوى ${acc.level || 50}</span>
-                <span class="spec-chip"><i class="fas fa-shield-alt text-emerald" style="color: #10b981;"></i> وساطة آمنة 100%</span>
-            `;
+            const totalEl = document.getElementById('modal-total-price');
+            if (totalEl) totalEl.textContent = `${price.buyerPrice} نقطة`;
 
-            if (acc.accountNotes && acc.accountNotes.trim()) {
-                notesEl.textContent = acc.accountNotes;
-                notesEl.style.display = 'block';
-            } else {
-                notesEl.style.display = 'none';
+            const buyBtn = document.getElementById('modal-buy-btn');
+            if (buyBtn) {
+                const isSold = (acc.status === 'sold' || acc.status === 'completed');
+                if (isSold) {
+                    buyBtn.disabled = true;
+                    buyBtn.innerHTML = '<i class="fas fa-lock"></i> تم بيع هذا الحساب مسبقاً';
+                    buyBtn.className = 'btn-3d btn-outline';
+                    buyBtn.onclick = null;
+                } else {
+                    buyBtn.disabled = false;
+                    buyBtn.innerHTML = '<i class="fas fa-shield-alt"></i> طلب وساطة وشراء الحساب';
+                    buyBtn.className = 'btn-3d btn-orange';
+                    buyBtn.onclick = () => requestEscrow(acc);
+                }
             }
 
-            if (acc.status === 'sold' || acc.status === 'completed') {
-                buyBtn.disabled = true;
-                buyBtn.innerHTML = '<i class="fas fa-lock"></i> تم البيع بنجاح (مغلق)';
-                buyBtn.style.background = 'rgba(255, 255, 255, 0.08)';
-                buyBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                buyBtn.style.color = '#94a3b8';
-                buyBtn.style.cursor = 'not-allowed';
-                buyBtn.onclick = null;
-            } else {
-                buyBtn.disabled = false;
-                buyBtn.innerHTML = '<i class="fas fa-shield-alt"></i> طلب وساطة وشراء الحساب';
-                buyBtn.style.background = '';
-                buyBtn.style.borderColor = '';
-                buyBtn.style.color = '';
-                buyBtn.style.cursor = '';
-                buyBtn.onclick = () => {
-                    closeModal();
-                    requestEscrow(acc.id);
-                };
-            }
-
-            renderModalGallery();
             modal.style.display = 'flex';
         }
 
         function closeModal() {
-            const modal = document.getElementById('store-account-modal');
+            const modal = document.getElementById('modal-store-details');
             if (modal) modal.style.display = 'none';
             modalActiveAccount = null;
         }
 
-        function renderModalGallery() {
+        function updateModalGallery(images) {
+            const mainImg = document.getElementById('modal-main-image');
+            const thumbsRow = document.getElementById('modal-thumbs-row');
+            if (!mainImg || !images || images.length === 0) return;
+
+            mainImg.src = images[modalImageIndex] || 'assets/logo.png';
+            mainImg.onerror = function () { this.src = 'assets/logo.png'; };
+
+            if (thumbsRow) {
+                thumbsRow.innerHTML = images.map((img, i) => `
+                    <div class="gallery-thumb-item ${i === modalImageIndex ? 'active' : ''}" onclick="ProfileStore.setImageIndex(${i})">
+                        <img src="${esc(img)}" alt="صورة ${i + 1}" onerror="this.src='assets/logo.png'">
+                    </div>
+                `).join('');
+            }
+        }
+
+        function setImageIndex(idx) {
             if (!modalActiveAccount) return;
-            const imgs = (modalActiveAccount.images && modalActiveAccount.images.length > 0)
+            const images = (modalActiveAccount.images && modalActiveAccount.images.length > 0)
                 ? modalActiveAccount.images
                 : [modalActiveAccount.image || 'assets/logo.png'];
-
-            const mainImg = document.getElementById('modal-main-img');
-            const thumbsRow = document.getElementById('modal-thumbs-row');
-
-            if (modalImageIndex >= imgs.length) modalImageIndex = 0;
-            if (modalImageIndex < 0) modalImageIndex = imgs.length - 1;
-
-            mainImg.src = imgs[modalImageIndex];
-
-            thumbsRow.innerHTML = imgs.map((imgSrc, i) => `
-                <div class="gallery-thumb-item ${i === modalImageIndex ? 'active' : ''}" onclick="ProfileStore.setImageIndex(${i})">
-                    <img src="${esc(imgSrc)}" alt="معاينة مصغرة للحساب" onerror="this.src='assets/logo.png'">
-                </div>
-            `).join('');
+            if (idx >= 0 && idx < images.length) {
+                modalImageIndex = idx;
+                updateModalGallery(images);
+            }
         }
 
         function nextImage() {
-            modalImageIndex++;
-            renderModalGallery();
+            if (!modalActiveAccount) return;
+            const images = (modalActiveAccount.images && modalActiveAccount.images.length > 0)
+                ? modalActiveAccount.images
+                : [modalActiveAccount.image || 'assets/logo.png'];
+            modalImageIndex = (modalImageIndex + 1) % images.length;
+            updateModalGallery(images);
         }
 
         function prevImage() {
-            modalImageIndex--;
-            renderModalGallery();
+            if (!modalActiveAccount) return;
+            const images = (modalActiveAccount.images && modalActiveAccount.images.length > 0)
+                ? modalActiveAccount.images
+                : [modalActiveAccount.image || 'assets/logo.png'];
+            modalImageIndex = (modalImageIndex - 1 + images.length) % images.length;
+            updateModalGallery(images);
         }
 
-        function setImageIndex(i) {
-            modalImageIndex = i;
-            renderModalGallery();
-        }
-
-        /* ── طلب الوساطة والشراء بالنقاط ── */
-        async function requestEscrow(accountId) {
-            const acc = activeAccounts.find(a => a.id === accountId);
+        /* ── طلب وساطة وشراء الحساب عبر Escrow ── */
+        async function requestEscrow(acc) {
             if (!acc) return;
 
-            if (acc.status === 'sold' || acc.status === 'completed') {
-                if (typeof waseetAlert === 'function') {
-                    await waseetAlert('حساب مباع', 'هذا الحساب تم بيعه مسبقاً وغير متاح للشراء.', 'info');
-                } else {
-                    alert('هذا الحساب تم بيعه مسبقاً وغير متاح للشراء.');
-                }
-                return;
+            let currentUser = null;
+            if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && !WASEET_STATE.user.isGuest) {
+                currentUser = WASEET_STATE.user;
             }
 
-            // التحقق من تسجيل الدخول
-            const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
             if (!currentUser) {
                 if (typeof waseetAlert === 'function') {
                     await waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول أولاً لتتمكن من طلب الوساطة وشراء الحساب.', 'warning');
                 } else {
                     alert('يرجى تسجيل الدخول أولاً!');
                 }
-                if (typeof waseetSignInWithGoogle === 'function') {
-                    waseetSignInWithGoogle();
-                }
+                if (typeof waseetSignInWithGoogle === 'function') waseetSignInWithGoogle();
                 return;
             }
 
-            // منع الشراء الذاتي (Seller cannot buy their own account)
             const sellerId = acc.seller_id || acc.sellerId;
-            if (currentUser.id && sellerId && currentUser.id === sellerId) {
+            if (currentUser.id === sellerId) {
                 if (typeof waseetAlert === 'function') {
-                    await waseetAlert('تنبيه الشراء', 'لا يمكنك شراء حسابك الخاص المعروض للبيع.', 'warning');
+                    await waseetAlert('تنبيه', 'لا يمكنك شراء حسابك الخاص المعروض للبيع.', 'info');
                 } else {
                     alert('لا يمكنك شراء حسابك الخاص!');
                 }
                 return;
             }
 
-            // تحديث الرصيد قبل التحقق
-            if (typeof window.waseetRefreshMyWalletBalance === 'function') {
-                try { await window.waseetRefreshMyWalletBalance(); } catch (e) {}
-            }
-
             const price = typeof calculateWaseetFee === 'function'
-                ? calculateWaseetFee(acc.sellerPrice || 0)
+                ? calculateWaseetFee(acc.sellerPrice || acc.seller_price || 0)
                 : { buyerPrice: acc.sellerPrice || 0, fee: 0, sellerPrice: acc.sellerPrice || 0 };
 
-            const myPts = (currentUser.wallet && Number(currentUser.wallet.available)) || 0;
+            const myPts = currentUser.wallet ? (Number(currentUser.wallet.available) || 0) : (Number(currentUser.points_balance) || 0);
 
             const confirmed = (typeof waseetConfirm === 'function')
                 ? await waseetConfirm(
-                    'طلب وساطة لشراء هذا الحساب',
-                    `هل تود حجز ${price.buyerPrice} نقطة من محفظتك لشراء حساب "${acc.title}"؟\n(صافي البائع: ${price.sellerPrice} نقطة + عمولة الوساطة: ${price.fee} نقطة).\nسيتم حجز النقاط بخزينة الوساطة الآمنة حتى تفحص الحساب وتؤكد استلامه.`,
-                    'نعم، تأكيد الشراء والوساطة',
+                    'تأكيد طلب وساطة وشراء الحساب',
+                    `سيتم حجز ${price.buyerPrice} نقطة من محفظتك في خزينة الوساطة الآمنة لحين استلام الحساب.\n\nتفاصيل الحساب: ${acc.title}\nالضمان: 48 ساعة ضد الاسترجاع.\n\nهل تود المتابعة؟`,
+                    'تأكيد الشراء الفوري',
                     'إلغاء',
-                    'escrow'
+                    'success'
                 )
                 : confirm(`تأكيد شراء الحساب مقابل ${price.buyerPrice} نقطة؟`);
 
@@ -1116,7 +1936,6 @@
                 return;
             }
 
-            // إنشاء الصفقة في Supabase وحجز النقاط
             try {
                 if (typeof waseetCreateEscrowDealOnSupabase === 'function') {
                     const deal = await waseetCreateEscrowDealOnSupabase({
@@ -1148,7 +1967,6 @@
                 return;
             }
 
-            // توجيه المستخدم لغرفة الوساطة أو المتجر الرئيسي
             window.location.href = `index.html#marketplace`;
         }
 
@@ -1160,7 +1978,15 @@
             nextImage,
             prevImage,
             setImageIndex,
-            requestEscrow
+            requestEscrow,
+            switchTab,
+            saveProfileSettings,
+            resetFormValues,
+            promptAvatarChange,
+            handleAvatarFileSelect,
+            scrollToSettings,
+            copyAccountId,
+            confirmLogout
         };
     })();
 

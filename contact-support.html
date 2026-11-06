@@ -894,6 +894,15 @@
                 const avatar = (currentUser && currentUser.avatar) || 'assets/logo.png';
                 const name = (currentUser && currentUser.name) || 'زائر';
                 const roleLabel = isAdmin ? '👑 الوسيط المعتمد (المدير)' : (isBroker ? '🛡️ وسيط إقليمي معتمد' : '🏷️ مستخدم موثق');
+                if (currentUser && !currentUser.isGuest) {
+                    drawerCard.style.cursor = 'pointer';
+                    drawerCard.setAttribute('role', 'button');
+                    drawerCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    drawerCard.onclick = () => { window.location.href = 'profile.html'; };
+                } else {
+                    drawerCard.onclick = null;
+                    drawerCard.style.cursor = 'default';
+                }
                 drawerCard.innerHTML = `
                     <img src="${avatar}" class="drawer-avatar" alt="${name}" onerror="this.src='assets/logo.png'">
                     <div class="drawer-user-meta">

@@ -5797,6 +5797,187 @@ async function waseetRenderLeaderboard(force = false) {
         console.warn('[Leaderboard] Render error:', err);
     }
 }
+/**
+ * تحديث اسم المستخدم في جدول profiles والمزامنة اللحظية في كافة أنحاء الموقع
+ */
+async function waseetUpdateProfileName(newName) {
+    if (!newName || typeof newName !== 'string') {
+        throw new Error('يرجى إدخال اسم صحيح');
+    }
+    const cleanName = newName.trim();
+    if (cleanName.length < 2 || cleanName.length > 60) {
+        throw new Error('يجب أن يتراوح الاسم بين حرفين و 60 حرفاً');
+    }
+
+    const client = initWaseetSupabase();
+    const currentUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+    if (!currentUser || !currentUser.id) {
+        throw new Error('يجب تسجيل الدخول أولاً لتعديل الحساب');
+    }
+
+    if (client) {
+        const { error } = await client
+            .from('profiles')
+            .update({
+                name: cleanName,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            console.error('[Profile Update] Error updating name in Supabase:', error);
+            throw new Error(error.message || 'فشل حفظ الاسم في قاعدة البيانات');
+        }
+    }
+
+    // تحديث الحالة المحلية والمزامنة اللحظية
+    currentUser.name = cleanName;
+    if (currentUser.user_metadata) {
+        currentUser.user_metadata.full_name = cleanName;
+        currentUser.user_metadata.name = cleanName;
+    }
+
+    // حفظ في التخزين المحلي
+    try {
+        const rawSaved = localStorage.getItem('waseet_user_session');
+        if (rawSaved) {
+            const parsed = JSON.parse(rawSaved);
+            if (parsed && parsed.user) {
+                parsed.user.name = cleanName;
+                if (parsed.user.user_metadata) parsed.user.user_metadata.name = cleanName;
+                localStorage.setItem('waseet_user_session', JSON.stringify(parsed));
+            }
+        }
+        localStorage.setItem('waseet_saved_user', JSON.stringify(currentUser));
+    } catch (e) {}
+
+    // تحديث الواجهة فوراً
+    if (typeof window !== 'undefined') {
+        if (window.waseetApp && typeof window.waseetApp.updateAuthUI === 'function') {
+            window.waseetApp.updateAuthUI(currentUser);
+        }
+        if (typeof window.renderNavbarUser === 'function') {
+            window.renderNavbarUser();
+        }
+        window.dispatchEvent(new CustomEvent('waseet-user-updated', { detail: currentUser }));
+    }
+
+    return { success: true, name: cleanName };
+}
+window.waseetUpdateProfileName = waseetUpdateProfileName;
+
+/**
+ * رفع وتحديث الصورة الشخصية للمستخدم في Supabase Storage وجدول profiles والمزامنة اللحظية
+ */
+async function waseetUploadProfileAvatar(file) {
+    if (!file) throw new Error('يرجى اختيار صورة');
+    if (!file.type || !file.type.startsWith('image/')) {
+        throw new Error('نوع الملف غير مدعوم، يرجى اختيار ملف صورة صالح (PNG, JPG, WebP)');
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        throw new Error('حجم الصورة كبير جداً، الحد الأقصى المسموح هو 5 ميجابايت');
+    }
+
+    const client = initWaseetSupabase();
+    const currentUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+    if (!currentUser || !currentUser.id) {
+        throw new Error('يجب تسجيل الدخول أولاً لتغيير الصورة الشخصية');
+    }
+
+    let publicUrl = null;
+
+    // محاولة الرفع إلى سلة تخزين Supabase Storage 'avatars'
+    if (client && client.storage) {
+        try {
+            const ext = (file.name && file.name.split('.').pop()) || 'png';
+            const cleanExt = ext.toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+            const filePath = `${currentUser.id}/${Date.now()}_avatar.${cleanExt}`;
+
+            const { data: uploadData, error: uploadErr } = await client.storage
+                .from('avatars')
+                .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+            if (!uploadErr && uploadData) {
+                const { data: pubData } = client.storage.from('avatars').getPublicUrl(filePath);
+                if (pubData && pubData.publicUrl) {
+                    publicUrl = pubData.publicUrl;
+                }
+            } else if (uploadErr) {
+                console.warn('[Avatar Upload] Storage bucket upload warning:', uploadErr.message);
+            }
+        } catch (storageEx) {
+            console.warn('[Avatar Upload] Supabase storage exception:', storageEx);
+        }
+    }
+
+    // صمام أمان موثوق (Resilient Fallback): في حال تعذر التخزين السحابي نحول الصورة إلى Base64 Data URL
+    if (!publicUrl) {
+        publicUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(new Error('فشل قراءة ملف الصورة'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // تحديث عمود avatar_url في جدول profiles
+    if (client) {
+        try {
+            const { error: dbErr } = await client
+                .from('profiles')
+                .update({
+                    avatar_url: publicUrl,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
+
+            if (dbErr) {
+                console.warn('[Avatar DB Update] Note:', dbErr.message);
+            }
+        } catch (dbEx) {
+            console.warn('[Avatar DB Update] Exception:', dbEx);
+        }
+    }
+
+    // تحديث الحالة العامة
+    currentUser.avatar = publicUrl;
+    if (!currentUser.user_metadata) currentUser.user_metadata = {};
+    currentUser.user_metadata.avatar_url = publicUrl;
+    currentUser.user_metadata.picture = publicUrl;
+
+    try {
+        const rawSaved = localStorage.getItem('waseet_user_session');
+        if (rawSaved) {
+            const parsed = JSON.parse(rawSaved);
+            if (parsed && parsed.user) {
+                parsed.user.avatar = publicUrl;
+                if (!parsed.user.user_metadata) parsed.user.user_metadata = {};
+                parsed.user.user_metadata.avatar_url = publicUrl;
+                localStorage.setItem('waseet_user_session', JSON.stringify(parsed));
+            }
+        }
+        localStorage.setItem('waseet_saved_user', JSON.stringify(currentUser));
+    } catch (e) {}
+
+    // مزامنة فورية في كافة عناصر الواجهة
+    if (typeof window !== 'undefined') {
+        if (window.waseetApp && typeof window.waseetApp.updateAuthUI === 'function') {
+            window.waseetApp.updateAuthUI(currentUser);
+        }
+        if (typeof window.renderNavbarUser === 'function') {
+            window.renderNavbarUser();
+        }
+        // تحديث الصور الموجودة مباشرة في DOM
+        document.querySelectorAll('.user-avatar-img, .drawer-avatar, #profile-avatar, #modal-profile-avatar, #dashboard-user-avatar').forEach(img => {
+            img.src = publicUrl;
+        });
+        window.dispatchEvent(new CustomEvent('waseet-user-updated', { detail: currentUser }));
+    }
+
+    return { success: true, avatarUrl: publicUrl };
+}
+window.waseetUploadProfileAvatar = waseetUploadProfileAvatar;
+
 window.waseetRenderLeaderboard = waseetRenderLeaderboard;
 
 // تشغيل المستمع بمجرد اكتمال تحميل DOM

@@ -278,6 +278,10 @@
                         ? '👑 الوسيط المعتمد (المدير)'
                         : (isBrokerRole ? '🛡️ وسيط إقليمي معتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
                     const pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
+                    userCard.style.cursor = 'pointer';
+                    userCard.setAttribute('role', 'button');
+                    userCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    userCard.onclick = () => { window.location.href = 'profile.html'; };
                     userCard.innerHTML = `
                         <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
@@ -287,6 +291,10 @@
                         </div>
                     `;
                 } else {
+                    userCard.style.cursor = 'pointer';
+                    userCard.setAttribute('role', 'button');
+                    userCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
+                    userCard.onclick = () => { window.location.href = 'profile.html'; };
                     userCard.innerHTML = `
                         <div class="drawer-avatar" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:var(--silver-muted);font-size:1.3rem;">
                             <i class="fas fa-user"></i>
