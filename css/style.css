@@ -9536,6 +9536,18 @@ html.lenis body {
     border: 2px solid #0b0f19;
     border-radius: 50%;
     box-shadow: 0 0 8px #10b981;
+    transition: all 0.3s ease;
+}
+
+.global-broker-online-dot.online {
+    background: #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.9) !important;
+}
+
+.global-broker-online-dot.offline {
+    background: #64748b !important;
+    box-shadow: none !important;
+    opacity: 0.75 !important;
 }
 
 .global-broker-country-badge {
@@ -10061,6 +10073,64 @@ html.lenis body {
 .kyc-toggle-switch input:checked + .kyc-toggle-slider:before {
     transform: translateX(20px);
 }
+
+/* ==========================================================================
+   28. أنماط تقييم الوسطاء وبيانات التسليم الأربعة
+   ========================================================================== */
+.broker-review-modal-overlay {
+    z-index: 100050 !important;
+}
+
+.broker-review-modal-card {
+    background: linear-gradient(145deg, #0d121f, #070a12);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 18px;
+    padding: 1.8rem;
+    max-width: 500px;
+    width: 92%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2);
+    position: relative;
+    animation: waseetModalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.broker-star-rating-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    direction: ltr;
+    margin: 1.2rem 0 0.6rem;
+}
+
+.broker-star-btn {
+    background: transparent;
+    border: none;
+    font-size: 2.2rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 0.2rem;
+}
+
+.broker-star-btn:hover,
+.broker-star-btn.active {
+    color: #facc15;
+    text-shadow: 0 0 16px rgba(250, 204, 21, 0.7);
+    transform: scale(1.18);
+}
+
+.credentials-buyer-container .cred-section-box {
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.credentials-buyer-container .cred-section-box:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.cred-field-card {
+    box-sizing: border-box;
+}
+
 
 
 

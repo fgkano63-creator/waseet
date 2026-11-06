@@ -3542,6 +3542,27 @@ function parseBrokerAvatarMeta(avatarUrl) {
     };
 }
 
+function isFakeBrokerRecord(b) {
+    if (!b) return true;
+    const name = String(b.name || '').toLowerCase().trim();
+    const email = String(b.email || '').toLowerCase().trim();
+    const country = String(b.country || '').toUpperCase().trim();
+
+    // طرد وتجريد zaki 0000 أو حساب z1a2k4i5 نهائياً
+    if (email.includes('z1a2k4i5') || name.includes('zaki 0000') || name.includes('zaki0000')) {
+        return true;
+    }
+
+    // طرد إبراهيم جلالي المنسوب للجزائر DZ (تجريد الوسيط الوهمي)، مع الحفاظ الصارم على ابراهيم جللي المنسوب لسوريا SY
+    const isJalaliName = name.includes('إبراهيم جلالي') || name.includes('ابراهيم جلالي') || name.includes('إبراهيم جللي') || name.includes('ابراهيم جللي');
+    if (isJalaliName && (country === 'DZ' || !country)) {
+        return true;
+    }
+
+    return false;
+}
+window.isFakeBrokerRecord = isFakeBrokerRecord;
+
 function getCachedRegionalBrokersList() {
     let list = [];
     try {
@@ -3554,7 +3575,12 @@ function getCachedRegionalBrokersList() {
     if (list.length === 0 && typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
         list = [...WASEET_STATE.brokers];
     }
-    return list;
+    // تصفية الوسطاء الوهميين وتطهير الكاش تلقائياً
+    const filtered = list.filter(b => !isFakeBrokerRecord(b));
+    if (filtered.length !== list.length) {
+        saveCachedRegionalBrokersList(filtered);
+    }
+    return filtered;
 }
 
 function saveCachedRegionalBrokersList(list) {
@@ -3957,7 +3983,7 @@ async function waseetFetchRegionalBrokers() {
             if (!rbError && Array.isArray(rbRows) && rbRows.length > 0) {
                 console.log('[Regional Brokers] Found rows in regional_brokers table:', rbRows.length);
                 rbRows.forEach(r => {
-                    if (r.is_active !== false) {
+                    if (r.is_active !== false && !isFakeBrokerRecord(r)) {
                         dbBrokers.push({
                             id: r.id || r.user_id || ('broker_' + Date.now()),
                             name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
@@ -3990,8 +4016,8 @@ async function waseetFetchRegionalBrokers() {
 
             if (!profError && Array.isArray(profileRows)) {
                 profileRows.forEach(row => {
-                    // إذا تم إرجاع رتبة المستخدم إلى 'user'، يتم استبعاده فوراً وحظره من الظهور كوسيط
-                    if (row.role === 'user') return;
+                    // إذا تم إرجاع رتبة المستخدم إلى 'user' أو كان وسيطاً وهمياً، يتم استبعاده فوراً
+                    if (row.role === 'user' || isFakeBrokerRecord(row)) return;
 
                     const avatarMeta = parseBrokerAvatarMeta(row.avatar_url);
                     const isBrokerRole = row.role === 'regional_broker' || row.role === 'broker';
@@ -4010,6 +4036,9 @@ async function waseetFetchRegionalBrokers() {
                             row.country ||
                             'DZ'
                         ).toUpperCase().trim();
+
+                        // فحص إضافي بعد استخراج الدولة لتصفية الحسابات الوهمية
+                        if (isFakeBrokerRecord({ ...row, country: resolvedCountry })) return;
 
                         const kycCached = getBrokerPublicKycFromMap(kycPublicCache, row.id, row.email);
                         const hasDbKyc = row.kyc_type !== undefined && row.kyc_type !== null && String(row.kyc_type).trim() !== '';
@@ -4037,7 +4066,7 @@ async function waseetFetchRegionalBrokers() {
                             is_fully_verified: resolvedVerified,
                             last_seen_at: row.last_seen_at || (kycCached && kycCached.last_seen_at) || null,
                             completed_deals: Number(row.completed_deals || (kycCached && kycCached.completed_deals) || (cachedMatch && cachedMatch.completed_deals) || 0),
-                            rating: Number(row.rating || 5.0),
+                            rating: Number(row.rating || 0.0),
                             created_at: row.created_at || new Date().toISOString()
                         });
                     }
@@ -4056,10 +4085,13 @@ async function waseetFetchRegionalBrokers() {
                 .select('id, name, avatar_url, role, country, kyc_type, is_fully_verified, last_seen_at, created_at');
             if (!pubErr && Array.isArray(pubRows)) {
                 pubRows.forEach(pRow => {
-                    if (!pRow || pRow.role === 'user') return;
+                    if (!pRow || pRow.role === 'user' || isFakeBrokerRecord(pRow)) return;
                     const avatarMeta = parseBrokerAvatarMeta(pRow.avatar_url);
                     const isBrokerRole = pRow.role === 'regional_broker' || pRow.role === 'broker' || avatarMeta.isBrokerTagged;
                     if (!isBrokerRole) return;
+                    const resolvedCountry = String(avatarMeta.countryCode || pRow.country || 'DZ').toUpperCase().trim();
+                    if (isFakeBrokerRecord({ ...pRow, country: resolvedCountry })) return;
+
                     const existing = dbBrokers.find(b => b.id && pRow.id && String(b.id) === String(pRow.id));
                     if (existing) {
                         if (pRow.kyc_type) existing.kyc_type = pRow.kyc_type;
@@ -4076,7 +4108,7 @@ async function waseetFetchRegionalBrokers() {
                             email: '',
                             avatar_url: avatarMeta.cleanAvatarUrl,
                             role: 'regional_broker',
-                            country: String(avatarMeta.countryCode || pRow.country || 'DZ').toUpperCase().trim(),
+                            country: resolvedCountry,
                             is_active: true,
                             wallet_balance: 0,
                             points_balance: 0,
@@ -4088,7 +4120,7 @@ async function waseetFetchRegionalBrokers() {
                                     : (hasDbKyc ? Boolean(pRow.is_fully_verified) : true),
                             last_seen_at: pRow.last_seen_at || null,
                             completed_deals: Number(kycCached?.completed_deals || 0),
-                            rating: 5.0,
+                            rating: 0.0,
                             created_at: pRow.created_at || new Date().toISOString()
                         });
                     }
@@ -4099,6 +4131,7 @@ async function waseetFetchRegionalBrokers() {
     const mergedMap = new Map();
 
     dbBrokers.forEach(b => {
+        if (isFakeBrokerRecord(b)) return;
         const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
         if (kycCached) {
             if (kycCached.kyc_type) b.kyc_type = kycCached.kyc_type;
@@ -4114,7 +4147,7 @@ async function waseetFetchRegionalBrokers() {
     });
 
     cachedBrokers.forEach(b => {
-        if (b && b.is_active !== false) {
+        if (b && b.is_active !== false && !isFakeBrokerRecord(b)) {
             const key = (b.email || b.id || '').toLowerCase();
             const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
             if (key) {
@@ -4129,7 +4162,9 @@ async function waseetFetchRegionalBrokers() {
                             : (typeof b.is_fully_verified === 'boolean' ? b.is_fully_verified : true)
                     };
                     delete cleanObj.kyc_document_url;
-                    mergedMap.set(key, cleanObj);
+                    if (!isFakeBrokerRecord(cleanObj)) {
+                        mergedMap.set(key, cleanObj);
+                    }
                 } else {
                     // إذا كان السجل موجوداً في قاعدة البيانات لكن دولته DZ بينما الكاش يحمل دولة محددة مسندة (مثل SY أو LY)، يتم اعتماد الدولة المسندة
                     const existing = mergedMap.get(key);
@@ -4145,7 +4180,7 @@ async function waseetFetchRegionalBrokers() {
         }
     });
 
-    const finalBrokers = Array.from(mergedMap.values());
+    const finalBrokers = Array.from(mergedMap.values()).filter(b => !isFakeBrokerRecord(b));
     saveCachedRegionalBrokersList(finalBrokers);
 
     // إذا كان المستخدم الحالي وسيطاً معتمداً بالفعل، نقوم بمزامنة دولته المسندة في الجلسة الحالية
@@ -4441,9 +4476,14 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
 
             const isFullyVerified = broker.is_fully_verified !== false;
             const kycShort = (typeof getKycTypeShortLabel === 'function') ? getKycTypeShortLabel(broker.kyc_type || 'national_id') : 'بطاقة وطنية';
-            const rating = Number(broker.rating || 5.0).toFixed(1);
-            const dealsCount = Number(broker.completed_deals || 28);
+            const rating = Number(broker.rating || 0.0).toFixed(1);
+            const dealsCount = Number(broker.completed_deals || 0);
+            const reviewsCount = Number(broker.reviews_count || broker.total_reviews || 0);
             const brokerId = broker.id || broker.email || countryCode;
+            const isOnline = Boolean(
+                broker.is_online === true ||
+                (broker.last_seen_at && (Date.now() - new Date(broker.last_seen_at).getTime() <= 10 * 60 * 1000))
+            );
 
             return `
                 <div class="global-broker-card" onclick="window.waseetOpenBrokerProfileModal('${escapeHtmlSafe(brokerId)}')" role="button" tabindex="0">
@@ -4451,7 +4491,7 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
                     <div class="global-broker-header">
                         <div class="global-broker-avatar-wrap">
                             <img src="${escapeHtmlSafe(avatarUrl)}" alt="${escapeHtmlSafe(brokerName)}" class="global-broker-avatar" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
-                            <span class="global-broker-online-dot" title="متصل وجاهز للوساطة"></span>
+                            <span class="global-broker-online-dot ${isOnline ? 'online' : 'offline'}" title="${isOnline ? 'متصل الآن وجاهز للوساطة' : 'غير متصل حالياً'}"></span>
                         </div>
                         <div class="global-broker-country-badge">
                             <img src="${escapeHtmlSafe(flagSvg)}" alt="${escapeHtmlSafe(countryName)}" class="global-broker-flag" onerror="this.src='assets/flags/dz.svg'">
@@ -4473,12 +4513,12 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
 
                         <div class="global-broker-stats-row">
                             <div class="broker-mini-stat">
-                                <span class="mini-stat-val">${dealsCount}+</span>
+                                <span class="mini-stat-val">${dealsCount}</span>
                                 <span class="mini-stat-lbl">صفقة ناجحة</span>
                             </div>
                             <div class="broker-mini-stat">
                                 <span class="mini-stat-val text-gold">${rating} ★</span>
-                                <span class="mini-stat-lbl">التقييم</span>
+                                <span class="mini-stat-lbl">التقييم${reviewsCount > 0 ? ` (${reviewsCount})` : ''}</span>
                             </div>
                             <div class="broker-mini-stat">
                                 <span class="mini-stat-val text-emerald">66%</span>
@@ -4547,22 +4587,10 @@ async function waseetFetchBrokerPublicProfile(brokerIdOrHint) {
         } catch (rpcErr) {}
     }
 
-    // حساب عدد الصفقات الناجحة من الصفقات والوساطة إذا كانت 0
+    // حساب عدد الصفقات والتقييم الحقيقي من قاعدة البيانات بدءاً من 0
     let completedDealsCount = Number((rpcData && rpcData.completed_deals) || (baseBroker && baseBroker.completed_deals) || 0);
-    if (completedDealsCount <= 0 && client) {
-        try {
-            const { count } = await client
-                .from('deals')
-                .select('id', { count: 'exact', head: true })
-                .eq('status', 'completed');
-            if (typeof count === 'number' && count > 0) {
-                completedDealsCount = count;
-            }
-        } catch (cErr) {}
-    }
-    if (completedDealsCount <= 0) {
-        completedDealsCount = 28; // رصيد ثقة ابتدائي للوسيط الإقليمي المعتمد
-    }
+    let brokerRating = Number((rpcData && rpcData.rating) || (baseBroker && baseBroker.rating) || 0.0);
+    let reviewsCount = Number((rpcData && rpcData.reviews_count) || (baseBroker && baseBroker.reviews_count) || 0);
 
     const mergedId = (rpcData && rpcData.id) || (baseBroker && baseBroker.id) || cleanHint || 'regional_broker';
     const mergedEmail = (baseBroker && baseBroker.email) || '';
@@ -4594,7 +4622,14 @@ async function waseetFetchBrokerPublicProfile(brokerIdOrHint) {
         'DZ'
     ).toUpperCase().trim();
 
-    const isOnline = (rpcData && typeof rpcData.is_online === 'boolean') ? rpcData.is_online : true;
+    const isOnline = (rpcData && typeof rpcData.is_online === 'boolean')
+        ? rpcData.is_online
+        : Boolean(
+            baseBroker && (
+                baseBroker.is_online === true ||
+                (baseBroker.last_seen_at && (Date.now() - new Date(baseBroker.last_seen_at).getTime() <= 10 * 60 * 1000))
+            )
+        );
 
     return {
         id: mergedId,
@@ -4606,7 +4641,8 @@ async function waseetFetchBrokerPublicProfile(brokerIdOrHint) {
         kyc_type_short: getKycTypeShortLabel(finalKycType),
         is_fully_verified: finalVerified,
         completed_deals: completedDealsCount,
-        rating: Number((rpcData && rpcData.rating) || (baseBroker && baseBroker.rating) || 5.0),
+        rating: brokerRating,
+        reviews_count: reviewsCount,
         is_online: isOnline,
         joined_at: (rpcData && rpcData.joined_at) || (baseBroker && baseBroker.created_at) || new Date().toISOString()
     };
@@ -4675,10 +4711,10 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
         const safeAvatar = escapeHtmlSafe(profile.avatar_url || 'assets/logo.png');
         const safeKycText = escapeHtmlSafe(profile.kyc_type_label || 'بطاقة وطنية (National ID)');
         const safeKycShort = escapeHtmlSafe(profile.kyc_type_short || 'بطاقة وطنية');
-        const ratingFormatted = Number(profile.rating || 5.0).toFixed(1);
-        const dealsCount = Number(profile.completed_deals || 28);
-        const isOnline = profile.is_online !== false;
-        const isFullyVerified = profile.is_fully_verified !== false;
+        const ratingFormatted = Number(profile.rating || 0.0).toFixed(1);
+        const dealsCount = Number(profile.completed_deals || 0);
+        const reviewsCount = Number(profile.reviews_count || 0);
+        const isOnline = Boolean(profile.is_online === true);
 
         let kycIcon = 'fa-id-card';
         if (profile.kyc_type === 'passport') kycIcon = 'fa-passport';
@@ -4751,7 +4787,7 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
                         <div class="stat-icon-circle emerald">
                             <i class="fas fa-handshake"></i>
                         </div>
-                        <strong class="stat-val">${dealsCount}+</strong>
+                        <strong class="stat-val">${dealsCount}${dealsCount > 0 ? '+' : ''}</strong>
                         <span class="stat-lbl">صفقة ناجحة</span>
                     </div>
 
@@ -4759,7 +4795,7 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
                         <div class="stat-icon-circle gold">
                             <i class="fas fa-star"></i>
                         </div>
-                        <strong class="stat-val">${ratingFormatted} <span class="stars-mini">★★★★★</span></strong>
+                        <strong class="stat-val">${ratingFormatted} ★${reviewsCount > 0 ? ` <small style="font-size:0.75rem; color:#cbd5e1;">(${reviewsCount})</small>` : ''}</strong>
                         <span class="stat-lbl">التقييم بالنجوم</span>
                     </div>
 
@@ -4827,6 +4863,205 @@ function waseetHandleBrokerProfileAction(actionType, brokerId) {
     }
 }
 window.waseetHandleBrokerProfileAction = waseetHandleBrokerProfileAction;
+
+/**
+ * إرسال تقييم للوسيط بعد إتمام الصفقة (1 إلى 5 نجوم مع تعليق اختياري)
+ */
+async function waseetSubmitBrokerReview(dealId, brokerId, rating, comment = '') {
+    const client = initWaseetSupabase();
+    if (!dealId) return { ok: false, message: 'معرف الصفقة غير صالح' };
+    const numRating = Math.max(1, Math.min(5, parseInt(rating, 10) || 5));
+
+    if (client) {
+        try {
+            const { data, error } = await client.rpc('submit_broker_review', {
+                p_deal_id: dealId,
+                p_broker_id: brokerId,
+                p_rating: numRating,
+                p_comment: String(comment || '').trim()
+            });
+
+            if (!error && data && data.ok) {
+                return { ok: true, data };
+            }
+            if (error) {
+                console.warn('[Broker Review RPC Error]', error.message);
+                const user = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+                if (user && user.id && brokerId) {
+                    const { error: insErr } = await client.from('broker_reviews').upsert({
+                        deal_id: dealId,
+                        broker_id: brokerId,
+                        reviewer_id: user.id,
+                        reviewer_role: 'buyer',
+                        rating: numRating,
+                        comment: String(comment || '').trim()
+                    }, { onConflict: 'deal_id, reviewer_id' });
+                    if (!insErr) return { ok: true, rating: numRating };
+                }
+                return { ok: false, message: error.message };
+            }
+        } catch (ex) {
+            console.warn('[Broker Review Exception]', ex);
+            return { ok: false, message: ex.message || 'حدث خطأ أثناء إرسال التقييم' };
+        }
+    }
+
+    return { ok: true, localOnly: true, rating: numRating };
+}
+window.waseetSubmitBrokerReview = waseetSubmitBrokerReview;
+
+/**
+ * جلب إحصائيات تقييمات الوسيط الحقيقية من Supabase
+ */
+async function waseetGetBrokerRatingStats(brokerId) {
+    const client = initWaseetSupabase();
+    if (!client || !brokerId) return { total_reviews: 0, avg_rating: 0.0, completed_deals_count: 0 };
+    try {
+        const { data, error } = await client.rpc('get_broker_rating_stats', { p_broker_id: brokerId });
+        if (!error && data && data.ok) return data;
+    } catch (e) {}
+    return { total_reviews: 0, avg_rating: 0.0, completed_deals_count: 0 };
+}
+window.waseetGetBrokerRatingStats = waseetGetBrokerRatingStats;
+
+/**
+ * نافذة تقييم الوسيط الإقليمي المعتمد بعد اكتمال الصفقة
+ */
+function waseetOpenBrokerReviewModal(dealObj) {
+    if (!dealObj) return;
+    const dealId = dealObj.id || dealObj.dealId;
+    const brokerId = dealObj.mediator_id || dealObj.mediatorId || (dealObj.mediator && dealObj.mediator.id) || null;
+    const brokerName = (dealObj.mediator && dealObj.mediator.name) || 'الوسيط المعتمد';
+
+    let modal = document.getElementById('modal-broker-review');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-broker-review';
+        modal.className = 'modal-overlay broker-review-modal-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.onclick = function(e) {
+            if (e.target === modal) waseetCloseBrokerReviewModal();
+        };
+        document.body.appendChild(modal);
+    }
+
+    let selectedRating = 5;
+    const ratingLabels = {
+        1: 'ضعيف جداً 😞',
+        2: 'مقبول 😐',
+        3: 'جيد 👍',
+        4: 'ممتاز جداً 🌟',
+        5: 'أسطوري - موصى به بشدة! 👑'
+    };
+
+    const renderContent = () => {
+        modal.innerHTML = `
+            <div class="broker-review-modal-card" onclick="event.stopPropagation()">
+                <button type="button" class="broker-profile-close-btn" onclick="window.waseetCloseBrokerReviewModal()" aria-label="إغلاق">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div style="text-align: center; margin-bottom: 1.2rem;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #f59e0b; margin-bottom: 0.6rem;">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h3 style="color: #fff; font-size: 1.25rem; font-weight: 800; margin: 0 0 0.3rem;">تقييم تجربة الوساطة الآمنة</h3>
+                    <p style="color: var(--silver-muted); font-size: 0.85rem; margin: 0;">رأيك يساعدنا في الحفاظ على أعلى معايير الأمان والثقة في المنصة</p>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1.2rem;">
+                    <span style="font-size: 0.84rem; color: var(--silver-muted); display: block; margin-bottom: 0.4rem;">الوسيط المشرف على الصفقة:</span>
+                    <strong style="color: #fff; font-size: 1.05rem;"><i class="fas fa-shield-alt text-emerald"></i> ${String(brokerName).replace(/</g, '&lt;')}</strong>
+                    
+                    <div class="broker-star-rating-row" id="review-stars-row">
+                        ${[1, 2, 3, 4, 5].map(star => `
+                            <button type="button" class="broker-star-btn ${star <= selectedRating ? 'active' : ''}" onclick="window._setReviewRating(${star})" title="${star} نجوم">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="review-rating-label" style="color: #facc15; font-size: 0.92rem; font-weight: 700; min-height: 1.4rem;">
+                        ${ratingLabels[selectedRating]}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 0.4rem;">
+                        <i class="far fa-comment-dots text-gold"></i> تعليق أو ملاحظة إضافية حول سرعة الوسيط وأمانه (اختياري):
+                    </label>
+                    <textarea id="review-comment-input" rows="3" placeholder="اكتب كلمتك الصادقة عن تجربة التعامل مع الوسيط..." style="width: 100%; box-sizing: border-box; background: rgba(8, 10, 16, 0.9); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: #fff; padding: 0.75rem; font-family: inherit; font-size: 0.88rem; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 0.6rem;">
+                    <button type="button" id="btn-submit-broker-review" class="btn-3d btn-gold glow-gold" style="flex: 2; padding: 0.75rem; font-weight: 800; justify-content: center;" onclick="window._submitReviewAction()">
+                        <i class="fas fa-paper-plane"></i> إرسال التقييم
+                    </button>
+                    <button type="button" class="btn-3d btn-outline" style="flex: 1; padding: 0.75rem; justify-content: center;" onclick="window.waseetCloseBrokerReviewModal()">
+                        تخطي
+                    </button>
+                </div>
+            </div>
+        `;
+    };
+
+    window._setReviewRating = (star) => {
+        selectedRating = star;
+        const row = document.getElementById('review-stars-row');
+        if (row) {
+            const btns = row.querySelectorAll('.broker-star-btn');
+            btns.forEach((btn, idx) => {
+                if (idx < star) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+        const lbl = document.getElementById('review-rating-label');
+        if (lbl) lbl.textContent = ratingLabels[star] || '';
+    };
+
+    window._submitReviewAction = async () => {
+        const commentEl = document.getElementById('review-comment-input');
+        const comment = commentEl ? commentEl.value.trim() : '';
+        const submitBtn = document.getElementById('btn-submit-broker-review');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        }
+
+        const res = await waseetSubmitBrokerReview(dealId, brokerId, selectedRating, comment);
+        if (res && res.ok) {
+            window.waseetCloseBrokerReviewModal();
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert('شكراً لتقييمك!', 'تم حفظ تقييمك للوسيط بنجاح واحتسابه ضمن المتوسط الحسابي للتقييمات.', 'success');
+            } else {
+                alert('تم إرسال التقييم بنجاح!');
+            }
+        } else {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال التقييم';
+            }
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert('تنبيه', res?.message || 'تعذر إرسال التقييم حالياً', 'warning');
+            } else {
+                alert(res?.message || 'تعذر إرسال التقييم');
+            }
+        }
+    };
+
+    renderContent();
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('active'));
+}
+window.waseetOpenBrokerReviewModal = waseetOpenBrokerReviewModal;
+
+function waseetCloseBrokerReviewModal() {
+    const modal = document.getElementById('modal-broker-review');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => { modal.style.display = 'none'; }, 200);
+    }
+}
+window.waseetCloseBrokerReviewModal = waseetCloseBrokerReviewModal;
 
 /**
  * [خاص بالمدير فقط] رفع صورة وثيقة التوثيق الرسمية للوسيط إلى Bucket خاص (kyc_documents)

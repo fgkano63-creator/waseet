@@ -1223,9 +1223,10 @@
             const acc = myPurchasesList.find(a => String(a.id) === String(accId));
             if (!acc) return;
 
+            let secRes = null;
             if (typeof window.waseetGetAccountCredentialsSecure === 'function' && acc && acc.id) {
                 try {
-                    const secRes = await window.waseetGetAccountCredentialsSecure(acc.id);
+                    secRes = await window.waseetGetAccountCredentialsSecure(acc.id);
                     if (secRes && (secRes.password || secRes.email_or_phone || secRes.credentials)) {
                         acc.credentials = {
                             ...(acc.credentials || {}),
@@ -1234,6 +1235,7 @@
                             password: secRes.password || (secRes.credentials && secRes.credentials.password) || acc.credentials?.password,
                             rawPassword: secRes.password || (secRes.credentials && secRes.credentials.password) || acc.credentials?.rawPassword,
                             recoveryEmail: secRes.recovery_email || (secRes.credentials && secRes.credentials.recoveryEmail) || acc.credentials?.recoveryEmail,
+                            recoveryPassword: secRes.recovery_password || (secRes.credentials && secRes.credentials.recoveryPassword) || acc.credentials?.recoveryPassword,
                             notes: secRes.notes || (secRes.credentials && secRes.credentials.notes) || acc.credentials?.notes
                         };
                     }
@@ -1244,9 +1246,11 @@
 
             const creds = acc.credentials || {};
             const safeLoginType = esc(creds.loginType || 'جوجل Gmail');
-            const safeEmail = esc(creds.email || 'لم يتم تحديد بريد');
-            const rawPwd = creds.rawPassword || creds.password || '••••••••';
-            const safeBackup = esc(creds.backupCodes || creds.notes || creds.recoveryEmail || 'لا توجد أكواد إضافية');
+            const safeEmail = esc(creds.email || (secRes && secRes.email_or_phone) || 'لم يتم تحديد بريد');
+            const rawPwd = creds.rawPassword || creds.password || (secRes && secRes.password) || '••••••••';
+            const safeRecEmail = esc(creds.recoveryEmail || creds.recovery_email || (secRes && secRes.recovery_email) || 'لا يوجد بريد استرداد');
+            const rawRecPwd = creds.recoveryPassword || creds.recovery_password || (secRes && secRes.recovery_password) || '••••••••';
+            const safeNotes = esc(creds.notes || (secRes && secRes.notes) || '');
 
             const body = document.getElementById('purchased-creds-modal-body');
             if (body) {
@@ -1259,53 +1263,94 @@
                         </p>
                     </div>
 
-                    <div class="delivery-credentials-card" style="background: rgba(8, 10, 16, 0.9); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 14px; padding: 1.2rem;">
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-link text-gold"></i> نوع الربط:</span>
-                            <span class="cred-value font-mono text-silver" style="font-weight: 700;">${safeLoginType}</span>
-                        </div>
+                    <!-- حاوية بيانات الدخول المقسمة لـ 4 خانات واضحة -->
+                    <div class="credentials-buyer-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- الصندوق الأول: بيانات الدخول الأساسية -->
+                        <div class="cred-section-box" style="background: rgba(13, 18, 31, 0.9); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 1.1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-key text-gold" style="font-size: 1.1rem;"></i>
+                                    <h5 style="color: #f59e0b; font-size: 0.95rem; font-weight: 800; margin: 0;">بيانات الدخول الأساسية للحساب</h5>
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--silver-muted); background: rgba(255,255,255,0.06); padding: 0.2rem 0.6rem; border-radius: 6px;"><i class="fas fa-link text-gold"></i> نوع الربط: <strong>${safeLoginType}</strong></span>
+                            </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرف:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono text-gold" id="p-modal-email" style="font-weight: 700;">${safeEmail}</span>
-                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeEmail}', 'تم نسخ البريد الإلكتروني')" title="نسخ البريد">
-                                    <i class="far fa-copy"></i>
-                                </button>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                                <!-- البريد الإلكتروني / المعرف -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope text-gold"></i> البريد الإلكتروني / رقم الحساب:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono text-gold" id="p-modal-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeEmail}</span>
+                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeEmail}', 'تم نسخ البريد الإلكتروني')" title="نسخ البريد">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- كلمة المرور الأساسية -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono" id="p-modal-pwd" style="color: #10b981; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
+                                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('p-modal-pwd', 'p-modal-eye', '${rawPwd}')" title="إظهار / إخفاء">
+                                                <i class="fas fa-eye" id="p-modal-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono" id="p-modal-pwd" style="color: #10b981; font-weight: 700;">••••••••••••</span>
-                                <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('${rawPwd}')" title="إظهار / إخفاء">
-                                    <i class="fas fa-eye" id="p-modal-eye"></i>
-                                </button>
-                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور">
-                                    <i class="far fa-copy"></i>
-                                </button>
+                        <!-- الصندوق الثاني: حساب الاسترداد والتأمين -->
+                        <div class="cred-section-box" style="background: rgba(13, 18, 31, 0.9); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 14px; padding: 1.1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding-bottom: 0.5rem;">
+                                <i class="fas fa-user-shield text-blue-400" style="font-size: 1.1rem; color: #60a5fa;"></i>
+                                <h5 style="color: #60a5fa; font-size: 0.95rem; font-weight: 800; margin: 0;">حساب الاسترداد والتأمين (Recovery Account)</h5>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                                <!-- بريد الاسترداد -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope-open-text" style="color: #60a5fa;"></i> البريد / رقم حساب الاسترداد:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono text-silver" id="p-modal-rec-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeRecEmail}</span>
+                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeRecEmail}', 'تم نسخ بريد الاسترداد')" title="نسخ بريد الاسترداد">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- كلمة مرور الاسترداد -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-shield-alt" style="color: #60a5fa;"></i> كلمة المرور لحساب الاسترداد:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono" id="p-modal-rec-pwd" style="color: #60a5fa; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
+                                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('p-modal-rec-pwd', 'p-modal-rec-eye', '${rawRecPwd}')" title="إظهار / إخفاء">
+                                                <i class="fas fa-eye" id="p-modal-rec-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawRecPwd}', 'تم نسخ كلمة مرور الاسترداد')" title="نسخ كلمة مرور الاسترداد">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono text-silver" style="font-size: 0.85rem;">${safeBackup}</span>
-                                <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeBackup}', 'تم نسخ الملاحظات')" title="نسخ">
-                                    <i class="far fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.2rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-virus text-gold"></i> حماية WASEET:</span>
-                            <span class="cred-value" style="color: #10b981; font-weight: 700; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> 48 ساعة ضد الاسترجاع</span>
+                        <!-- ضمان وسيط الذهبي -->
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-virus text-emerald"></i> حماية وضمان منصة WASEET:</span>
+                            <span style="color: #10b981; font-weight: 700; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> ساري لمدة 48 ساعة ضد الاسترجاع</span>
                         </div>
                     </div>
 
                     <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="copyAllPurchasedCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeBackup}')">
+                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="copyAllPurchasedCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeRecEmail}', '${rawRecPwd}', '${safeNotes}')">
                             <i class="fas fa-clipboard-check"></i> نسخ كافة بيانات الدخول
                         </button>
                         ${acc.dealId ? `
@@ -1332,12 +1377,24 @@
             }
         }
 
-        function togglePurchasedPw(rawPwd) {
-            const el = document.getElementById('p-modal-pwd');
-            const eye = document.getElementById('p-modal-eye');
+        function togglePurchasedPw(fieldIdOrVal, eyeId, rawVal) {
+            let targetFieldId = 'p-modal-pwd';
+            let targetEyeId = 'p-modal-eye';
+            let valueToToggle = '';
+
+            if (arguments.length >= 3) {
+                targetFieldId = fieldIdOrVal;
+                targetEyeId = eyeId;
+                valueToToggle = rawVal;
+            } else {
+                valueToToggle = fieldIdOrVal;
+            }
+
+            const el = document.getElementById(targetFieldId);
+            const eye = document.getElementById(targetEyeId);
             if (!el) return;
             if (el.innerText.includes('•')) {
-                el.innerText = rawPwd;
+                el.innerText = valueToToggle;
                 if (eye) { eye.classList.remove('fa-eye'); eye.classList.add('fa-eye-slash'); }
             } else {
                 el.innerText = '••••••••••••';
@@ -1358,8 +1415,19 @@
             }
         }
 
-        async function copyAllPurchasedCredentials(loginType, email, pwd, backup) {
-            const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):\n-----------------------------------\nنوع الربط: ${loginType}\nالبريد / اسم المستخدم: ${email}\nكلمة المرور: ${pwd}\nأكواد الاسترداد / الملاحظات: ${backup}\n-----------------------------------\nالحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة.`;
+        async function copyAllPurchasedCredentials(loginType, email, pwd, recEmail, recPwd, notes) {
+            const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):
+-----------------------------------
+نوع الربط: ${loginType}
+[بيانات الدخول الأساسية]
+البريد الإلكتروني / اسم المستخدم: ${email}
+كلمة المرور: ${pwd}
+-----------------------------------
+[حساب الاسترداد والتأمين]
+بريد الاسترداد: ${recEmail || 'لا يوجد'}
+كلمة مرور الاسترداد: ${recPwd || 'لا يوجد'}
+-----------------------------------
+${notes ? `ملاحظات إضافية: ${notes}\n-----------------------------------\n` : ''}الحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة ضد الاسترجاع.`;
             await copyPurchasedText(fullText, 'تم نسخ كافة بيانات تسجيل الدخول بنجاح!');
         }
 
@@ -1463,36 +1531,55 @@
 
         async function handleDeleteAccount(accId) {
             const confirmed = await waseetConfirm(
-                'تأكيد حذف الحساب',
-                'هل أنت متأكد من رغبتك في حذف هذا الحساب نهائياً من المتجر؟ لن يظهر الحساب للمشترين بعد الحذف.',
-                'نعم، احذف الحساب',
+                'تأكيد حذف الحساب نهائياً',
+                'هل أنت متأكد من رغبتك في حذف هذا الحساب نهائياً من المتجر وقاعدة البيانات؟ لن يظهر الحساب للمشترين بعد الحذف ولن تستطيع استعادته.',
+                'نعم، احذف الحساب نهائياً',
                 'إلغاء',
                 'danger'
             );
 
             if (!confirmed) return;
 
-            const user = WASEET_STATE.user;
-            const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+            let deleteOk = false;
+            let deleteErrMsg = '';
 
-            // حذف من Supabase
-            if (client && user && user.id) {
+            // استدعاء دالة الحذف الفعلية والآمنة من Supabase
+            if (typeof window.waseetDeleteMarketplaceAccount === 'function') {
                 try {
-                    const { error } = await client
-                        .from('marketplace_accounts')
-                        .delete()
-                        .eq('id', accId)
-                        .eq('seller_id', user.id);
-
-                    if (error) {
-                        console.warn('[Delete Account] خطأ Supabase:', error.message);
+                    const delRes = await window.waseetDeleteMarketplaceAccount(accId);
+                    if (delRes && delRes.ok) {
+                        deleteOk = true;
+                    } else if (delRes && delRes.error) {
+                        deleteErrMsg = delRes.error.message || 'حدث خطأ أثناء محاولة الحذف من الخادم';
                     }
-                } catch (err) {
-                    console.warn('[Delete Account] استثناء الحذف:', err);
+                } catch (ex) {
+                    deleteErrMsg = ex.message || 'حدث خطأ استثنائي أثناء الحذف';
+                }
+            } else {
+                const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
+                const user = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
+                if (client && user && user.id) {
+                    try {
+                        await client.from('marketplace_account_secrets').delete().eq('account_id', accId);
+                        const { error } = await client.from('marketplace_accounts').delete().eq('id', accId).eq('seller_id', user.id);
+                        if (!error) deleteOk = true;
+                        else deleteErrMsg = error.message;
+                    } catch (e) {
+                        deleteErrMsg = e.message;
+                    }
                 }
             }
 
-            // حذف من الحالة المحلية
+            if (!deleteOk && deleteErrMsg) {
+                await waseetAlert(
+                    'فشل الحذف',
+                    `تعذر حذف الحساب من قاعدة البيانات: ${deleteErrMsg}`,
+                    'danger'
+                );
+                return;
+            }
+
+            // حذف من الحالة المحلية وكافة الذاكرات المؤقتة
             myAccountsList = myAccountsList.filter(a => a.id.toString() !== accId.toString());
             if (WASEET_STATE.accounts) {
                 WASEET_STATE.accounts = WASEET_STATE.accounts.filter(a => a.id.toString() !== accId.toString());
@@ -1503,15 +1590,19 @@
                 const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
                 const filtered = saved.filter(a => a.id.toString() !== accId.toString());
                 localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(filtered));
+
+                const genAccs = JSON.parse(localStorage.getItem('waseet_accounts') || '[]');
+                const filteredGen = genAccs.filter(a => a.id.toString() !== accId.toString());
+                localStorage.setItem('waseet_accounts', JSON.stringify(filteredGen));
             } catch (e) {}
 
             updateMyAccountsStats(myAccountsList);
             renderMyAccountsGrid(myAccountsList);
 
             await waseetAlert(
-                'تم حذف الحساب',
-                'تم مسح الحساب نهائياً وإخفاؤه من متجر الحسابات بنجاح.',
-                'info'
+                'تم حذف الحساب نهائياً',
+                'تم مسح الحساب وبياناته السرية نهائياً من قاعدة بيانات المتجر ولن يظهر مجدداً.',
+                'success'
             );
         }
 

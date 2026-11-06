@@ -588,7 +588,10 @@ class WaseetEscrowRoom {
                                     password: secCreds.password,
                                     rawPassword: secCreds.password,
                                     recovery_email: secCreds.recovery_email,
-                                    recovery_password: secCreds.recovery_password
+                                    recoveryEmail: secCreds.recovery_email,
+                                    recovery_password: secCreds.recovery_password,
+                                    recoveryPassword: secCreds.recovery_password,
+                                    notes: secCreds.notes
                                 };
                             }
                         }
@@ -1129,17 +1132,13 @@ class WaseetEscrowRoom {
         // ==========================================
         if (this.viewerRole === 'buyer') {
             const isCompleted = this.deal.status === 'completed' || this.deal.currentStep >= 4;
-            const creds = this.deal.credentials || {
-                loginType: 'جوجل Gmail',
-                email: 'buyer@gmail.com',
-                password: '••••••••••••',
-                rawPassword: '••••••••••••',
-                backupCodes: 'لا يوجد'
-            };
+            const creds = this.deal.credentials || {};
             const rawPwd = creds.rawPassword || creds.password || '••••••••';
-            const safeEmail = creds.email || 'حساب غير محدد';
+            const safeEmail = creds.email || creds.email_or_phone || 'حساب غير محدد';
             const safeLoginType = creds.loginType || 'جوجل Gmail';
-            const safeBackup = creds.backupCodes || creds.recoveryEmail || creds.notes || 'لا توجد أكواد إضافية';
+            const safeRecEmail = creds.recoveryEmail || creds.recovery_email || 'لا يوجد بريد استرداد';
+            const rawRecPwd = creds.recoveryPassword || creds.recovery_password || '••••••••';
+            const safeBackup = creds.backupCodes || creds.notes || '';
 
             const completedHeroHtml = isCompleted ? `
                 <div class="buyer-completed-hero-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(10, 15, 24, 0.95)); border: 2px solid #10b981; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(16, 185, 129, 0.22);">
@@ -1153,12 +1152,13 @@ class WaseetEscrowRoom {
                         </div>
                     </div>
 
-                    <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.9rem;">
+                    <!-- الصندوق الأول: بيانات الدخول الأساسية -->
+                    <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.8rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.4rem;">
+                            <span style="font-size: 0.88rem; font-weight: 800; color: #f59e0b;"><i class="fas fa-key text-gold"></i> بيانات الدخول الأساسية</span>
+                            <span style="font-size: 0.75rem; color: var(--silver-muted); background: rgba(255,255,255,0.05); padding: 0.2rem 0.5rem; border-radius: 6px;">نوع الربط: ${safeLoginType}</span>
+                        </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.65rem;">
-                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
-                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-link text-gold"></i> نوع الربط:</span>
-                                <strong style="color: #fff; font-size: 0.9rem;">${safeLoginType}</strong>
-                            </div>
                             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرّف:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
@@ -1171,16 +1171,35 @@ class WaseetEscrowRoom {
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                     <code id="hero-buyer-pwd" style="color: #34d399; font-size: 0.92rem; font-weight: 800; letter-spacing: 1px;">••••••••••••</code>
                                     <div style="display: flex; gap: 0.25rem;">
-                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('hero-buyer-pwd', 'hero-buyer-eye')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-eye"></i></button>
+                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('hero-buyer-pwd', 'hero-buyer-eye', '${rawPwd}')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-eye"></i></button>
                                         <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerPassword()" title="نسخ كلمة المرور"><i class="far fa-copy"></i></button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- الصندوق الثاني: حساب الاسترداد والتأمين -->
+                    <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.9rem;">
+                        <div style="margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.4rem;">
+                            <span style="font-size: 0.88rem; font-weight: 800; color: #60a5fa;"><i class="fas fa-user-shield text-blue-400"></i> حساب الاسترداد والتأمين</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.65rem;">
                             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
-                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-envelope-open-text text-blue-400"></i> بريد الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
-                                    <span style="color: #fff; font-size: 0.82rem; word-break: break-all;">${safeBackup}</span>
-                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerBackup()" title="نسخ"><i class="far fa-copy"></i></button>
+                                    <code style="color: #cbd5e1; font-size: 0.88rem; font-weight: 700; word-break: break-all;">${safeRecEmail}</code>
+                                    <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerRecoveryEmail()" title="نسخ بريد الاسترداد"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem;">
+                                <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.2rem;"><i class="fas fa-shield-alt text-blue-400"></i> كلمة مرور الاسترداد:</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                    <code id="hero-buyer-rec-pwd" style="color: #60a5fa; font-size: 0.92rem; font-weight: 800; letter-spacing: 1px;">••••••••••••</code>
+                                    <div style="display: flex; gap: 0.25rem;">
+                                        <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('hero-buyer-rec-pwd', 'hero-buyer-rec-eye', '${rawRecPwd}')" title="إظهار / إخفاء"><i class="fas fa-eye" id="hero-buyer-rec-eye"></i></button>
+                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerRecoveryPassword()" title="نسخ كلمة مرور الاسترداد"><i class="far fa-copy"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1191,7 +1210,11 @@ class WaseetEscrowRoom {
                             <i class="fas fa-clipboard-check"></i>
                             <span>نسخ كافة بيانات الدخول</span>
                         </button>
-                        <a href="my-accounts.html?tab=purchases" class="btn-3d btn-outline" style="flex: 1; min-width: 150px; padding: 0.7rem 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 700;">
+                        <button type="button" class="btn-3d btn-primary" style="flex: 1; min-width: 160px; padding: 0.7rem 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: linear-gradient(135deg, #f59e0b, #d97706); border: 1px solid #f59e0b;" onclick="window.waseetOpenBrokerReviewModal && window.waseetOpenBrokerReviewModal(window.escrowRoom.deal)">
+                            <i class="fas fa-star text-white"></i>
+                            <span>تقييم أداء الوسيط</span>
+                        </button>
+                        <a href="my-accounts.html?tab=purchases" class="btn-3d btn-outline" style="flex: 1; min-width: 140px; padding: 0.7rem 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 700;">
                             <i class="fas fa-boxes text-orange"></i>
                             <span>حساباتي المشتراة</span>
                         </a>
@@ -2194,9 +2217,11 @@ class WaseetEscrowRoom {
         };
 
         const rawPwd = creds.rawPassword || creds.password || '••••••••';
-        const safeEmail = creds.email || 'لم يتم التحديد';
+        const safeEmail = creds.email || creds.email_or_phone || 'لم يتم التحديد';
         const safeLoginType = creds.loginType || 'جوجل Gmail';
-        const safeBackup = creds.backupCodes || creds.recoveryEmail || creds.notes || 'لا توجد أكواد إضافية';
+        const safeRecEmail = creds.recoveryEmail || creds.recovery_email || 'لا يوجد بريد استرداد';
+        const rawRecPwd = creds.recoveryPassword || creds.recovery_password || '••••••••';
+        const safeBackup = creds.backupCodes || creds.notes || '';
 
         if (body) {
             if (isCompleted) {
@@ -2209,54 +2234,99 @@ class WaseetEscrowRoom {
                         </p>
                     </div>
 
-                    <div class="delivery-credentials-card" style="background: rgba(8, 10, 16, 0.9); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 14px; padding: 1.2rem;">
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-link text-gold"></i> نوع الربط:</span>
-                            <span class="cred-value font-mono text-silver" style="font-weight: 700;">${safeLoginType}</span>
-                        </div>
+                    <!-- حاوية بيانات الدخول المقسمة لـ 4 خانات واضحة -->
+                    <div class="credentials-buyer-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- الصندوق الأول: بيانات الدخول الأساسية -->
+                        <div class="cred-section-box" style="background: rgba(13, 18, 31, 0.9); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 1.1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-key text-gold" style="font-size: 1.1rem;"></i>
+                                    <h5 style="color: #f59e0b; font-size: 0.95rem; font-weight: 800; margin: 0;">بيانات الدخول الأساسية للحساب</h5>
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--silver-muted); background: rgba(255,255,255,0.06); padding: 0.2rem 0.6rem; border-radius: 6px;"><i class="fas fa-link text-gold"></i> نوع الربط: <strong>${safeLoginType}</strong></span>
+                            </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-envelope text-gold"></i> البريد / المعرف:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono text-gold" id="modal-buyer-email" style="font-weight: 700;">${safeEmail}</span>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerEmail()" title="نسخ البريد">
-                                    <i class="far fa-copy"></i>
-                                </button>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                                <!-- البريد الإلكتروني / المعرف -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope text-gold"></i> البريد الإلكتروني / رقم الحساب:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono text-gold" id="modal-buyer-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeEmail}</span>
+                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerEmail()" title="نسخ البريد">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- كلمة المرور الأساسية -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono" id="modal-buyer-pwd" style="color: #10b981; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
+                                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('modal-buyer-pwd', 'modal-buyer-eye', '${rawPwd}')" title="إظهار / إخفاء">
+                                                <i class="fas fa-eye" id="modal-buyer-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerPassword()" title="نسخ كلمة المرور">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-lock text-orange"></i> كلمة المرور:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono" id="modal-buyer-pwd" style="color: #10b981; font-weight: 700;">••••••••••••</span>
-                                <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('modal-buyer-pwd', 'modal-buyer-eye')" title="إظهار / إخفاء">
-                                    <i class="fas fa-eye" id="modal-buyer-eye"></i>
-                                </button>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerPassword()" title="نسخ كلمة المرور">
-                                    <i class="far fa-copy"></i>
-                                </button>
+                        <!-- الصندوق الثاني: حساب الاسترداد والتأمين -->
+                        <div class="cred-section-box" style="background: rgba(13, 18, 31, 0.9); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 14px; padding: 1.1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding-bottom: 0.5rem;">
+                                <i class="fas fa-user-shield" style="font-size: 1.1rem; color: #60a5fa;"></i>
+                                <h5 style="color: #60a5fa; font-size: 0.95rem; font-weight: 800; margin: 0;">حساب الاسترداد والتأمين (Recovery Account)</h5>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                                <!-- بريد الاسترداد -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope-open-text" style="color: #60a5fa;"></i> بريد الاسترداد:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono text-silver" id="modal-buyer-rec-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeRecEmail}</span>
+                                        <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerRecoveryEmail()" title="نسخ بريد الاسترداد">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- كلمة مرور الاسترداد -->
+                                <div class="cred-field-card" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem;">
+                                    <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-shield-alt" style="color: #60a5fa;"></i> كلمة مرور الاسترداد:</span>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                                        <span class="cred-value font-mono" id="modal-buyer-rec-pwd" style="color: #60a5fa; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
+                                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="window.escrowRoom.toggleBuyerCredPassword('modal-buyer-rec-pwd', 'modal-buyer-rec-eye', '${rawRecPwd}')" title="إظهار / إخفاء">
+                                                <i class="fas fa-eye" id="modal-buyer-rec-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerRecoveryPassword()" title="نسخ كلمة مرور الاسترداد">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.6rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-alt text-gold"></i> أكواد الاسترداد / الملاحظات:</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="cred-value font-mono text-silver" style="font-size: 0.85rem;">${safeBackup}</span>
-                                <button type="button" class="btn-copy-cred" onclick="window.escrowRoom.copyBuyerBackup()" title="نسخ">
-                                    <i class="far fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="cred-item" style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.2rem;">
-                            <span class="cred-label" style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-virus text-gold"></i> حماية WASEET:</span>
-                            <span class="cred-value" style="color: #10b981; font-weight: 700; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> 48 ساعة ضد الاسترجاع</span>
+                        <!-- ضمان وسيط الذهبي -->
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--silver-muted); font-size: 0.85rem;"><i class="fas fa-shield-virus text-emerald"></i> حماية وضمان منصة WASEET:</span>
+                            <span style="color: #10b981; font-weight: 700; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> ساري لمدة 48 ساعة ضد الاسترجاع</span>
                         </div>
                     </div>
 
                     <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="window.escrowRoom.copyAllCredentialsFromDeal()">
-                            <i class="fas fa-clipboard-check"></i> نسخ كافة البيانات
+                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 2; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="window.escrowRoom.copyAllCredentialsFromDeal()">
+                            <i class="fas fa-clipboard-check"></i> نسخ كافة بيانات الدخول
+                        </button>
+                        <button type="button" class="btn-3d btn-primary" style="flex: 1; min-width: 160px; padding: 0.75rem 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: linear-gradient(135deg, #f59e0b, #d97706); border: 1px solid #f59e0b;" onclick="window.waseetOpenBrokerReviewModal && window.waseetOpenBrokerReviewModal(window.escrowRoom.deal)">
+                            <i class="fas fa-star text-white"></i>
+                            <span>تقييم أداء الوسيط</span>
                         </button>
                         <a href="my-accounts.html?tab=purchases" class="btn-3d btn-outline" style="padding: 0.75rem 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
                             <i class="fas fa-boxes"></i> حساباتي المشتراة
@@ -2326,13 +2396,23 @@ class WaseetEscrowRoom {
     }
 
     copyBuyerEmail() {
-        const email = (this.deal && this.deal.credentials && this.deal.credentials.email) || '';
-        this.copyCredText(email, 'تم نسخ البريد');
+        const email = (this.deal && this.deal.credentials && (this.deal.credentials.email || this.deal.credentials.email_or_phone)) || '';
+        this.copyCredText(email, 'تم نسخ البريد الإلكتروني');
     }
 
     copyBuyerPassword() {
         const pwd = (this.deal && this.deal.credentials && (this.deal.credentials.rawPassword || this.deal.credentials.password)) || '';
         this.copyCredText(pwd, 'تم نسخ كلمة المرور');
+    }
+
+    copyBuyerRecoveryEmail() {
+        const recEmail = (this.deal && this.deal.credentials && (this.deal.credentials.recoveryEmail || this.deal.credentials.recovery_email)) || '';
+        this.copyCredText(recEmail, 'تم نسخ بريد الاسترداد');
+    }
+
+    copyBuyerRecoveryPassword() {
+        const recPwd = (this.deal && this.deal.credentials && (this.deal.credentials.recoveryPassword || this.deal.credentials.recovery_password)) || '';
+        this.copyCredText(recPwd, 'تم نسخ كلمة مرور الاسترداد');
     }
 
     copyBuyerBackup() {
@@ -2344,10 +2424,12 @@ class WaseetEscrowRoom {
     copyAllCredentialsFromDeal() {
         const creds = (this.deal && this.deal.credentials) || {};
         const loginType = creds.loginType || 'جوجل Gmail';
-        const email = creds.email || '';
+        const email = creds.email || creds.email_or_phone || '';
         const pwd = creds.rawPassword || creds.password || '';
-        const backup = creds.backupCodes || creds.recoveryEmail || creds.notes || 'لا توجد أكواد إضافية';
-        this.copyAllCredentials(loginType, email, pwd, backup);
+        const recEmail = creds.recoveryEmail || creds.recovery_email || '';
+        const recPwd = creds.recoveryPassword || creds.recovery_password || '';
+        const notes = creds.notes || creds.backupCodes || '';
+        this.copyAllCredentials(loginType, email, pwd, recEmail, recPwd, notes);
     }
 
     async copyCredText(text, successMsg = 'تم النسخ بنجاح') {
@@ -2363,8 +2445,19 @@ class WaseetEscrowRoom {
         }
     }
 
-    async copyAllCredentials(loginType, email, pwd, backup) {
-        const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):\n-----------------------------------\nنوع الربط: ${loginType}\nالبريد / اسم المستخدم: ${email}\nكلمة المرور: ${pwd}\nأكواد الاسترداد / الملاحظات: ${backup}\n-----------------------------------\nالحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة.`;
+    async copyAllCredentials(loginType, email, pwd, recEmail, recPwd, notes) {
+        const fullText = `بيانات استلام الحساب من منصة وسيط (WASEET):
+-----------------------------------
+نوع الربط: ${loginType}
+[بيانات الدخول الأساسية]
+البريد الإلكتروني / اسم المستخدم: ${email}
+كلمة المرور: ${pwd}
+-----------------------------------
+[حساب الاسترداد والتأمين]
+بريد الاسترداد: ${recEmail || 'لا يوجد'}
+كلمة مرور الاسترداد: ${recPwd || 'لا يوجد'}
+-----------------------------------
+${notes ? `ملاحظات إضافية: ${notes}\n-----------------------------------\n` : ''}الحساب مؤمن بضمان منصة وسيط الذهبي لمدة 48 ساعة ضد الاسترجاع.`;
         await this.copyCredText(fullText, 'تم نسخ كافة بيانات تسجيل الدخول بنجاح!');
     }
 }
