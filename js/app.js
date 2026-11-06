@@ -758,11 +758,13 @@ class WaseetApp {
                 const avatar = (WASEET_STATE.user.user_metadata && WASEET_STATE.user.user_metadata.avatar_url)
                     || WASEET_STATE.user.avatar
                     || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
-                currentStatusBox.innerHTML = `
+                const safeUserName = this.escapeHtml(WASEET_STATE.user.name || 'مستخدم');
+                const safeAvatar = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(avatar) : this.escapeHtml(avatar);
+                const statusBoxMarkup = `
                     <div style="background: rgba(197,160,89,0.12); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 0.8rem; margin-bottom: 1.2rem; text-align: center;">
-                        <img src="${avatar}" alt="${WASEET_STATE.user.name || 'الصورة الشخصية'}" referrerpolicy="no-referrer" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin: 0 auto 0.5rem; display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <img src="${safeAvatar}" alt="${safeUserName}" referrerpolicy="no-referrer" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin: 0 auto 0.5rem; display: block;" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div style="font-size: 0.8rem; color: var(--silver-muted);">أنت مسجل حالياً باسم:</div>
-                        <strong style="color: #fff; font-size: 0.95rem;">${WASEET_STATE.user.name}</strong>
+                        <strong style="color: #fff; font-size: 0.95rem;">${safeUserName}</strong>
                         <div style="font-size: 0.75rem; color: var(--gold-light); margin-top: 2px;">(${roleBadge})</div>
                         ${isBrokerModal ? `
                         <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;margin-top:0.55rem;">
@@ -775,6 +777,7 @@ class WaseetApp {
                         </button>
                     </div>
                 `;
+                currentStatusBox.innerHTML = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(statusBoxMarkup) : statusBoxMarkup;
                 currentStatusBox.style.display = 'block';
             } else {
                 currentStatusBox.style.display = 'none';
@@ -2560,20 +2563,23 @@ class WaseetApp {
         const toast = document.createElement('div');
         toast.id = 'waseet-auto-toast';
         toast.className = 'waseet-auto-toast card-3d animate-in';
-        toast.innerHTML = `
+        const safeTitle = this.escapeHtml(title || '');
+        const safeMessage = this.escapeHtml(message || '').replace(/\n/g, '<br>');
+        const toastMarkup = `
             <div class="toast-content">
                 <div class="toast-icon-circle glow-orange">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="toast-text-col">
-                    <h4 class="toast-title">${title}</h4>
-                    <p class="toast-body">${message.replace(/\n/g, '<br>')}</p>
+                    <h4 class="toast-title">${safeTitle}</h4>
+                    <p class="toast-body">${safeMessage}</p>
                 </div>
             </div>
             <div class="toast-progress-bar">
                 <div class="toast-progress-fill" style="animation-duration: ${durationMs}ms;"></div>
             </div>
         `;
+        toast.innerHTML = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(toastMarkup) : toastMarkup;
         document.body.appendChild(toast);
 
         let completed = false;

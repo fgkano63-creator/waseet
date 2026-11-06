@@ -13,7 +13,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "10. Regional Broker Card & Real-time Reactivity Audit"; Script = "tests\test-broker-card-and-realtime-reactivity.js"; Type = "node" },
     [PSCustomObject]@{ Name = "11. Dynamic Broker Rating, Credentials & Fake Broker Purge Audit"; Script = "tests\test-dynamic-rating-and-credentials.js"; Type = "node" },
     [PSCustomObject]@{ Name = "12. Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-deep-scan.ps1"; Type = "ps1" },
-    [PSCustomObject]@{ Name = "13. Profile Dashboard & UI Libraries Integration Audit"; Script = "tests\test-profile-dashboard-and-ui-libraries.js"; Type = "node" }
+    [PSCustomObject]@{ Name = "13. Profile Dashboard & UI Libraries Integration Audit"; Script = "tests\test-profile-dashboard-and-ui-libraries.js"; Type = "node" },
+    [PSCustomObject]@{ Name = "14. Forensic Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-forensic-deep.js"; Type = "node" }
 )
 
 $summary = @()

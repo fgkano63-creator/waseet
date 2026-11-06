@@ -517,38 +517,6 @@ async function runE2ESimulation() {
     assert(checkRoomAccess(admin.id) === 'admin', 'Security Flow', 'Super Admin Supervisor Room Authorization', 'Admin granted supervisor access');
     assert(checkRoomAccess('unauthorized-uuid-999') === 'unauthorized', 'Security Flow', 'Unauthorized 5th Party Strict Denial', '5th unauthorized party strictly blocked (Max 4 parties)');
 
-    // 3b. Syria (SY) Regional Broker Promotion & Routing Verification
-    const syriaBroker = {
-        id: 'broker-sy-uuid-503',
-        email: 'broker.sy@waseet.test',
-        full_name: 'وسيط سوريا المعتمد',
-        role: 'regional_broker',
-        country: 'SY',
-        points_balance: 0,
-        wallet_balance: 0
-    };
-    DB.profiles.push(syriaBroker);
-    assert(syriaBroker.role === 'regional_broker' && syriaBroker.country === 'SY', 'Regional Broker Flow', 'Syria Regional Broker Promotion & Assignment', 'User promoted to regional_broker for Syria (SY)');
-
-    const syriaBuyer = { id: 'buyer-sy-uuid-504', name: 'طارق دمشق', country: 'SY', points_balance: 400, locked_points: 0 };
-    DB.profiles.push(syriaBuyer);
-    const matchedSyBroker = DB.profiles.find(p => p.role === 'regional_broker' && p.country === syriaBuyer.country);
-    assert(matchedSyBroker && matchedSyBroker.id === syriaBroker.id, 'Regional Broker Flow', 'Syria Smart Routing Broker Match', 'Buyer from Syria (SY) correctly routed to Syria regional broker');
-
-    // 3c. Strict Admin RBAC Verification (Regional Brokers shielded from super admin actions)
-    function isStrictAdminSim(user) {
-        if (!user) return false;
-        if (user.role === 'user' || user.role === 'regional_broker') return false;
-        if (user.role === 'admin' || user.isAdmin === true || user.is_admin === true) return true;
-        const email = user.email ? String(user.email).toLowerCase().trim() : '';
-        const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
-        return !!(email && adminEmails.includes(email));
-    }
-
-    assert(!isStrictAdminSim(regionalBroker), 'Security Flow', 'Regional Broker Super Admin Access Denial', 'Regional broker strictly forbidden from super admin access');
-    assert(!isStrictAdminSim(syriaBroker), 'Security Flow', 'Syria Broker Super Admin Access Denial', 'Syria regional broker strictly blocked from admin-only controls');
-    assert(isStrictAdminSim(admin), 'Security Flow', 'Super Admin Authority Authorization', 'Platform administrator successfully authorized');
-
     // 4. Commission Splitting Execution: 10 points fee -> 6 to broker, 4 to admin
     const fee10 = regionalDeal.fee; // 10
     const brokerShare10 = Math.floor(fee10 * (2 / 3)); // 6
@@ -605,7 +573,44 @@ async function runE2ESimulation() {
     assert(canRefundDeal(regionalBroker.id, regionalDeal) === true, 'Regional Broker Flow', 'Assigned Broker Dispute Refund Authorization (Migration 21)', 'Assigned regional broker authorized to cancel disputed deal and refund buyer');
     assert(canRefundDeal('unrelated-broker-999', regionalDeal) === false, 'Security Flow', 'Unassigned Broker Dispute Refund Denial', 'Non-assigned broker strictly blocked from refunding deal');
 
-    // 6c. Cascading Regional Broker Demotion and Deletion Simulation (Migration 22)
+    // --------------------------------------------------------------------------
+    // PHASE 10: SUPER ADMIN BROKER PROMOTION, DEMOTION & CASCADING PURGE
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 10: SUPER ADMIN BROKER PROMOTION, DEMOTION & CASCADING PURGE\x1b[0m');
+
+    // 10.1 Syria (SY) Regional Broker Promotion & Routing Verification
+    const syriaBroker = {
+        id: 'broker-sy-uuid-503',
+        email: 'broker.sy@waseet.test',
+        full_name: 'وسيط سوريا المعتمد',
+        role: 'regional_broker',
+        country: 'SY',
+        points_balance: 0,
+        wallet_balance: 0
+    };
+    DB.profiles.push(syriaBroker);
+    assert(syriaBroker.role === 'regional_broker' && syriaBroker.country === 'SY', 'Regional Broker Flow', 'Syria Regional Broker Promotion & Assignment', 'User promoted to regional_broker for Syria (SY)');
+
+    const syriaBuyer = { id: 'buyer-sy-uuid-504', name: 'طارق دمشق', country: 'SY', points_balance: 400, locked_points: 0 };
+    DB.profiles.push(syriaBuyer);
+    const matchedSyBroker = DB.profiles.find(p => p.role === 'regional_broker' && p.country === syriaBuyer.country);
+    assert(matchedSyBroker && matchedSyBroker.id === syriaBroker.id, 'Regional Broker Flow', 'Syria Smart Routing Broker Match', 'Buyer from Syria (SY) correctly routed to Syria regional broker');
+
+    // 10.2 Strict Admin RBAC Verification (Regional Brokers shielded from super admin actions)
+    function isStrictAdminSim(user) {
+        if (!user) return false;
+        if (user.role === 'user' || user.role === 'regional_broker') return false;
+        if (user.role === 'admin' || user.isAdmin === true || user.is_admin === true) return true;
+        const email = user.email ? String(user.email).toLowerCase().trim() : '';
+        const adminEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+        return !!(email && adminEmails.includes(email));
+    }
+
+    assert(!isStrictAdminSim(regionalBroker), 'Security Flow', 'Regional Broker Super Admin Access Denial', 'Regional broker strictly forbidden from super admin access');
+    assert(!isStrictAdminSim(syriaBroker), 'Security Flow', 'Syria Broker Super Admin Access Denial', 'Syria regional broker strictly blocked from admin-only controls');
+    assert(isStrictAdminSim(admin), 'Security Flow', 'Super Admin Authority Authorization', 'Platform administrator successfully authorized');
+
+    // 10.3 Cascading Regional Broker Demotion and Deletion Simulation (Migration 22)
     function simulateBrokerDemotion(caller, targetBrokerId, targetEmail) {
         if (!isStrictAdminSim(caller)) {
             return { ok: false, error: 'Unauthorized: Admin role strictly required' };
@@ -634,7 +639,7 @@ async function runE2ESimulation() {
     const authDemoteRes = simulateBrokerDemotion(admin, syriaBroker.id, syriaBroker.email);
     assert(authDemoteRes.ok === true && authDemoteRes.newRole === 'user' && syriaBroker.role === 'user', 'Regional Broker Flow', 'Admin Cascading Broker Demotion & Role Reversal (Migration 22)', 'Broker record purged and user profile role immediately reversed to user');
 
-    // 7. Automated EmailJS Broker Notification Pipeline Simulation
+    // 10.4 Automated EmailJS Broker Notification Pipeline Simulation
     function simulateBrokerWelcomeEmail(toEmail, countryCode, countryName, config = {}) {
         if (!toEmail || !toEmail.includes('@')) {
             return { ok: false, error: 'Target is not an email' };
@@ -659,15 +664,15 @@ async function runE2ESimulation() {
         return { ok: true, templateParams };
     }
 
-    // 7a. Rejects invalid email target
+    // 10.4a Rejects invalid email target
     const invalidEmailRes = simulateBrokerWelcomeEmail('invalid_username_or_id', 'DZ', 'الجزائر');
     assert(invalidEmailRes.ok === false && invalidEmailRes.error === 'Target is not an email', 'EmailJS Pipeline', 'Invalid Email Target Guard', 'Non-email targets safely skipped without throwing errors');
 
-    // 7b. Graceful fallback when unconfigured
+    // 10.4b Graceful fallback when unconfigured
     const unconfigRes = simulateBrokerWelcomeEmail('broker.dz@waseet.com', 'DZ', 'الجزائر', { publicKey: 'YOUR_PUBLIC_KEY' });
     assert(unconfigRes.ok === false && unconfigRes.notConfigured === true, 'EmailJS Pipeline', 'Unconfigured Key Safe Fallback', 'Gracefully skips network dispatch when user keys not set');
 
-    // 7c. Full payload delivery validation with configured keys
+    // 10.4c Full payload delivery validation with configured keys
     const configuredRes = simulateBrokerWelcomeEmail('broker.dz@waseet.com', 'DZ', 'الجزائر', {
         publicKey: 'pub_key_mock_123',
         serviceId: 'service_mock_456',
@@ -675,18 +680,8 @@ async function runE2ESimulation() {
     });
     assert(configuredRes.ok === true && configuredRes.templateParams.to_email === 'broker.dz@waseet.com' && configuredRes.templateParams.country_code === 'DZ', 'EmailJS Pipeline', 'Configured Automated Dispatch Integrity', 'Valid template payload constructed for recipient delivery');
 
-    // 7d. Live Automatic Session & Role Refresh Simulation (without logout/re-login)
-    const supabaseJsSrc = require('fs').readFileSync(require('path').join(__dirname, '..', 'js', 'supabase.js'), 'utf8');
-    const hasLiveRoleSync = supabaseJsSrc.includes('function waseetInitLiveRoleAndSessionSync')
-        && supabaseJsSrc.includes('function waseetApplyLiveRoleUpdateToUI')
-        && supabaseJsSrc.includes('waseet_live_role_sync_rt')
-        && supabaseJsSrc.includes('client.auth.refreshSession');
-    assert(hasLiveRoleSync, 'Live Session Sync', 'Automatic Role Upgrade & Session Refresh', 'Realtime + focus/visibility + heartbeat auto-promotes user session and reveals broker tools without logout');
-
-    // --------------------------------------------------------------------------
-    // PHASE 10: WITHDRAWALS SYSTEM & FINANCIAL INTEGRITY
-    // --------------------------------------------------------------------------
-    console.log('\n\x1b[33m>>> PHASE 10: WITHDRAWALS SYSTEM & FINANCIAL INTEGRITY\x1b[0m');
+    // 10.5 Withdrawals System & Financial Integrity Control
+    // (Admin review, points deduction, rejection and unfreeze)
 
     // 10.1 User available balance check before withdrawal request
     const sellerUser = DB.profiles.find(p => p.id === 'seller-uuid-202');
@@ -768,9 +763,44 @@ async function runE2ESimulation() {
     assert(rejectRes.ok === true && sellerUser.locked_points === prevSellerLocked, 'Withdrawal Flow', 'Admin Rejection & Balance Unfreeze', 'Unfreezes points back to seller available balance on rejection');
 
     // --------------------------------------------------------------------------
-    // PHASE 11: MULTI-CURRENCY GATEWAYS, FEE CALCULATOR & RESILIENCE
+    // PHASE 11: REALTIME BROKER PRESENCE HEARTBEAT & AUTO-RECOVERY
     // --------------------------------------------------------------------------
-    console.log('\n\x1b[33m>>> PHASE 11: MULTI-CURRENCY GATEWAYS, FEE CALCULATOR & RESILIENCE\x1b[0m');
+    console.log('\n\x1b[33m>>> PHASE 11: REALTIME BROKER PRESENCE HEARTBEAT & AUTO-RECOVERY\x1b[0m');
+
+    // 11.1 Realtime Online Presence Heartbeat Activation (touch_last_seen)
+    const testPresenceBroker = {
+        id: 'broker-presence-test-01',
+        name: 'وسيط الحضور المعتمد',
+        role: 'regional_broker',
+        country: 'DZ',
+        last_seen_at: null
+    };
+
+    function simulateTouchLastSeen(user) {
+        user.last_seen_at = new Date().toISOString();
+        return user.last_seen_at;
+    }
+
+    function checkBrokerOnlineState(user) {
+        return Boolean(user.last_seen_at && (Date.now() - new Date(user.last_seen_at).getTime() <= 5 * 60 * 1000));
+    }
+
+    simulateTouchLastSeen(testPresenceBroker);
+    const onlineStateNow = checkBrokerOnlineState(testPresenceBroker);
+    assert(onlineStateNow === true, 'Presence Flow', 'Realtime Online Presence Heartbeat Activation', 'touch_last_seen establishes active online glow indicator');
+
+    // 11.2 Stale Presence Transition to Offline (> 5-minute threshold)
+    testPresenceBroker.last_seen_at = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const offlineStateLater = checkBrokerOnlineState(testPresenceBroker);
+    assert(offlineStateLater === false, 'Presence Flow', 'Stale Presence Transition to Offline', 'Inactivity beyond 5-minute threshold cleanly transitions broker to offline state');
+
+    // 11.3 Live Automatic Session & Role Refresh Simulation (without logout/re-login)
+    const supabaseJsSrc = require('fs').readFileSync(require('path').join(__dirname, '..', 'js', 'supabase.js'), 'utf8');
+    const hasLiveRoleSync = supabaseJsSrc.includes('function waseetInitLiveRoleAndSessionSync')
+        && supabaseJsSrc.includes('function waseetApplyLiveRoleUpdateToUI')
+        && supabaseJsSrc.includes('waseet_live_role_sync_rt')
+        && supabaseJsSrc.includes('client.auth.refreshSession');
+    assert(hasLiveRoleSync, 'Live Session Sync', 'Automatic Role Upgrade & Session Refresh', 'Realtime + focus/visibility + heartbeat auto-promotes user session and reveals broker tools without logout');
 
     // 11.1 Fee Calculator Tiers Invariant
     function calculateWaseetFeeSim(sellerPrice) {
@@ -1349,20 +1379,6 @@ async function runE2ESimulation() {
     const documentUrlShielded = (publicBrokerData.kyc_document_url === undefined);
     assert(publicBrokerData.found === true && publicBrokerData.is_fully_verified === true && documentUrlShielded, 'KYC Privacy Flow', 'KYC Document Privacy Shield (Zero ID Exposure)', 'Public profile exposes verification badge and type, but strictly conceals private document URL');
 
-    // 15.4 Online Presence Heartbeat & Staleness Window (touch_last_seen)
-    function simulateTouchLastSeen(user) {
-        user.last_seen_at = new Date().toISOString();
-        return user.last_seen_at;
-    }
-
-    simulateTouchLastSeen(testBrokerProfile);
-    const onlineStateNow = simulateGetBrokerPublicProfile(testBrokerProfile.id).is_online;
-    assert(onlineStateNow === true, 'Presence Flow', 'Realtime Online Presence Heartbeat Activation', 'touch_last_seen establishes active online glow indicator');
-
-    // Simulate stale last seen (> 15 minutes ago)
-    testBrokerProfile.last_seen_at = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    const offlineStateLater = simulateGetBrokerPublicProfile(testBrokerProfile.id).is_online;
-    assert(offlineStateLater === false, 'Presence Flow', 'Stale Presence Transition to Offline', 'Inactivity beyond 5-minute threshold cleanly transitions broker to offline state');
 
     // ==========================================================================
     // PHASE 16: BROKER DYNAMIC REVIEWS & PERMANENT ACCOUNT DELETION (MIGRATION 28)

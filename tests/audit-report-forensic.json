@@ -1,0 +1,2051 @@
+{
+  "timestamp": "2026-11-06T08:11:00.101Z",
+  "stats": {
+    "totalChecks": 290,
+    "passed": 290,
+    "warnings": 0,
+    "failures": 0
+  },
+  "categories": {
+    "htmlQuality": [
+      {
+        "checkId": "404.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "404.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "404.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "404.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "404.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"404 - الصفحة غير موجودة | وسيط - WA...\"",
+        "details": null
+      },
+      {
+        "checkId": "404.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (0 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "404.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (0 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "404.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "404.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (1 images)",
+        "details": null
+      },
+      {
+        "checkId": "404.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | إدارة الوسطاء الإقليميين (...\"",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (45 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (13 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "admin-brokers.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | محادثات الإدارة والدعم الم...\"",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (32 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (12 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "admin-chats.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"إدارة طلبات شحن النقاط | WASEET - ل...\"",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (26 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (13 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (3 images)",
+        "details": null
+      },
+      {
+        "checkId": "admin-deposits.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"إدارة طلبات سحب الأرباح | WASEET - ...\"",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (24 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (12 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "admin-withdrawals.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | التحقق من تسجيل الدخول الآ...\"",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (8 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (4 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (0 images)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback/index.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | التحقق من تسجيل الدخول الآ...\"",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (8 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (4 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (0 images)",
+        "details": null
+      },
+      {
+        "checkId": "auth/callback.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | غرفة الوساطة المباشرة والم...\"",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (22 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (14 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (3 images)",
+        "details": null
+      },
+      {
+        "checkId": "chat.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | المحادثة المباشرة مع الوسي...\"",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (24 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (11 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (4 images)",
+        "details": null
+      },
+      {
+        "checkId": "contact-support.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | قائمة صفقات وطلبات الوساطة...\"",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (19 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (14 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (4 images)",
+        "details": null
+      },
+      {
+        "checkId": "deals.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "index.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "index.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "index.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "index.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "index.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"وسيط | WASEET - منصة الوساطة الآمنة...\"",
+        "details": null
+      },
+      {
+        "checkId": "index.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (117 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "index.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (19 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "index.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "index.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (16 images)",
+        "details": null
+      },
+      {
+        "checkId": "index.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"الصيانة | وسيط - WASEET...\"",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (0 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (0 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (1 images)",
+        "details": null
+      },
+      {
+        "checkId": "maintenance.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | حساباتي المعروضة للبيع وإد...\"",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (49 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (15 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (5 images)",
+        "details": null
+      },
+      {
+        "checkId": "my-accounts.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | الحسابات قيد الفحص والمراج...\"",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (40 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (13 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (7 images)",
+        "details": null
+      },
+      {
+        "checkId": "pending-accounts.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | الملف الشخصي ولوحة الحساب...\"",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (69 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (16 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (4 images)",
+        "details": null
+      },
+      {
+        "checkId": "profile.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | لوحة اختبارات أمان Google ...\"",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (4 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (3 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (0 images)",
+        "details": null
+      },
+      {
+        "checkId": "tests/test-runner.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"محفظتي وشحن النقاط | WASEET - منصة ...\"",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (76 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (13 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (9 images)",
+        "details": null
+      },
+      {
+        "checkId": "wallet.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      }
+    ],
+    "cssResponsiveness": [
+      {
+        "checkId": "CSS-BraceBalance",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "CSS curly braces perfectly balanced (1320 rules)",
+        "details": null
+      },
+      {
+        "checkId": "CSS-HorizontalOverflow",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Both html and body enforce overflow-x: hidden to eliminate horizontal scroll",
+        "details": null
+      },
+      {
+        "checkId": "CSS-ResponsiveBreakpoints",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Comprehensive responsive coverage with 47 media queries (Mobile 375px/480px, Tablet 768px, Desktop)",
+        "details": null
+      },
+      {
+        "checkId": "CSS-MobileDrawer",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile navigation drawer and interactive backdrop overlay configured",
+        "details": null
+      },
+      {
+        "checkId": "CSS-FixedWidthHazards",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero layout containers with dangerous fixed pixel widths without max-width",
+        "details": null
+      },
+      {
+        "checkId": "CSS-TouchTargets",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard interactive buttons define comfortable touch hit areas",
+        "details": null
+      }
+    ],
+    "securityAndPrivacy": [
+      {
+        "checkId": "JS-Syntax-js/app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/app.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/app.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/app.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/app.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/auth.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/auth.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/auth.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/calculator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/calculator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/calculator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/data.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/data.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/data.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/data.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/dialog.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/dialog.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/dialog.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/dialog.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/escrow.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/escrow.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/escrow.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/escrow.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/instant-nav.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/instant-nav.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/instant-nav.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/instant-nav.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/navbar.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/navbar.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/navbar.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/navbar.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/notifications.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/notifications.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/notifications.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/notifications.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/particles.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/particles.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/particles.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/particles.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/pwa-register.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/pwa-register.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/pwa-register.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/slider.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/slider.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/slider.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/slider.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/supabase.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/supabase.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/supabase.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/supabase.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/support.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/support.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/support.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/support.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/vendor/gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/vendor/gsap.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/vendor/gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/vendor/gsap.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/vendor/gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/vendor/gsap.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/vendor/gsap.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/vendor/lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/vendor/lenis.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/vendor/lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/vendor/lenis.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/vendor/lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/vendor/lenis.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/vendor/lenis.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/vendor/ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/vendor/ScrollTrigger.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/vendor/ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/vendor/ScrollTrigger.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/vendor/ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/vendor/ScrollTrigger.min.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/vendor/ScrollTrigger.min.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: service-worker.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in service-worker.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in service-worker.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-service-worker.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-admin-brokers.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-admin-chats.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-chat.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-contact-support.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-deals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-index.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-my-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-pending-accounts.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-profile.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "DOMPurify-wallet.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
+        "checkId": "SecretsScanning",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Scanned 1917 files. Zero private credentials or service_role tokens exposed.",
+        "details": null
+      },
+      {
+        "checkId": "Header-X-Frame-Options",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clickjacking defense configured: DENY",
+        "details": null
+      },
+      {
+        "checkId": "Header-X-Content-Type-Options",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "MIME sniffing protection: nosniff",
+        "details": null
+      },
+      {
+        "checkId": "Header-HSTS",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "HSTS active: max-age=31536000; includeSubDomains; preload",
+        "details": null
+      },
+      {
+        "checkId": "Header-CSP",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Content-Security-Policy enforced",
+        "details": null
+      },
+      {
+        "checkId": "Header-Referrer-Policy",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Referrer-Policy configured: strict-origin-when-cross-origin",
+        "details": null
+      },
+      {
+        "checkId": "Header-Permissions-Policy",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Permissions-Policy restricts unused hardware APIs",
+        "details": null
+      },
+      {
+        "checkId": "Vercel-OAuthRewrite",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Canonical /auth/callback rewrite configured in vercel.json",
+        "details": null
+      },
+      {
+        "checkId": "Robots-AdminShield",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "robots.txt shields admin panels and auth callback endpoints from indexing",
+        "details": null
+      }
+    ],
+    "supabaseRLSAndFinances": [
+      {
+        "checkId": "RLS-Enabled-profiles",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'profiles'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-deals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'deals'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-marketplace_accounts",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'marketplace_accounts'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-marketplace_account_secrets",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'marketplace_account_secrets'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-wallet_transactions",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'wallet_transactions'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-deposit_requests",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'deposit_requests'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-deal_messages",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'deal_messages'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-support_messages",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'support_messages'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-notifications",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'notifications'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-payment_methods",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'payment_methods'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-withdrawals",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'withdrawals'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-regional_brokers",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'regional_brokers'",
+        "details": null
+      },
+      {
+        "checkId": "RLS-Enabled-broker_reviews",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Row Level Security explicitly enabled on 'broker_reviews'",
+        "details": null
+      },
+      {
+        "checkId": "DB-SecurityDefinerSearchPath",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All SECURITY DEFINER database functions explicitly set search_path = public, auth",
+        "details": null
+      },
+      {
+        "checkId": "DB-DealTamperTrigger",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "BEFORE UPDATE trigger blocks client mutation of deal prices, fees, and status transitions",
+        "details": null
+      },
+      {
+        "checkId": "DB-WithdrawalFreezeTrigger",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "BEFORE INSERT trigger blocks unfrozen direct balance withdrawal inserts",
+        "details": null
+      },
+      {
+        "checkId": "DB-SecretsActiveDealLock",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "RLS policy strictly blocks sellers from modifying credentials during active escrow deals",
+        "details": null
+      },
+      {
+        "checkId": "DB-AtomicEscrowRPCs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Atomic stored procedures active: cancel_escrow_deal, sync_wallet_locked_points, delete_marketplace_account",
+        "details": null
+      }
+    ],
+    "performanceAndPWA": [
+      {
+        "checkId": "PWA-ManifestCompliance",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Compliant PWA manifest (6 icons verified on disk, standalone display)",
+        "details": null
+      },
+      {
+        "checkId": "PWA-ServiceWorker",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Service worker lifecycle properly implemented",
+        "details": null
+      },
+      {
+        "checkId": "Assets-SizeOptimization",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All 62 static assets are optimized under 1MB",
+        "details": null
+      }
+    ]
+  }
+}
