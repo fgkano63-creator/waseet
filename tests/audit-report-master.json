@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-07T10:48:49.551Z",
+  "timestamp": "2026-11-07T11:10:17.342Z",
   "metrics": {
     "totalChecks": 255,
-    "passed": 254,
-    "warnings": 1,
+    "passed": 255,
+    "warnings": 0,
     "failures": 0
   },
   "sections": {
@@ -437,9 +437,9 @@
       },
       {
         "id": "HTML-ImgAlt-ad-walkthrough.html",
-        "status": "WARN",
-        "severity": "LOW",
-        "message": "3 <img> tags missing alt attribute in ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in ad-walkthrough.html",
         "details": null
       },
       {
@@ -1255,7 +1255,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1825 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1847 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

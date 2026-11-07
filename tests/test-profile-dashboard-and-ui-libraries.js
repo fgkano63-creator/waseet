@@ -67,4 +67,10 @@ const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
 assert(indexHtml.includes('calc-card animata-glow-card'), 'index.html applies animata-glow-card to fee calculator');
 assert(indexHtml.includes('leaderboard-card-3d animata-glow-card'), 'index.html applies animata-glow-card to leaderboard');
 
+// 7. Check Account Details Modal Close Button UI Safety (z-index 9999, contrast & overflow visible)
+assert(cssContent.includes('#btn-close-card-deck') && cssContent.includes('.store-modal-close'), 'css/style.css targets account details close buttons');
+assert(cssContent.includes('z-index: 9999 !important;'), 'css/style.css elevates close buttons with z-index 9999');
+assert(cssContent.includes('overflow: visible !important;'), 'css/style.css ensures modal headers do not clip close buttons');
+assert(profileHtml.includes('.store-modal-close') && profileHtml.includes('z-index: 9999 !important;'), 'profile.html elevates .store-modal-close with z-index 9999');
+
 console.log('\n>>> ALL PROFILE DASHBOARD & UI LIBRARIES AUDITS PASSED (100%) <<<');

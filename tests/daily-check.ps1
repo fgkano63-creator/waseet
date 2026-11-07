@@ -53,7 +53,7 @@ foreach ($t in $tests) {
     } elseif ($outStr -match 'ALL SELLER PROFILE CARD AUDITS PASSED') {
         $checksCount = 18
     } elseif ($outStr -match 'ALL PROFILE DASHBOARD & UI LIBRARIES AUDITS PASSED') {
-        $checksCount = 22
+        $checksCount = 26
     } elseif ($outStr -match 'Summary:\s*([0-9]+)/') {
         $checksCount = [int]$Matches[1]
     }

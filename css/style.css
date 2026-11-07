@@ -1930,6 +1930,9 @@ body::before {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 9999;
+    overflow: visible !important;
 }
 
 .modal-title {
@@ -1942,22 +1945,33 @@ body::before {
 }
 
 .btn-close-modal {
+    position: relative;
+    z-index: 9999 !important;
     width: 44px;
     height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: none;
-    border: none;
-    color: var(--silver-muted);
-    font-size: 1.4rem;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    pointer-events: auto !important;
 }
 
 .btn-close-modal:hover {
-    color: #fff;
+    background: #ef4444 !important;
+    border-color: #f87171 !important;
+    color: #ffffff !important;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 6px 22px rgba(239, 68, 68, 0.6);
 }
 
 .form-grid-2 {
@@ -10322,6 +10336,83 @@ html.lenis body {
     background: rgba(15, 23, 42, 0.95);
     box-shadow: 0 0 15px rgba(197, 160, 89, 0.25);
 }
+
+/* ==========================================================================
+   Account Details Modal Close Button (Fix: High z-index: 9999, Contrast & Overflow Safety)
+   ========================================================================== */
+#btn-close-card-deck,
+.cards-deck-modal-box .btn-close-modal,
+#modal-inspect-account .btn-close-modal,
+#modal-inspect-account-detail .btn-close-modal,
+.store-modal-close,
+.broker-profile-close-btn,
+.lightbox-close,
+.modal-close-high-priority {
+    position: relative;
+    z-index: 9999 !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.2) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.store-modal-close {
+    position: absolute !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+}
+
+.broker-profile-close-btn {
+    position: absolute !important;
+    top: 1.1rem !important;
+    left: 1.1rem !important;
+    width: 38px !important;
+    height: 38px !important;
+}
+
+#btn-close-card-deck:hover,
+.cards-deck-modal-box .btn-close-modal:hover,
+#modal-inspect-account .btn-close-modal:hover,
+#modal-inspect-account-detail .btn-close-modal:hover,
+.store-modal-close:hover,
+.broker-profile-close-btn:hover,
+.lightbox-close:hover,
+.modal-close-high-priority:hover {
+    background: #ef4444 !important;
+    border-color: #f87171 !important;
+    color: #ffffff !important;
+    transform: scale(1.1) rotate(90deg) !important;
+    box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6) !important;
+}
+
+/* Ensure no parent container clips or hides the close button */
+.modal-header,
+.modal-box-3d > .modal-header,
+.cards-deck-modal-box > .modal-header {
+    position: relative;
+    z-index: 9999;
+    overflow: visible !important;
+}
+
+.cards-deck-modal-box,
+.store-modal-card {
+    overflow-x: visible !important;
+}
+
 
 
 
