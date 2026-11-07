@@ -230,6 +230,7 @@
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
+    <script src="js/security-validator.js"></script>
     <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/calculator.js"></script>
     <!-- particles disabled for chat stability -->
@@ -282,10 +283,13 @@
                     userCard.setAttribute('role', 'button');
                     userCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
                     userCard.onclick = () => { window.location.href = 'profile.html'; };
+                    const safeChatUserName = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     userCard.innerHTML = `
-                        <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${user.name}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <img src="${avatar}" referrerpolicy="no-referrer" class="drawer-avatar" alt="${safeChatUserName}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
-                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-name">${safeChatUserName}</span>
                             <span class="drawer-user-role">${roleLabel}</span>
                             <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
@@ -434,9 +438,12 @@
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
                     const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
+                    const safeNavUser = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     navUserBox.innerHTML = `
-                        <div class="user-profile-pill nav-user-chip" onclick="toggleChatDrawer()" title="${user.name}">
-                            <img src="${avatar}" alt="${user.name}" referrerpolicy="no-referrer" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <div class="user-profile-pill nav-user-chip" onclick="toggleChatDrawer()" title="${safeNavUser}">
+                            <img src="${avatar}" alt="${safeNavUser}" referrerpolicy="no-referrer" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         </div>
                     `;
                 } else {

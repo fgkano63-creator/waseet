@@ -14,7 +14,8 @@ $tests = @(
     [PSCustomObject]@{ Name = "11. Dynamic Broker Rating, Credentials & Fake Broker Purge Audit"; Script = "tests\test-dynamic-rating-and-credentials.js"; Type = "node" },
     [PSCustomObject]@{ Name = "12. Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-deep-scan.ps1"; Type = "ps1" },
     [PSCustomObject]@{ Name = "13. Profile Dashboard & UI Libraries Integration Audit"; Script = "tests\test-profile-dashboard-and-ui-libraries.js"; Type = "node" },
-    [PSCustomObject]@{ Name = "14. Forensic Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-forensic-deep.js"; Type = "node" }
+    [PSCustomObject]@{ Name = "14. Forensic Deep Quality, Responsiveness & Security Audit"; Script = "tests\audit-forensic-deep.js"; Type = "node" },
+    [PSCustomObject]@{ Name = "15. Cloudflare Security Audit & Vulnerability Suite"; Script = "tests\audit-cloudflare-security.js"; Type = "node" }
 )
 
 $summary = @()
@@ -54,6 +55,8 @@ foreach ($t in $tests) {
         $checksCount = 18
     } elseif ($outStr -match 'ALL PROFILE DASHBOARD & UI LIBRARIES AUDITS PASSED') {
         $checksCount = 26
+    } elseif ($outStr -match 'Total Security Checks\s*:\s*([0-9]+)') {
+        $checksCount = [int]$Matches[1]
     } elseif ($outStr -match 'Summary:\s*([0-9]+)/') {
         $checksCount = [int]$Matches[1]
     }

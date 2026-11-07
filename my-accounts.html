@@ -595,9 +595,12 @@
             if (container) {
                 if (user) {
                     const avatar = user.avatar || 'assets/logo.png';
+                    const safeName = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     container.innerHTML = `
-                        <div class="user-profile-pill" onclick="toggleMyAccountsDrawer()" title="${user.name}">
-                            <img src="${avatar}" alt="${user.name}" class="user-avatar-img">
+                        <div class="user-profile-pill" onclick="toggleMyAccountsDrawer()" title="${safeName}">
+                            <img src="${avatar}" alt="${safeName}" class="user-avatar-img">
                         </div>
                     `;
                 } else {
@@ -613,14 +616,17 @@
                 if (user) {
                     const avatar = (user.user_metadata && user.user_metadata.avatar_url) || user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
                     const roleBadge = isAdmin ? '👑 الوسيط المعتمد (المدير)' : (isBroker ? '🛡️ وسيط إقليمي معتمد' : '🏷️ بائع موثق');
+                    const safeDrawerName = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     drawerUser.style.cursor = 'pointer';
                     drawerUser.setAttribute('role', 'button');
                     drawerUser.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
                     drawerUser.onclick = () => { window.location.href = 'profile.html'; };
                     drawerUser.innerHTML = `
-                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <img src="${avatar}" class="drawer-avatar" alt="${safeDrawerName}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         <div class="drawer-user-meta">
-                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-name">${safeDrawerName}</span>
                             <span class="drawer-user-role">${roleBadge}</span>
                             <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
@@ -835,21 +841,25 @@
                 try {
                     // أ) الحسابات التي حالتها sold أو completed وتعود لهذا المشتري (buyer_id أو owner_id = currentUser.id)
                     let boughtAccs = null;
-                    try {
-                        const { data } = await client
-                            .from('marketplace_accounts')
-                            .select('*')
-                            .or(`buyer_id.eq.${currentUser.id},owner_id.eq.${currentUser.id}`)
-                            .in('status', ['sold', 'completed'])
-                            .order('updated_at', { ascending: false });
-                        boughtAccs = data;
-                    } catch (e1) {
-                        const { data } = await client
-                            .from('marketplace_accounts')
-                            .select('*')
-                            .eq('buyer_id', currentUser.id)
-                            .order('updated_at', { ascending: false });
-                        boughtAccs = data;
+                    const cleanUserId = String(currentUser.id || '').trim();
+                    const isValidUid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanUserId);
+                    if (isValidUid) {
+                        try {
+                            const { data } = await client
+                                .from('marketplace_accounts')
+                                .select('*')
+                                .or(`buyer_id.eq.${cleanUserId},owner_id.eq.${cleanUserId}`)
+                                .in('status', ['sold', 'completed'])
+                                .order('updated_at', { ascending: false });
+                            boughtAccs = data;
+                        } catch (e1) {
+                            const { data } = await client
+                                .from('marketplace_accounts')
+                                .select('*')
+                                .eq('buyer_id', cleanUserId)
+                                .order('updated_at', { ascending: false });
+                            boughtAccs = data;
+                        }
                     }
 
                     if (Array.isArray(boughtAccs)) {

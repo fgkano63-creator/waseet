@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-07T11:10:17.342Z",
+  "timestamp": "2026-11-07T11:32:54.468Z",
   "metrics": {
-    "totalChecks": 255,
-    "passed": 255,
+    "totalChecks": 263,
+    "passed": 263,
     "warnings": 0,
     "failures": 0
   },
@@ -48,6 +48,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\auth.js async error-handling coverage verified (0 async, 9 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\button-self-reporter.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\button-self-reporter.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\button-self-reporter.js async error-handling coverage verified (0 async, 5 catch)",
         "details": null
       },
       {
@@ -237,6 +258,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\pwa-register.js async error-handling coverage verified (0 async, 6 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\security-validator.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\security-validator.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\security-validator.js async error-handling coverage verified (0 async, 0 catch)",
         "details": null
       },
       {
@@ -1255,7 +1297,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1847 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1856 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1343,6 +1385,13 @@
         "details": null
       },
       {
+        "id": "XSS-RawInnerHTML-js\\button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\button-self-reporter.js",
+        "details": null
+      },
+      {
         "id": "XSS-RawInnerHTML-js\\calculator.js",
         "status": "PASS",
         "severity": "INFO",
@@ -1403,6 +1452,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "No raw unescaped user-input innerHTML interpolations detected in js\\pwa-register.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\security-validator.js",
         "details": null
       },
       {

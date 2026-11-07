@@ -336,6 +336,7 @@
     <script src="js/vendor/supabase.min.js"></script>
     <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
+    <script src="js/security-validator.js"></script>
     <script src="js/calculator.js"></script>
     <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/particles.js?v=20261104_v6"></script>
@@ -360,8 +361,9 @@
         window.addEventListener('storage', (e) => {
             if (!e.key || e.key.startsWith('WASEET_')) {
                 try {
+                    const isDealDone = typeof waseetIsDealCompleted === 'function' ? waseetIsDealCompleted : (d => d && (d.status === 'completed' || d.status === 'cancelled'));
                     const savedActive = JSON.parse(localStorage.getItem('WASEET_DEALS_ACTIVE') || 'null');
-                    if (Array.isArray(savedActive)) WASEET_STATE.deals = savedActive;
+                    if (Array.isArray(savedActive)) WASEET_STATE.deals = savedActive.filter(d => !isDealDone(d));
                     const savedCompleted = JSON.parse(localStorage.getItem('WASEET_DEALS_COMPLETED') || 'null');
                     if (Array.isArray(savedCompleted)) WASEET_STATE.completedDeals = savedCompleted;
                 } catch (err) {}
@@ -417,14 +419,17 @@
                         ? '👑 الوسيط المعتمد (المدير)'
                         : (isBrokerRole ? '🛡️ وسيط إقليمي معتمد' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
                     const pts = (user && user.wallet) ? (Number(user.wallet.available) || 0) : 0;
+                    const safeUserName = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     userCard.style.cursor = 'pointer';
                     userCard.setAttribute('role', 'button');
                     userCard.setAttribute('title', 'عرض الملف الشخصي وإعدادات الحساب');
                     userCard.onclick = () => { window.location.href = 'profile.html'; };
                     userCard.innerHTML = `
-                        <img src="${avatar}" class="drawer-avatar" alt="${user.name}">
+                        <img src="${avatar}" class="drawer-avatar" alt="${safeUserName}">
                         <div class="drawer-user-meta">
-                            <span class="drawer-user-name">${user.name}</span>
+                            <span class="drawer-user-name">${safeUserName}</span>
                             <span class="drawer-user-role">${roleLabel}</span>
                             <span class="drawer-user-pts"><i class="fas fa-coins text-gold"></i> ${pts} نقطة متاحة</span>
                         </div>
@@ -535,7 +540,8 @@
 
             const adminDealsBadge = document.getElementById('admin-nav-deals-badge');
             if (adminDealsBadge) {
-                const dCount = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled').length;
+                const isDealDone = typeof waseetIsDealCompleted === 'function' ? waseetIsDealCompleted : (d => d && (d.status === 'completed' || d.status === 'cancelled'));
+                const dCount = (WASEET_STATE.deals || []).filter(d => d && !isDealDone(d)).length;
                 adminDealsBadge.innerText = dCount > 0 ? String(dCount) : '';
                 adminDealsBadge.style.display = (isAdmin && dCount > 0) ? 'inline-flex' : 'none';
             }
@@ -557,9 +563,12 @@
                         || user.avatar
                         || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200';
                     const roleTag = isMediatorUser(user) ? '👑 الوسيط' : (user.role === 'buyer' ? '🛒 مشتري' : '🏷️ بائع');
+                    const safeNavName = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                        ? DOMPurify.sanitize(String(user.name || 'مستخدم'))
+                        : String(user.name || 'مستخدم').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                     navUserBox.innerHTML = `
-                        <div class="user-profile-pill nav-user-chip" onclick="toggleDealsDrawer()" title="${user.name}">
-                            <img src="${avatar}" alt="${user.name}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
+                        <div class="user-profile-pill nav-user-chip" onclick="toggleDealsDrawer()" title="${safeNavName}">
+                            <img src="${avatar}" alt="${safeNavName}" class="user-avatar-img" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'">
                         </div>
                     `;
                 } else {
@@ -660,9 +669,10 @@
             if (!isMediatorUser(user)) {
                 const isBuyer = user.role === 'buyer';
                 
-                // Filter user's active deals
+                // Filter user's active deals (استثناء أي صفقة مكتملة أو مقيمة أو منتهية)
+                const isDealDone = typeof waseetIsDealCompleted === 'function' ? waseetIsDealCompleted : (d => d && (d.status === 'completed' || d.status === 'cancelled'));
                 const myDeals = (WASEET_STATE.deals || []).filter(d => {
-                    if (!d || d.status === 'completed' || d.status === 'cancelled') return false;
+                    if (!d || isDealDone(d)) return false;
                     return (d.buyer && (d.buyer.id === user.id || d.buyer.name === user.name)) ||
                            (d.seller && (d.seller.id === user.id || d.seller.name === user.name));
                 });
@@ -844,9 +854,11 @@
                 });
             }
 
-            // Active/Pending/In-Progress Deals (all non-completed, non-cancelled statuses: waiting_credentials, mediator_inspecting, buyer_inspecting, pending_middleman, active, pending, created, disputed, etc.)
-            const activeDeals = allPlatformDeals.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
-            const completedDeals = allPlatformDeals.filter(d => d.status === 'completed' || d.status === 'cancelled');
+            // Active/Pending/In-Progress Deals vs Completed/Finished Deals
+            // تصفية صارمة: أي صفقة مكتملة أو مقيمة أو منتهية تستثنى تماماً من الصفقات النشطة وتنقل حصراً لسجل المعاملات المكتملة
+            const isDealDone = typeof waseetIsDealCompleted === 'function' ? waseetIsDealCompleted : (d => d && (d.status === 'completed' || d.status === 'cancelled'));
+            const activeDeals = allPlatformDeals.filter(d => !isDealDone(d));
+            const completedDeals = allPlatformDeals.filter(d => isDealDone(d));
 
             // Filter by search query (Requirement 6)
             const q = searchQuery.trim().toLowerCase();
@@ -874,6 +886,9 @@
             const filteredCompleted = completedDeals.filter(filterFn);
 
             let html = '';
+            const safeSearchVal = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize)
+                ? DOMPurify.sanitize(String(searchQuery || '')).replace(/"/g, '&quot;')
+                : String(searchQuery || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
             // Search Bar (Requirement 6)
             html += `
@@ -882,7 +897,7 @@
                         <i class="fas fa-search" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); font-size: 1.05rem;"></i>
                         <input type="text" id="deals-search-input" class="input-3d" 
                                placeholder="ابحث برقم الحساب (#1001) أو رقم الصفقة (#1) أو اسم الحساب أو البريد..." 
-                               value="${searchQuery}"
+                               value="${safeSearchVal}"
                                style="padding-right: 46px; width: 100%; font-size: 0.95rem; border-radius: 14px;"
                                oninput="debouncedRenderDealsView(this.value)">
                     </div>

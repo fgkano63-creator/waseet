@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-07T11:10:19.057Z",
+  "timestamp": "2026-11-07T11:32:56.499Z",
   "stats": {
-    "totalChecks": 300,
-    "passed": 300,
+    "totalChecks": 318,
+    "passed": 318,
     "warnings": 0,
     "failures": 0
   },
@@ -614,7 +614,7 @@
         "checkId": "chat.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -754,7 +754,7 @@
         "checkId": "deals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -824,7 +824,7 @@
         "checkId": "index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (19 scripts)",
+        "message": "All local script tags resolve to valid files (20 scripts)",
         "details": null
       },
       {
@@ -1097,14 +1097,14 @@
         "checkId": "profile.html-DuplicateIDs",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Zero duplicate element IDs (69 IDs scanned)",
+        "message": "Zero duplicate element IDs (74 IDs scanned)",
         "details": null
       },
       {
         "checkId": "profile.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (16 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -1118,11 +1118,81 @@
         "checkId": "profile.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (4 images)",
+        "message": "All local image tags resolve on disk (3 images)",
         "details": null
       },
       {
         "checkId": "profile.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | لوحة فحص الأزرار والإنذار ...\"",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (15 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (1 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (0 images)",
+        "details": null
+      },
+      {
+        "checkId": "tests/button-test-dashboard.html-InternalLinks",
         "status": "PASS",
         "severity": "INFO",
         "message": "All internal page links resolve correctly",
@@ -1244,7 +1314,7 @@
         "checkId": "wallet.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -1274,7 +1344,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1326 rules)",
+        "message": "CSS curly braces perfectly balanced (1328 rules)",
         "details": null
       },
       {
@@ -1365,6 +1435,34 @@
       },
       {
         "checkId": "JS-InnerHTML-js/auth.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/button-self-reporter.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/button-self-reporter.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/button-self-reporter.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/button-self-reporter.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/button-self-reporter.js",
         "status": "PASS",
         "severity": "INFO",
         "message": "Safe dynamic HTML interpolation and sanitization verified",
@@ -1617,6 +1715,34 @@
       },
       {
         "checkId": "JS-InnerHTML-js/pwa-register.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/security-validator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/security-validator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/security-validator.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/security-validator.js",
         "status": "PASS",
         "severity": "INFO",
         "message": "Safe dynamic HTML interpolation and sanitization verified",
@@ -1906,7 +2032,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1942 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1951 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {

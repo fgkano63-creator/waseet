@@ -583,10 +583,11 @@
                     <section class="profile-hero-card tier-copper-card animata-glow-card">
                         <div class="profile-header-flex">
                             <div class="profile-identity-col">
-                                <div class="profile-avatar-wrap tier-copper-wrap" style="position: relative;">
-                                    <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="الصورة الشخصية" class="profile-avatar-img" referrerpolicy="no-referrer">
+                                <div class="profile-avatar-wrap tier-copper-wrap" id="profile-avatar-wrap" style="position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(197, 160, 89, 0.22) 0%, rgba(15, 20, 32, 0.95) 70%);">
+                                    <i class="fas fa-user text-gold" id="profile-avatar-fallback-icon" style="font-size: 2.2rem; opacity: 0.85;"></i>
+                                    <img id="profile-avatar" src="" alt="الصورة الشخصية" class="profile-avatar-img" referrerpolicy="no-referrer" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;" onload="if(this.src && this.src.length > 5 && !this.src.endsWith('/')) { this.style.display='block'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='none'; }" onerror="this.style.display='none'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='block';">
                                     <span class="profile-online-dot" title="متصل الآن على منصة وسيط"></span>
-                                    <button type="button" class="profile-avatar-edit-trigger" onclick="ProfileStore.promptAvatarChange()" title="تغيير صورتك الشخصية">
+                                    <button type="button" class="profile-avatar-edit-trigger" onclick="ProfileStore.promptAvatarChange()" title="رفع وتغيير صورتك الشخصية">
                                         <i class="fas fa-camera"></i>
                                     </button>
                                     <input type="file" id="profile-avatar-file-input" accept="image/*" style="display: none;" onchange="ProfileStore.handleAvatarFileSelect(this)">
@@ -810,12 +811,28 @@
                                     <input type="tel" id="input-profile-phone" class="profile-field-input" placeholder="+213 555 123 456">
                                 </div>
 
-                                <!-- رابط الصورة الشخصية -->
-                                <div class="profile-field-group">
-                                    <label class="profile-field-label" for="input-profile-avatar">
-                                        <i class="fas fa-image text-gold"></i> رابط الصورة الرمزية (Avatar URL)
+                                <!-- رابط وخيار رفع الصورة الشخصية (إخفاء الصورة المكسورة افتراضياً والاعتماد على زر رفع الملف) -->
+                                <div class="profile-field-group" style="grid-column: 1 / -1; background: rgba(197, 160, 89, 0.05); border: 1px dashed rgba(197, 160, 89, 0.25); border-radius: 14px; padding: 1.1rem;">
+                                    <label class="profile-field-label" style="font-weight: 800; color: #fff; margin-bottom: 0.6rem;">
+                                        <i class="fas fa-camera text-gold"></i> الصورة الشخصية للملف (Avatar)
                                     </label>
-                                    <input type="url" id="input-profile-avatar" class="profile-field-input" placeholder="https://example.com/my-photo.jpg">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                        <!-- عنصر المعاينة مخفي (display: none) افتراضياً ولا يظهر إلا إذا كان هناك رابط صورة فعلي متوفر -->
+                                        <div id="settings-avatar-preview-wrap" style="position: relative; width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(197, 160, 89, 0.4); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                            <i class="fas fa-user-circle text-silver" id="settings-avatar-placeholder-icon" style="font-size: 2.2rem; opacity: 0.5;"></i>
+                                            <img id="settings-avatar-preview-img" src="" alt="معاينة الصورة" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onload="if(this.src && this.src.length > 5 && !this.src.endsWith('/')) { this.style.display='block'; const ph=document.getElementById('settings-avatar-placeholder-icon'); if(ph) ph.style.display='none'; }" onerror="this.style.display='none'; const ph=document.getElementById('settings-avatar-placeholder-icon'); if(ph) ph.style.display='block';">
+                                        </div>
+
+                                        <div style="flex: 1; min-width: 220px;">
+                                            <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                                                <button type="button" class="btn-3d btn-gold" onclick="ProfileStore.promptAvatarChange()" style="padding: 0.55rem 1.2rem; font-size: 0.88rem;">
+                                                    <i class="fas fa-upload"></i> رفع الملف
+                                                </button>
+                                                <span style="font-size: 0.78rem; color: var(--silver-muted);">اختر صورة من جهازك (JPG, PNG, WebP) بحد أقصى 5MB</span>
+                                            </div>
+                                            <input type="url" id="input-profile-avatar" class="profile-field-input" placeholder="أو الصق رابط صورة خارجي مباشر (Avatar URL)" oninput="ProfileStore.handleAvatarUrlInput(this.value)">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -954,6 +971,7 @@
     <script src="js/vendor/lenis.min.js"></script>
     <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
+    <script src="js/security-validator.js"></script>
     <script src="js/data.js?v=20261104_v6"></script>
     <script src="js/calculator.js"></script>
     <script src="js/particles.js?v=20261104_v6"></script>
@@ -1286,9 +1304,36 @@
             const ownerHeading = document.getElementById('storefront-owner-heading');
 
             if (nameEl) nameEl.textContent = userName;
+            const fallbackIcon = document.getElementById('profile-avatar-fallback-icon');
+            const previewImg = document.getElementById('settings-avatar-preview-img');
+            const previewPlaceholder = document.getElementById('settings-avatar-placeholder-icon');
+
             if (avatarEl) {
-                avatarEl.src = p.avatar_url || DEFAULT_AVATAR;
-                avatarEl.onerror = function () { this.src = DEFAULT_AVATAR; };
+                if (p.avatar_url && String(p.avatar_url).trim().length > 5) {
+                    avatarEl.src = String(p.avatar_url).trim();
+                    avatarEl.style.display = 'block';
+                    if (fallbackIcon) fallbackIcon.style.display = 'none';
+                } else {
+                    avatarEl.src = '';
+                    avatarEl.style.display = 'none';
+                    if (fallbackIcon) fallbackIcon.style.display = 'block';
+                }
+                avatarEl.onerror = function () { 
+                    this.style.display = 'none'; 
+                    if (fallbackIcon) fallbackIcon.style.display = 'block';
+                };
+            }
+
+            if (previewImg) {
+                if (p.avatar_url && String(p.avatar_url).trim().length > 5) {
+                    previewImg.src = String(p.avatar_url).trim();
+                    previewImg.style.display = 'block';
+                    if (previewPlaceholder) previewPlaceholder.style.display = 'none';
+                } else {
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                    if (previewPlaceholder) previewPlaceholder.style.display = 'block';
+                }
             }
 
             const prefix = userName.trim().startsWith('متجر') ? 'معروضات ' : 'معروضات متجر ';
@@ -1470,10 +1515,32 @@
             const newCountry = countryInput ? countryInput.value.trim() : 'DZ';
             const newAvatar = avatarInput ? avatarInput.value.trim() : '';
 
-            if (!newName) {
-                if (typeof waseetAlert === 'function') waseetAlert('خطأ', 'يرجى إدخال اسمك الظاهر أو اسم المتجر.', 'warning');
-                return;
+            // فحص أمني صارم ضد ثغرات XSS والحقن (Input Validation & XSS Prevention)
+            if (typeof WaseetValidator !== 'undefined') {
+                const nameCheck = WaseetValidator.name(newName);
+                if (!nameCheck.isValid) {
+                    if (typeof waseetAlert === 'function') waseetAlert('خطأ في الاسم', nameCheck.error, 'warning');
+                    return;
+                }
+                const phoneCheck = WaseetValidator.phone(newPhone);
+                if (!phoneCheck.isValid) {
+                    if (typeof waseetAlert === 'function') waseetAlert('خطأ في الهاتف', phoneCheck.error, 'warning');
+                    return;
+                }
+                const avatarCheck = WaseetValidator.imageUrl(newAvatar);
+                if (!avatarCheck.isValid) {
+                    if (typeof waseetAlert === 'function') waseetAlert('رابط صورة غير صالح', avatarCheck.error, 'warning');
+                    return;
+                }
+            } else {
+                if (!newName || newName.length < 2 || newName.length > 60 || /<[^>]+>/i.test(newName) || /javascript:/i.test(newName)) {
+                    if (typeof waseetAlert === 'function') waseetAlert('خطأ', 'يرجى إدخال اسم صالح بين حرفين و 60 حرفاً بدون وسوم برمجية.', 'warning');
+                    return;
+                }
             }
+
+            const cleanCountry = /^[A-Z]{2}$/i.test(newCountry) ? newCountry.toUpperCase() : 'DZ';
+            const cleanAvatar = (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(newAvatar) : newAvatar;
 
             const saveBtn = document.getElementById('btn-save-profile');
             if (saveBtn) {
@@ -1483,13 +1550,20 @@
 
             try {
                 if (client && targetUserId) {
+                    // التحقق من هوية المستخدم النشط لمنع انتحال المعرف (Spoofing Protection)
+                    if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.id) {
+                        if (String(WASEET_STATE.user.id) !== String(targetUserId) && !isStrictAdmin(WASEET_STATE.user)) {
+                            throw new Error('أمني: لا يمكنك تعديل بيانات ملف شخصي لمستخدم آخر');
+                        }
+                    }
+
                     const updates = {
                         name: newName,
-                        country: newCountry,
+                        country: cleanCountry,
                         updated_at: new Date().toISOString()
                     };
                     if (newPhone) updates.phone = newPhone;
-                    if (newAvatar) updates.avatar_url = newAvatar;
+                    if (cleanAvatar) updates.avatar_url = cleanAvatar;
 
                     const { error } = await client
                         .from('profiles')
@@ -1573,6 +1647,38 @@
             }
         }
 
+        function handleAvatarUrlInput(val) {
+            const preview = document.getElementById('settings-avatar-preview-img');
+            const placeholder = document.getElementById('settings-avatar-placeholder-icon');
+            const heroAvatar = document.getElementById('profile-avatar');
+            const heroFallback = document.getElementById('profile-avatar-fallback-icon');
+            const clean = String(val || '').trim();
+
+            if (clean && clean.length > 5) {
+                if (preview) {
+                    preview.src = clean;
+                    preview.style.display = 'block';
+                }
+                if (placeholder) placeholder.style.display = 'none';
+                if (heroAvatar) {
+                    heroAvatar.src = clean;
+                    heroAvatar.style.display = 'block';
+                }
+                if (heroFallback) heroFallback.style.display = 'none';
+            } else {
+                if (preview) {
+                    preview.src = '';
+                    preview.style.display = 'none';
+                }
+                if (placeholder) placeholder.style.display = 'block';
+                if (heroAvatar) {
+                    heroAvatar.src = '';
+                    heroAvatar.style.display = 'none';
+                }
+                if (heroFallback) heroFallback.style.display = 'block';
+            }
+        }
+
         async function handleAvatarFileSelect(input) {
             if (!input || !input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -1587,7 +1693,21 @@
                 if (res && res.success) {
                     const newUrl = res.avatarUrl;
                     const avatarEl = document.getElementById('profile-avatar');
-                    if (avatarEl) avatarEl.src = newUrl;
+                    const fallbackEl = document.getElementById('profile-avatar-fallback-icon');
+                    if (avatarEl) {
+                        avatarEl.src = newUrl;
+                        avatarEl.style.display = 'block';
+                    }
+                    if (fallbackEl) fallbackEl.style.display = 'none';
+
+                    const preview = document.getElementById('settings-avatar-preview-img');
+                    const placeholder = document.getElementById('settings-avatar-placeholder-icon');
+                    if (preview) {
+                        preview.src = newUrl;
+                        preview.style.display = 'block';
+                    }
+                    if (placeholder) placeholder.style.display = 'none';
+
                     const avatarInput = document.getElementById('input-profile-avatar');
                     if (avatarInput) avatarInput.value = newUrl;
                     if (profileData) profileData.avatar_url = newUrl;
@@ -2000,6 +2120,7 @@
             resetFormValues,
             promptAvatarChange,
             handleAvatarFileSelect,
+            handleAvatarUrlInput,
             scrollToSettings,
             copyAccountId,
             confirmLogout
