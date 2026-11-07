@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="العرض التوضيحي ودليل الاستخدام التفاعلي لمنصة وسيط WASEET للتجارة الإلكترونية والوساطة المالية الآمنة.">
+  <title>WASEET · العرض التوضيحي التفاعلي (دليل استخدام المنصة)</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-dark: #0f1523;
+      --gold-primary: #f59e0b;
+      --gold-light: #fbbf24;
+      --gold-glow: rgba(245, 158, 11, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --cyan: #06b6d4;
+      --text-muted: #94a3b8;
+      --phone-border: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #151b2e 0%, #080b12 70%, #030407 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 20px 10px;
+    }
+
+    /* Ambient background lights */
+    .ambient-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .ambient-glow-green {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--emerald-glow) 0%, transparent 70%);
+      bottom: -150px;
+      right: 10%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1050px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Header Bar */
+    .top-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(15, 21, 35, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 2px solid var(--gold-primary);
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, var(--gold-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* Main Stage Layout */
+    .stage-wrapper {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    @media (max-width: 880px) {
+      .stage-wrapper {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+
+    /* Phone Mockup Frame */
+    .phone-container {
+      position: relative;
+      width: 340px;
+      height: 680px;
+      background: #000;
+      border-radius: 50px;
+      border: 10px solid #1e2536;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8),
+                  0 0 40px rgba(245, 158, 11, 0.25),
+                  inset 0 0 15px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 24px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .camera-lens {
+      width: 10px;
+      height: 10px;
+      background: #0f172a;
+      border-radius: 50%;
+      border: 1.5px solid #1e293b;
+    }
+
+    /* Phone Screen Content */
+    .phone-screen {
+      flex: 1;
+      background: #090e17;
+      overflow-y: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Simulated Animated Cursor */
+    .virtual-cursor {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.4);
+      border: 2px solid var(--gold-light);
+      box-shadow: 0 0 20px var(--gold-primary);
+      z-index: 99;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .virtual-cursor::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #fff;
+    }
+
+    .virtual-cursor.clicking {
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(16, 185, 129, 0.6);
+      border-color: #34d399;
+    }
+
+    /* Scene Container inside Phone */
+    .scene-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: scale(0.96);
+      padding: 50px 16px 20px;
+    }
+
+    .scene-view.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    /* Scene 1: Vault & Shield */
+    .scene-1-vault {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .vault-shield-icon {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #2a3449 0%, #0d121c 80%);
+      border: 3px solid var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 40px var(--gold-glow);
+      position: relative;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .vault-shield-icon svg {
+      width: 70px;
+      height: 70px;
+      fill: none;
+      stroke: var(--gold-light);
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 10px var(--gold-primary));
+    }
+
+    .badge-demo {
+      display: inline-block;
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 10px;
+      border-radius: 12px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    /* Scene 2: Marketplace */
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mock-game-filter {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .filter-chip {
+      background: #151d2f;
+      border: 1px solid #232f48;
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .filter-chip.active {
+      background: var(--gold-primary);
+      color: #000;
+      font-weight: 800;
+      border-color: var(--gold-light);
+    }
+
+    .mock-card {
+      background: #111827;
+      border: 1px solid #1f293d;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+    }
+
+    .mock-card.highlight {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 25px var(--gold-glow);
+    }
+
+    .mock-card-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: #1e293b;
+    }
+
+    .mock-card-body {
+      padding: 10px;
+    }
+
+    .calc-box {
+      margin-top: 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 12px;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.75rem;
+    }
+
+    /* Scene 3: Escrow Safe */
+    .escrow-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .escrow-lock-box {
+      width: 100%;
+      background: #131b2c;
+      border: 2px solid var(--emerald);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 0 30px var(--emerald-glow);
+    }
+
+    .warranty-tag {
+      background: #10b981;
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    /* Scene 4: Regional Broker */
+    .broker-card {
+      background: #131b2e;
+      border: 1px solid #23314f;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .broker-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid var(--gold-primary);
+      background: #1e293b;
+      position: relative;
+    }
+
+    .broker-avatar .dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid #000;
+    }
+
+    .flag-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+    }
+
+    /* Scene 5: Wallet */
+    .wallet-card {
+      background: linear-gradient(135deg, #182238 0%, #0d1322 100%);
+      border: 1px solid #273757;
+      border-radius: 20px;
+      padding: 18px;
+      margin-top: 10px;
+    }
+
+    .receipt-upload-box {
+      margin-top: 15px;
+      border: 2px dashed #334155;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .receipt-upload-box.uploaded {
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.08);
+      color: #34d399;
+    }
+
+    /* Scene 6: Outro */
+    .outro-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 15px;
+    }
+
+    .url-pill {
+      background: #1e293b;
+      border: 1px solid var(--gold-primary);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      box-shadow: 0 0 25px var(--gold-glow);
+    }
+
+    /* Right Side: Explainer Content & Interactive Controls */
+    .narrative-card {
+      background: rgba(15, 21, 35, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-indicator {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .step-bar {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .step-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .step-bar.completed .step-bar-fill {
+      width: 100%;
+    }
+
+    .scene-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scene-tag {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .scene-timer {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .narrative-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: #fff;
+    }
+
+    .voiceover-box {
+      background: rgba(0, 0, 0, 0.4);
+      border-right: 4px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .voiceover-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .voiceover-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    .legal-alert {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Player Controls */
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-control {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-control:hover {
+      background: #2b3952;
+      border-color: var(--gold-primary);
+    }
+
+    .btn-play-master {
+      background: linear-gradient(135deg, var(--gold-primary) 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      box-shadow: 0 0 20px var(--gold-glow);
+      padding: 12px 28px;
+      font-size: 1rem;
+      border-radius: 16px;
+    }
+
+    .btn-play-master:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px var(--gold-glow);
+    }
+
+    /* Quick Scene Selector Buttons */
+    .scene-nav-buttons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .nav-btn {
+      background: #131a2b;
+      border: 1px solid #1f2b44;
+      color: #94a3b8;
+      padding: 8px 4px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-green"></div>
+
+  <div class="container">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand-box">
+        <img src="assets/logo.png" alt="WASEET Logo" class="brand-logo" onerror="this.src='assets/favicons/icon-192x192.png'">
+        <div>
+          <h1 class="brand-title">WASEET · منصة الوساطة الذكية</h1>
+          <p class="brand-subtitle">محاكاة توضيحية إعلانية شاملة (90 ثانية - 6 مقاطع تفاعلية)</p>
+        </div>
+      </div>
+      <div class="live-badge">
+        <span class="pulse-dot"></span>
+        <span>بث توضيحي حي</span>
+      </div>
+    </header>
+
+    <!-- Stage Layout -->
+    <div class="stage-wrapper">
+
+      <!-- Left: Sleek Smartphone Mockup with Real Animated UI -->
+      <div class="phone-container">
+        <div class="dynamic-island">
+          <div class="camera-lens"></div>
+          <span style="font-size: 9px; color: #64748b; font-weight: 700;">WASEET</span>
+        </div>
+
+        <div class="phone-screen" id="phoneScreen">
+          <!-- Animated Virtual Cursor -->
+          <div class="virtual-cursor" id="virtualCursor"></div>
+
+          <!-- Scene 1: Vault & Fear-Breaking -->
+          <div class="scene-view active" id="view-1">
+            <div class="scene-1-vault">
+              <span class="badge-demo">🛡️ أمان الوساطة</span>
+              <div class="vault-shield-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"></path>
+                  <path d="M12 8v8M8 12h8"></path>
+                </svg>
+              </div>
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff;">وساطة رسمية بإشراف</h2>
+              <p style="font-size: 0.75rem; color: #94a3b8; line-height: 1.5; padding: 0 10px;">
+                بيع وشراء حسابات الألعاب بدون خوف من الاحتيال أو سرقة الحساب.
+              </p>
+              <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 12px; padding: 8px 14px; font-size: 0.72rem; color: #34d399; font-weight: 700;">
+                ✓ وساطة بمتابعة دورية لحق الطرفين
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 2: Marketplace & Commission Calculator -->
+          <div class="scene-view" id="view-2">
+            <div class="mock-header">
+              <span style="font-weight: 800; font-size: 0.85rem; color: var(--gold-light);">🔥 سوق الحسابات</span>
+              <span class="badge-demo">عرض توضيحي</span>
+            </div>
+            <div class="mock-game-filter">
+              <div class="filter-chip active" id="btnFilterFF">فري فاير</div>
+              <div class="filter-chip">ببجي موبايل</div>
+              <div class="filter-chip">برايم</div>
+              <div class="filter-chip">ليفل 60+</div>
+            </div>
+
+            <!-- Card 1 -->
+            <div class="mock-card highlight" id="mockCard1">
+              <img src="assets/screenshots/screenshot-desktop.png" class="mock-card-img" onerror="this.src='assets/splash.png'">
+              <div class="mock-card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 800; font-size: 0.85rem;">حساب فاخر Lv.65</span>
+                  <span style="color: var(--gold-light); font-weight: 900; font-size: 0.9rem;">33 نقطة</span>
+                </div>
+                <div class="calc-box" id="calcBox">
+                  <strong>حاسبة العمولة الشفافة:</strong><br>
+                  30 نقطة للبائع + 3 نقاط عمولة الوساطة = <strong>33 للمشتري</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 3: Escrow Holding -->
+          <div class="scene-view" id="view-3">
+            <div class="mock-header">
+              <span style="font-weight: 800; font-size: 0.85rem; color: #34d399;">🔒 نظام الضمان (Escrow)</span>
+              <span class="badge-demo">حجز الرصيد</span>
+            </div>
+            <div class="escrow-flow">
+              <div class="escrow-lock-box" id="escrowBox">
+                <span class="warranty-tag">ضمان 48 ساعة معلن</span>
+                <div style="font-size: 1.4rem; font-weight: 900; color: var(--gold-light); margin: 6px 0;">33 نقطة محجوزة 🔒</div>
+                <p style="font-size: 0.72rem; color: #cbd5e1; line-height: 1.5;">
+                  تُحجز نقاط الصفقة في خزنة الوساطة الذكية لحين استلام المشتري للحساب وفحصه وتغيير بياناته.
+                </p>
+              </div>
+              <div style="width: 100%; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; font-size: 0.72rem; color: #94a3b8;">
+                ✓ لا يتم تحرير الرصيد للبائع إلا بعد انقضاء الفحص أو تأكيد المشتري.
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 4: Regional Brokers -->
+          <div class="scene-view" id="view-4">
+            <div class="mock-header">
+              <span style="font-weight: 800; font-size: 0.85rem; color: #60a5fa;">🌍 الوساطة الإقليمية</span>
+              <span class="badge-demo">حسب دولتك</span>
+            </div>
+            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+              <div class="broker-card" id="brokerCard">
+                <div class="broker-avatar">
+                  <img src="assets/default-avatar.png" style="width: 100%; height: 100%; border-radius: 50%;" onerror="this.src='assets/logo.png'">
+                  <div class="dot"></div>
+                </div>
+                <div style="text-align: center;">
+                  <h3 style="font-size: 0.95rem; font-weight: 800; color: #fff;">الوسيط الإقليمي المعتمد</h3>
+                  <div class="flag-pill">🇸🇦 المملكة العربية السعودية</div>
+                </div>
+                <button class="btn-control" id="btnContactBroker" style="width: 100%; justify-content: center; background: rgba(37, 99, 235, 0.2); border-color: #3b82f6; font-size: 0.78rem;">
+                  💬 تواصل مع الوسيط المعتمد
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 5: Wallet & Recharge -->
+          <div class="scene-view" id="view-5">
+            <div class="mock-header">
+              <span style="font-weight: 800; font-size: 0.85rem; color: var(--gold-light);">💳 محفظة النقاط</span>
+              <span class="badge-demo">إدارة الرصيد</span>
+            </div>
+            <div class="wallet-card">
+              <span style="font-size: 0.7rem; color: #94a3b8;">الرصيد المتاح</span>
+              <div style="font-size: 1.6rem; font-weight: 900; color: var(--gold-light);">150 <span style="font-size: 0.8rem; color: #fff;">نقطة</span></div>
+              <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-control" style="flex: 1; padding: 6px; font-size: 0.72rem; justify-content: center; background: var(--gold-primary); color: #000; border: none; font-weight: 800;">شحن الرصيد</button>
+                <button class="btn-control" style="flex: 1; padding: 6px; font-size: 0.72rem; justify-content: center;">سحب الأرباح</button>
+              </div>
+            </div>
+            <div class="receipt-upload-box" id="receiptBox">
+              📤 إرفاق إيصال التحويل للمراجعة
+            </div>
+            <div style="margin-top: 10px; font-size: 0.65rem; color: #f87171; text-align: center;">
+              ⚠️ تنبيه: حالة الدفع تحتاج تأكيداً - تحقق من الشروط قبل التحويل.
+            </div>
+          </div>
+
+          <!-- Scene 6: Outro & Call to Action -->
+          <div class="scene-view" id="view-6">
+            <div class="outro-view">
+              <img src="assets/logo.png" style="width: 80px; height: 80px; border-radius: 20px; box-shadow: 0 0 35px var(--gold-glow);" onerror="this.src='assets/favicons/icon-192x192.png'">
+              <h2 style="font-size: 1.2rem; font-weight: 900; color: #fff;">لا تغامر بحسابك بعد اليوم</h2>
+              <p style="font-size: 0.75rem; color: #94a3b8; line-height: 1.5;">
+                تعرّف على آلية منصة وسيط وشروط الضمان وتأكد من حالة الخدمات.
+              </p>
+              <div class="url-pill" id="urlBox">waseetar.vercel.app</div>
+              <button class="btn-control" style="background: var(--gold-primary); color: #000; font-weight: 800; border: none;" onclick="window.open('https://waseetar.vercel.app', '_blank')">
+                🚀 افتح المنصة الآن
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Detailed Narrative, Voiceover Transcript & Player Controls -->
+      <div class="narrative-card">
+
+        <!-- Progress Indicator -->
+        <div class="step-indicator" id="stepIndicator">
+          <div class="step-bar" onclick="jumpToScene(0)"><div class="step-bar-fill"></div></div>
+          <div class="step-bar" onclick="jumpToScene(1)"><div class="step-bar-fill"></div></div>
+          <div class="step-bar" onclick="jumpToScene(2)"><div class="step-bar-fill"></div></div>
+          <div class="step-bar" onclick="jumpToScene(3)"><div class="step-bar-fill"></div></div>
+          <div class="step-bar" onclick="jumpToScene(4)"><div class="step-bar-fill"></div></div>
+          <div class="step-bar" onclick="jumpToScene(5)"><div class="step-bar-fill"></div></div>
+        </div>
+
+        <div class="scene-meta">
+          <span class="scene-tag" id="sceneTag">المشهد 1 / 6 · جذب الانتباه وكسر الخوف</span>
+          <span class="scene-timer" id="sceneTimer">00:00 / 01:30</span>
+        </div>
+
+        <h2 class="narrative-title" id="sceneHeadline">تبي تبيع أو تشري حسابك وأنت متطمن؟ 🛡️ مع WASEET.. وساطة بإشراف ومتابعة</h2>
+
+        <!-- Synchronized Voiceover Card -->
+        <div class="voiceover-box">
+          <div class="voiceover-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path></svg>
+            <span>التعليق الصوتي الصوتي المتزامن (لهجة خليجية فصيحة):</span>
+          </div>
+          <p class="voiceover-text" id="voiceoverText">
+            «تخاف ينصب عليك وأنت تشتري أو تبيع حساب لعبتك؟ تعرّف على منصة وسيط وآلية الوساطة قبل بدء صفقتك.»
+          </p>
+        </div>
+
+        <div class="legal-alert" id="legalNotice" style="display: none;">
+          <span>⚠️</span>
+          <span><strong>تنبيه الاستخدام:</strong> حالة الدفع تحتاج تأكيداً - الصفحة الرئيسية تذكر وضعاً تجريبياً، تحقق من الشروط والخدمة في بلدك قبل التحويل.</span>
+        </div>
+
+        <!-- Quick Scene Navigation -->
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">المقاطع التوضيحية:</span>
+          <div class="scene-nav-buttons">
+            <button class="nav-btn active" onclick="jumpToScene(0)">1. الأمان</button>
+            <button class="nav-btn" onclick="jumpToScene(1)">2. السوق</button>
+            <button class="nav-btn" onclick="jumpToScene(2)">3. الضمان</button>
+            <button class="nav-btn" onclick="jumpToScene(3)">4. الوسطاء</button>
+            <button class="nav-btn" onclick="jumpToScene(4)">5. المحفظة</button>
+            <button class="nav-btn" onclick="jumpToScene(5)">6. الختام</button>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="controls-panel">
+          <button class="btn-play-master" id="btnPlayMaster" onclick="togglePlay()">
+            <span id="playIcon">▶ تشغيل العرض</span>
+          </button>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-control" id="btnMute" onclick="toggleMute()">
+              🔊 الصوت
+            </button>
+            <button class="btn-control" onclick="restartShow()">
+              ↺ إعادة
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Audio Elements for each Scene -->
+  <audio id="audio-0" src="assets/audio/tutorial/scene1.mp3" preload="auto"></audio>
+  <audio id="audio-1" src="assets/audio/tutorial/scene2.mp3" preload="auto"></audio>
+  <audio id="audio-2" src="assets/audio/tutorial/scene3.mp3" preload="auto"></audio>
+  <audio id="audio-3" src="assets/audio/tutorial/scene4.mp3" preload="auto"></audio>
+  <audio id="audio-4" src="assets/audio/tutorial/scene5.mp3" preload="auto"></audio>
+  <audio id="audio-5" src="assets/audio/tutorial/scene6.mp3" preload="auto"></audio>
+
+  <script>
+    const scenes = [
+      {
+        tag: "المشهد 1 / 6 · جذب الانتباه وكسر الخوف",
+        headline: "تبي تبيع أو تشري حسابك وأنت متطمن؟ 🛡️ مع WASEET.. وساطة بإشراف ومتابعة",
+        voiceText: "«تخاف ينصب عليك وأنت تشتري أو تبيع حساب لعبتك؟ تعرّف على منصة وسيط وآلية الوساطة قبل بدء صفقتك.»",
+        duration: 15,
+        showAlert: false,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '40%';
+          cursor.style.left = '50%';
+        }
+      },
+      {
+        tag: "المشهد 2 / 6 · سوق الحسابات وحاسبة العمولة",
+        headline: "🔥 سوق حسابات الألعاب.. تصفح المواصفات واحسب عمولتك",
+        voiceText: "«تصفح واجهة سوق حسابات الألعاب، قارن المواصفات، واعرض حسابك للمراجعة، مع حاسبة توضح صافي البائع وعمولة الوساطة.»",
+        duration: 15,
+        showAlert: false,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '120px';
+          cursor.style.left = '35%';
+          setTimeout(() => {
+            cursor.classList.add('clicking');
+            setTimeout(() => {
+              cursor.classList.remove('clicking');
+              cursor.style.top = '280px';
+              cursor.style.left = '50%';
+              document.getElementById('mockCard1').classList.add('highlight');
+            }, 500);
+          }, 1200);
+        }
+      },
+      {
+        tag: "المشهد 3 / 6 · نظام الضمان المالي (Escrow)",
+        headline: "🔒 نظام الضمان (Escrow): حجز النقاط لحين استلام الحساب وفحصه",
+        voiceText: "«بحسب وصف المنصة، تُحجز نقاط الصفقة حتى فحص الحساب وتأمينه ونقله للمشتري، مع ضمان معلن لمدة ثمانٍ وأربعين ساعة. راجع شروط الضمان قبل الشراء.»",
+        duration: 15,
+        showAlert: false,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '220px';
+          cursor.style.left = '50%';
+          const box = document.getElementById('escrowBox');
+          box.style.transform = 'scale(1.03)';
+          box.style.borderColor = '#fbbf24';
+          setTimeout(() => {
+            box.style.transform = 'scale(1)';
+            box.style.borderColor = '#10b981';
+          }, 1500);
+        }
+      },
+      {
+        tag: "المشهد 4 / 6 · شبكة الوسطاء الإقليميين",
+        headline: "🌍 وساطة إقليمية.. اختر دولتك وتواصل مع الوسيط",
+        voiceText: "«تعرّف على شبكة الوساطة الإقليمية التي تعرضها المنصة، واختر دولتك وتحقق من اعتماد الوسيط قبل بدء أي تحويل.»",
+        duration: 15,
+        showAlert: false,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '360px';
+          cursor.style.left = '50%';
+          setTimeout(() => {
+            cursor.classList.add('clicking');
+            const btn = document.getElementById('btnContactBroker');
+            btn.style.background = '#2563eb';
+            btn.style.color = '#fff';
+            setTimeout(() => {
+              cursor.classList.remove('clicking');
+            }, 600);
+          }, 1500);
+        }
+      },
+      {
+        tag: "المشهد 5 / 6 · المحفظة وشحن الرصيد والسحب",
+        headline: "💳 محفظة نقاط.. إدارة الرصيد وطلبات الشحن والسحب",
+        voiceText: "«واجهة المحفظة تجمع الرصيد المتاح والنقاط المحجوزة وطلبات الشحن والسحب. تأكد من تفعيل وسيلة الدفع وشروطها في بلدك قبل التحويل.»",
+        duration: 15,
+        showAlert: true,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '320px';
+          cursor.style.left = '50%';
+          setTimeout(() => {
+            cursor.classList.add('clicking');
+            const receipt = document.getElementById('receiptBox');
+            receipt.classList.add('uploaded');
+            receipt.innerHTML = '✓ تم رفع إيصال التحويل للمراجعة';
+            setTimeout(() => {
+              cursor.classList.remove('clicking');
+            }, 600);
+          }, 1800);
+        }
+      },
+      {
+        tag: "المشهد 6 / 6 · الختام والدعوة للإجراء (CTA)",
+        headline: "🚀 لا تغامر بحسابك.. تعرّف على WASEET وشروط الوساطة",
+        voiceText: "«زُر منصة وسيط، تعرّف على آلية الوساطة وشروط الضمان، وتأكد من حالة الخدمات قبل بدء صفقتك. waseetar.vercel.app»",
+        duration: 15,
+        showAlert: true,
+        action: (cursor) => {
+          cursor.style.opacity = '1';
+          cursor.style.top = '340px';
+          cursor.style.left = '50%';
+          const urlBox = document.getElementById('urlBox');
+          urlBox.style.transform = 'scale(1.08)';
+          urlBox.style.boxShadow = '0 0 35px #f59e0b';
+        }
+      }
+    ];
+
+    let currentScene = 0;
+    let isPlaying = false;
+    let isMuted = false;
+    let sceneTimer = null;
+    let sceneStartTime = 0;
+    let elapsedInScene = 0;
+    let globalTimerInterval = null;
+
+    function updateUI(index) {
+      // Switch active phone screen view
+      for (let i = 1; i <= 6; i++) {
+        const v = document.getElementById(`view-${i}`);
+        if (v) v.classList.toggle('active', i === index + 1);
+      }
+
+      // Update Narrative Box
+      const sc = scenes[index];
+      document.getElementById('sceneTag').innerText = sc.tag;
+      document.getElementById('sceneHeadline').innerText = sc.headline;
+      document.getElementById('voiceoverText').innerText = sc.voiceText;
+      document.getElementById('legalNotice').style.display = sc.showAlert ? 'flex' : 'none';
+
+      // Update Nav Buttons
+      const btns = document.querySelectorAll('.nav-btn');
+      btns.forEach((b, i) => b.classList.toggle('active', i === index));
+
+      // Trigger Virtual Cursor Actions
+      const cursor = document.getElementById('virtualCursor');
+      sc.action(cursor);
+
+      // Play matching audio
+      playSceneAudio(index);
+    }
+
+    function playSceneAudio(index) {
+      // Stop all audios
+      for (let i = 0; i < 6; i++) {
+        const a = document.getElementById(`audio-${i}`);
+        if (a) {
+          a.pause();
+          a.currentTime = 0;
+        }
+      }
+
+      if (isPlaying && !isMuted) {
+        const activeAudio = document.getElementById(`audio-${index}`);
+        if (activeAudio) {
+          activeAudio.play().catch(e => console.log('Audio autoplay prevented:', e));
+        }
+      }
+    }
+
+    function jumpToScene(index) {
+      currentScene = index;
+      elapsedInScene = 0;
+      updateUI(currentScene);
+
+      // Update Step Bars
+      const bars = document.querySelectorAll('.step-bar');
+      bars.forEach((b, i) => {
+        b.classList.toggle('completed', i < index);
+        const fill = b.querySelector('.step-bar-fill');
+        if (fill) fill.style.width = i < index ? '100%' : (i === index ? '0%' : '0%');
+      });
+
+      if (isPlaying) {
+        startSceneCountdown();
+      }
+    }
+
+    function startSceneCountdown() {
+      if (sceneTimer) clearInterval(sceneTimer);
+
+      const sc = scenes[currentScene];
+      const totalDuration = sc.duration;
+
+      sceneStartTime = Date.now() - (elapsedInScene * 1000);
+
+      sceneTimer = setInterval(() => {
+        const now = Date.now();
+        elapsedInScene = (now - sceneStartTime) / 1000;
+
+        // Update current step fill
+        const currentBar = document.querySelectorAll('.step-bar')[currentScene];
+        if (currentBar) {
+          const fill = currentBar.querySelector('.step-bar-fill');
+          const pct = Math.min(100, (elapsedInScene / totalDuration) * 100);
+          if (fill) fill.style.width = `${pct}%`;
+        }
+
+        // Update overall time
+        const totalElapsed = (currentScene * 15) + Math.min(15, elapsedInScene);
+        const mins = Math.floor(totalElapsed / 60).toString().padStart(2, '0');
+        const secs = Math.floor(totalElapsed % 60).toString().padStart(2, '0');
+        document.getElementById('sceneTimer').innerText = `${mins}:${secs} / 01:30`;
+
+        if (elapsedInScene >= totalDuration) {
+          clearInterval(sceneTimer);
+          if (currentScene < 5) {
+            jumpToScene(currentScene + 1);
+          } else {
+            // Finished
+            isPlaying = false;
+            document.getElementById('playIcon').innerText = '▶ إعادة التشغيل';
+          }
+        }
+      }, 50);
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      const icon = document.getElementById('playIcon');
+
+      if (isPlaying) {
+        icon.innerText = '⏸ إيقاف مؤقت';
+        updateUI(currentScene);
+        startSceneCountdown();
+      } else {
+        icon.innerText = '▶ متابعة العرض';
+        if (sceneTimer) clearInterval(sceneTimer);
+        const currentAudio = document.getElementById(`audio-${currentScene}`);
+        if (currentAudio) currentAudio.pause();
+      }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('btnMute').innerText = isMuted ? '🔇 مكتوم' : '🔊 الصوت';
+      const currentAudio = document.getElementById(`audio-${currentScene}`);
+      if (currentAudio) {
+        if (isMuted) {
+          currentAudio.pause();
+        } else if (isPlaying) {
+          currentAudio.play().catch(e => console.log(e));
+        }
+      }
+    }
+
+    function restartShow() {
+      jumpToScene(0);
+      if (!isPlaying) {
+        togglePlay();
+      }
+    }
+
+    // Initialize View
+    updateUI(0);
+  </script>
+</body>
+</html>

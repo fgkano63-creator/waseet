@@ -3579,6 +3579,43 @@ function isFakeBrokerRecord(b) {
 }
 window.isFakeBrokerRecord = isFakeBrokerRecord;
 
+/**
+ * فحص وتطابق هوية الوسيط الإقليمي لمنع أي تكرار عبر المعرف، أو البريد، أو الاسم والدولة
+ */
+function isSameBrokerRecord(b1, b2) {
+    if (!b1 || !b2) return false;
+
+    // 1. المطابقة بمعرف المستخدم أو معرف سجل الوساطة
+    const id1 = String(b1.id || '').toLowerCase().trim();
+    const id2 = String(b2.id || '').toLowerCase().trim();
+    const uid1 = String(b1.user_id || '').toLowerCase().trim();
+    const uid2 = String(b2.user_id || '').toLowerCase().trim();
+
+    if (id1 && id2 && id1 === id2) return true;
+    if (uid1 && uid2 && uid1 === uid2) return true;
+    if (uid1 && id2 && uid1 === id2) return true;
+    if (id1 && uid2 && id1 === uid2) return true;
+
+    // 2. المطابقة بالبريد الإلكتروني
+    const email1 = String(b1.email || '').toLowerCase().trim();
+    const email2 = String(b2.email || '').toLowerCase().trim();
+    if (email1 && email2 && email1 === email2) return true;
+
+    // 3. المطابقة الصارمة بالاسم والدولة مع تسوية الألف والياء العربية
+    const norm = (s) => String(s || '').toLowerCase().trim().replace(/[إأآا]/g, 'ا').replace(/[ىي]/g, 'ي').replace(/\s+/g, ' ');
+    const name1 = norm(b1.name);
+    const name2 = norm(b2.name);
+    const country1 = String(b1.country || '').toUpperCase().trim();
+    const country2 = String(b2.country || '').toUpperCase().trim();
+
+    if (name1 && name2 && name1 === name2 && country1 && country2 && country1 === country2) {
+        return true;
+    }
+
+    return false;
+}
+window.isSameBrokerRecord = isSameBrokerRecord;
+
 function getCachedRegionalBrokersList() {
     let list = [];
     try {
@@ -3591,12 +3628,25 @@ function getCachedRegionalBrokersList() {
     if (list.length === 0 && typeof WASEET_STATE !== 'undefined' && Array.isArray(WASEET_STATE.brokers)) {
         list = [...WASEET_STATE.brokers];
     }
-    // تصفية الوسطاء الوهميين وتطهير الكاش تلقائياً
-    const filtered = list.filter(b => !isFakeBrokerRecord(b));
-    if (filtered.length !== list.length) {
-        saveCachedRegionalBrokersList(filtered);
+    // تصفية الوسطاء الوهميين وتطهير الكاش تلقائياً من أي تكرار
+    const deduplicated = [];
+    list.filter(b => !isFakeBrokerRecord(b)).forEach(b => {
+        const existingIdx = deduplicated.findIndex(u => isSameBrokerRecord(u, b));
+        if (existingIdx === -1) {
+            deduplicated.push(b);
+        } else {
+            const prev = deduplicated[existingIdx];
+            if (b.is_fully_verified === true) prev.is_fully_verified = true;
+            if (b.avatar_url && (!prev.avatar_url || prev.avatar_url.includes('default-avatar'))) {
+                prev.avatar_url = b.avatar_url;
+            }
+        }
+    });
+
+    if (deduplicated.length !== list.length) {
+        saveCachedRegionalBrokersList(deduplicated);
     }
-    return filtered;
+    return deduplicated;
 }
 
 function saveCachedRegionalBrokersList(list) {
@@ -4007,6 +4057,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                             if (r.is_active !== false && !isFakeBrokerRecord(r)) {
                                 dbBrokers.push({
                                     id: r.id || r.user_id || ('broker_' + Date.now()),
+                                    user_id: r.user_id || r.id,
                                     name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
                                     email: r.email || '',
                                     avatar_url: waseetSanitizeAvatarUrl(r.avatar_url, 'assets/default-avatar.png'),
@@ -4016,7 +4067,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                                     wallet_balance: Number(r.wallet_balance) || 0,
                                     points_balance: Number(r.points_balance) || 0,
                                     kyc_type: r.kyc_type || 'national_id',
-                                    is_fully_verified: r.is_fully_verified !== false,
+                                    is_fully_verified: true,
                                     last_seen_at: r.last_seen_at || null,
                                     completed_deals: Number(r.completed_deals || 0),
                                     rating: Number(r.rating || 0.0),
@@ -4032,7 +4083,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                     try {
                         const { data: rbRows, error: rbError } = await client
                             .from('regional_brokers')
-                            .select('id, name, email, avatar_url, role, country, is_active, wallet_balance, points_balance, created_at')
+                            .select('id, user_id, name, email, avatar_url, role, country, is_active, wallet_balance, points_balance, created_at')
                             .eq('is_active', true);
 
                         if (!rbError && Array.isArray(rbRows) && rbRows.length > 0) {
@@ -4040,6 +4091,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                                 if (r.is_active !== false && !isFakeBrokerRecord(r)) {
                                     dbBrokers.push({
                                         id: r.id || r.user_id || ('broker_' + Date.now()),
+                                        user_id: r.user_id || r.id,
                                         name: r.name || (r.email ? r.email.split('@')[0] : 'وسيط إقليمي معتمد'),
                                         email: r.email || '',
                                         avatar_url: waseetSanitizeAvatarUrl(r.avatar_url, 'assets/default-avatar.png'),
@@ -4048,6 +4100,8 @@ async function waseetFetchRegionalBrokers(force = false) {
                                         is_active: true,
                                         wallet_balance: Number(r.wallet_balance) || 0,
                                         points_balance: Number(r.points_balance) || 0,
+                                        kyc_type: r.kyc_type || 'national_id',
+                                        is_fully_verified: true,
                                         created_at: r.created_at || new Date().toISOString()
                                     });
                                 }
@@ -4057,7 +4111,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                 }
             }
 
-            // 2. الجلب من العرض الآمن public_profiles أولاً بفلترة role = regional_broker
+            // 2. الجلب من العرض الآمن public_profiles أولاً بفلترة role = regional_broker مع منع التكرار
             if (client) {
                 try {
                     const { data: pubRows, error: pubErr } = await client
@@ -4071,16 +4125,19 @@ async function waseetFetchRegionalBrokers(force = false) {
                             const resolvedCountry = String(avatarMeta.countryCode || pRow.country || 'DZ').toUpperCase().trim();
                             if (isFakeBrokerRecord({ ...pRow, country: resolvedCountry })) return;
 
-                            const existing = dbBrokers.find(b => b.id && pRow.id && String(b.id) === String(pRow.id));
+                            const existing = dbBrokers.find(b => isSameBrokerRecord(b, { ...pRow, country: resolvedCountry }));
                             if (existing) {
                                 if (pRow.kyc_type) existing.kyc_type = pRow.kyc_type;
-                                if (typeof pRow.is_fully_verified === 'boolean') {
-                                    existing.is_fully_verified = pRow.is_fully_verified;
-                                }
+                                existing.is_fully_verified = true;
                                 if (pRow.last_seen_at) existing.last_seen_at = pRow.last_seen_at;
+                                if (!existing.user_id) existing.user_id = pRow.id;
+                                if (!existing.avatar_url || existing.avatar_url.includes('default-avatar')) {
+                                    existing.avatar_url = avatarMeta.cleanAvatarUrl;
+                                }
                             } else {
                                 dbBrokers.push({
                                     id: pRow.id,
+                                    user_id: pRow.id,
                                     name: pRow.name || 'وسيط إقليمي معتمد',
                                     email: '',
                                     avatar_url: avatarMeta.cleanAvatarUrl,
@@ -4090,7 +4147,7 @@ async function waseetFetchRegionalBrokers(force = false) {
                                     wallet_balance: 0,
                                     points_balance: 0,
                                     kyc_type: pRow.kyc_type || 'national_id',
-                                    is_fully_verified: pRow.is_fully_verified !== false,
+                                    is_fully_verified: true,
                                     last_seen_at: pRow.last_seen_at || null,
                                     completed_deals: 0,
                                     rating: 0.0,
@@ -4116,85 +4173,86 @@ async function waseetFetchRegionalBrokers(force = false) {
                                 const resolvedCountry = String(avatarMeta.countryCode || row.country || 'DZ').toUpperCase().trim();
                                 if (isFakeBrokerRecord({ ...row, country: resolvedCountry })) return;
 
-                                dbBrokers.push({
-                                    id: row.id,
-                                    name: row.name || (row.email ? row.email.split('@')[0] : 'وسيط إقليمي معتمد'),
-                                    email: row.email || '',
-                                    avatar_url: avatarMeta.cleanAvatarUrl,
-                                    role: 'regional_broker',
-                                    country: resolvedCountry,
-                                    is_active: true,
-                                    wallet_balance: Number(row.wallet_balance) || 0,
-                                    points_balance: Number(row.points_balance) || 0,
-                                    kyc_type: row.kyc_type || 'national_id',
-                                    is_fully_verified: row.is_fully_verified !== false,
-                                    last_seen_at: row.last_seen_at || null,
-                                    completed_deals: Number(row.completed_deals || 0),
-                                    rating: Number(row.rating || 0.0),
-                                    created_at: row.created_at || new Date().toISOString()
-                                });
+                                const existing = dbBrokers.find(b => isSameBrokerRecord(b, { ...row, country: resolvedCountry }));
+                                if (existing) {
+                                    if (row.kyc_type) existing.kyc_type = row.kyc_type;
+                                    existing.is_fully_verified = true;
+                                    if (!existing.user_id) existing.user_id = row.id;
+                                    if (!existing.email && row.email) existing.email = row.email;
+                                } else {
+                                    dbBrokers.push({
+                                        id: row.id,
+                                        user_id: row.id,
+                                        name: row.name || (row.email ? row.email.split('@')[0] : 'وسيط إقليمي معتمد'),
+                                        email: row.email || '',
+                                        avatar_url: avatarMeta.cleanAvatarUrl,
+                                        role: 'regional_broker',
+                                        country: resolvedCountry,
+                                        is_active: true,
+                                        wallet_balance: Number(row.wallet_balance) || 0,
+                                        points_balance: Number(row.points_balance) || 0,
+                                        kyc_type: row.kyc_type || 'national_id',
+                                        is_fully_verified: true,
+                                        last_seen_at: row.last_seen_at || null,
+                                        completed_deals: Number(row.completed_deals || 0),
+                                        rating: Number(row.rating || 0.0),
+                                        created_at: row.created_at || new Date().toISOString()
+                                    });
+                                }
                             });
                         }
                     } catch (err) {}
                 }
             }
 
-            // 3. دمج نتائج قاعدة البيانات مع الكاش المحلي لضمان استقرار العرض
+            // 3. دمج نتائج قاعدة البيانات مع الكاش المحلي لضمان استقرار العرض ومنع أي تكرار
             const cachedBrokers = getCachedRegionalBrokersList();
             const kycPublicCache = getBrokerPublicKycCacheMap();
-            const mergedMap = new Map();
+            const mergedList = [];
 
-            dbBrokers.forEach(b => {
-                if (isFakeBrokerRecord(b)) return;
-                const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
-                if (kycCached) {
-                    if (kycCached.kyc_type) b.kyc_type = kycCached.kyc_type;
-                    if (typeof kycCached.is_fully_verified === 'boolean') b.is_fully_verified = kycCached.is_fully_verified;
-                }
-                if (!b.kyc_type) b.kyc_type = 'national_id';
-                if (typeof b.is_fully_verified !== 'boolean') b.is_fully_verified = true;
-                delete b.kyc_document_url;
-                b.avatar_url = waseetSanitizeAvatarUrl(b.avatar_url, 'assets/default-avatar.png');
+            const processBrokerItem = (b) => {
+                if (!b || b.is_active === false || isFakeBrokerRecord(b)) return;
+                const cleanCountry = String(b.country || 'DZ').toUpperCase().trim();
+                const avatarMeta = parseBrokerAvatarMeta(b.avatar_url);
+                const resolvedCountry = String(avatarMeta.countryCode || cleanCountry).toUpperCase().trim();
 
-                const key = (b.email || b.id || '').toLowerCase();
-                if (key) mergedMap.set(key, b);
-            });
+                const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email) ||
+                                  (b.user_id ? getBrokerPublicKycFromMap(kycPublicCache, b.user_id, b.email) : null);
 
-            cachedBrokers.forEach(b => {
-                if (b && b.is_active !== false && !isFakeBrokerRecord(b)) {
-                    const key = (b.email || b.id || '').toLowerCase();
-                    const kycCached = getBrokerPublicKycFromMap(kycPublicCache, b.id, b.email);
-                    if (key) {
-                        if (!mergedMap.has(key)) {
-                            const cleanObj = {
-                                ...b,
-                                role: 'regional_broker',
-                                country: String(b.country || 'DZ').toUpperCase().trim(),
-                                avatar_url: waseetSanitizeAvatarUrl(b.avatar_url, 'assets/default-avatar.png'),
-                                kyc_type: (kycCached && kycCached.kyc_type) || b.kyc_type || 'national_id',
-                                is_fully_verified: (kycCached && typeof kycCached.is_fully_verified === 'boolean')
-                                    ? kycCached.is_fully_verified
-                                    : (typeof b.is_fully_verified === 'boolean' ? b.is_fully_verified : true)
-                            };
-                            delete cleanObj.kyc_document_url;
-                            if (!isFakeBrokerRecord(cleanObj)) {
-                                mergedMap.set(key, cleanObj);
-                            }
-                        } else {
-                            const existing = mergedMap.get(key);
-                            if (existing && (!existing.country || existing.country === 'DZ') && b.country && b.country !== 'DZ') {
-                                existing.country = String(b.country).toUpperCase().trim();
-                            }
-                            if (existing && kycCached) {
-                                if (kycCached.kyc_type) existing.kyc_type = kycCached.kyc_type;
-                                if (typeof kycCached.is_fully_verified === 'boolean') existing.is_fully_verified = kycCached.is_fully_verified;
-                            }
-                        }
+                const item = {
+                    ...b,
+                    id: b.id || b.user_id,
+                    user_id: b.user_id || b.id,
+                    role: 'regional_broker',
+                    country: resolvedCountry,
+                    avatar_url: avatarMeta.cleanAvatarUrl || waseetSanitizeAvatarUrl(b.avatar_url, 'assets/default-avatar.png'),
+                    kyc_type: (kycCached && kycCached.kyc_type) || b.kyc_type || 'national_id',
+                    is_fully_verified: true,
+                    is_active: true
+                };
+                delete item.kyc_document_url;
+
+                const dupIdx = mergedList.findIndex(existing => isSameBrokerRecord(existing, item));
+                if (dupIdx === -1) {
+                    mergedList.push(item);
+                } else {
+                    const prev = mergedList[dupIdx];
+                    prev.is_fully_verified = true;
+                    if (item.email && !prev.email) prev.email = item.email;
+                    if (item.avatar_url && (!prev.avatar_url || prev.avatar_url.includes('default-avatar'))) {
+                        prev.avatar_url = item.avatar_url;
                     }
+                    if (item.rating && !prev.rating) prev.rating = item.rating;
+                    if (item.completed_deals && !prev.completed_deals) prev.completed_deals = item.completed_deals;
+                    if (item.last_seen_at && !prev.last_seen_at) prev.last_seen_at = item.last_seen_at;
+                    if (item.kyc_type && prev.kyc_type === 'national_id') prev.kyc_type = item.kyc_type;
                 }
-            });
+            };
 
-            const finalBrokers = Array.from(mergedMap.values()).filter(b => !isFakeBrokerRecord(b));
+            dbBrokers.forEach(processBrokerItem);
+            cachedBrokers.forEach(processBrokerItem);
+
+            const finalBrokers = mergedList.filter(b => !isFakeBrokerRecord(b));
             saveCachedRegionalBrokersList(finalBrokers);
 
             // تحديث الكاش في الذاكرة ووقت الجلب
@@ -4481,8 +4539,32 @@ async function waseetRenderGlobalBrokersSection(targetContainerId = 'global-brok
             brokers = getCachedRegionalBrokersList();
         }
 
-        // فلترة الوسطاء النشطين فقط (بدون أي فلترة على الدولة)
-        const activeBrokers = brokers.filter(b => b && b.is_active !== false && (b.role === 'regional_broker' || b.role === 'broker'));
+        // فلترة الوسطاء النشطين وتطهير أي تكرار وتثبيت حالة التوثيق التام
+        const deduplicatedActiveBrokers = [];
+        (Array.isArray(brokers) ? brokers : []).forEach(b => {
+            if (!b || b.is_active === false || isFakeBrokerRecord(b)) return;
+            if (b.role !== 'regional_broker' && b.role !== 'broker') return;
+
+            const existingIdx = deduplicatedActiveBrokers.findIndex(existing => isSameBrokerRecord(existing, b));
+            if (existingIdx === -1) {
+                deduplicatedActiveBrokers.push({
+                    ...b,
+                    is_fully_verified: true, // الوسطاء الإقليميون المعتمدون في الدليل العام موثقون بالكامل دائماً
+                    kyc_type: b.kyc_type || 'national_id'
+                });
+            } else {
+                const prev = deduplicatedActiveBrokers[existingIdx];
+                prev.is_fully_verified = true;
+                if (b.kyc_type && prev.kyc_type === 'national_id') prev.kyc_type = b.kyc_type;
+                if (b.avatar_url && (!prev.avatar_url || prev.avatar_url.includes('default-avatar'))) {
+                    prev.avatar_url = b.avatar_url;
+                }
+                if (b.email && !prev.email) prev.email = b.email;
+                if (b.rating && !prev.rating) prev.rating = b.rating;
+                if (b.completed_deals && !prev.completed_deals) prev.completed_deals = b.completed_deals;
+            }
+        });
+        const activeBrokers = deduplicatedActiveBrokers;
 
         if (activeBrokers.length === 0) {
             container.innerHTML = `

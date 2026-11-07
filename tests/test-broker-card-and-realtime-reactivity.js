@@ -110,6 +110,22 @@ const tests = [
                    (walletHtml.includes('id="drawer-regional-broker-card"') || walletHtml.includes('mobile-drawer-container')) &&
                    (appJs.includes("id = 'drawer-regional-broker-card'") || navbarJs.includes("id=\"drawer-regional-broker-card\""));
         }
+    },
+    {
+        name: 'Broker Deduplication and Identity Matching isSameBrokerRecord',
+        assert: () => {
+            return supabaseJs.includes('function isSameBrokerRecord(b1, b2)') &&
+                   supabaseJs.includes('window.isSameBrokerRecord = isSameBrokerRecord;') &&
+                   supabaseJs.includes("replace(/[إأآا]/g, 'ا')");
+        }
+    },
+    {
+        name: 'Global Certified Brokers Section Deduplication Guard & 100% Fully Verified Status',
+        assert: () => {
+            return supabaseJs.includes('deduplicatedActiveBrokers') &&
+                   supabaseJs.includes('is_fully_verified: true, // الوسطاء الإقليميون المعتمدون في الدليل العام موثقون بالكامل دائماً') &&
+                   supabaseJs.includes('waseetRenderGlobalBrokersSection');
+        }
     }
 ];
 

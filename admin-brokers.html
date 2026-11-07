@@ -971,7 +971,25 @@
             const statActive = document.getElementById('stat-active-brokers');
             const statCountries = document.getElementById('stat-covered-countries');
 
-            currentBrokersList = Array.isArray(brokers) ? brokers : [];
+            const rawList = Array.isArray(brokers) ? brokers : [];
+            const deduplicated = [];
+            rawList.forEach(b => {
+                if (!b) return;
+                const matchFn = (typeof isSameBrokerRecord === 'function')
+                    ? (existing) => isSameBrokerRecord(existing, b)
+                    : (existing) => (existing.id && b.id && existing.id === b.id) || (existing.email && b.email && String(existing.email).toLowerCase() === String(b.email).toLowerCase());
+                const idx = deduplicated.findIndex(matchFn);
+                if (idx === -1) {
+                    deduplicated.push(b);
+                } else {
+                    const prev = deduplicated[idx];
+                    if (b.is_fully_verified === true) prev.is_fully_verified = true;
+                    if (b.avatar_url && (!prev.avatar_url || prev.avatar_url.includes('default-avatar'))) {
+                        prev.avatar_url = b.avatar_url;
+                    }
+                }
+            });
+            currentBrokersList = deduplicated;
             const isSuperAdmin = document.body.classList.contains('is-admin-mode');
 
             const uniqueCountries = new Set(currentBrokersList.map(b => String(b.country || 'DZ').toUpperCase()));

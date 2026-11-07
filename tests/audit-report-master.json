@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-06T08:10:58.232Z",
+  "timestamp": "2026-11-07T10:48:49.551Z",
   "metrics": {
-    "totalChecks": 248,
-    "passed": 248,
-    "warnings": 0,
+    "totalChecks": 255,
+    "passed": 254,
+    "warnings": 1,
     "failures": 0
   },
   "sections": {
@@ -419,6 +419,41 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All inline scripts syntax valid in 404.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-ad-walkthrough.html",
+        "status": "WARN",
+        "severity": "LOW",
+        "message": "3 <img> tags missing alt attribute in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in ad-walkthrough.html",
         "details": null
       },
       {
@@ -963,6 +998,20 @@
         "details": null
       },
       {
+        "id": "Viewport-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "RTL-ad-walkthrough.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in ad-walkthrough.html",
+        "details": null
+      },
+      {
         "id": "Viewport-admin-brokers.html",
         "status": "PASS",
         "severity": "INFO",
@@ -1206,7 +1255,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1822 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1825 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

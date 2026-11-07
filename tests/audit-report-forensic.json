@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-06T08:11:00.101Z",
+  "timestamp": "2026-11-07T10:48:51.211Z",
   "stats": {
-    "totalChecks": 290,
-    "passed": 290,
+    "totalChecks": 300,
+    "passed": 300,
     "warnings": 0,
     "failures": 0
   },
@@ -73,6 +73,76 @@
       },
       {
         "checkId": "404.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET · العرض التوضيحي التفاعلي (د...\"",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (31 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (0 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (4 images)",
+        "details": null
+      },
+      {
+        "checkId": "ad-walkthrough.html-InternalLinks",
         "status": "PASS",
         "severity": "INFO",
         "message": "All internal page links resolve correctly",
@@ -404,7 +474,7 @@
         "checkId": "auth/callback/index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (4 scripts)",
+        "message": "All local script tags resolve to valid files (5 scripts)",
         "details": null
       },
       {
@@ -474,7 +544,7 @@
         "checkId": "auth/callback.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (4 scripts)",
+        "message": "All local script tags resolve to valid files (5 scripts)",
         "details": null
       },
       {
@@ -1836,7 +1906,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1917 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1920 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {
