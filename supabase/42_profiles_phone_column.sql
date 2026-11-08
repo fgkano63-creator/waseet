@@ -1,5 +1,5 @@
--- WASEET Platform - الهجرة رقم 39: إضافة عمود phone لجدول profiles وصلاحيات التحديث
--- 39_profiles_phone_column.sql
+-- WASEET Platform - الهجرة رقم 42: إضافة عمود phone لجدول profiles وصلاحيات التحديث
+-- 42_profiles_phone_column.sql
 -- =================================================================================
 
 BEGIN;

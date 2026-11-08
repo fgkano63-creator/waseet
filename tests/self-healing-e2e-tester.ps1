@@ -62,8 +62,8 @@ $mig34Content = if (Test-Path 'D:\waseet-app\supabase\34_support_messages_broker
 $mig35Content = if (Test-Path 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql') { Get-Content 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql' -Raw -Encoding UTF8 } else { "" }
 $mig36Content = if (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql') { Get-Content 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql' -Raw -Encoding UTF8 } else { "" }
 $mig37Content = if (Test-Path 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql') { Get-Content 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql' -Raw -Encoding UTF8 } else { "" }
-$mig38Content = if (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } else { "" }
-$mig39Content = if (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\39_profiles_phone_column.sql' -Raw -Encoding UTF8 } else { "" }
+$mig38Content = if (Test-Path 'D:\waseet-app\supabase\41_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\41_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } elseif (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } else { "" }
+$mig39Content = if (Test-Path 'D:\waseet-app\supabase\42_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\42_profiles_phone_column.sql' -Raw -Encoding UTF8 } elseif (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\39_profiles_phone_column.sql' -Raw -Encoding UTF8 } else { "" }
 
 Write-Host ""
 Write-Host ">>> 1. FLOW 1: SELLER ACCOUNT LISTING AND SIMULATION RESILIENCE" -ForegroundColor Yellow
@@ -492,9 +492,9 @@ $escrowCancel5 = ($desktopSqlFiles | Where-Object { $_.Name -like '*37*' }).Coun
 Check-Result -Flow 'Escrow Security' -Name 'Desktop SQL Parity (Migration 37 on Desktop)' -Success $escrowCancel5 -Detail 'Standalone Migration 37 SQL file present on Desktop for 1-click execution in Supabase'
 
 Write-Host ""
-Write-Host ">>> 18. FLOW 18: RECOVERY CREDENTIALS VAULT & SECURE MEDIATION ACCESS (MIGRATION 38)" -ForegroundColor Yellow
-$recCred1 = (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') -and $mig38Content.Contains('recovery_email') -and $mig38Content.Contains('recovery_password')
-Check-Result -Flow 'Credentials Vault' -Name 'Supabase Migration 38 Recovery Account Columns Schema' -Success $recCred1 -Detail 'Adds recovery_email and recovery_password to marketplace accounts schema'
+Write-Host ">>> 18. FLOW 18: RECOVERY CREDENTIALS VAULT & SECURE MEDIATION ACCESS (MIGRATION 38/41)" -ForegroundColor Yellow
+$recCred1 = ((Test-Path 'D:\waseet-app\supabase\41_recovery_account_columns_and_access.sql') -or (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql')) -and $mig38Content.Contains('recovery_email') -and $mig38Content.Contains('recovery_password')
+Check-Result -Flow 'Credentials Vault' -Name 'Supabase Migration 38/41 Recovery Account Columns Schema' -Success $recCred1 -Detail 'Adds recovery_email and recovery_password to marketplace accounts schema'
 
 $recCred2 = $mig38Content.Contains('save_account_credentials_secure') -and $mig38Content.Contains('SET search_path = public, pg_temp')
 Check-Result -Flow 'Credentials Vault' -Name 'save_account_credentials_secure Procedure & Search Path Hygiene' -Success $recCred2 -Detail 'Safely inserts primary and recovery credentials into marketplace_account_secrets'
@@ -505,19 +505,19 @@ Check-Result -Flow 'Credentials Vault' -Name 'get_account_credentials_secure Aut
 $recCred4 = $escrowJs.Contains('recoveryPassword') -and $myAccountsHtml.Contains('recoveryPassword')
 Check-Result -Flow 'Credentials Vault' -Name 'Client 4-Field Credentials Dossier Parity' -Success $recCred4 -Detail 'UI and escrow engines support primary and recovery credentials throughout the deal lifecycle'
 
-$recCred5 = ($desktopSqlFiles | Where-Object { $_.Name -like '*38*' }).Count -gt 0
-Check-Result -Flow 'Credentials Vault' -Name 'Desktop SQL Parity (Migration 38 on Desktop)' -Success $recCred5 -Detail 'Standalone Migration 38 SQL file present on Desktop for 1-click execution in Supabase'
+$recCred5 = ($desktopSqlFiles | Where-Object { $_.Name -like '*38*' -or $_.Name -like '*41*' -or $_.Name -like '*recovery*' }).Count -gt 0
+Check-Result -Flow 'Credentials Vault' -Name 'Desktop SQL Parity (Migration 38/41 on Desktop)' -Success $recCred5 -Detail 'Standalone Migration 38/41 SQL file present on Desktop for 1-click execution in Supabase'
 
 Write-Host ""
-Write-Host ">>> 19. FLOW 19: PROFILES PHONE COORDINATION & DIRECT BROKER CHANNEL (MIGRATION 39)" -ForegroundColor Yellow
-$phone1 = (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') -and $mig39Content.Contains('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone')
-Check-Result -Flow 'Phone Coordination' -Name 'Supabase Migration 39 Profiles Phone Column' -Success $phone1 -Detail 'Adds phone column to profiles table for WhatsApp broker coordination'
+Write-Host ">>> 19. FLOW 19: PROFILES PHONE COORDINATION & DIRECT BROKER CHANNEL (MIGRATION 39/42)" -ForegroundColor Yellow
+$phone1 = ((Test-Path 'D:\waseet-app\supabase\42_profiles_phone_column.sql') -or (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql')) -and $mig39Content.Contains('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone')
+Check-Result -Flow 'Phone Coordination' -Name 'Supabase Migration 39/42 Profiles Phone Column' -Success $phone1 -Detail 'Adds phone column to profiles table for WhatsApp broker coordination'
 
 $phone2 = $mig39Content.Contains('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated')
 Check-Result -Flow 'Phone Coordination' -Name 'Phone Column Authenticated Update Grant' -Success $phone2 -Detail 'Explicitly grants authenticated users permission to update their phone numbers'
 
-$phone3 = ($desktopSqlFiles | Where-Object { $_.Name -like '*39*' }).Count -gt 0
-Check-Result -Flow 'Phone Coordination' -Name 'Desktop SQL Parity (Migration 39 on Desktop)' -Success $phone3 -Detail 'Standalone Migration 39 SQL file present on Desktop for 1-click execution in Supabase'
+$phone3 = ($desktopSqlFiles | Where-Object { $_.Name -like '*39*' -or $_.Name -like '*42*' -or $_.Name -like '*phone*' }).Count -gt 0
+Check-Result -Flow 'Phone Coordination' -Name 'Desktop SQL Parity (Migration 39/42 on Desktop)' -Success $phone3 -Detail 'Standalone Migration 39/42 SQL file present on Desktop for 1-click execution in Supabase'
 
 Write-Host ""
 Write-Host ">>> 20. FLOW 20: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow

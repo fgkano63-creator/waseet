@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-08T11:50:20.831Z",
+  "timestamp": "2026-11-08T13:50:14.476Z",
   "metrics": {
-    "totalChecks": 275,
-    "passed": 275,
+    "totalChecks": 279,
+    "passed": 279,
     "warnings": 0,
     "failures": 0
   },
@@ -300,6 +300,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\security-validator.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\showcase-accounts.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\showcase-accounts.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\showcase-accounts.js async error-handling coverage verified (0 async, 0 catch)",
         "details": null
       },
       {
@@ -1360,7 +1381,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1877 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1879 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1529,6 +1550,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "No raw unescaped user-input innerHTML interpolations detected in js\\security-validator.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\showcase-accounts.js",
         "details": null
       },
       {

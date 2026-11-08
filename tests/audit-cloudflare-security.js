@@ -191,18 +191,26 @@ check('Database RLS', 'Escrow Unilateral Cancellation Prevention Guard [WST-AUTH
 check('Database RLS', 'Avatars Storage Bucket BOLA / IDOR Shielding [WST-STORAGE-BOLA-05]', hasMig37 && mig37Content.includes('avatars_authenticated_update') && mig37Content.includes('storage.foldername(name)'), 'Restricts avatar modifications exclusively to the file owner or admin');
 check('Database RLS', 'Escrow Deal Cancellation Anonymous Execution Denial', hasMig37 && mig37Content.includes('REVOKE EXECUTE ON FUNCTION public.cancel_escrow_deal') && mig37Content.includes('FROM anon'), 'Revokes public anonymous execution on cancel_escrow_deal to prevent unauthorized refunds');
 
-// Migration 38 Checks (Recovery Credentials Vault & Secure Access)
-const mig38Path = path.join(ROOT_DIR, 'supabase', '38_recovery_account_columns_and_access.sql');
+// Migration 38 / 41 Checks (Recovery Credentials Vault & Secure Access)
+const mig38Candidates = [
+    path.join(ROOT_DIR, 'supabase', '41_recovery_account_columns_and_access.sql'),
+    path.join(ROOT_DIR, 'supabase', '38_recovery_account_columns_and_access.sql')
+];
+const mig38Path = mig38Candidates.find(p => fs.existsSync(p)) || mig38Candidates[0];
 const hasMig38 = fs.existsSync(mig38Path);
 const mig38Content = hasMig38 ? fs.readFileSync(mig38Path, 'utf8') : '';
-check('Database RLS', 'Recovery Credentials Vault Storage & Function Hygiene (Migration 38)', hasMig38 && mig38Content.includes('save_account_credentials_secure') && mig38Content.includes('recovery_password') && mig38Content.includes('SET search_path = public, pg_temp'), 'Secure definer procedure safely preserves primary & recovery secrets with search_path hygiene');
-check('Database RLS', 'Recovery Credentials Access Control & Broker Authorization (Migration 38)', hasMig38 && mig38Content.includes('get_account_credentials_secure') && mig38Content.includes('public.is_regional_broker()'), 'Authorizes regional brokers, admins, sellers, and inspecting buyers while denying 3rd parties');
+check('Database RLS', 'Recovery Credentials Vault Storage & Function Hygiene (Migration 38/41)', hasMig38 && mig38Content.includes('save_account_credentials_secure') && mig38Content.includes('recovery_password') && mig38Content.includes('SET search_path = public, pg_temp'), 'Secure definer procedure safely preserves primary & recovery secrets with search_path hygiene');
+check('Database RLS', 'Recovery Credentials Access Control & Broker Authorization (Migration 38/41)', hasMig38 && mig38Content.includes('get_account_credentials_secure') && mig38Content.includes('public.is_regional_broker()'), 'Authorizes regional brokers, admins, sellers, and inspecting buyers while denying 3rd parties');
 
-// Migration 39 Checks (Profiles Phone Column & Direct Broker Coordination)
-const mig39Path = path.join(ROOT_DIR, 'supabase', '39_profiles_phone_column.sql');
+// Migration 39 / 42 Checks (Profiles Phone Column & Direct Broker Coordination)
+const mig39Candidates = [
+    path.join(ROOT_DIR, 'supabase', '42_profiles_phone_column.sql'),
+    path.join(ROOT_DIR, 'supabase', '39_profiles_phone_column.sql')
+];
+const mig39Path = mig39Candidates.find(p => fs.existsSync(p)) || mig39Candidates[0];
 const hasMig39 = fs.existsSync(mig39Path);
 const mig39Content = hasMig39 ? fs.readFileSync(mig39Path, 'utf8') : '';
-check('Database RLS', 'Profiles Phone Number Coordination Schema (Migration 39)', hasMig39 && mig39Content.includes('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone') && mig39Content.includes('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated'), 'Safely grants users permission to coordinate with brokers via phone/WhatsApp');
+check('Database RLS', 'Profiles Phone Number Coordination Schema (Migration 39/42)', hasMig39 && mig39Content.includes('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone') && mig39Content.includes('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated'), 'Safely grants users permission to coordinate with brokers via phone/WhatsApp');
 
 // ------------------------------------------------------------------------------
 // SUMMARY

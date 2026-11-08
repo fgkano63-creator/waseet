@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-08T11:50:09.120Z",
+  "timestamp": "2026-11-08T13:52:55.244Z",
   "stats": {
-    "totalChecks": 330,
-    "passed": 330,
+    "totalChecks": 334,
+    "passed": 334,
     "warnings": 0,
     "failures": 0
   },
@@ -754,7 +754,7 @@
         "checkId": "deals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (18 scripts)",
+        "message": "All local script tags resolve to valid files (19 scripts)",
         "details": null
       },
       {
@@ -824,7 +824,7 @@
         "checkId": "index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (23 scripts)",
+        "message": "All local script tags resolve to valid files (24 scripts)",
         "details": null
       },
       {
@@ -1034,7 +1034,7 @@
         "checkId": "pending-accounts.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (15 scripts)",
+        "message": "All local script tags resolve to valid files (16 scripts)",
         "details": null
       },
       {
@@ -1104,7 +1104,7 @@
         "checkId": "profile.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (20 scripts)",
+        "message": "All local script tags resolve to valid files (21 scripts)",
         "details": null
       },
       {
@@ -1344,7 +1344,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1366 rules)",
+        "message": "CSS curly braces perfectly balanced (1367 rules)",
         "details": null
       },
       {
@@ -1777,6 +1777,34 @@
         "details": null
       },
       {
+        "checkId": "JS-Syntax-js/showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/showcase-accounts.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/showcase-accounts.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/showcase-accounts.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/showcase-accounts.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
         "checkId": "JS-Syntax-js/skeleton-ui.js",
         "status": "PASS",
         "severity": "INFO",
@@ -2116,7 +2144,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1972 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1974 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {
@@ -2323,7 +2351,7 @@
         "checkId": "Assets-SizeOptimization",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All 73 static assets are optimized under 1MB",
+        "message": "All 85 static assets are optimized under 1MB",
         "details": null
       }
     ]
