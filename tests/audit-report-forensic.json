@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08T10:25:45.177Z",
+  "timestamp": "2026-11-08T10:42:03.059Z",
   "stats": {
     "totalChecks": 322,
     "passed": 322,
@@ -1344,7 +1344,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1329 rules)",
+        "message": "CSS curly braces perfectly balanced (1331 rules)",
         "details": null
       },
       {
@@ -2060,7 +2060,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1963 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1962 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {
@@ -2267,7 +2267,7 @@
         "checkId": "Assets-SizeOptimization",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All 63 static assets are optimized under 1MB",
+        "message": "All 62 static assets are optimized under 1MB",
         "details": null
       }
     ]

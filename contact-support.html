@@ -14,7 +14,8 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري -->
+    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري (W) الموحد -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261027_w_crop">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261027_w_crop">
     <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261027_w_crop">
@@ -376,75 +377,130 @@
             display: none;
         }
 
-        /* التمرير مقتصر فقط وحصرياً على صندوق الرسائل */
-        .support-chat-messages {
+        /* ══════════════════════════════════════════════════════════════════
+           إصلاح وتأمين حاوية المحادثة الرئيسية وصندوق الإدخال لمنع أي خروج أو تشوه
+           ══════════════════════════════════════════════════════════════════ */
+        .whatsapp-chat-main,
+        .main-chat-area,
+        #support-chat-main {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: radial-gradient(circle at center, rgba(14, 18, 28, 0.92), rgba(8, 10, 16, 0.99)) !important;
+        }
+
+        #support-chat-active {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .whatsapp-chat-body,
+        .support-chat-messages,
+        #support-chat-messages {
             flex: 1 1 0% !important;
             min-height: 0 !important;
+            height: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             overscroll-behavior: contain !important;
             -webkit-overflow-scrolling: touch !important;
-            box-sizing: border-box !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 0.8rem !important;
-            background: radial-gradient(circle at center, rgba(16, 22, 34, 0.9), rgba(9, 12, 18, 0.98));
+            padding: 0.9rem !important;
+            background: radial-gradient(circle at center, rgba(16, 22, 34, 0.9), rgba(9, 12, 18, 0.98)) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
         }
 
-        .support-chat-input-bar {
+        .whatsapp-chat-footer,
+        .support-chat-input-bar,
+        .chat-input-area,
+        #support-chat-form {
             flex-shrink: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
+            min-width: 0 !important;
             box-sizing: border-box !important;
-            padding: 0.65rem 0.85rem !important;
-            background: rgba(14, 18, 28, 0.98);
-            border-top: 1px solid var(--border-metal);
+            margin: 0 !important;
+            padding: 0.75rem 1rem !important;
+            background: rgba(14, 18, 28, 0.98) !important;
+            border-top: 1px solid var(--border-metal) !important;
             display: flex !important;
-            gap: 0.6rem !important;
             align-items: center !important;
+            gap: 0.6rem !important;
+            position: relative !important;
+            z-index: 5 !important;
         }
 
-        .support-chat-input {
+        .wa-chat-input,
+        .support-chat-input,
+        #support-chat-input {
             min-width: 0 !important;
             flex: 1 1 0% !important;
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            background: rgba(22, 28, 44, 0.85);
-            border: 1px solid var(--border-metal);
-            border-radius: 12px;
+            background: rgba(22, 28, 44, 0.85) !important;
+            border: 1px solid var(--border-metal) !important;
+            border-radius: 12px !important;
             padding: 0.7rem 0.95rem !important;
             font-size: 0.9rem !important;
-            color: #fff;
-            font-family: var(--font-ar);
-            outline: none;
-            transition: border-color 0.2s ease;
+            color: #fff !important;
+            font-family: var(--font-ar) !important;
+            outline: none !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
         }
 
-        .support-chat-input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 12px rgba(197, 160, 89, 0.25);
+        .wa-chat-input:focus,
+        .support-chat-input:focus,
+        #support-chat-input:focus {
+            border-color: var(--gold-primary) !important;
+            box-shadow: 0 0 12px rgba(197, 160, 89, 0.25) !important;
         }
 
-        .btn-send-support {
+        .btn-send-support,
+        #btn-send-support {
             flex-shrink: 0 !important;
             width: 44px !important;
             height: 44px !important;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--orange-bright), #c2410c);
-            border: 1px solid var(--orange-bright);
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: all 0.2s ease;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            box-sizing: border-box !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, var(--orange-bright), #c2410c) !important;
+            border: 1px solid var(--orange-bright) !important;
+            color: #fff !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.1rem !important;
+            transition: all 0.2s ease !important;
         }
 
-        .btn-send-support:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4);
+        .btn-send-support:hover,
+        #btn-send-support:hover {
+            transform: scale(1.04) !important;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4) !important;
         }
 
         .support-msg-text {
@@ -490,11 +546,16 @@
                 font-size: 0.6rem !important;
                 padding: 2px 5px !important;
             }
-            .support-chat-input-bar {
+            .support-chat-input-bar,
+            .whatsapp-chat-footer,
+            .chat-input-area,
+            #support-chat-form {
                 padding: 0.45rem 0.55rem !important;
                 gap: 0.4rem !important;
             }
-            .support-chat-input {
+            .support-chat-input,
+            .wa-chat-input,
+            #support-chat-input {
                 padding: 0.55rem 0.7rem !important;
                 font-size: 0.85rem !important;
             }
@@ -653,7 +714,7 @@
                 </aside>
 
                 <!-- 2. نافذة الدردشة (Chat Main Window) -->
-                <section class="whatsapp-chat-main mobile-hidden" id="support-chat-main">
+                <section class="whatsapp-chat-main main-chat-area mobile-hidden" id="support-chat-main">
                     
                     <!-- الحالة الافتراضية الفارغة عند الدخول: "اختر محادثة للبدء" -->
                     <div class="wa-empty-state" id="support-chat-placeholder" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--silver-muted); padding: 2.5rem 1.5rem;">
@@ -667,7 +728,7 @@
                     </div>
 
                     <!-- مساحة المحادثة النشطة (تظهر عند اختيار جهة اتصال من القائمة) -->
-                    <div id="support-chat-active" style="display: none; flex-direction: column; height: 100%; min-height: 0; flex: 1;">
+                    <div id="support-chat-active" style="display: none; flex-direction: column; height: 100%; min-height: 0; flex: 1; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow: hidden; position: relative;">
                         <!-- ترويسة جهة الاتصال النشطة -->
                         <div class="whatsapp-chat-header">
                             <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
@@ -708,7 +769,7 @@
                         </div>
 
                         <!-- مساحة عرض الرسائل -->
-                        <div class="whatsapp-chat-body" id="support-chat-messages">
+                        <div class="whatsapp-chat-body support-chat-messages" id="support-chat-messages">
                             <div class="support-welcome-bubble" id="support-chat-welcome">
                                 <div class="support-welcome-icon"><i class="fas fa-shield-alt text-gold"></i></div>
                                 <h4 id="support-welcome-title" style="margin: 0 0 0.35rem; color: #fff; font-size: 1rem;">مرحباً بك في المحادثة المباشرة مع إدارة WASEET</h4>
@@ -719,8 +780,8 @@
                         </div>
 
                         <!-- صندوق الإدخال والإرسال -->
-                        <form class="whatsapp-chat-footer" id="support-chat-form" onsubmit="return false;">
-                            <input type="text" id="support-chat-input" class="wa-chat-input" placeholder="اكتب رسالتك..." autocomplete="off" maxlength="1500" required>
+                        <form class="whatsapp-chat-footer support-chat-input-bar chat-input-area" id="support-chat-form" onsubmit="return false;">
+                            <input type="text" id="support-chat-input" class="wa-chat-input support-chat-input" placeholder="اكتب رسالتك..." autocomplete="off" maxlength="1500" required>
                             <button type="submit" class="btn-send-support" id="btn-send-support" title="إرسال">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
