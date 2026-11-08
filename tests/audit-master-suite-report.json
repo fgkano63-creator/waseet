@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-08 12:59:33",
+    "Timestamp":  "2026-11-08 13:25:46",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  891,
-    "PassCount":  891,
+    "TotalChecks":  908,
+    "PassCount":  908,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -730,8 +730,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  376,
-                                               "Pass":  376,
+                                               "Total":  388,
+                                               "Pass":  388,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -916,6 +916,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
+                                                                 "Test":  "admin-brokers.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
                                                                  "Test":  "admin-brokers.html script: js/app.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1046,6 +1052,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-chats.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "admin-chats.html script: js/pwa-register.js",
@@ -1180,6 +1192,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
                                                              },
                                                              {
+                                                                 "Test":  "admin-deposits.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
                                                                  "Test":  "admin-deposits.html script: js/pwa-register.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1310,6 +1328,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-withdrawals.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "admin-withdrawals.html script: js/pwa-register.js",
@@ -1456,6 +1480,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
                                                              },
                                                              {
+                                                                 "Test":  "chat.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
                                                                  "Test":  "chat.html script: js/pwa-register.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1586,6 +1616,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "contact-support.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "contact-support.html script: js/pwa-register.js",
@@ -1754,6 +1790,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "deals.html script: js/pwa-register.js",
@@ -1934,6 +1976,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "index.html script: js/app.js",
@@ -2272,6 +2320,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
+                                                                 "Test":  "my-accounts.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
                                                                  "Test":  "my-accounts.html script: js/visual-inspector.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2408,6 +2462,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "pending-accounts.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "pending-accounts.html script: js/visual-inspector.js",
@@ -2596,6 +2656,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
                                                              },
                                                              {
+                                                                 "Test":  "profile.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
                                                                  "Test":  "profile.html script: js/pwa-register.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2756,6 +2822,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html script: js/pwa-register.js",
@@ -4539,7 +4611,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1331 open, 1331 close"
+                                                             "Details":  "Balanced: 1366 open, 1366 close"
                                                          }
                                                      ]
                                        },
@@ -4559,7 +4631,7 @@
                                                                 "Test":  "Responsive Media Queries",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
-                                                                "Details":  "High responsive granularity with 47 media queries"
+                                                                "Details":  "High responsive granularity with 48 media queries"
                                                             },
                                                             {
                                                                 "Test":  "Breakpoints Coverage (Mobile, Tablet, Desktop)",
@@ -4590,8 +4662,8 @@
                                                    ]
                                      },
                        "Security-Secrets":  {
-                                                "Total":  18,
-                                                "Pass":  18,
+                                                "Total":  19,
+                                                "Pass":  19,
                                                 "Warn":  0,
                                                 "Fail":  0,
                                                 "Items":  [
@@ -4680,6 +4752,12 @@
                                                                   "Details":  "No private keys or service_role credentials exposed"
                                                               },
                                                               {
+                                                                  "Test":  "js\\skeleton-ui.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
                                                                   "Test":  "js\\slider.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
@@ -4706,8 +4784,8 @@
                                                           ]
                                             },
                        "Security-Code":  {
-                                             "Total":  18,
-                                             "Pass":  18,
+                                             "Total":  19,
+                                             "Pass":  19,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4791,6 +4869,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\security-validator.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\skeleton-ui.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
@@ -5052,8 +5136,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  64,
-                                                 "Pass":  64,
+                                                 "Total":  67,
+                                                 "Pass":  67,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -5437,6 +5521,24 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.handle_new_user",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.save_account_credentials_secure",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

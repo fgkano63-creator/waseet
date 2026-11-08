@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08T11:09:30.674Z",
+  "timestamp": "2026-11-08T11:39:28.680Z",
   "stats": {
     "totalChecks": 330,
     "passed": 330,
@@ -264,7 +264,7 @@
         "checkId": "admin-chats.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (12 scripts)",
+        "message": "All local script tags resolve to valid files (13 scripts)",
         "details": null
       },
       {
@@ -614,7 +614,7 @@
         "checkId": "chat.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (16 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -754,7 +754,7 @@
         "checkId": "deals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (17 scripts)",
+        "message": "All local script tags resolve to valid files (18 scripts)",
         "details": null
       },
       {
@@ -1104,7 +1104,7 @@
         "checkId": "profile.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (19 scripts)",
+        "message": "All local script tags resolve to valid files (20 scripts)",
         "details": null
       },
       {
@@ -1344,7 +1344,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1364 rules)",
+        "message": "CSS curly braces perfectly balanced (1366 rules)",
         "details": null
       },
       {
@@ -2116,7 +2116,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1968 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1972 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {
@@ -2323,7 +2323,7 @@
         "checkId": "Assets-SizeOptimization",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All 62 static assets are optimized under 1MB",
+        "message": "All 63 static assets are optimized under 1MB",
         "details": null
       }
     ]

@@ -473,7 +473,7 @@ Check-Result -Flow 'Geolocation Engine' -Name 'Country Code Security Validator A
 
 Write-Host ""
 Write-Host ">>> 17. FLOW 17: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
-$nodeCmd = if (Get-Command "agy-node" -ErrorAction SilentlyContinue) { "agy-node" } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { "node" } else { "agy-node" }
+$nodeCmd = if (Get-Command "agy-node.cmd" -ErrorAction SilentlyContinue) { (Get-Command "agy-node.cmd").Source } elseif (Get-Command "agy-node" -ErrorAction SilentlyContinue) { (Get-Command "agy-node").Source } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { (Get-Command "node").Source } else { "C:\Users\H P\AppData\Roaming\Antigravity\bin\agy-node.cmd" }
 $cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
 $cfAuditSuccess = ($cfAuditResult.ExitCode -eq 0)
 Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, and RLS triggers'

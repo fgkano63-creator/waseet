@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-11-08T11:09:29.048Z",
+  "timestamp": "2026-11-08T11:39:26.961Z",
   "metrics": {
     "totalChecks": 275,
-    "passed": 274,
+    "passed": 275,
     "warnings": 0,
-    "failures": 1
+    "failures": 0
   },
   "sections": {
     "codeQuality": [
@@ -26,7 +26,7 @@
         "id": "JS-AsyncCatch-js\\app.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\app.js async error-handling coverage verified (2 async, 24 catch)",
+        "message": "js\\app.js async error-handling coverage verified (2 async, 25 catch)",
         "details": null
       },
       {
@@ -836,10 +836,10 @@
       },
       {
         "id": "HTML-InlineScriptSyntax-contact-support.html",
-        "status": "FAIL",
-        "severity": "HIGH",
-        "message": "Inline script syntax error in contact-support.html",
-        "details": "Script #1: Invalid or unexpected token"
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in contact-support.html",
+        "details": null
       },
       {
         "id": "HTML-DocType-deals.html",
@@ -1360,7 +1360,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1873 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1877 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

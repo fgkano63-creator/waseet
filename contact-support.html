@@ -794,30 +794,117 @@
 
 
 
-        #support-chat-active {
-
+                #support-chat-placeholder {
             width: 100% !important;
-
-            max-width: 100% !important;
-
-            min-width: 0 !important;
-
             height: 100% !important;
-
             min-height: 0 !important;
-
-            display: flex !important;
-
-            flex-direction: column !important;
-
             flex: 1 1 0% !important;
-
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
             box-sizing: border-box !important;
+        }
 
+        #support-chat-placeholder[style*="display: none"] {
+            display: none !important;
+        }
+
+        #support-chat-active {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            box-sizing: border-box !important;
             overflow: hidden !important;
-
             position: relative !important;
+        }
 
+        #support-chat-active[style*="display: none"] {
+            display: none !important;
+        }
+
+        #support-chat-active:not([style*="display: none"]) {
+            display: flex !important;
+        }
+
+        .whatsapp-chat-header {
+            order: 1 !important;
+            flex-shrink: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            background: rgba(14, 18, 28, 0.98) !important;
+            border-bottom: 1px solid var(--border-metal) !important;
+            padding: 0.75rem 1rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.6rem !important;
+            box-sizing: border-box !important;
+            z-index: 10 !important;
+        }
+
+        .support-quick-chips {
+            order: 2 !important;
+            flex-shrink: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: auto !important;
+            padding: 0.5rem 0.75rem !important;
+            background: rgba(9, 12, 19, 0.85) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            display: flex !important;
+            gap: 0.45rem !important;
+            white-space: nowrap !important;
+            z-index: 9 !important;
+        }
+
+        .whatsapp-chat-body,
+        .support-chat-messages,
+        #support-chat-messages {
+            order: 3 !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            overscroll-behavior: contain !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 0.9rem !important;
+            background: radial-gradient(circle at center, rgba(16, 22, 34, 0.9), rgba(9, 12, 18, 0.98)) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+        }
+
+        .whatsapp-chat-footer,
+        .support-chat-input-bar,
+        .chat-input-area,
+        #support-chat-form {
+            order: 4 !important;
+            flex-shrink: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 0.75rem 1rem !important;
+            background: rgba(14, 18, 28, 0.98) !important;
+            border-top: 1px solid var(--border-metal) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.6rem !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
 
 
@@ -1951,7 +2038,7 @@
 
                 if (listEl) {
 
-                    listEl.innerHTML = '                        <div class="skeleton-chat-item">
+                    listEl.innerHTML = `                        <div class="skeleton-chat-item">
                             <div class="skeleton-shimmer skeleton-avatar"></div>
                             <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;">
                                 <div class="skeleton-shimmer skeleton-text" style="width: 50%; height: 14px; margin: 0;"></div>
@@ -1964,7 +2051,7 @@
                                 <div class="skeleton-shimmer skeleton-text" style="width: 45%; height: 14px; margin: 0;"></div>
                                 <div class="skeleton-shimmer skeleton-text" style="width: 65%; height: 11px; margin: 0;"></div>
                             </div>
-                        </div>';
+                        </div>`;
 
                 }
 
@@ -2213,6 +2300,12 @@
 
 
                 renderContactsList();
+
+                // تفعيل جهة الاتصال الأولى تلقائياً على الشاشات الكبيرة لمنع أي فراغ أو تشوه في التخطيط
+                if (window.innerWidth > 868 && Array.isArray(contacts) && contacts.length > 0 && !activeContactId) {
+                    selectContact(contacts[0].id, false);
+                }
+
 
 
 
@@ -2604,11 +2697,11 @@
 
 
 
-                if (placeholderEl) placeholderEl.style.display = 'flex';
+                if (placeholderEl) { placeholderEl.style.setProperty('display', 'flex', 'important'); }
 
 
 
-                if (chatActiveEl) chatActiveEl.style.display = 'none';
+                if (chatActiveEl) { chatActiveEl.style.setProperty('display', 'none', 'important'); }
 
 
 
@@ -2716,11 +2809,11 @@
 
 
 
-                if (placeholderEl) placeholderEl.style.display = 'none';
+                if (placeholderEl) { placeholderEl.style.setProperty('display', 'none', 'important'); }
 
 
 
-                if (chatActiveEl) chatActiveEl.style.display = 'flex';
+                if (chatActiveEl) { chatActiveEl.style.setProperty('display', 'flex', 'important'); }
 
 
 

@@ -84,20 +84,27 @@
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(197, 160, 89, 0.25);
         }
 
-        /* ── Copper Level Styling ── */
+        /* ── Copper Level Styling & Hero Card ── */
         .profile-hero-card.tier-copper-card {
-            background: linear-gradient(135deg, rgba(184, 115, 51, 0.3) 0%, rgba(24, 18, 14, 0.95) 45%, rgba(10, 13, 20, 0.99) 100%) !important;
-            border: 1.5px solid rgba(184, 115, 51, 0.68) !important;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(184, 115, 51, 0.28) !important;
+            background: linear-gradient(135deg, rgba(28, 20, 16, 0.95) 0%, rgba(18, 22, 34, 0.98) 55%, rgba(10, 13, 20, 0.99) 100%) !important;
+            border: 1.5px solid rgba(184, 115, 51, 0.65) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(184, 115, 51, 0.2) !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
-        .profile-hero-card.tier-copper-card::before {
-            background: linear-gradient(90deg, #b87333, #d9823b, #b87333) !important;
+        .profile-hero-card::before {
+            display: none !important; /* منع أي تداخل أو طبقة مصمتة تغطي الكرت */
         }
-        .profile-avatar-wrap.tier-copper-wrap .profile-avatar-img {
-            border: 3.5px solid #b87333 !important;
-            box-shadow: 0 0 22px rgba(184, 115, 51, 0.8), inset 0 0 10px rgba(184, 115, 51, 0.4) !important;
-            outline: 2.5px solid rgba(217, 130, 59, 0.45);
-            outline-offset: 3px;
+        .profile-hero-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #b87333, var(--gold-primary), #b87333);
+            pointer-events: none;
+            z-index: 5;
         }
         .seller-tier-badge.tier-copper {
             background: linear-gradient(135deg, #b87333 0%, #7d4416 100%) !important;
@@ -107,28 +114,108 @@
             font-weight: 800;
         }
 
-        /* ── Avatar Edit Floating Trigger ── */
-        .profile-avatar-edit-trigger {
-            position: absolute;
-            bottom: -4px;
-            left: -4px;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            color: #0b0e14;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.78rem;
+        /* ── Profile Avatar Container & Dimensions (أبعاد ثابتة وتأثير شفاف ملكي) ── */
+        .profile-avatar-wrap {
+            position: relative !important;
+            width: 104px !important;
+            height: 104px !important;
+            min-width: 104px !important;
+            min-height: 104px !important;
+            max-width: 104px !important;
+            max-height: 104px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: radial-gradient(circle at 35% 35%, rgba(212, 175, 55, 0.3) 0%, rgba(184, 115, 51, 0.2) 40%, rgba(15, 20, 32, 0.95) 100%) !important;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-            border: 2px solid #0f1422;
-            transition: all 0.2s;
+            flex-shrink: 0 !important;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            overflow: visible !important;
+        }
+
+        /* تأثير التدرج الشبكي والرعدي الشفاف الملكي عند التمرير (Royal Transparent Mesh & Fractal Glow) */
+        .profile-avatar-wrap::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 10%, rgba(255, 225, 150, 0.45) 0%, transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.35) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(184, 115, 51, 0.2) 0%, rgba(212, 175, 55, 0.15) 50%, rgba(16, 185, 129, 0.1) 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), inset 0 0 15px rgba(255, 225, 150, 0.3);
+            z-index: 2;
+        }
+
+        .profile-avatar-wrap:hover::after {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.7), inset 0 0 20px rgba(255, 225, 150, 0.45);
+        }
+
+        .profile-avatar-wrap .profile-avatar-img {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 3.5px solid #b87333 !important;
+            box-shadow: 0 0 22px rgba(184, 115, 51, 0.7), inset 0 0 10px rgba(184, 115, 51, 0.4) !important;
+            outline: 2.5px solid rgba(217, 130, 59, 0.45);
+            outline-offset: 3px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 1 !important;
+            background: #0d121c;
+        }
+
+        .profile-avatar-wrap:hover .profile-avatar-img {
+            transform: scale(1.02);
+            filter: brightness(1.08) contrast(1.05);
+        }
+
+        /* ── Avatar Edit Floating Trigger (زر تعديل الصورة بثبات وظهور كامل) ── */
+        .profile-avatar-edit-trigger {
+            position: absolute !important;
+            bottom: 0px !important;
+            left: 0px !important;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light)) !important;
+            color: #0b0e14 !important;
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.88rem !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.85), 0 0 10px rgba(212, 175, 55, 0.5) !important;
+            border: 2.5px solid #0f1422 !important;
+            z-index: 10 !important;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s !important;
         }
         .profile-avatar-edit-trigger:hover {
-            transform: scale(1.12);
-            color: #000;
+            transform: scale(1.18) !important;
+            color: #000 !important;
+            background: #ffffff !important;
+        }
+
+        .profile-online-dot {
+            position: absolute !important;
+            bottom: 4px !important;
+            right: 4px !important;
+            width: 18px !important;
+            height: 18px !important;
+            border-radius: 50% !important;
+            background: #10b981 !important;
+            border: 3px solid #0f1420 !important;
+            box-shadow: 0 0 12px #10b981 !important;
+            z-index: 10 !important;
         }
 
         /* ── Profile Meta Chips ── */
@@ -162,15 +249,70 @@
             color: var(--silver-light);
         }
 
-        /* ── Wallet Overview Section in Dashboard ── */
+        /* ── Mobile Layout Resilience (منع تداخل المربعات والأزرار على الموبايل) ── */
+        @media (max-width: 868px) {
+            .profile-header-flex {
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                gap: 1.2rem !important;
+            }
+            .profile-identity-col {
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                width: 100% !important;
+                gap: 0.9rem !important;
+            }
+            .profile-avatar-wrap {
+                margin: 0 auto 0.4rem auto !important;
+            }
+            .profile-name-title {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            #profile-tier-container {
+                justify-content: center !important;
+            }
+            .profile-meta-row {
+                justify-content: center !important;
+                flex-wrap: wrap !important;
+                gap: 0.4rem !important;
+            }
+            .profile-actions-col {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 0.6rem !important;
+                margin-top: 0.5rem !important;
+            }
+            .profile-actions-col button,
+            .profile-actions-col a {
+                flex: 1 1 calc(50% - 0.6rem) !important;
+                min-width: 130px !important;
+                max-width: 100% !important;
+                text-align: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+            }
+            .profile-wallet-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.9rem !important;
+            }
+        }
+
+        /* ── Wallet Overview Section in Dashboard (إظهار كافة العناصر والأزرار بوضوح) ── */
         .profile-wallet-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.2rem;
             margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
         }
         .profile-wallet-card {
-            background: linear-gradient(145deg, rgba(18, 24, 38, 0.95), rgba(12, 16, 26, 0.98));
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.98), rgba(12, 16, 26, 0.99)) !important;
             border: 1px solid var(--border-metal);
             border-radius: 18px;
             padding: 1.4rem;
@@ -181,9 +323,16 @@
             position: relative;
             overflow: hidden;
             transition: all 0.25s ease;
+            z-index: 2;
+        }
+        .profile-wallet-card > * {
+            position: relative;
+            z-index: 3;
+            pointer-events: auto;
         }
         .profile-wallet-card:hover {
             transform: translateY(-3px);
+            border-color: rgba(197, 160, 89, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(197, 160, 89, 0.15);
         }
         .profile-wallet-card::before {
@@ -191,15 +340,17 @@
             position: absolute;
             top: 0; right: 0; left: 0;
             height: 3px;
+            z-index: 4;
+            pointer-events: none;
         }
         .profile-wallet-card.card-available::before {
-            background: linear-gradient(90deg, #10b981, #34d399);
+            background: linear-gradient(90deg, #10b981, #34d399) !important;
         }
         .profile-wallet-card.card-escrow::before {
-            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9) !important;
         }
         .profile-wallet-card.card-total::before {
-            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light)) !important;
         }
 
         /* ── Profile Section General Card ── */
@@ -594,14 +745,14 @@
                 <div id="profile-dashboard-view">
 
                     <!-- 1. بطاقة الهوية والمستوى الشخصي 3D -->
-                    <section class="profile-hero-card tier-copper-card animata-glow-card">
+                    <section class="profile-hero-card tier-copper-card">
                         <div class="profile-header-flex">
                             <div class="profile-identity-col">
-                                <div class="profile-avatar-wrap tier-copper-wrap" id="profile-avatar-wrap" style="position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(197, 160, 89, 0.22) 0%, rgba(15, 20, 32, 0.95) 70%);">
-                                    <i class="fas fa-user text-gold" id="profile-avatar-fallback-icon" style="font-size: 2.2rem; opacity: 0.85;"></i>
-                                    <img id="profile-avatar" src="" alt="الصورة الشخصية" class="profile-avatar-img" referrerpolicy="no-referrer" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;" onload="if(this.src && this.src.length > 5 && !this.src.endsWith('/')) { this.style.display='block'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='none'; }" onerror="this.style.display='none'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='block';">
+                                <div class="profile-avatar-wrap tier-copper-wrap" id="profile-avatar-wrap" onclick="ProfileStore.promptAvatarChange()" title="تغيير الصورة الشخصية">
+                                    <i class="fas fa-user text-gold" id="profile-avatar-fallback-icon" style="font-size: 2.5rem; opacity: 0.85;"></i>
+                                    <img id="profile-avatar" src="" alt="الصورة الشخصية" class="profile-avatar-img" referrerpolicy="no-referrer" style="display: none;" onload="if(this.src && this.src.length > 5 && !this.src.endsWith('/')) { this.style.display='block'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='none'; }" onerror="this.style.display='none'; const fb = document.getElementById('profile-avatar-fallback-icon'); if (fb) fb.style.display='block';">
                                     <span class="profile-online-dot" title="متصل الآن على منصة وسيط"></span>
-                                    <button type="button" class="profile-avatar-edit-trigger" onclick="ProfileStore.promptAvatarChange()" title="رفع وتغيير صورتك الشخصية">
+                                    <button type="button" class="profile-avatar-edit-trigger" onclick="event.stopPropagation(); ProfileStore.promptAvatarChange();" title="رفع وتغيير صورتك الشخصية">
                                         <i class="fas fa-camera"></i>
                                     </button>
                                     <input type="file" id="profile-avatar-file-input" accept="image/*" style="display: none;" onchange="ProfileStore.handleAvatarFileSelect(this)">
@@ -845,7 +996,7 @@
                                                 </button>
                                                 <span style="font-size: 0.78rem; color: var(--silver-muted);">اختر صورة من جهازك (JPG, PNG, WebP) بحد أقصى 5MB</span>
                                             </div>
-                                            <input type="url" id="input-profile-avatar" class="profile-field-input" placeholder="أو الصق رابط صورة خارجي مباشر (Avatar URL)" oninput="ProfileStore.handleAvatarUrlInput(this.value)">
+                                            <input type="url" id="input-profile-avatar" class="profile-field-input" placeholder="رابط صورة الملف الشخصي" style="display: none;" oninput="ProfileStore.handleAvatarUrlInput(this.value)">
                                         </div>
                                     </div>
                                 </div>
@@ -1589,12 +1740,29 @@
                     if (newPhone) updates.phone = newPhone;
                     if (cleanAvatar) updates.avatar_url = cleanAvatar;
 
-                    const { error } = await client
+                    let { error } = await client
                         .from('profiles')
                         .update(updates)
                         .eq('id', targetUserId);
 
-                    if (error) throw error;
+                    // معالجة ذكية في حال لم يكن عمود phone مسجلاً بعد في قاعدة البيانات السحابية (Schema Cache / Pending Migration)
+                    if (error && error.message && error.message.includes("'phone' column")) {
+                        console.warn('[ProfileSettings] تنبيه: عمود phone غير موجود حالياً في profiles، جاري الحفظ وتحديث بيانات المستخدم الوصفية:', error.message);
+                        delete updates.phone;
+                        const retryRes = await client
+                            .from('profiles')
+                            .update(updates)
+                            .eq('id', targetUserId);
+                        if (retryRes.error) throw retryRes.error;
+                        error = null;
+                        try {
+                            if (client.auth && client.auth.updateUser) {
+                                await client.auth.updateUser({ data: { phone: newPhone } });
+                            }
+                        } catch (authErr) {}
+                    } else if (error) {
+                        throw error;
+                    }
                 }
 
                 // تحديث الجلسة المحلية WASEET_STATE
