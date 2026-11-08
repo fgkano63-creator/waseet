@@ -96,15 +96,20 @@ async function waseetSignInWithGoogle(options = {}) {
 
     try {
         console.log('[Supabase Auth] Starting signInWithOAuth for Google with redirectTo:', returnUrl);
+        const detectedGeoCountry = (typeof waseetGetVisitorCountrySync === 'function') ? waseetGetVisitorCountrySync() : null;
+        const oauthOptions = {
+            redirectTo: returnUrl || window.location.origin,
+            queryParams: {
+                access_type: 'offline',
+                prompt: 'select_account'
+            }
+        };
+        if (detectedGeoCountry) {
+            oauthOptions.data = { country: detectedGeoCountry };
+        }
         const { data, error } = await client.auth.signInWithOAuth({
             provider: 'google',
-            options: {
-                redirectTo: returnUrl || window.location.origin,
-                queryParams: {
-                    access_type: 'offline',
-                    prompt: 'select_account'
-                }
-            }
+            options: oauthOptions
         });
 
         if (error) {
@@ -769,6 +774,28 @@ async function waseetSyncAuthState(options = {}) {
             }
         }
 
+        // 2.2 التحديد التلقائي الدقيق لدولة المستخدم وحفظها في Supabase عند التسجيل أو الدخول
+        if (client && authUser.id && (!profile || !profile.country)) {
+            try {
+                const detectedCountryCode = (typeof waseetDetectVisitorCountry === 'function')
+                    ? await waseetDetectVisitorCountry()
+                    : (typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : null);
+                if (detectedCountryCode && /^[A-Z]{2}$/i.test(detectedCountryCode)) {
+                    const cleanCode = detectedCountryCode.toUpperCase().trim();
+                    console.log('[GeoIP Sync] Auto-saving detected user country to profiles table:', cleanCode);
+                    const { error: cErr } = await client
+                        .from('profiles')
+                        .update({ country: cleanCode, updated_at: new Date().toISOString() })
+                        .eq('id', authUser.id);
+                    if (!cErr && profile) {
+                        profile.country = cleanCode;
+                    }
+                }
+            } catch (cEx) {
+                console.warn('[GeoIP Sync] Exception assigning country:', cEx);
+            }
+        }
+
         // جلب رابط الصورة مباشرة من user.user_metadata.avatar_url كما هو مطلوب
         const avatarUrl = authUser.user_metadata?.avatar_url
             || authUser.user_metadata?.picture
@@ -831,19 +858,21 @@ async function waseetSyncAuthState(options = {}) {
         // بدون أي قيمة افتراضية ('DZ') حتى لا يُطابَق كل المستخدمين مع وسيط الجزائر بالخطأ
         const detectedVisitorCountry = (typeof window !== 'undefined' && typeof window.waseetGetVisitorCountrySync === 'function')
             ? window.waseetGetVisitorCountrySync()
-            : 'DZ';
+            : null;
 
         const userCountry = isBroker
             ? String(
                 avatarMeta.countryCode ||
                 (cachedBrokerEntry && cachedBrokerEntry.country) ||
                 (profile && profile.country) ||
-                detectedVisitorCountry
+                detectedVisitorCountry ||
+                ''
             ).toUpperCase().trim()
             : String(
                 (profile && profile.country) ||
                 authUser.user_metadata?.country ||
-                detectedVisitorCountry
+                detectedVisitorCountry ||
+                ''
             ).toUpperCase().trim();
 
         const rawAvail = profile
@@ -3226,7 +3255,7 @@ async function waseetCreateEscrowDealOnSupabase(params) {
 
     const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
     const buyerName = currentUser?.name || 'مشتري معتمد';
-    const buyerCountry = currentUser?.country || 'DZ';
+    const buyerCountry = (currentUser?.country || (typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || '').toUpperCase().trim();
 
     // منع البائع من شراء حسابه الخاص المعروض للبيع (Self-Purchase Prevention Guard)
     if (currentUser && params.seller_id && String(currentUser.id) === String(params.seller_id)) {
@@ -3269,7 +3298,7 @@ async function waseetCreateEscrowDealOnSupabase(params) {
         assignedBroker: assignedBroker,
         buyer: { id: params.buyer_id || currentUser?.id, name: buyerName, phone: '+212 60 *** ***', country: buyerCountry },
         seller: { id: params.seller_id || ('seller_' + params.account_id), name: 'بائع معتمد', phone: '+213 55 *** ***' },
-        mediator: { id: assignedBrokerId || 'admin_waseet', name: mediatorTitle, country: assignedBroker?.country || 'DZ' },
+        mediator: { id: assignedBrokerId || 'admin_waseet', name: mediatorTitle, country: assignedBroker?.country || '' },
         sellerPrice: Number(params.seller_amount || 0),
         fee: Number(params.fee_amount || 0),
         totalPoints: Number(params.total_amount || 0),

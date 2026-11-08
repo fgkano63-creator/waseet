@@ -56,6 +56,11 @@ $navbarJs = if (Test-Path 'D:\waseet-app\js\navbar.js') { Get-Content 'D:\waseet
 $vercelJson = Get-Content 'D:\waseet-app\vercel.json' -Raw -Encoding UTF8
 $sitemapXml = Get-Content 'D:\waseet-app\sitemap.xml' -Raw -Encoding UTF8
 $robotsTxt = Get-Content 'D:\waseet-app\robots.txt' -Raw -Encoding UTF8
+$securityValidatorJs = if (Test-Path 'D:\waseet-app\js\security-validator.js') { Get-Content 'D:\waseet-app\js\security-validator.js' -Raw -Encoding UTF8 } else { "" }
+$countryApiJs = if (Test-Path 'D:\waseet-app\api\country.js') { Get-Content 'D:\waseet-app\api\country.js' -Raw -Encoding UTF8 } else { "" }
+$mig34Content = if (Test-Path 'D:\waseet-app\supabase\34_support_messages_broker_support.sql') { Get-Content 'D:\waseet-app\supabase\34_support_messages_broker_support.sql' -Raw -Encoding UTF8 } else { "" }
+$mig35Content = if (Test-Path 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql') { Get-Content 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql' -Raw -Encoding UTF8 } else { "" }
+$mig36Content = if (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql') { Get-Content 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql' -Raw -Encoding UTF8 } else { "" }
 
 Write-Host ""
 Write-Host ">>> 1. FLOW 1: SELLER ACCOUNT LISTING AND SIMULATION RESILIENCE" -ForegroundColor Yellow
@@ -432,11 +437,58 @@ $uiLibrariesParity = $css.Contains('.animata-glow-card') -and $css.Contains('.sk
 Check-Result -Flow 'UI Design System' -Name 'Luxury UI Libraries Integration (Animata, Skiper, Vengeance)' -Success $uiLibrariesParity -Detail 'Bento grid, animated glow cards, vengeance stat cards, and shimmer buttons active'
 
 Write-Host ""
-Write-Host ">>> 15. FLOW 15: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE)" -ForegroundColor Yellow
+Write-Host ">>> 15. FLOW 15: SUPPORT MESSAGES SECURITY AND SENDER ROLE HARDENING" -ForegroundColor Yellow
+$sup1 = (Test-Path 'D:\waseet-app\supabase\34_support_messages_broker_support.sql') -and $mig34Content.Contains('broker_id')
+Check-Result -Flow 'Support Security' -Name 'Supabase Migration 34 Regional Broker Support Messages Table' -Success $sup1 -Detail 'Adds broker_id to support_messages enabling direct mediator chat'
+
+$sup2 = (Test-Path 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql') -and $mig35Content.Contains('support_messages_broker_insert') -and $mig35Content.Contains("sender_role = 'user'")
+Check-Result -Flow 'Support Security' -Name 'Supabase Migration 35 Support Messages Sender Role Anti-Spoofing RLS' -Success $sup2 -Detail 'Prevents non-admin callers from forging sender_role=admin in support messages'
+
+$sup3 = $mig35Content.Contains('button_error_incidents') -and $mig35Content.Contains('public.is_admin()')
+Check-Result -Flow 'Support Security' -Name 'Button Error Incidents RLS Shielding (Admin Only)' -Success $sup3 -Detail 'Restricts button error incidents inspection and mutations exclusively to administrators'
+
+$desktopSqlFiles = Get-ChildItem 'D:\H P' -Recurse -Filter '*.sql' -ErrorAction SilentlyContinue
+$sup4 = ($desktopSqlFiles | Where-Object { $_.Name -like '*35*' }).Count -gt 0
+Check-Result -Flow 'Support Security' -Name 'Desktop SQL Parity (Migration 35 on Desktop)' -Success $sup4 -Detail 'Direct standalone SQL file created on Desktop with full code and execution instructions'
+
+Write-Host ""
+Write-Host ">>> 16. FLOW 16: DYNAMIC VISITOR GEOLOCATION AND FAIR COUNTRY ASSIGNMENT" -ForegroundColor Yellow
+$geo1 = (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql') -and $mig36Content.Contains('ALTER COLUMN country DROP DEFAULT')
+Check-Result -Flow 'Geolocation Engine' -Name 'Supabase Migration 36 Country Neutrality' -Success $geo1 -Detail 'Drops hardcoded DZ default on profiles table to guarantee country neutrality'
+
+$geo2 = ($desktopSqlFiles | Where-Object { $_.Name -like '*36*' }).Count -gt 0
+Check-Result -Flow 'Geolocation Engine' -Name 'Desktop SQL Parity (Migration 36 on Desktop)' -Success $geo2 -Detail 'Standalone Migration 36 SQL file present on Desktop for 1-click execution in Supabase'
+
+$geo3 = (Test-Path 'D:\waseet-app\api\country.js') -and $countryApiJs.Contains('x-vercel-ip-country') -and $countryApiJs.Contains('cf-ipcountry')
+Check-Result -Flow 'Geolocation Engine' -Name 'Vercel Edge Serverless Geolocation Endpoint' -Success $geo3 -Detail 'High-accuracy instant visitor country detection using Edge geolocation headers'
+
+$geo4 = $dataJs.Contains('waseetDetectVisitorCountry') -and $dataJs.Contains('/api/country') -and $dataJs.Contains('api.country.is') -and $dataJs.Contains('ipapi.co') -and $dataJs.Contains('freeipapi.com')
+Check-Result -Flow 'Geolocation Engine' -Name 'Multi-Tier Resilient GeoIP Fallback Engine' -Success $geo4 -Detail 'Cascades through Edge API, country.is, ipapi.co, and freeipapi without single point of failure'
+
+$geo5 = $dataJs.Contains('return null;') -and $dataJs.Contains('WASEET_DETECTED_COUNTRY')
+Check-Result -Flow 'Geolocation Engine' -Name 'Safe Neutrality Invariant' -Success $geo5 -Detail 'Returns null upon total provider failure to prompt manual country selection'
+
+$geo6 = $securityValidatorJs.Contains('countryCode(val)') -and $securityValidatorJs.Contains('isValid: false')
+Check-Result -Flow 'Geolocation Engine' -Name 'Country Code Security Validator And Neutral Handling' -Success $geo6 -Detail 'Validates ISO-2 codes strictly while permitting empty string without defaulting to DZ'
+
+Write-Host ""
+Write-Host ">>> 17. FLOW 17: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
 $nodeCmd = if (Get-Command "agy-node" -ErrorAction SilentlyContinue) { "agy-node" } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { "node" } else { "agy-node" }
+$cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
+$cfAuditSuccess = ($cfAuditResult.ExitCode -eq 0)
+Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, and RLS triggers'
+
+Write-Host ""
+Write-Host ">>> 18. FLOW 18: BUTTON AND INTERACTIVE ELEMENTS SENTINEL HEALTH" -ForegroundColor Yellow
+$btnAuditorResult = Start-Process -FilePath "powershell" -ArgumentList "-ExecutionPolicy Bypass -File D:\waseet-app\tests\button-self-reporting-auditor.ps1" -NoNewWindow -Wait -PassThru
+$btnAuditorSuccess = ($btnAuditorResult.ExitCode -eq 0)
+Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls Health' -Success $btnAuditorSuccess -Detail 'Verified zero broken buttons, dead triggers, or unhandled click actions across all 17 HTML pages'
+
+Write-Host ""
+Write-Host ">>> 19. FLOW 19: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED)" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, and storage journeys in Node runtime'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 20 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, and storage journeys'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

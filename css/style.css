@@ -10532,6 +10532,220 @@ html.lenis body {
     overflow-x: visible !important;
 }
 
+/* ==========================================================================
+   WASEET PLATFORM - LUXURY SKELETON LOADING & SHIMMER UI SYSTEM
+   Seamless Dark-Mode Shimmer Placeholders replacing circular spinners
+   ========================================================================== */
+
+@keyframes waseet-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-shimmer,
+.skeleton-box,
+.skeleton-text,
+.skeleton-avatar,
+.skeleton-badge,
+.skeleton-btn,
+.skeleton-img {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 20%,
+        rgba(255, 255, 255, 0.08) 38%,
+        rgba(212, 175, 55, 0.06) 50%,
+        rgba(255, 255, 255, 0.08) 62%,
+        rgba(255, 255, 255, 0.03) 80%
+    );
+    background-size: 300% 100%;
+    animation: waseet-shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+.skeleton-box {
+    width: 100%;
+    height: 100%;
+    min-height: 24px;
+}
+
+.skeleton-img {
+    width: 100%;
+    height: 180px;
+    border-radius: 14px;
+}
+
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    width: 100%;
+}
+.skeleton-text.short { width: 35%; }
+.skeleton-text.medium { width: 65%; }
+.skeleton-text.long { width: 88%; }
+.skeleton-text.heading { height: 22px; width: 55%; margin-bottom: 12px; }
+
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.skeleton-avatar.lg { width: 68px; height: 68px; }
+.skeleton-avatar.sm { width: 34px; height: 34px; }
+
+.skeleton-badge {
+    height: 22px;
+    width: 75px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.skeleton-btn {
+    height: 40px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* Composite 1: Marketplace / Account Card Skeleton */
+.skeleton-marketplace-card {
+    background: linear-gradient(145deg, rgba(20, 26, 42, 0.75), rgba(12, 16, 26, 0.85));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    min-height: 380px;
+    box-sizing: border-box;
+}
+.skeleton-marketplace-card .skeleton-card-thumb {
+    width: 100%;
+    height: 180px;
+    border-radius: 14px;
+}
+.skeleton-marketplace-card .skeleton-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+.skeleton-marketplace-card .skeleton-card-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+.skeleton-marketplace-card .skeleton-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Composite 2: Pending Account Verification Card Skeleton (Image 1 replica) */
+.skeleton-pending-card {
+    background: linear-gradient(145deg, rgba(20, 26, 42, 0.85), rgba(10, 14, 24, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+.skeleton-pending-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.skeleton-pending-body {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+}
+@media (max-width: 768px) {
+    .skeleton-pending-body {
+        grid-template-columns: 1fr;
+    }
+}
+.skeleton-pending-preview {
+    width: 100%;
+    height: 170px;
+    border-radius: 12px;
+}
+.skeleton-pending-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+}
+.skeleton-pending-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Composite 3: Broker Card Skeleton */
+.skeleton-broker-card {
+    background: linear-gradient(145deg, rgba(20, 26, 42, 0.8), rgba(12, 16, 26, 0.9));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+.skeleton-broker-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-grow: 1;
+}
+
+/* Composite 4: Table Row / Activity Skeleton */
+.skeleton-table-row {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Composite 5: Chat Item Skeleton */
+.skeleton-chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 8px;
+}
+
 
 
 

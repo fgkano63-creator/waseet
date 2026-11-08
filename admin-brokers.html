@@ -995,7 +995,7 @@
             currentBrokersList = deduplicated;
             const isSuperAdmin = document.body.classList.contains('is-admin-mode');
 
-            const uniqueCountries = new Set(currentBrokersList.map(b => String(b.country || 'DZ').toUpperCase()));
+            const uniqueCountries = new Set(currentBrokersList.map(b => String(b.country || '').toUpperCase()).filter(Boolean));
             if (statActive) statActive.textContent = currentBrokersList.length;
             if (statCountries) statCountries.textContent = uniqueCountries.size;
             if (badge) badge.textContent = `${currentBrokersList.length} وسيط معتمد`;
@@ -1016,7 +1016,7 @@
             }
 
             container.innerHTML = currentBrokersList.map(b => {
-                const countryCode = String(b.country || 'DZ').toUpperCase();
+                const countryCode = String(b.country || '').toUpperCase();
                 const countryInfo = (typeof getWaseetCountryInfo === 'function') ? getWaseetCountryInfo(countryCode) : { name: countryCode, flag: '🌍' };
                 const safeName = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(b.name || 'وسيط إقليمي') : (b.name || 'وسيط إقليمي');
                 const safeEmail = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(b.email || '—') : (b.email || '—');

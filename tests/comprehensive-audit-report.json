@@ -2,11 +2,11 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-08 12:41:33",
+    "Timestamp":  "2026-11-08 12:50:48",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  846,
-                    "Passed":  846,
+                    "TotalChecks":  847,
+                    "Passed":  847,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
@@ -5167,8 +5167,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  112,
-                                        "Passed":  112,
+                                        "Total":  113,
+                                        "Passed":  113,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -5924,6 +5924,13 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v2",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.handle_new_user",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

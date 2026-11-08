@@ -311,7 +311,7 @@ const WASEET_SUPPORTED_COUNTRIES = {
 };
 
 function getWaseetCountryInfo(code) {
-    if (!code) return WASEET_SUPPORTED_COUNTRIES['DZ'];
+    if (!code) return { code: '', name: 'غير محدد', flag: '🌍', currency: 'USD' };
     const upper = String(code).toUpperCase().trim();
     return WASEET_SUPPORTED_COUNTRIES[upper] || { code: upper, name: upper, flag: '🌍', currency: 'USD' };
 }
@@ -411,33 +411,103 @@ window.waseetDebounce = waseetDebounce;
 
 /**
  * Dynamic Visitor Country Detection (GeoIP)
- * يكتشف تلقائياً دولة الزائر بناءً على عنوان الـ IP الحقيقي دون إجباره على دولة الجزائر افتراضياً
+ * يكتشف تلقائياً دولة الزائر بدقة عالية عبر ترويسات Vercel Edge ومزودي GeoIP مع كاش محلي
+ * ولا يفرض دولة الجزائر أبداً عند الفشل، بل يعيد null لطلب التحديد اليدوي
  */
-async function waseetDetectVisitorCountry() {
+async function waseetDetectVisitorCountry(forceRefresh = false) {
     try {
-        const cached = localStorage.getItem('WASEET_DETECTED_COUNTRY');
-        if (cached && /^[A-Z]{2}$/i.test(cached)) {
-            return cached.toUpperCase();
-        }
-        const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-        const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
-        const res = await fetch('https://api.country.is', {
-            signal: controller ? controller.signal : undefined,
-            headers: { 'Accept': 'application/json' }
-        });
-        if (timeoutId) clearTimeout(timeoutId);
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.country && /^[A-Z]{2}$/i.test(data.country)) {
-                const code = data.country.toUpperCase();
-                localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
-                return code;
+        if (!forceRefresh) {
+            const cached = localStorage.getItem('WASEET_DETECTED_COUNTRY');
+            if (cached && /^[A-Z]{2}$/.test(cached)) {
+                return cached.toUpperCase();
             }
         }
-    } catch (e) {
-        // Fallback silently if offline or blocked
+
+        // 1. تجربة Vercel Serverless / Edge Function الخاص بالمنصة
+        try {
+            const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const tid = ctrl ? setTimeout(() => ctrl.abort(), 1800) : null;
+            const res = await fetch('/api/country', {
+                signal: ctrl ? ctrl.signal : undefined,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (tid) clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.country && /^[A-Z]{2}$/i.test(data.country)) {
+                    const code = data.country.toUpperCase();
+                    localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
+                    return code;
+                }
+            }
+        } catch (e) {}
+
+        // 2. تجربة api.country.is السريع المجاني
+        try {
+            const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const tid = ctrl ? setTimeout(() => ctrl.abort(), 2200) : null;
+            const res = await fetch('https://api.country.is', {
+                signal: ctrl ? ctrl.signal : undefined,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (tid) clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.country && /^[A-Z]{2}$/i.test(data.country)) {
+                    const code = data.country.toUpperCase();
+                    localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
+                    return code;
+                }
+            }
+        } catch (e) {}
+
+        // 3. تجربة ipapi.co/json/
+        try {
+            const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const tid = ctrl ? setTimeout(() => ctrl.abort(), 2500) : null;
+            const res = await fetch('https://ipapi.co/json/', {
+                signal: ctrl ? ctrl.signal : undefined,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (tid) clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                const rawCode = data && (data.country_code || data.country);
+                if (rawCode && /^[A-Z]{2}$/i.test(rawCode)) {
+                    const code = rawCode.toUpperCase();
+                    localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
+                    return code;
+                }
+            }
+        } catch (e) {}
+
+        // 4. تجربة freeipapi.com
+        try {
+            const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const tid = ctrl ? setTimeout(() => ctrl.abort(), 2500) : null;
+            const res = await fetch('https://freeipapi.com/api/json', {
+                signal: ctrl ? ctrl.signal : undefined,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (tid) clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                const rawCode = data && (data.countryCode || data.country);
+                if (rawCode && /^[A-Z]{2}$/i.test(rawCode)) {
+                    const code = rawCode.toUpperCase();
+                    localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
+                    return code;
+                }
+            }
+        } catch (e) {}
+
+    } catch (globalEx) {
+        console.warn('[GeoIP] Error during country detection:', globalEx);
     }
-    return localStorage.getItem('WASEET_DETECTED_COUNTRY') || 'DZ';
+
+    // عند فشل جميع مزودي الجغرافيا: لا تضع الجزائر أبداً، بل أعد null لطلب التحديد اليدوي
+    const fallback = localStorage.getItem('WASEET_DETECTED_COUNTRY');
+    return (fallback && /^[A-Z]{2}$/i.test(fallback)) ? fallback.toUpperCase() : null;
 }
 
 function waseetGetVisitorCountrySync() {
@@ -447,7 +517,7 @@ function waseetGetVisitorCountrySync() {
             return cached.toUpperCase();
         }
     } catch (e) {}
-    return 'DZ';
+    return null; // لا ترجع DZ عند عدم معرفة الدولة
 }
 
 if (typeof window !== 'undefined') {

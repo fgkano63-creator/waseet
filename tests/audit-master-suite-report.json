@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-08 12:41:26",
+    "Timestamp":  "2026-11-08 12:59:33",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  882,
-    "PassCount":  882,
+    "TotalChecks":  891,
+    "PassCount":  891,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -730,8 +730,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  371,
-                                               "Pass":  371,
+                                               "Total":  376,
+                                               "Pass":  376,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -1552,6 +1552,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
                                                              },
                                                              {
+                                                                 "Test":  "contact-support.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
+                                                             },
+                                                             {
                                                                  "Test":  "contact-support.html script: js/auth.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1712,6 +1718,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
                                                              },
                                                              {
                                                                  "Test":  "deals.html script: js/auth.js",
@@ -1886,6 +1898,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
                                                              },
                                                              {
                                                                  "Test":  "index.html script: js/auth.js",
@@ -2542,6 +2560,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
                                                              },
                                                              {
+                                                                 "Test":  "profile.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
+                                                             },
+                                                             {
                                                                  "Test":  "profile.html script: js/auth.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2690,6 +2714,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html script: js/auth.js",
@@ -4560,8 +4590,8 @@
                                                    ]
                                      },
                        "Security-Secrets":  {
-                                                "Total":  17,
-                                                "Pass":  17,
+                                                "Total":  18,
+                                                "Pass":  18,
                                                 "Warn":  0,
                                                 "Fail":  0,
                                                 "Items":  [
@@ -4585,6 +4615,12 @@
                                                               },
                                                               {
                                                                   "Test":  "js\\calculator.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
+                                                                  "Test":  "js\\country-selector.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
                                                                   "Details":  "No private keys or service_role credentials exposed"
@@ -4670,8 +4706,8 @@
                                                           ]
                                             },
                        "Security-Code":  {
-                                             "Total":  17,
-                                             "Pass":  17,
+                                             "Total":  18,
+                                             "Pass":  18,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4695,6 +4731,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\calculator.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\country-selector.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
@@ -4780,8 +4822,8 @@
                                                        ]
                                          },
                        "JS-Resilience":  {
-                                             "Total":  11,
-                                             "Pass":  11,
+                                             "Total":  12,
+                                             "Pass":  12,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4799,6 +4841,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\button-self-reporter.js - LocalStorage Error Boundary",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "LocalStorage operations are guarded against private mode / quota exceptions"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\country-selector.js - LocalStorage Error Boundary",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "LocalStorage operations are guarded against private mode / quota exceptions"
@@ -5004,8 +5052,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  63,
-                                                 "Pass":  63,
+                                                 "Total":  64,
+                                                 "Pass":  64,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -5383,6 +5431,12 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v2",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.handle_new_user",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

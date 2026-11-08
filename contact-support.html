@@ -829,7 +829,8 @@
     <script src="js/supabase.js?v=20261104_v6"></script>
     <script src="js/purify.min.js"></script>
     <script src="js/data.js?v=20261104_v6"></script>
-    <script src="js/dialog.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/country-selector.js?v=20261108" defer></script>
     <script src="js/auth.js"></script>
     <script src="js/particles.js?v=20261104_v6"></script>
     <script src="js/notifications.js?v=20261026_w2"></script>
@@ -922,7 +923,8 @@
             return {
                 id: guestId,
                 name: 'زائر المنصة',
-                country: 'DZ',
+                country: (typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || '',
+
                 isGuest: true,
                 wallet: { available: 0, locked: 0, total: 0 }
             };
@@ -975,7 +977,8 @@
 
                 const userCountry = (currentUser && currentUser.country)
                     ? String(currentUser.country).toUpperCase().trim()
-                    : 'DZ';
+                    : ((typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || '');
+
 
                 let localBrokers = [];
                 let otherBrokers = [];
@@ -1183,7 +1186,8 @@
 
                     ? String(currentUser.country).toUpperCase().trim()
 
-                    : 'DZ';
+                    : ((typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || '');
+
 
 
 
@@ -1759,7 +1763,7 @@
                             email: u.email,
                             name: (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || u.email.split('@')[0],
                             avatar: (u.user_metadata && (u.user_metadata.avatar_url || u.user_metadata.picture)) || 'assets/logo.png',
-                            country: (u.user_metadata && u.user_metadata.country) || 'DZ',
+                            country: (u.country || (u.user_metadata && u.user_metadata.country) || (typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || ''),
                             role: (u.email === 'fgkano63@gmail.com') ? 'admin' : 'buyer',
                             wallet: (currentUser && currentUser.wallet) || { available: 0, locked: 0, total: 0 }
                         };

@@ -152,9 +152,12 @@
          * التحقق من رمز الدولة
          */
         countryCode(val) {
-            const str = String(val || 'DZ').trim().toUpperCase();
+            const str = String(val || '').trim().toUpperCase();
+            if (!str) {
+                return { isValid: true, value: '' };
+            }
             if (!/^[A-Z]{2}$/.test(str)) {
-                return { isValid: false, error: 'رمز الدولة غير صالح', value: 'DZ' };
+                return { isValid: false, error: 'رمز الدولة غير صالح', value: '' };
             }
             return { isValid: true, value: str };
         },

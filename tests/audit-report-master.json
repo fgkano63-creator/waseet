@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08T10:42:01.346Z",
+  "timestamp": "2026-11-08T10:57:15.358Z",
   "metrics": {
     "totalChecks": 267,
     "passed": 267,
@@ -110,7 +110,7 @@
         "id": "JS-AsyncCatch-js\\data.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\data.js async error-handling coverage verified (1 async, 7 catch)",
+        "message": "js\\data.js async error-handling coverage verified (1 async, 11 catch)",
         "details": null
       },
       {
@@ -320,7 +320,7 @@
         "id": "JS-AsyncCatch-js\\supabase.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\supabase.js async error-handling coverage verified (63 async, 148 catch)",
+        "message": "js\\supabase.js async error-handling coverage verified (63 async, 149 catch)",
         "details": null
       },
       {
@@ -1318,7 +1318,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1867 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1869 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

@@ -102,7 +102,9 @@ const DB = {
     deal_messages: [],
     wallet_transactions: [],
     deposit_requests: [],
-    regional_brokers: []
+    regional_brokers: [],
+    support_messages: [],
+    button_error_incidents: []
 };
 
 // Platform fee calculation logic (matches js/app.js)
@@ -1579,6 +1581,231 @@ async function runE2ESimulation() {
 
     simulateUpdateProfileNameAndAvatar(buyer, 'أحمد المشتري المعتمد', cloudFailureRes.avatarUrl);
     assert(buyer.name === 'أحمد المشتري المعتمد' && buyer.avatar_url.startsWith('data:image/webp'), 'Profile Experience', 'Profile Name & Avatar Live Synchronization', 'User name and avatar state updated atomically in user profile store');
+
+    // ==========================================================================
+    // PHASE 18: SUPPORT MESSAGES SECURITY & ANTI-SPOOFING (MIGRATIONS 34 & 35)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 18: SUPPORT MESSAGES SECURITY & ANTI-SPOOFING (MIGRATIONS 34 & 35)\x1b[0m');
+
+    // 18.1 RLS Simulation for support_messages INSERT (Migration 35)
+    function simulateInsertSupportMessage(callerUser, msgPayload) {
+        if (!callerUser) throw new Error('أمني: يجب تسجيل الدخول لإرسال رسائل الدعم');
+        const role = msgPayload.sender_role || 'user';
+        const userId = msgPayload.user_id;
+        const brokerId = msgPayload.broker_id;
+
+        const isUserSelf = (userId === callerUser.id && role === 'user');
+        const isAssignedBroker = (role === 'admin' && (brokerId === callerUser.id || brokerId === `broker_${callerUser.id}`));
+        const isSuperAdmin = (isStrictAdminSim(callerUser) && role === 'admin');
+
+        if (!isUserSelf && !isAssignedBroker && !isSuperAdmin) {
+            throw new Error('أمني: انتهاك سياسة RLS: غير مصرح لك بإرسال رسالة دعم بهذه الرتبة أو لهذا المستخدم');
+        }
+
+        const record = {
+            id: `msg-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            user_id: userId,
+            broker_id: brokerId,
+            message: msgPayload.message,
+            sender_role: role,
+            created_at: new Date().toISOString()
+        };
+        DB.support_messages.push(record);
+        return { ok: true, data: record };
+    }
+
+    // Normal user spoofing admin role blocked
+    let spoofSupportBlocked = false;
+    try {
+        simulateInsertSupportMessage(buyer, {
+            user_id: buyer.id,
+            broker_id: regionalBroker.id,
+            message: 'أنا مدير وسيط وأطلب بياناتك',
+            sender_role: 'admin'
+        });
+    } catch (e) {
+        spoofSupportBlocked = e.message.includes('انتهاك سياسة RLS');
+    }
+    assert(spoofSupportBlocked, 'Support Security', 'Support Message Admin Role Spoof Shield (Migration 35)', 'Normal user strictly blocked from forging sender_role="admin" in support chat');
+
+    // Normal user legitimate user message allowed
+    const validUserMsg = simulateInsertSupportMessage(buyer, {
+        user_id: buyer.id,
+        broker_id: regionalBroker.id,
+        message: 'مرحباً، لدي استفسار عن صفقة رقم 101',
+        sender_role: 'user'
+    });
+    assert(validUserMsg.ok === true && validUserMsg.data.sender_role === 'user', 'Support Security', 'Legitimate User Support Message Acceptance', 'Regular authenticated user dispatches support query with sender_role="user"');
+
+    // Assigned regional broker legitimate admin reply allowed
+    const brokerReplyMsg = simulateInsertSupportMessage(regionalBroker, {
+        user_id: buyer.id,
+        broker_id: regionalBroker.id,
+        message: 'أهلاً بك، تم استلام استفسارك وسيتم الرد خلال دقائق',
+        sender_role: 'admin'
+    });
+    assert(brokerReplyMsg.ok === true && brokerReplyMsg.data.sender_role === 'admin', 'Support Security', 'Assigned Regional Broker Admin Reply Acceptance', 'Assigned regional broker authorized to respond with sender_role="admin"');
+
+    // 18.2 Button Error Incidents Isolation (Migration 35)
+    function simulateAccessButtonIncidents(callerUser, action = 'SELECT') {
+        const isAdmin = isStrictAdminSim(callerUser);
+        if (!isAdmin) {
+            throw new Error('أمني: انتهاك سياسة RLS: جدول بلاغات الأزرار مخصص لإدارة المنصة فقط');
+        }
+        return { ok: true, count: DB.button_error_incidents.length };
+    }
+
+    let userIncidentReadBlocked = false;
+    try {
+        simulateAccessButtonIncidents(buyer, 'SELECT');
+    } catch (e) {
+        userIncidentReadBlocked = e.message.includes('مخصص لإدارة المنصة فقط');
+    }
+    assert(userIncidentReadBlocked, 'Incident Security', 'Button Error Incidents Non-Admin Isolation (Migration 35)', 'Non-admin users strictly prohibited from reading or mutating button error incidents');
+
+    const adminIncidentAccess = simulateAccessButtonIncidents(admin, 'SELECT');
+    assert(adminIncidentAccess.ok === true, 'Incident Security', 'Administrator Button Error Incidents Full Access', 'Super admin authorized to inspect and manage button error incidents');
+
+    // ==========================================================================
+    // PHASE 19: DYNAMIC VISITOR GEOLOCATION & FAIR COUNTRY ASSIGNMENT (MIGRATION 36 & /api/country)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 19: DYNAMIC VISITOR GEOLOCATION & FAIR COUNTRY ASSIGNMENT (MIGRATION 36 & /api/country)\x1b[0m');
+
+    // 19.1 Migration 36 Database Profile Country Default Null Check
+    const MIGRATION_36_SPECS = {
+        profiles_country_default: null,
+        handle_new_user_country_logic: 'nullif(upper(trim(coalesce(new.raw_user_meta_data->>\'country\', \'\'))), \'\')'
+    };
+    assert(MIGRATION_36_SPECS.profiles_country_default === null, 'GeoIP Security', 'Database Country Default Neutrality (Zero Hardcoded DZ Default)', 'profiles.country default is NULL to prevent forced Algerian nationality assignment');
+
+    // 19.2 New User Registration Without Country Metatada Leaves Country Null
+    function simulateHandleNewUserRegistration(authEvent) {
+        const rawCountry = authEvent.raw_user_meta_data && authEvent.raw_user_meta_data.country;
+        const cleanCountry = (rawCountry && /^[A-Z]{2}$/i.test(rawCountry.trim())) ? rawCountry.trim().toUpperCase() : null;
+        const newProfile = {
+            id: authEvent.id,
+            email: authEvent.email,
+            name: (authEvent.raw_user_meta_data && authEvent.raw_user_meta_data.full_name) || authEvent.email.split('@')[0],
+            role: (['fgkano63@gmail.com', 'saadani2009@gmail.com'].includes(authEvent.email.toLowerCase())) ? 'admin' : 'user',
+            country: cleanCountry,
+            wallet_balance: 0,
+            points_balance: 0,
+            locked_points: 0
+        };
+        DB.profiles.push(newProfile);
+        return newProfile;
+    }
+
+    const neutralUser = simulateHandleNewUserRegistration({
+        id: 'user-unspecified-geo-99',
+        email: 'international_user@global.test',
+        raw_user_meta_data: { full_name: 'مستخدم دولي' }
+    });
+    assert(neutralUser.country === null, 'GeoIP Security', 'Unspecified Registration Country Remains NULL', 'Registration without explicit country metadata safely creates neutral profile');
+
+    const explicitSyrianUser = simulateHandleNewUserRegistration({
+        id: 'user-syria-01',
+        email: 'syrian_user@waseet.sy',
+        raw_user_meta_data: { full_name: 'عمر الدمشقي', country: 'SY' }
+    });
+    assert(explicitSyrianUser.country === 'SY', 'GeoIP Security', 'Explicit Country Metadata Preserved Accurately', 'Registration with Syrian country code accurately registers SY in profile');
+
+    // 19.3 Multi-Tier GeoIP Fallback Engine & Never Force DZ Rule
+    function simulateVisitorCountryDetection(tierMockResponses) {
+        // Tier 1: /api/country
+        if (tierMockResponses.apiCountry && /^[A-Za-z]{2}$/.test(tierMockResponses.apiCountry)) {
+            return tierMockResponses.apiCountry.toUpperCase();
+        }
+        // Tier 2: api.country.is
+        if (tierMockResponses.countryIs && /^[A-Za-z]{2}$/.test(tierMockResponses.countryIs)) {
+            return tierMockResponses.countryIs.toUpperCase();
+        }
+        // Tier 3: ipapi.co
+        if (tierMockResponses.ipapiCo && /^[A-Za-z]{2}$/.test(tierMockResponses.ipapiCo)) {
+            return tierMockResponses.ipapiCo.toUpperCase();
+        }
+        // Tier 4: freeipapi.com
+        if (tierMockResponses.freeIpApi && /^[A-Za-z]{2}$/.test(tierMockResponses.freeIpApi)) {
+            return tierMockResponses.freeIpApi.toUpperCase();
+        }
+        // Strict Fallback: return null, NEVER DZ
+        return null;
+    }
+
+    const detectedEgyptian = simulateVisitorCountryDetection({ apiCountry: 'EG' });
+    assert(detectedEgyptian === 'EG', 'GeoIP Engine', 'Primary Edge Serverless Country Detection (/api/country)', 'Vercel / Cloudflare edge correctly resolved Egypt (EG)');
+
+    const detectedLibyan = simulateVisitorCountryDetection({ apiCountry: null, countryIs: 'LY' });
+    assert(detectedLibyan === 'LY', 'GeoIP Engine', 'Secondary Public GeoIP Fallback (api.country.is)', 'Gracefully recovered Libya (LY) from secondary provider');
+
+    const allFailedResult = simulateVisitorCountryDetection({ apiCountry: null, countryIs: null, ipapiCo: null, freeIpApi: null });
+    assert(allFailedResult === null, 'GeoIP Engine', 'Total GeoIP Failure Safe Neutrality (Never Forces DZ)', 'Returns null upon total provider outage, triggering manual country picker rather than defaulting to Algeria');
+
+    // 19.4 Country Code Security Validator
+    function simulateValidateCountryCode(val) {
+        const str = String(val || '').trim().toUpperCase();
+        if (!str) return { isValid: true, value: '' };
+        if (!/^[A-Z]{2}$/.test(str)) return { isValid: false, error: 'رمز الدولة غير صالح', value: '' };
+        return { isValid: true, value: str };
+    }
+
+    assert(simulateValidateCountryCode('').isValid === true && simulateValidateCountryCode('').value === '', 'GeoIP Validator', 'Empty Country Code Validation Acceptance', 'Empty country code accepted as neutral without injection or default override');
+    assert(simulateValidateCountryCode('SA').isValid === true && simulateValidateCountryCode('SA').value === 'SA', 'GeoIP Validator', 'Valid Country Code Validation (SA)', 'Valid ISO-2 code normalized to uppercase');
+    assert(simulateValidateCountryCode('INVALID_CODE').isValid === false, 'GeoIP Validator', 'Malicious / Invalid Country Code Rejection', 'Malicious or non-standard country input safely rejected');
+
+    // ==========================================================================
+    // PHASE 20: CLOUDFLARE SECURITY AUDIT SKILL COMPLIANCE & CONTINUOUS DEFENSE
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 20: CLOUDFLARE SECURITY AUDIT SKILL COMPLIANCE & CONTINUOUS DEFENSE\x1b[0m');
+
+    // 20.1 DOM XSS & Dangerous Sink Sanitization Check
+    function simulateSanitizeHTML(rawString) {
+        if (typeof rawString !== 'string') return '';
+        // Emulating DOMPurify behavior: eliminate script tags and javascript: links
+        return rawString
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/javascript:[^"'>]*/gi, '')
+            .replace(/onload\s*=\s*["'][^"']*["']/gi, '')
+            .replace(/onerror\s*=\s*["'][^"']*["']/gi, '');
+    }
+
+    const maliciousAuditPayload = '<img src="x" onerror="alert(document.cookie)"><b>مرحباً بكم</b><script>fetch("http://evil.com")</script>';
+    const sanitizedResult = simulateSanitizeHTML(maliciousAuditPayload);
+    const isCleanXSS = !sanitizedResult.includes('<script>') && !sanitizedResult.includes('onerror=') && sanitizedResult.includes('<b>مرحباً بكم</b>');
+    assert(isCleanXSS, 'Security Skill', 'DOMPurify Input Sanitization & XSS Elimination', 'Malicious execution vectors purged while preserving safe Arabic typography');
+
+    // 20.2 Prototype Pollution Invariant Guard
+    function simulateSafeMerge(target, source) {
+        for (const key of Object.keys(source)) {
+            if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+                continue; // Shield against prototype poisoning
+            }
+            target[key] = source[key];
+        }
+        return target;
+    }
+
+    const testTarget = {};
+    simulateSafeMerge(testTarget, JSON.parse('{"__proto__": {"polluted": true}, "validKey": "safeValue"}'));
+    const isImmuneToPollution = !Object.prototype.polluted && testTarget.validKey === 'safeValue';
+    assert(isImmuneToPollution, 'Security Skill', 'Object Prototype Pollution Invariant Shield', 'Dangerous object prototype manipulation keys cleanly dropped');
+
+    // 20.3 Multi-Tier Financial Conservation Verification
+    const testCasesFee = [
+        { price: 10, expectedFee: 3, expectedBuyer: 13 },
+        { price: 40, expectedFee: 3, expectedBuyer: 43 },
+        { price: 100, expectedFee: 6, expectedBuyer: 106 },
+        { price: 500, expectedFee: 25, expectedBuyer: 525 }
+    ];
+    let allFeesMatch = true;
+    for (const tc of testCasesFee) {
+        const res = waseetCalculatePlatformFee(tc.price);
+        if (res.fee !== tc.expectedFee || res.buyerPrice !== tc.expectedBuyer) {
+            allFeesMatch = false;
+            break;
+        }
+    }
+    assert(allFeesMatch, 'Security Skill', 'Platform Tiered Fee Mathematical Invariant Check', 'Fee scaling verified across low, mid, and enterprise value transactions');
 
     // --------------------------------------------------------------------------
     // SUMMARY

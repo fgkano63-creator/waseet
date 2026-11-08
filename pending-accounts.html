@@ -712,7 +712,7 @@
                 curUser.isBroker === true ||
                 (typeof isRegionalBroker === 'function' && isRegionalBroker(curUser))
             ));
-            const brokerCountry = (curUser && curUser.country) ? String(curUser.country).toUpperCase().trim() : 'DZ';
+            const brokerCountry = (curUser && curUser.country) ? String(curUser.country).toUpperCase().trim() : '';
 
             if (isBrokerUserRole && !isStrictAdminUser) {
                 rawPending = rawPending.filter(acc => {

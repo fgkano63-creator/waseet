@@ -340,7 +340,7 @@
                     window.location.href = 'profile.html';
                 };
                 var role = broker
-                    ? '🌍 وسيط إقليمي معتمد (' + (u.country || 'DZ') + ')'
+                    ? ('🌍 وسيط إقليمي معتمد' + (u.country ? ' (' + (COUNTRY_NAMES_AR[u.country] || u.country) + ')' : ''))
                     : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
                 card.innerHTML =
                     '<img src="' + esc(userAvatar(u)) + '" class="drawer-avatar" alt="' + esc(u.name || 'مستخدم') + '" referrerpolicy="no-referrer" ' +
@@ -437,7 +437,7 @@
                     window.location.href = 'profile.html';
                 };
                 var role = broker
-                    ? '🌍 وسيط إقليمي معتمد (' + (user.country || 'DZ') + ')'
+                    ? ('🌍 وسيط إقليمي معتمد' + (user.country ? ' (' + (COUNTRY_NAMES_AR[user.country] || user.country) + ')' : ''))
                     : (admin ? '👑 الوسيط المعتمد (المدير)' : '🏷️ عضو موثق');
                 card.innerHTML =
                     '<img src="' + esc(userAvatar(user)) + '" class="drawer-avatar" alt="' + esc(user.name) + '" referrerpolicy="no-referrer" ' +

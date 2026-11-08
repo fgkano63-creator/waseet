@@ -628,7 +628,7 @@ class WaseetApp {
                     ? DOMPurify.sanitize(avatar) 
                     : this.escapeHtml(avatar);
                 const roleLabel = isBroker
-                    ? `🌍 وسيط إقليمي معتمد (${this.escapeHtml(user.country || 'DZ')})`
+                    ? (user.country ? `🌍 وسيط إقليمي معتمد (${this.escapeHtml(user.country)})` : `🌍 وسيط إقليمي معتمد`)
                     : (isAdmin ? '👑 الوسيط المعتمد (المدير)' : (user.role === 'buyer' ? '🛒 مشتري موثق' : '🏷️ بائع موثق'));
                 const pts = this.escapeHtml(String(currentPts));
                 const safeName = this.escapeHtml(user.name || 'مستخدم');
@@ -753,7 +753,7 @@ class WaseetApp {
                 const u = WASEET_STATE.user;
                 const isBrokerModal = !!(u.role === 'regional_broker' || u.role === 'broker' || u.isBroker === true || u.brokerRole === 'broker');
                 const roleBadge = isBrokerModal
-                    ? `🌍 وسيط إقليمي معتمد (${u.country || 'DZ'})`
+                    ? (u.country ? `🌍 وسيط إقليمي معتمد (${u.country})` : `🌍 وسيط إقليمي معتمد`)
                     : (isMediatorUser(u) ? '👑 الوسيط المعتمد (المدير)' : 'مستخدم');
                 const avatar = (WASEET_STATE.user.user_metadata && WASEET_STATE.user.user_metadata.avatar_url)
                     || WASEET_STATE.user.avatar
@@ -2436,15 +2436,15 @@ class WaseetApp {
             }
             localStorage.setItem('WASEET_DEAL_COUNTER', String(dealCounter));
 
-            const buyerCountry = WASEET_STATE.user?.country || 'DZ';
+            const buyerCountry = (WASEET_STATE.user?.country || (typeof waseetGetVisitorCountrySync === 'function' ? waseetGetVisitorCountrySync() : '') || '').toUpperCase().trim();
             let assignedBroker = null;
-            if (typeof window.waseetGetBrokerForCountry === 'function') {
+            if (buyerCountry && typeof window.waseetGetBrokerForCountry === 'function') {
                 try {
                     assignedBroker = await window.waseetGetBrokerForCountry(buyerCountry);
                 } catch (e) {}
             }
-            if (!assignedBroker && WASEET_STATE.brokers && Array.isArray(WASEET_STATE.brokers)) {
-                assignedBroker = WASEET_STATE.brokers.find(b => String(b.country).toUpperCase() === buyerCountry.toUpperCase()) || WASEET_STATE.brokers[0];
+            if (!assignedBroker && buyerCountry && WASEET_STATE.brokers && Array.isArray(WASEET_STATE.brokers)) {
+                assignedBroker = WASEET_STATE.brokers.find(b => String(b.country).toUpperCase() === buyerCountry.toUpperCase());
             }
 
             const assignedBrokerId = assignedBroker ? assignedBroker.id : null;
