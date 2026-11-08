@@ -3176,12 +3176,14 @@ class WaseetApp {
         if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
             try {
                 const sec = await window.waseetGetAccountCredentialsSecure(accountId);
-                if (sec && sec.recovery_password) recPwd = sec.recovery_password;
+                if (sec && (sec.recovery_password || sec.recoveryPassword)) recPwd = sec.recovery_password || sec.recoveryPassword;
             } catch (e) {}
         }
         if (!recPwd || recPwd === '••••••••') {
             const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
-            recPwd = (acc && acc.credentials && acc.credentials.recovery_password) || 'غير مضاف';
+            recPwd = (acc && acc.credentials && (acc.credentials.recovery_password || acc.credentials.recoveryPassword)) ||
+                     (acc && (acc.recovery_password || acc.recoveryPassword)) ||
+                     (acc && acc.details && (acc.details.recovery_password || acc.details.recoveryPassword)) || 'غير مضاف';
         }
 
         el.innerText = recPwd;
@@ -3193,17 +3195,19 @@ class WaseetApp {
     async copyDeckRecoveryPassword(accountId) {
         let recPwd = '';
         const el = document.getElementById(`deck-rec-pw-${accountId}`);
-        if (el && el.getAttribute('data-revealed') === 'true' && el.innerText !== '••••••••••') {
+        if (el && el.getAttribute('data-revealed') === 'true' && el.innerText !== '••••••••••' && el.innerText !== 'غير مضاف') {
             recPwd = el.innerText;
         } else if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accountId))) {
             try {
                 const sec = await window.waseetGetAccountCredentialsSecure(accountId);
-                if (sec && sec.recovery_password) recPwd = sec.recovery_password;
+                if (sec && (sec.recovery_password || sec.recoveryPassword)) recPwd = sec.recovery_password || sec.recoveryPassword;
             } catch (e) {}
         }
         if (!recPwd) {
             const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
-            recPwd = (acc && acc.credentials && acc.credentials.recovery_password) || '';
+            recPwd = (acc && acc.credentials && (acc.credentials.recovery_password || acc.credentials.recoveryPassword)) ||
+                     (acc && (acc.recovery_password || acc.recoveryPassword)) ||
+                     (acc && acc.details && (acc.details.recovery_password || acc.details.recoveryPassword)) || '';
         }
         this.copyToClipboard(recPwd, 'تم نسخ كلمة مرور الاسترداد');
     }

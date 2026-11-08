@@ -608,9 +608,16 @@
                 if (dc && typeof dc === 'object') c = dc;
             }
             if (!c || typeof c !== 'object') c = {};
+            const recEmail = String(c.recovery_email || c.recoveryEmail || (acc && (acc.recovery_email || acc.recoveryEmail)) || (details && (details.recovery_email || details.recoveryEmail)) || (details && details.credentials && (details.credentials.recovery_email || details.credentials.recoveryEmail)) || '').trim();
+            const recPassword = String(c.recovery_password || c.recoveryPassword || (acc && (acc.recovery_password || acc.recoveryPassword)) || (details && (details.recovery_password || details.recoveryPassword)) || (details && details.credentials && (details.credentials.recovery_password || details.credentials.recoveryPassword)) || '').trim();
+
             return {
                 email_or_phone: String(c.email_or_phone || c.email || c.login || (acc && acc.login_identifier) || details.email_or_phone || 'غير متوفر'),
-                password: String(c.password || c.pass || (acc && acc.raw_password) || details.password || '••••••••')
+                password: String(c.password || c.pass || (acc && acc.raw_password) || details.password || '••••••••'),
+                recovery_email: recEmail,
+                recovery_password: recPassword,
+                recoveryEmail: recEmail,
+                recoveryPassword: recPassword
             };
         }
 
