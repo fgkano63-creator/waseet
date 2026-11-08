@@ -1039,8 +1039,13 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
 
         const credsObj = account.credentials || {
             email_or_phone: '',
-            password: ''
+            password: '',
+            recovery_email: '',
+            recovery_password: ''
         };
+
+        const recEmailVal = String(credsObj.recovery_email || credsObj.recoveryEmail || account.recovery_email || account.recoveryEmail || (account.details && (account.details.recovery_email || account.details.recoveryEmail)) || '').trim();
+        const recPasswordVal = String(credsObj.recovery_password || credsObj.recoveryPassword || account.recovery_password || account.recoveryPassword || (account.details && (account.details.recovery_password || account.details.recoveryPassword)) || '').trim();
 
         const detailsObj = {
             ...(account.details || {}),
@@ -1058,10 +1063,14 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             badge: account.badge || '',
             reviewStatus: account.reviewStatus || (dbStatus === 'available' ? 'approved' : 'pending'),
             rejectionReason: account.rejectionReason || '',
+            recovery_email: recEmailVal,
+            recovery_password: recPasswordVal,
             // أمني: حماية بيانات الدخول وعدم تخزين كلمة المرور داخل details لمنع تسريبها في السوق العام
             credentials: {
                 email_or_phone: credsObj.email_or_phone || '',
-                has_password: !!(credsObj.password && credsObj.password !== '••••••••')
+                has_password: !!(credsObj.password && credsObj.password !== '••••••••'),
+                recovery_email: recEmailVal,
+                has_recovery_password: !!(recPasswordVal && recPasswordVal !== '••••••••')
             }
         };
 
@@ -1079,7 +1088,9 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             seller_price: Math.max(1, parseFloat(account.sellerPrice) || 10),
             images: imagesArr,
             details: detailsObj,
-            status: dbStatus
+            status: dbStatus,
+            recovery_email: recEmailVal,
+            recovery_password: recPasswordVal
         };
 
         let resultRow = null;
@@ -1140,14 +1151,14 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             account.syncedToSupabase = true;
 
             // أمني: حفظ بيانات الدخول الحساسة في الجدول المنعزل والمحمي حصراً عبر RPC الآمن
-            if (credsObj && (credsObj.password || credsObj.email_or_phone)) {
+            if (credsObj && (credsObj.password || credsObj.email_or_phone || recEmailVal || recPasswordVal)) {
                 try {
                     await client.rpc('save_account_credentials_secure', {
                         p_account_id: resultRow.id,
                         p_email_or_phone: credsObj.email_or_phone || '',
                         p_password: credsObj.password || '',
-                        p_recovery_email: credsObj.recovery_email || '',
-                        p_recovery_password: credsObj.recovery_password || '',
+                        p_recovery_email: recEmailVal || credsObj.recovery_email || '',
+                        p_recovery_password: recPasswordVal || credsObj.recovery_password || '',
                         p_notes: detailsObj.accountNotes || ''
                     });
                 } catch (rpcErr) {
@@ -1242,11 +1253,31 @@ function waseetSafeParseCredentials(acc, details = {}) {
         parsedCreds = {};
     }
 
+    const recEmail = String(
+        parsedCreds.recovery_email ||
+        parsedCreds.recoveryEmail ||
+        (acc && (acc.recovery_email || acc.recoveryEmail)) ||
+        (details && (details.recovery_email || details.recoveryEmail)) ||
+        (details && details.credentials && (details.credentials.recovery_email || details.credentials.recoveryEmail)) ||
+        ''
+    ).trim();
+
+    const recPassword = String(
+        parsedCreds.recovery_password ||
+        parsedCreds.recoveryPassword ||
+        (acc && (acc.recovery_password || acc.recoveryPassword)) ||
+        (details && (details.recovery_password || details.recoveryPassword)) ||
+        (details && details.credentials && (details.credentials.recovery_password || details.credentials.recoveryPassword)) ||
+        ''
+    ).trim();
+
     return {
         email_or_phone: String(parsedCreds.email_or_phone || parsedCreds.email || parsedCreds.login || (acc && acc.login_identifier) || details.email_or_phone || 'غير متوفر'),
         password: String(parsedCreds.password || parsedCreds.pass || (acc && acc.raw_password) || details.password || '••••••••'),
-        recovery_email: String(parsedCreds.recovery_email || details.recovery_email || ''),
-        recovery_password: String(parsedCreds.recovery_password || details.recovery_password || '')
+        recovery_email: recEmail,
+        recovery_password: recPassword,
+        recoveryEmail: recEmail,
+        recoveryPassword: recPassword
     };
 }
 
@@ -1332,6 +1363,10 @@ function waseetMapRemoteAccountRow(acc, profilesMap = {}) {
         featured: false,
         status: (acc.status === 'approved') ? 'available' : ((acc.status === 'pending_verification' || acc.status === 'pending_review' || !acc.status) ? 'pending' : acc.status),
         credentials: parsedCreds,
+        recovery_email: parsedCreds.recovery_email || '',
+        recovery_password: parsedCreds.recovery_password || '',
+        recoveryEmail: parsedCreds.recovery_email || '',
+        recoveryPassword: parsedCreds.recovery_password || '',
         createdAt: acc.created_at,
         submittedAt: acc.created_at,
         reviewStatus: details.reviewStatus || acc.review_status || ((acc.status === 'available' || acc.status === 'approved') ? 'approved' : 'pending'),

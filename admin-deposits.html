@@ -409,9 +409,44 @@
 
             <!-- 3. شبكة بطاقات طلبات الشحن -->
             <section class="deposits-cards-grid" id="admin-deposits-grid">
-                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--silver-muted);">
-                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.7rem;"></i>
-                    <div>جاري جلب طلبات الشحن من قاعدة البيانات...</div>
+                <div class="skeleton-table-row" style="grid-column: 1 / -1;">
+                    <div style="display: flex; align-items: center; gap: 12px; width: 35%;">
+                        <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                        <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                            <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-text" style="width: 90px; height: 16px; margin: 0;"></div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 75px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-btn" style="width: 80px; height: 32px; border-radius: 6px;"></div>
+                </div>
+                <div class="skeleton-table-row" style="grid-column: 1 / -1;">
+                    <div style="display: flex; align-items: center; gap: 12px; width: 35%;">
+                        <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                        <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                            <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-text" style="width: 90px; height: 16px; margin: 0;"></div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 75px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-btn" style="width: 80px; height: 32px; border-radius: 6px;"></div>
+                </div>
+                <div class="skeleton-table-row" style="grid-column: 1 / -1;">
+                    <div style="display: flex; align-items: center; gap: 12px; width: 35%;">
+                        <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                        <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                            <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-text" style="width: 90px; height: 16px; margin: 0;"></div>
+                    <div class="skeleton-shimmer skeleton-badge" style="width: 75px; height: 24px;"></div>
+                    <div class="skeleton-shimmer skeleton-btn" style="width: 80px; height: 32px; border-radius: 6px;"></div>
                 </div>
             </section>
 
@@ -439,6 +474,7 @@
     <script src="js/notifications.js?v=20261026_w2"></script>
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/pwa-register.js"></script>
 
     <script>

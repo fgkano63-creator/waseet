@@ -273,31 +273,95 @@
                 }
                 .waseet-vi-extracted-text {
                     font-size: 14px;
-                    line-height: 1.6;
+                    line-height: 1.8;
                     color: #f1f5f9;
-                    background: rgba(0, 0, 0, 0.3);
-                    padding: 10px 14px;
+                    background: rgba(0, 0, 0, 0.4);
+                    padding: 12px 14px;
                     border-radius: 8px;
                     max-height: 120px;
                     overflow-y: auto;
                     white-space: pre-wrap;
                     word-break: break-word;
+                    overflow-wrap: break-word;
                     font-family: inherit;
+                    direction: rtl;
+                    text-align: right;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
                 }
                 .waseet-vi-elements-chips {
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 6px;
-                    margin-top: 10px;
+                    gap: 8px;
+                    margin-top: 12px;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.35);
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    direction: ltr;
+                    justify-content: flex-start;
+                    align-items: center;
                 }
                 .waseet-vi-chip {
-                    background: rgba(56, 189, 248, 0.12);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    background: rgba(56, 189, 248, 0.14);
                     color: #38bdf8;
-                    border: 1px solid rgba(56, 189, 248, 0.3);
+                    border: 1px solid rgba(56, 189, 248, 0.4);
                     font-size: 11px;
-                    padding: 3px 8px;
+                    padding: 4px 10px;
                     border-radius: 6px;
-                    font-family: monospace;
+                    font-family: 'Rajdhani', monospace;
+                    direction: ltr;
+                    unicode-bidi: isolate;
+                    white-space: nowrap;
+                    line-height: 1.4;
+                    box-sizing: border-box;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                }
+                .waseet-vi-image-attachment-section {
+                    margin-bottom: 14px;
+                    background: rgba(10, 12, 19, 0.7);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 12px;
+                    padding: 12px;
+                }
+                .waseet-vi-btn-attach {
+                    background: rgba(56, 189, 248, 0.15);
+                    border: 1px solid rgba(56, 189, 248, 0.4);
+                    color: #38bdf8;
+                    padding: 4px 12px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.2s;
+                    user-select: none;
+                }
+                .waseet-vi-btn-attach:hover {
+                    background: rgba(56, 189, 248, 0.25);
+                    border-color: #38bdf8;
+                    color: #fff;
+                }
+                .waseet-vi-dropzone {
+                    border: 1px dashed rgba(255, 255, 255, 0.18);
+                    border-radius: 8px;
+                    padding: 12px;
+                    text-align: center;
+                    background: rgba(0, 0, 0, 0.25);
+                    transition: all 0.2s;
+                    cursor: pointer;
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .waseet-vi-dropzone:hover, .waseet-vi-dropzone.dragover {
+                    border-color: #d4af37;
+                    background: rgba(212, 175, 55, 0.08);
                 }
                 .waseet-vi-question-input {
                     width: 100%;
@@ -663,9 +727,9 @@
             modalOverlay.className = 'waseet-vi-modal-overlay';
 
             const elementsCount = this.capturedData.elements.length;
-            const chipsHtml = this.capturedData.elements.slice(0, 8).map(e => {
+            const chipsHtml = this.capturedData.elements.slice(0, 10).map(e => {
                 const label = e.id ? `#${e.id}` : (e.classes ? `.${e.classes.split(' ')[0]}` : `<${e.tag}>`);
-                return `<span class="waseet-vi-chip" title="${e.text || ''}">${label}</span>`;
+                return `<bdi class="waseet-vi-chip" dir="ltr" title="${this.escapeHtml(e.text || '')}">${this.escapeHtml(label)}</bdi>`;
             }).join('');
 
             modalOverlay.innerHTML = `
@@ -688,6 +752,29 @@
                             <i class="fa-regular fa-comment-dots" style="color: #d4af37;"></i> اطرح سؤالك حول هذا الجزء أو صف الخطأ الموجود:
                         </label>
                         <textarea class="waseet-vi-question-input" id="vi-user-question" placeholder="مثال: لماذا لا يعمل هذا الزر؟ أو هل هذا الجزء متجاوب مع الموبايل؟ أو ما وظيفة هذه البيانات؟"></textarea>
+
+                        <!-- قسم إرفاق لقطة شاشة أو صورة للخطأ -->
+                        <div class="waseet-vi-image-attachment-section">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                                <label style="font-size: 13px; font-weight: 700; color: #cbd5e1; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-camera" style="color: #38bdf8;"></i> إرفاق صورة أو لقطة شاشة للخطأ:
+                                </label>
+                                <label for="vi-image-file-input" class="waseet-vi-btn-attach">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة من الجهاز
+                                </label>
+                                <input type="file" id="vi-image-file-input" accept="image/*" style="display: none;">
+                            </div>
+                            
+                            <div id="vi-image-dropzone" class="waseet-vi-dropzone">
+                                <span id="vi-dropzone-placeholder" style="color: #94a3b8; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fa-regular fa-image" style="font-size: 16px; color: #d4af37;"></i> اضغط لرفع صورة، أو الصق لقطة الشاشة بـ (Ctrl+V) مباشرة
+                                </span>
+                                <div id="vi-image-preview-wrapper" style="display: none; position: relative; width: 100%; text-align: center;">
+                                    <img id="vi-image-preview-img" src="" alt="معاينة الصورة" style="max-height: 180px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.5); object-fit: contain; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.7);">
+                                    <button type="button" id="vi-remove-image-btn" title="حذف الصورة المرفقة" style="position: absolute; top: 6px; right: 12px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">&times;</button>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="waseet-vi-quick-actions">
                             <button type="button" class="waseet-vi-btn-action" data-q="ما وظيفة هذا الجزء وهل به أي خلل برمجي؟"><i class="fa-solid fa-bolt"></i> فحص الخلل البرمجي</button>
@@ -730,6 +817,79 @@
                 const q = modalOverlay.querySelector('#vi-user-question').value.trim();
                 this.executeAnalysis(q || 'تحليل شامل للعناصر المحددة والبحث عن أي أخطاء برمجية أو أمنية.');
             });
+
+            // Image Attachment Handling (File Upload, Drag & Drop, Clipboard Paste)
+            this.capturedData.attachedImage = null;
+            const fileInput = modalOverlay.querySelector('#vi-image-file-input');
+            const dropzone = modalOverlay.querySelector('#vi-image-dropzone');
+            const previewWrapper = modalOverlay.querySelector('#vi-image-preview-wrapper');
+            const previewImg = modalOverlay.querySelector('#vi-image-preview-img');
+            const placeholder = modalOverlay.querySelector('#vi-dropzone-placeholder');
+            const removeBtn = modalOverlay.querySelector('#vi-remove-image-btn');
+
+            const handleImageFile = (file) => {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    this.capturedData.attachedImage = ev.target.result;
+                    previewImg.src = ev.target.result;
+                    previewWrapper.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            };
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                        handleImageFile(e.target.files[0]);
+                    }
+                });
+            }
+
+            if (dropzone) {
+                dropzone.addEventListener('click', (e) => {
+                    if (e.target !== removeBtn && !previewWrapper.contains(e.target)) {
+                        fileInput.click();
+                    }
+                });
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                });
+                dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        handleImageFile(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+
+            if (removeBtn) {
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.capturedData.attachedImage = null;
+                    previewImg.src = '';
+                    previewWrapper.style.display = 'none';
+                    placeholder.style.display = 'inline-flex';
+                    if (fileInput) fileInput.value = '';
+                });
+            }
+
+            // Clipboard Paste support anywhere in modal (Ctrl+V)
+            modalOverlay.addEventListener('paste', (e) => {
+                const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+                if (!items) return;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        const blob = items[i].getAsFile();
+                        handleImageFile(blob);
+                        break;
+                    }
+                }
+            });
         }
 
         /**
@@ -759,7 +919,8 @@
                 elementsDetected: this.capturedData.elements.length,
                 collectedText: this.capturedData.collectedText,
                 chips: this.capturedData.elements.slice(0, 10).map(e => e.id ? `#${e.id}` : (e.classes ? `.${e.classes.split(' ')[0]}` : `<${e.tag}>`)),
-                consoleErrors: this.capturedData.consoleErrors
+                consoleErrors: this.capturedData.consoleErrors,
+                attachedImage: this.capturedData.attachedImage || null
             };
 
             try {

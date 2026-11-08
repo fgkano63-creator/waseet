@@ -522,11 +522,24 @@
         <!-- ================= Main Profile & Dashboard Content ================= -->
         <main class="profile-page-container">
 
-            <!-- 1. مؤشر التحميل الأولي -->
-            <div id="profile-loading-state" style="text-align: center; padding: 5rem 1rem; color: var(--silver-muted);">
-                <i class="fas fa-circle-notch fa-spin text-gold" style="font-size: 2.8rem; margin-bottom: 1.2rem;"></i>
-                <h3 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem;">جاري تحميل بيانات الملف الشخصي والحساب...</h3>
-                <p style="font-size: 0.9rem; margin: 0;">يتم الاتصال بقاعدة بيانات وسيط المشفرة وجلب الرصيد والإحصائيات</p>
+            <!-- 1. مؤشر التحميل الأولي (Skeleton Shimmer UI) -->
+            <div id="profile-loading-state" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+                <div style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div class="skeleton-shimmer skeleton-avatar lg" style="width: 85px; height: 85px;"></div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1;">
+                        <div class="skeleton-shimmer skeleton-text heading" style="width: 45%;"></div>
+                        <div class="skeleton-shimmer skeleton-text medium" style="width: 30%;"></div>
+                        <div style="display: flex; gap: 8px; margin-top: 4px;">
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 80px; height: 22px;"></div>
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 22px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="skeleton-shimmer skeleton-box" style="height: 100px; border-radius: 16px;"></div>
+                    <div class="skeleton-shimmer skeleton-box" style="height: 100px; border-radius: 16px;"></div>
+                    <div class="skeleton-shimmer skeleton-box" style="height: 100px; border-radius: 16px;"></div>
+                </div>
             </div>
 
             <!-- 2. بطاقة تسجيل الدخول للزوار غير المسجلين -->
@@ -984,6 +997,7 @@
     <script src="js/notifications.js?v=20261026_w2"></script>
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/pwa-register.js"></script>
     <script src="js/visual-inspector.js" defer></script>
 

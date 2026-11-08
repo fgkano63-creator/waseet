@@ -1637,25 +1637,57 @@
 
                     <!-- قائمة طلبات الشحن -->
                     <div id="tab-panel-deposits" class="history-list">
-                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                            <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
-                            <div>جاري تحميل طلبات الشحن...</div>
+                        <div class="skeleton-table-row">
+                            <div style="display: flex; align-items: center; gap: 12px; width: 40%;">
+                                <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                                <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="width: 80px; height: 16px; margin: 0;"></div>
+                        </div>
+                        <div class="skeleton-table-row">
+                            <div style="display: flex; align-items: center; gap: 12px; width: 40%;">
+                                <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                                <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="width: 80px; height: 16px; margin: 0;"></div>
                         </div>
                     </div>
 
                     <!-- قائمة طلبات السحب -->
                     <div id="tab-panel-withdrawals" class="history-list" style="display: none;">
-                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                            <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
-                            <div>جاري تحميل طلبات السحب...</div>
+                        <div class="skeleton-table-row">
+                            <div style="display: flex; align-items: center; gap: 12px; width: 40%;">
+                                <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                                <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="width: 80px; height: 16px; margin: 0;"></div>
                         </div>
                     </div>
 
                     <!-- قائمة سجل الحركات المالية -->
                     <div id="tab-panel-transactions" class="history-list" style="display: none;">
-                        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                            <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.8rem; margin-bottom: 0.6rem;"></i>
-                            <div>جاري تحميل سجل العمليات...</div>
+                        <div class="skeleton-table-row">
+                            <div style="display: flex; align-items: center; gap: 12px; width: 40%;">
+                                <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                                <div style="display: flex; flex-direction: column; gap: 5px; width: 70%;">
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 14px; width: 80%; margin: 0;"></div>
+                                    <div class="skeleton-shimmer skeleton-text" style="height: 10px; width: 45%; margin: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-shimmer skeleton-badge" style="width: 85px; height: 24px;"></div>
+                            <div class="skeleton-shimmer skeleton-text" style="width: 80px; height: 16px; margin: 0;"></div>
                         </div>
                     </div>
                 </div>
@@ -1923,6 +1955,7 @@
     <script src="js/notifications.js?v=20261026_w2"></script>
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/pwa-register.js"></script>
     <script src="js/visual-inspector.js" defer></script>
 
@@ -2761,12 +2794,13 @@
             const listEl = document.getElementById('modal-escrow-deals-list');
             if (!listEl) return;
 
-            listEl.innerHTML = `
-                <div style="text-align: center; padding: 1.5rem 1rem; color: var(--silver-muted); font-size: 0.86rem;">
-                    <i class="fas fa-spinner fa-spin text-orange" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
-                    جاري جلب وتدقيق تفاصيل الصفقات وطلبات السحب من الخزينة الآمنة...
-                </div>
-            `;
+            listEl.innerHTML = (typeof WaseetSkeleton !== 'undefined')
+                ? WaseetSkeleton.getTableRows(3)
+                : `
+                    <div class="skeleton-table-row">
+                        <div class="skeleton-shimmer skeleton-text heading"></div>
+                    </div>
+                `;
 
             let user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
             const lockedPts = user && user.wallet ? Number(user.wallet.locked || 0) : 0;

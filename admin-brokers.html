@@ -661,6 +661,7 @@
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/app.js?v=20261104_v6"></script>
 
     <script>
@@ -1086,12 +1087,17 @@
             const container = document.getElementById('brokers-roster-container');
 
             if (container) {
-                container.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                        <i class="fas fa-spinner fa-spin text-orange" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
-                        <span>جاري جلب قائمة الوسطاء الإقليميين وتحديث الأرصدة...</span>
-                    </div>
-                `;
+                container.innerHTML = (typeof WaseetSkeleton !== 'undefined')
+                    ? WaseetSkeleton.getBrokersList(4)
+                    : `
+                        <div class="skeleton-broker-card">
+                            <div class="skeleton-shimmer skeleton-avatar lg"></div>
+                            <div style="flex-grow: 1;">
+                                <div class="skeleton-shimmer skeleton-text heading"></div>
+                                <div class="skeleton-shimmer skeleton-text medium"></div>
+                            </div>
+                        </div>
+                    `;
             }
 
             let brokers = [];

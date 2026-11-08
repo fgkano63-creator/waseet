@@ -373,6 +373,7 @@
     <script src="js/app.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/visual-inspector.js" defer></script>
 
     <!-- My Accounts Page Script -->
@@ -708,12 +709,17 @@
             // منع مسح الشاشة وميض العناصر (Flickering Prevention)
             const hasExistingCards = container.querySelector('.accounts-grid') || myAccountsList.length > 0;
             if (!hasExistingCards && (!options || !options.background)) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: var(--silver-muted);">
-                        <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
-                        جاري تحميل وتحديث قائمة حساباتك...
-                    </div>
-                `;
+                container.innerHTML = (typeof WaseetSkeleton !== 'undefined')
+                    ? WaseetSkeleton.getMarketplaceCards(3)
+                    : `
+                        <div class="skeleton-marketplace-card">
+                            <div class="skeleton-shimmer skeleton-card-thumb"></div>
+                            <div class="skeleton-card-body">
+                                <div class="skeleton-shimmer skeleton-text heading"></div>
+                                <div class="skeleton-shimmer skeleton-text medium"></div>
+                            </div>
+                        </div>
+                    `;
             }
 
             // الاشتراك في التحديثات اللحظية عبر Supabase Realtime لمزامنة التغييرات فوراً دون وميض

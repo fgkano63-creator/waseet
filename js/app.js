@@ -1578,7 +1578,7 @@ class WaseetApp {
                             <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                    <code style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && acc.credentials.recovery_email) || 'غير مضاف'}</code>
+                                    <code id="deck-rec-email-${acc.id}" style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && (acc.credentials.recovery_email || acc.credentials.recoveryEmail)) || acc.recovery_email || acc.recoveryEmail || (acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) || 'غير مضاف'}</code>
                                     <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckRecoveryEmail('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                         <i class="fas fa-copy"></i>
                                     </button>
@@ -2731,12 +2731,14 @@ class WaseetApp {
         if (!modal || !body) return;
 
         modal.classList.add('active');
-        body.innerHTML = `
-            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
-                <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2rem; margin-bottom: 0.8rem; display: block;"></i>
-                جاري تحميل حساباتك المعروضة...
-            </div>
-        `;
+        body.innerHTML = (typeof WaseetSkeleton !== 'undefined')
+            ? `<div class="accounts-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;">` + WaseetSkeleton.getMarketplaceCards(2) + `</div>`
+            : `
+                <div style="text-align: center; padding: 2.5rem 1rem; color: var(--silver-muted);">
+                    <div class="skeleton-shimmer skeleton-text heading" style="margin: 0 auto 10px;"></div>
+                    <div class="skeleton-shimmer skeleton-text medium" style="margin: 0 auto;"></div>
+                </div>
+            `;
 
         const myAccounts = await this.getSellerOwnAccounts();
 
@@ -3077,9 +3079,23 @@ class WaseetApp {
         this.copyToClipboard(email, 'تم نسخ البريد / رقم الحساب');
     }
 
-    copyDeckRecoveryEmail(accId) {
-        const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accId));
-        const rec = (acc && acc.credentials && acc.credentials.recovery_email) || '';
+    async copyDeckRecoveryEmail(accId) {
+        let rec = '';
+        const el = document.getElementById(`deck-rec-email-${accId}`);
+        if (el && el.innerText && el.innerText.trim() !== 'غير مضاف') {
+            rec = el.innerText.trim();
+        } else if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(accId))) {
+            try {
+                const sec = await window.waseetGetAccountCredentialsSecure(accId);
+                if (sec && (sec.recovery_email || sec.recoveryEmail)) rec = sec.recovery_email || sec.recoveryEmail;
+            } catch (e) {}
+        }
+        if (!rec) {
+            const acc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accId));
+            rec = (acc && acc.credentials && (acc.credentials.recovery_email || acc.credentials.recoveryEmail)) ||
+                  (acc && (acc.recovery_email || acc.recoveryEmail)) ||
+                  (acc && acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) || '';
+        }
         this.copyToClipboard(rec, 'تم نسخ حساب الاسترداد');
     }
 

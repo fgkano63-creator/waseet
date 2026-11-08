@@ -255,9 +255,63 @@
 
             <!-- Pending Accounts List Container -->
             <div id="pending-accounts-list-container">
-                <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
-                    <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
-                    جاري تحميل الحسابات المعلقة وقيد الفحص...
+                <div class="skeleton-pending-card">
+                    <div class="skeleton-pending-header">
+                        <div style="display: flex; align-items: center; gap: 12px; width: 60%;">
+                            <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                            <div style="display: flex; flex-direction: column; gap: 6px; width: 70%;">
+                                <div class="skeleton-shimmer skeleton-text heading" style="margin: 0; width: 50%;"></div>
+                                <div class="skeleton-shimmer skeleton-text short" style="margin: 0;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-shimmer skeleton-badge" style="width: 110px; height: 26px;"></div>
+                    </div>
+                    <div class="skeleton-pending-body">
+                        <div class="skeleton-shimmer skeleton-pending-preview"></div>
+                        <div class="skeleton-pending-details">
+                            <div class="skeleton-shimmer skeleton-text heading" style="width: 75%;"></div>
+                            <div class="skeleton-shimmer skeleton-text long"></div>
+                            <div class="skeleton-shimmer skeleton-text medium"></div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-pending-actions">
+                        <div class="skeleton-shimmer skeleton-btn" style="width: 120px; height: 38px;"></div>
+                        <div class="skeleton-shimmer skeleton-btn" style="width: 120px; height: 38px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-pending-card">
+                    <div class="skeleton-pending-header">
+                        <div style="display: flex; align-items: center; gap: 12px; width: 60%;">
+                            <div class="skeleton-shimmer skeleton-avatar sm"></div>
+                            <div style="display: flex; flex-direction: column; gap: 6px; width: 70%;">
+                                <div class="skeleton-shimmer skeleton-text heading" style="margin: 0; width: 50%;"></div>
+                                <div class="skeleton-shimmer skeleton-text short" style="margin: 0;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-shimmer skeleton-badge" style="width: 110px; height: 26px;"></div>
+                    </div>
+                    <div class="skeleton-pending-body">
+                        <div class="skeleton-shimmer skeleton-pending-preview"></div>
+                        <div class="skeleton-pending-details">
+                            <div class="skeleton-shimmer skeleton-text heading" style="width: 75%;"></div>
+                            <div class="skeleton-shimmer skeleton-text long"></div>
+                            <div class="skeleton-shimmer skeleton-text medium"></div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                                <div class="skeleton-shimmer skeleton-badge" style="width: 90px; height: 28px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-pending-actions">
+                        <div class="skeleton-shimmer skeleton-btn" style="width: 120px; height: 38px;"></div>
+                        <div class="skeleton-shimmer skeleton-btn" style="width: 120px; height: 38px;"></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -335,6 +389,7 @@
     <script src="js/navbar.js"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/skeleton-ui.js"></script>
     <script src="js/visual-inspector.js" defer></script>
 
     <!-- Pending Accounts Page Logic -->
@@ -577,12 +632,9 @@
             if (!container) return;
 
             if (!allPendingAccounts || allPendingAccounts.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 4rem 1rem; color: var(--silver-muted);">
-                        <i class="fas fa-spinner fa-spin text-gold" style="font-size: 2.2rem; margin-bottom: 1rem; display: block;"></i>
-                        جاري جلب وتحديث الحسابات المعلقة من قاعدة البيانات...
-                    </div>
-                `;
+                container.innerHTML = (typeof WaseetSkeleton !== 'undefined')
+                    ? WaseetSkeleton.getPendingAccountsList(3)
+                    : container.innerHTML;
             }
 
             const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : window.waseetSupabaseClient;

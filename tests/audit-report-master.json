@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-11-08T10:57:15.358Z",
+  "timestamp": "2026-11-08T11:09:29.048Z",
   "metrics": {
-    "totalChecks": 267,
-    "passed": 267,
+    "totalChecks": 275,
+    "passed": 274,
     "warnings": 0,
-    "failures": 0
+    "failures": 1
   },
   "sections": {
     "codeQuality": [
@@ -90,6 +90,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\calculator.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\country-selector.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\country-selector.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\country-selector.js async error-handling coverage verified (2 async, 4 catch)",
         "details": null
       },
       {
@@ -279,6 +300,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\security-validator.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\skeleton-ui.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\skeleton-ui.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\skeleton-ui.js async error-handling coverage verified (0 async, 0 catch)",
         "details": null
       },
       {
@@ -794,10 +836,10 @@
       },
       {
         "id": "HTML-InlineScriptSyntax-contact-support.html",
-        "status": "PASS",
-        "severity": "INFO",
-        "message": "All inline scripts syntax valid in contact-support.html",
-        "details": null
+        "status": "FAIL",
+        "severity": "HIGH",
+        "message": "Inline script syntax error in contact-support.html",
+        "details": "Script #1: Invalid or unexpected token"
       },
       {
         "id": "HTML-DocType-deals.html",
@@ -1288,7 +1330,7 @@
         "id": "CSS-Breakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive layout defined with 47 media queries",
+        "message": "Comprehensive responsive layout defined with 48 media queries",
         "details": null
       },
       {
@@ -1318,7 +1360,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1869 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1873 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1420,6 +1462,13 @@
         "details": null
       },
       {
+        "id": "XSS-RawInnerHTML-js\\country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\country-selector.js",
+        "details": null
+      },
+      {
         "id": "XSS-RawInnerHTML-js\\data.js",
         "status": "PASS",
         "severity": "INFO",
@@ -1480,6 +1529,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "No raw unescaped user-input innerHTML interpolations detected in js\\security-validator.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\skeleton-ui.js",
         "details": null
       },
       {

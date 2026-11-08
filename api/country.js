@@ -19,7 +19,8 @@ export default function handler(req, res) {
         : null;
 
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.setHeader('Vary', 'x-vercel-ip-country, cf-ipcountry, x-country-code');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -27,10 +28,19 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
 
+    let cleanCity = null;
+    if (vercelCity) {
+        try {
+            cleanCity = decodeURIComponent(vercelCity);
+        } catch (e) {
+            cleanCity = String(vercelCity).replace(/[^a-zA-Z0-9\s_-]/g, '').slice(0, 80) || null;
+        }
+    }
+
     return res.status(200).json({
         success: true,
         country: cleanCountry,
-        city: vercelCity ? decodeURIComponent(vercelCity) : null,
+        city: cleanCity,
         region: vercelRegion || null,
         detectedVia: vercelCountry ? 'vercel_edge' : (cfCountry ? 'cloudflare' : 'fallback')
     });

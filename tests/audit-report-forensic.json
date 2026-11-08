@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-08T10:57:17.275Z",
+  "timestamp": "2026-11-08T11:09:30.674Z",
   "stats": {
-    "totalChecks": 322,
-    "passed": 322,
+    "totalChecks": 330,
+    "passed": 330,
     "warnings": 0,
     "failures": 0
   },
@@ -194,7 +194,7 @@
         "checkId": "admin-brokers.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -334,7 +334,7 @@
         "checkId": "admin-deposits.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -404,7 +404,7 @@
         "checkId": "admin-withdrawals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (12 scripts)",
+        "message": "All local script tags resolve to valid files (13 scripts)",
         "details": null
       },
       {
@@ -684,7 +684,7 @@
         "checkId": "contact-support.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (11 scripts)",
+        "message": "All local script tags resolve to valid files (13 scripts)",
         "details": null
       },
       {
@@ -754,7 +754,7 @@
         "checkId": "deals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (16 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -824,7 +824,7 @@
         "checkId": "index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (21 scripts)",
+        "message": "All local script tags resolve to valid files (23 scripts)",
         "details": null
       },
       {
@@ -964,7 +964,7 @@
         "checkId": "my-accounts.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (16 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -1034,7 +1034,7 @@
         "checkId": "pending-accounts.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -1104,7 +1104,7 @@
         "checkId": "profile.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (18 scripts)",
+        "message": "All local script tags resolve to valid files (19 scripts)",
         "details": null
       },
       {
@@ -1314,7 +1314,7 @@
         "checkId": "wallet.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (15 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -1344,7 +1344,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1331 rules)",
+        "message": "CSS curly braces perfectly balanced (1364 rules)",
         "details": null
       },
       {
@@ -1358,7 +1358,7 @@
         "checkId": "CSS-ResponsiveBreakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive coverage with 47 media queries (Mobile 375px/480px, Tablet 768px, Desktop)",
+        "message": "Comprehensive responsive coverage with 48 media queries (Mobile 375px/480px, Tablet 768px, Desktop)",
         "details": null
       },
       {
@@ -1491,6 +1491,34 @@
       },
       {
         "checkId": "JS-InnerHTML-js/calculator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/country-selector.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/country-selector.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/country-selector.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/country-selector.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/country-selector.js",
         "status": "PASS",
         "severity": "INFO",
         "message": "Safe dynamic HTML interpolation and sanitization verified",
@@ -1743,6 +1771,34 @@
       },
       {
         "checkId": "JS-InnerHTML-js/security-validator.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
+        "checkId": "JS-Syntax-js/skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/skeleton-ui.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/skeleton-ui.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/skeleton-ui.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/skeleton-ui.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/skeleton-ui.js",
         "status": "PASS",
         "severity": "INFO",
         "message": "Safe dynamic HTML interpolation and sanitization verified",
@@ -2060,7 +2116,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1964 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1968 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {
