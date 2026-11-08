@@ -829,17 +829,21 @@ async function waseetSyncAuthState(options = {}) {
         const avatarMeta = parseBrokerAvatarMeta(profile?.avatar_url || authUser.user_metadata?.avatar_url);
         // دولة المستخدم: للوسيط تُحسم من وسم الترقية/الكاش، أما المستخدم العادي فتُقرأ من profiles.country حرفياً
         // بدون أي قيمة افتراضية ('DZ') حتى لا يُطابَق كل المستخدمين مع وسيط الجزائر بالخطأ
+        const detectedVisitorCountry = (typeof window !== 'undefined' && typeof window.waseetGetVisitorCountrySync === 'function')
+            ? window.waseetGetVisitorCountrySync()
+            : 'DZ';
+
         const userCountry = isBroker
             ? String(
                 avatarMeta.countryCode ||
                 (cachedBrokerEntry && cachedBrokerEntry.country) ||
                 (profile && profile.country) ||
-                'DZ'
+                detectedVisitorCountry
             ).toUpperCase().trim()
             : String(
                 (profile && profile.country) ||
                 authUser.user_metadata?.country ||
-                ''
+                detectedVisitorCountry
             ).toUpperCase().trim();
 
         const rawAvail = profile

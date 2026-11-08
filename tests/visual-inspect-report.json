@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-11-08T12:20:00+02:00",
+  "captureType": "BoxSelection (AltGr+1)",
+  "selectionBoxDimensions": "412x922px",
+  "screenDimensions": "1434x998px",
+  "page": {
+    "url": "http://localhost:5055/index.html",
+    "file": "D:/waseet-app/index.html",
+    "title": "وسيط | WASEET - منصة الوساطة المالية والتجارية المضمونة"
+  },
+  "userNotes": "قم بازالة السكرول على الحاسبة فقط اجعله مربع عادي واضف عليه تاثير المكتبات التي ارفقتك اياها",
+  "capturedComponent": {
+    "title": "حاسبة العمولات الآلية للبائع والمشتري",
+    "description": "عند وضع سعرك، يضيف الموقع عمولة الوساطة الآمنة تلقائياً للمشتري، لتستلم أنت حقك كاملاً دون أي خصم! المبلغ الصافي الذي ترغب في استلامه كبائع (بالنقاط): نقطة",
+    "elementsDetected": 15,
+    "chips": [
+      "calc-seller-input#",
+      "stepper-btn.",
+      "input-label.",
+      "calc-desc.",
+      "calc-title.",
+      "calc-card.",
+      "stepper-btn.",
+      "stepper-unit-label."
+    ],
+    "flaggedWarnings": [
+      "pointer-events: none detected on decorative/sub-elements (span)",
+      "Unwanted scrollbar container wrapping calculator card"
+    ]
+  },
+  "requestedActions": [
+    "Remove overflow scrollbar from calculator container/card so it renders as a clean normal box",
+    "Apply platform UI library effects (VanillaTilt 3D tilt, glassmorphism, gold neon borders, micro-interactions)",
+    "Preserve responsive sizing and clean layout across mobile and desktop screens"
+  ],
+  "imagePath": "D:/waseet-app/assets/clipboard_latest.png",
+  "status": "CAPTURED_AND_ANALYZED"
+}

@@ -68,22 +68,36 @@ try {
             try {
                 $payload = $body | ConvertFrom-Json
 
-                # Output Formatted Incident Report
-                Write-Host "`n🚨 ======================================================================" -ForegroundColor Red
-                Write-Host "🚨 [INCOMING BROKEN BUTTON ALERT RECEIVED AT $timestamp]" -ForegroundColor Red
-                Write-Host "   Target Agents : AntiGravity & OpenCode (First Assistant)" -ForegroundColor Green
-                Write-Host "   Page URL      : $($payload.page.url)" -ForegroundColor White
-                Write-Host "   Selector      : $($payload.element.selector)" -ForegroundColor Yellow
-                Write-Host "   Button Text   : $($payload.element.buttonText)" -ForegroundColor White
-                Write-Host "   Failure Type  : $($payload.failure.code) ($($payload.failure.title))" -ForegroundColor Red
-                Write-Host "   Failure Detail: $($payload.failure.detailedReason)" -ForegroundColor Yellow
-                
-                if ($payload.failure.blockingElement) {
-                    Write-Host "   Blocking Elem : $($payload.failure.blockingElement.selector) (z-index: $($payload.failure.blockingElement.zIndex))" -ForegroundColor Magenta
+                # Handle Visual Box Inspector reports
+                if ($request.Url.AbsolutePath -like "*visual-inspect*" -or $payload.captureType) {
+                    Write-Host "`n🔍 ======================================================================" -ForegroundColor Cyan
+                    Write-Host "🔍 [VISUAL BOX SCREEN INSPECTION RECEIVED AT $timestamp]" -ForegroundColor Cyan
+                    Write-Host "   Capture Type : $($payload.captureType) ($($payload.selectionBoxDimensions))" -ForegroundColor White
+                    Write-Host "   Page URL     : $($payload.page.url)" -ForegroundColor White
+                    Write-Host "   User Question: $($payload.userQuestion)" -ForegroundColor Yellow
+                    Write-Host "   Elements     : $($payload.elementsDetected) elements detected" -ForegroundColor DarkGray
+                    Write-Host "🔍 ======================================================================`n" -ForegroundColor Cyan
+
+                    $reportFile = Join-Path $root "tests\visual-inspect-report.json"
+                    $body | Out-File -FilePath $reportFile -Encoding UTF8
+                } else {
+                    # Output Formatted Incident Report
+                    Write-Host "`n🚨 ======================================================================" -ForegroundColor Red
+                    Write-Host "🚨 [INCOMING BROKEN BUTTON ALERT RECEIVED AT $timestamp]" -ForegroundColor Red
+                    Write-Host "   Target Agents : AntiGravity & OpenCode (First Assistant)" -ForegroundColor Green
+                    Write-Host "   Page URL      : $($payload.page.url)" -ForegroundColor White
+                    Write-Host "   Selector      : $($payload.element.selector)" -ForegroundColor Yellow
+                    Write-Host "   Button Text   : $($payload.element.buttonText)" -ForegroundColor White
+                    Write-Host "   Failure Type  : $($payload.failure.code) ($($payload.failure.title))" -ForegroundColor Red
+                    Write-Host "   Failure Detail: $($payload.failure.detailedReason)" -ForegroundColor Yellow
+                    
+                    if ($payload.failure.blockingElement) {
+                        Write-Host "   Blocking Elem : $($payload.failure.blockingElement.selector) (z-index: $($payload.failure.blockingElement.zIndex))" -ForegroundColor Magenta
+                    }
+                    
+                    Write-Host "   Suggested Fix : $($payload.agentDispatch.suggestedFix)" -ForegroundColor Cyan
+                    Write-Host "🚨 ======================================================================`n" -ForegroundColor Red
                 }
-                
-                Write-Host "   Suggested Fix : $($payload.agentDispatch.suggestedFix)" -ForegroundColor Cyan
-                Write-Host "🚨 ======================================================================`n" -ForegroundColor Red
 
                 # Append to queue
                 try {

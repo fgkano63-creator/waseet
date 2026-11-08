@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-07T14:52:16.704Z",
+  "timestamp": "2026-11-08T10:25:31.545Z",
   "metrics": {
     "totalChecks": 267,
     "passed": 267,
@@ -425,7 +425,7 @@
         "id": "JS-AsyncCatch-js\\visual-inspector.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\visual-inspector.js async error-handling coverage verified (0 async, 0 catch)",
+        "message": "js\\visual-inspector.js async error-handling coverage verified (0 async, 3 catch)",
         "details": null
       },
       {
@@ -1318,7 +1318,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1865 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1868 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

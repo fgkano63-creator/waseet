@@ -839,22 +839,38 @@ body::before {
 }
 
 .calc-card {
-    background: linear-gradient(145deg, rgba(20, 24, 38, 0.9), rgba(12, 14, 22, 0.95));
-    border: 1px solid var(--border-metal);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(145deg, rgba(18, 24, 38, 0.92) 0%, rgba(9, 13, 22, 0.98) 100%);
+    border: 1.5px solid rgba(197, 160, 89, 0.35);
+    border-radius: 22px;
+    padding: 2.25rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(197, 160, 89, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     position: relative;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+    overflow: visible;
+}
+
+.calc-card:hover {
+    border-color: rgba(197, 160, 89, 0.65);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(197, 160, 89, 0.22);
+    transform: translateY(-3px);
 }
 
 .calc-card::after {
     content: '';
     position: absolute;
     inset: -1px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(234, 88, 12, 0.3), transparent 50%, rgba(197, 160, 89, 0.3));
+    border-radius: 22px;
+    background: radial-gradient(circle at 80% 20%, rgba(234, 88, 12, 0.18), transparent 45%), radial-gradient(circle at 20% 80%, rgba(197, 160, 89, 0.18), transparent 50%);
     z-index: -1;
     pointer-events: none;
+    opacity: 0.85;
+    transition: opacity 0.4s ease;
+}
+
+.calc-card:hover::after {
+    opacity: 1;
 }
 
 .calc-grid {
@@ -919,13 +935,22 @@ body::before {
 }
 
 .calc-results-panel {
-    background: rgba(10, 12, 18, 0.7);
-    border: 1px solid rgba(197, 160, 89, 0.3);
-    border-radius: 16px;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(22, 28, 44, 0.85) 0%, rgba(11, 14, 23, 0.94) 100%);
+    border: 1px solid rgba(197, 160, 89, 0.35);
+    border-radius: 18px;
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.calc-results-panel:hover {
+    border-color: rgba(197, 160, 89, 0.55);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(197, 160, 89, 0.15);
 }
 
 .res-row {
@@ -4258,103 +4283,103 @@ html, body {
 
 
     /* ==========================================================================
-       حاسبة العمولات الآلية في الهواتف المحمولة: تصميم مدمج وخفيف لا يتجاوز 60vh مع تمرير داخلي
+       حاسبة العمولات الآلية: مربع عادي بدون سكرول مع تأثيرات مكتبات Skiper و Vengeance و Animata
        ========================================================================== */
     .calc-section {
-        padding: 0.8rem 0 !important;
+        padding: 1.25rem 0 !important;
     }
 
     .calc-card,
     .calc-card-3d,
     #fee-calculator .calc-card {
-        max-height: 60vh !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior: contain !important;
-        padding: 0.75rem 0.85rem !important;
-        border-radius: 14px !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-y: visible !important;
+        overflow-x: visible !important;
+        padding: 1.35rem 1.15rem !important;
+        border-radius: 18px !important;
         box-sizing: border-box !important;
-        scrollbar-width: thin !important;
-        scrollbar-color: rgba(197, 160, 89, 0.4) transparent !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
     }
 
-    .calc-card::-webkit-scrollbar {
-        width: 4px !important;
-    }
-    .calc-card::-webkit-scrollbar-thumb {
-        background: rgba(197, 160, 89, 0.4) !important;
-        border-radius: 4px !important;
+    .calc-card::-webkit-scrollbar,
+    .calc-card-3d::-webkit-scrollbar,
+    #fee-calculator .calc-card::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 
     .calc-grid {
         grid-template-columns: 1fr !important;
-        gap: 0.5rem !important;
+        gap: 1.25rem !important;
     }
 
     .calc-title {
-        font-size: 1rem !important;
-        margin-bottom: 0.25rem !important;
-        gap: 0.4rem !important;
+        font-size: 1.15rem !important;
+        margin-bottom: 0.35rem !important;
+        gap: 0.5rem !important;
     }
 
     .calc-title i {
-        font-size: 0.95rem !important;
-    }
-
-    .calc-desc {
-        font-size: 0.75rem !important;
-        line-height: 1.35 !important;
-        margin-bottom: 0.45rem !important;
-    }
-
-    .calc-card .input-group {
-        margin-bottom: 0.4rem !important;
-    }
-
-    .calc-card .input-label {
-        font-size: 0.74rem !important;
-        margin-bottom: 0.25rem !important;
-    }
-
-    .calc-card .luxury-stepper-container {
-        height: 38px !important;
-        margin-bottom: 0.3rem !important;
-    }
-
-    .calc-card .stepper-btn {
-        width: 38px !important;
-        height: 38px !important;
-        font-size: 0.85rem !important;
-    }
-
-    .calc-card .stepper-number-input {
         font-size: 1.1rem !important;
     }
 
-    .calc-card small {
-        font-size: 0.68rem !important;
-        line-height: 1.35 !important;
-        padding: 0.35rem 0.5rem !important;
-        background: rgba(0, 0, 0, 0.35) !important;
-        border-radius: 8px !important;
-        display: block !important;
-        margin-top: 0.3rem !important;
+    .calc-desc {
+        font-size: 0.82rem !important;
+        line-height: 1.45 !important;
+        margin-bottom: 0.75rem !important;
     }
 
-    /* لوحة النتائج مثبتة ومدمجة في الأسفل لتكون دائماً مرئية وسهلة الوصول */
+    .calc-card .input-group {
+        margin-bottom: 0.6rem !important;
+    }
+
+    .calc-card .input-label {
+        font-size: 0.8rem !important;
+        margin-bottom: 0.35rem !important;
+    }
+
+    .calc-card .luxury-stepper-container {
+        height: 44px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .calc-card .stepper-btn {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 0.95rem !important;
+    }
+
+    .calc-card .stepper-number-input {
+        font-size: 1.2rem !important;
+    }
+
+    .calc-card small {
+        font-size: 0.72rem !important;
+        line-height: 1.45 !important;
+        padding: 0.5rem 0.7rem !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 10px !important;
+        display: block !important;
+        margin-top: 0.5rem !important;
+    }
+
+    /* لوحة النتائج: انسيابية كجزء طبيعي من المربع بدون تثبيت أو سكرول */
     .calc-results-panel {
-        position: sticky !important;
-        bottom: 0 !important;
-        z-index: 5 !important;
-        background: rgba(10, 13, 20, 0.96) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(197, 160, 89, 0.45) !important;
-        border-radius: 12px !important;
-        padding: 0.6rem 0.8rem !important;
-        gap: 0.35rem !important;
-        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6) !important;
+        position: relative !important;
+        bottom: auto !important;
+        z-index: 1 !important;
+        background: linear-gradient(135deg, rgba(20, 26, 42, 0.9), rgba(10, 13, 20, 0.96)) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(197, 160, 89, 0.4) !important;
+        border-radius: 14px !important;
+        padding: 1.1rem !important;
+        gap: 0.65rem !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
         margin-top: 0.5rem !important;
     }
 
@@ -5608,7 +5633,9 @@ input[type=number] {
     background: rgba(255, 255, 255, 0.06);
     padding: 2px 8px;
     border-radius: 6px;
-    pointer-events: none;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: auto;
 }
 
 .stepper-live-val {
@@ -6610,12 +6637,21 @@ input[type=number] {
     text-overflow: ellipsis;
 }
 
-/* Chat Main Area */
-.whatsapp-chat-main {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(14, 18, 28, 0.9), rgba(8, 10, 16, 0.98));
+/* Chat Main Area & Containment Safety */
+.whatsapp-chat-main,
+.main-chat-area,
+#support-chat-main {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: radial-gradient(circle at center, rgba(14, 18, 28, 0.9), rgba(8, 10, 16, 0.98)) !important;
 }
 
 .whatsapp-chat-header {
@@ -6625,24 +6661,76 @@ input[type=number] {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
-.whatsapp-chat-body {
-    flex: 1;
-    overflow-y: auto;
+.whatsapp-chat-body,
+.support-chat-messages,
+#support-chat-messages {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
     padding: 1.2rem 1.4rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.whatsapp-chat-footer {
-    background: #111624;
-    border-top: 1px solid var(--border-metal);
-    padding: 0.9rem 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+.whatsapp-chat-footer,
+.support-chat-input-bar,
+.chat-input-area,
+#support-chat-form {
+    background: #111624 !important;
+    border-top: 1px solid var(--border-metal) !important;
+    padding: 0.8rem 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+.wa-chat-input,
+.support-chat-input,
+#support-chat-input {
+    min-width: 0 !important;
+    flex: 1 1 0% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    background: rgba(22, 28, 44, 0.85) !important;
+    border: 1px solid var(--border-metal) !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 0.95rem !important;
+    font-size: 0.9rem !important;
+    color: #fff !important;
+    font-family: var(--font-ar) !important;
+    outline: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.wa-chat-input:focus,
+.support-chat-input:focus,
+#support-chat-input:focus {
+    border-color: var(--gold-primary) !important;
+    box-shadow: 0 0 12px rgba(197, 160, 89, 0.25) !important;
 }
 
 @media (max-width: 868px) {

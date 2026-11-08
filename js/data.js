@@ -409,3 +409,49 @@ function waseetDebounce(func, wait = 300) {
 }
 window.waseetDebounce = waseetDebounce;
 
+/**
+ * Dynamic Visitor Country Detection (GeoIP)
+ * يكتشف تلقائياً دولة الزائر بناءً على عنوان الـ IP الحقيقي دون إجباره على دولة الجزائر افتراضياً
+ */
+async function waseetDetectVisitorCountry() {
+    try {
+        const cached = localStorage.getItem('WASEET_DETECTED_COUNTRY');
+        if (cached && /^[A-Z]{2}$/i.test(cached)) {
+            return cached.toUpperCase();
+        }
+        const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
+        const res = await fetch('https://api.country.is', {
+            signal: controller ? controller.signal : undefined,
+            headers: { 'Accept': 'application/json' }
+        });
+        if (timeoutId) clearTimeout(timeoutId);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.country && /^[A-Z]{2}$/i.test(data.country)) {
+                const code = data.country.toUpperCase();
+                localStorage.setItem('WASEET_DETECTED_COUNTRY', code);
+                return code;
+            }
+        }
+    } catch (e) {
+        // Fallback silently if offline or blocked
+    }
+    return localStorage.getItem('WASEET_DETECTED_COUNTRY') || 'DZ';
+}
+
+function waseetGetVisitorCountrySync() {
+    try {
+        const cached = localStorage.getItem('WASEET_DETECTED_COUNTRY');
+        if (cached && /^[A-Z]{2}$/i.test(cached)) {
+            return cached.toUpperCase();
+        }
+    } catch (e) {}
+    return 'DZ';
+}
+
+if (typeof window !== 'undefined') {
+    window.waseetDetectVisitorCountry = waseetDetectVisitorCountry;
+    window.waseetGetVisitorCountrySync = waseetGetVisitorCountrySync;
+    try { waseetDetectVisitorCountry(); } catch (e) {}
+}

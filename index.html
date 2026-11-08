@@ -535,7 +535,7 @@
                                     </button>
                                     <div class="stepper-input-wrap">
                                         <input type="number" id="calc-seller-input" class="stepper-number-input" value="30" min="5" max="10000" step="5">
-                                        <span class="stepper-unit-label">نقطة</span>
+                                        <span class="stepper-unit-label" onclick="document.getElementById('calc-seller-input')?.focus()" title="انقر للإدخال">نقطة</span>
                                     </div>
                                     <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustCalc(10)" title="زيادة 10 نقاط">
                                         <i class="fas fa-plus"></i>
@@ -1043,7 +1043,7 @@
                         </button>
                         <div class="stepper-input-wrap">
                             <input type="number" id="topup-amount" class="stepper-number-input" value="50" min="10" max="10000" step="5" oninput="window.waseetSyncTopupInput()">
-                            <span class="stepper-unit-label">نقطة</span>
+                            <span class="stepper-unit-label" onclick="document.getElementById('topup-amount')?.focus()" title="انقر للإدخال">نقطة</span>
                         </div>
                         <button type="button" class="stepper-btn stepper-btn-plus" onclick="window.waseetAdjustTopup(10)" title="زيادة 10 نقاط">
                             <i class="fas fa-plus"></i>

@@ -746,6 +746,34 @@
                 </div>
             `;
 
+            // Persist report locally and attempt dev webhook dispatch
+            const reportPayload = {
+                timestamp: new Date().toISOString(),
+                captureType: this.capturedData.rect.isFullPage ? 'FullScreen (AltGr+2)' : 'BoxSelection (AltGr+1)',
+                selectionBoxDimensions: `${Math.round(this.capturedData.rect.width)}x${Math.round(this.capturedData.rect.height)}px`,
+                page: {
+                    url: window.location.href,
+                    title: document.title
+                },
+                userQuestion: userQuestion,
+                elementsDetected: this.capturedData.elements.length,
+                collectedText: this.capturedData.collectedText,
+                chips: this.capturedData.elements.slice(0, 10).map(e => e.id ? `#${e.id}` : (e.classes ? `.${e.classes.split(' ')[0]}` : `<${e.tag}>`)),
+                consoleErrors: this.capturedData.consoleErrors
+            };
+
+            try {
+                localStorage.setItem('waseet_visual_inspect_report', JSON.stringify(reportPayload));
+            } catch (err) {}
+
+            try {
+                fetch('http://localhost:5055/webhook/visual-inspect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportPayload)
+                }).catch(() => {});
+            } catch (err) {}
+
             setTimeout(() => {
                 const diagnosis = this.generateDiagnosis(userQuestion);
                 container.innerHTML = `
