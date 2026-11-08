@@ -334,6 +334,7 @@
     <script src="js/navbar.js"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
 
     <!-- Pending Accounts Page Logic -->
     <script>
@@ -1116,8 +1117,8 @@
                             <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
                                 <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                    <code style="color: #fff; font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.recovery_email || 'غير مضاف'}</code>
-                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${(creds.recovery_email || '').replace(/'/g, "\\'")}', 'تم نسخ بريد الاسترداد')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                    <code style="color: #fff; font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${escPendingHtml(creds.recovery_email || 'غير مضاف')}</code>
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('recovery_email')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -1125,8 +1126,8 @@
                             <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-metal); border-radius: 10px; padding: 0.85rem;">
                                 <span style="color: var(--silver-muted); font-size: 0.78rem; display: block; margin-bottom: 0.35rem;">كلمة المرور لحساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                    <code style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${creds.recovery_password || 'غير مضاف'}</code>
-                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectText('${(creds.recovery_password || '').replace(/'/g, "\\'")}', 'تم نسخ كلمة مرور الاسترداد')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
+                                    <code style="color: var(--orange-bright); font-size: 0.95rem; font-weight: 800; font-family: monospace; word-break: break-all;">${escPendingHtml(creds.recovery_password || 'غير مضاف')}</code>
+                                    <button type="button" class="btn-3d btn-outline" onclick="copyInspectCred('recovery_password')" style="padding: 4px 10px; font-size: 0.8rem;" title="نسخ">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -1246,6 +1247,10 @@
             const creds = (currentInspectingAccount && currentInspectingAccount.credentials) || {};
             if (type === 'email') {
                 copyInspectText(creds.email_or_phone || '', 'تم نسخ البريد الإلكتروني');
+            } else if (type === 'recovery_email') {
+                copyInspectText(creds.recovery_email || '', 'تم نسخ بريد الاسترداد');
+            } else if (type === 'recovery_password') {
+                copyInspectText(creds.recovery_password || '', 'تم نسخ كلمة مرور الاسترداد');
             } else {
                 copyInspectText(creds.password || '', 'تم نسخ كلمة المرور');
             }

@@ -2375,6 +2375,17 @@ class WaseetApp {
         const acc = WASEET_STATE.accounts.find(a => a.id === accountId);
         if (!acc) return;
 
+        // منع البائع من شراء حسابه الخاص المعروض للبيع (Self-Purchase Prevention Guard)
+        const sellerId = acc.sellerId || acc.seller_id;
+        if (WASEET_STATE.user && sellerId && (String(WASEET_STATE.user.id) === String(sellerId))) {
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert('تنبيه أمان', 'لا يمكنك شراء حسابك الخاص المعروض للبيع.', 'info');
+            } else {
+                alert('لا يمكنك شراء حسابك الخاص المعروض للبيع!');
+            }
+            return;
+        }
+
         // Refresh latest points balance from Supabase before checking
         if (typeof window.waseetRefreshMyWalletBalance === 'function') {
             try {

@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-07 12:55:39",
+    "Timestamp":  "2026-11-07 16:51:58",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  832,
-    "PassCount":  832,
+    "TotalChecks":  853,
+    "PassCount":  853,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -730,8 +730,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  330,
-                                               "Pass":  330,
+                                               "Total":  343,
+                                               "Pass":  343,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -1324,6 +1324,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
                                                              },
                                                              {
+                                                                 "Test":  "chat.html script: js/security-validator.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
                                                                  "Test":  "chat.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1382,6 +1388,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "chat.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
                                                                  "Test":  "chat.html link: assets/favicons/favicon-32x32.png",
@@ -1564,6 +1576,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "contact-support.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "deals.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1580,6 +1598,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html script: js/security-validator.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
                                                              },
                                                              {
                                                                  "Test":  "deals.html script: js/calculator.js",
@@ -1640,6 +1664,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
                                                                  "Test":  "deals.html link: assets/favicons/favicon-32x32.png",
@@ -1732,6 +1762,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
                                                              },
                                                              {
+                                                                 "Test":  "index.html script: js/security-validator.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
                                                                  "Test":  "index.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1808,6 +1844,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
                                                                  "Test":  "index.html link: assets/logo.png",
@@ -2092,6 +2134,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
+                                                                 "Test":  "my-accounts.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
+                                                             },
+                                                             {
                                                                  "Test":  "my-accounts.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2218,6 +2266,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
+                                                                 "Test":  "pending-accounts.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
+                                                             },
+                                                             {
                                                                  "Test":  "pending-accounts.html link: assets/logo.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2326,6 +2380,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
                                                              },
                                                              {
+                                                                 "Test":  "profile.html script: js/security-validator.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
                                                                  "Test":  "profile.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2384,6 +2444,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "profile.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
                                                                  "Test":  "profile.html link: assets/favicons/favicon-32x32.png",
@@ -2464,6 +2530,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
                                                              },
                                                              {
+                                                                 "Test":  "wallet.html script: js/security-validator.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
                                                                  "Test":  "wallet.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2522,6 +2594,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html script: js/visual-inspector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html link: assets/favicons/favicon-32x32.png",
@@ -4263,7 +4341,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1320 open, 1320 close"
+                                                             "Details":  "Balanced: 1327 open, 1327 close"
                                                          }
                                                      ]
                                        },
@@ -4314,8 +4392,8 @@
                                                    ]
                                      },
                        "Security-Secrets":  {
-                                                "Total":  14,
-                                                "Pass":  14,
+                                                "Total":  17,
+                                                "Pass":  17,
                                                 "Warn":  0,
                                                 "Fail":  0,
                                                 "Items":  [
@@ -4327,6 +4405,12 @@
                                                               },
                                                               {
                                                                   "Test":  "js\\auth.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
+                                                                  "Test":  "js\\button-self-reporter.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
                                                                   "Details":  "No private keys or service_role credentials exposed"
@@ -4386,6 +4470,12 @@
                                                                   "Details":  "No private keys or service_role credentials exposed"
                                                               },
                                                               {
+                                                                  "Test":  "js\\security-validator.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
                                                                   "Test":  "js\\slider.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
@@ -4402,12 +4492,18 @@
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
                                                                   "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
+                                                                  "Test":  "js\\visual-inspector.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
                                                               }
                                                           ]
                                             },
                        "Security-Code":  {
-                                             "Total":  14,
-                                             "Pass":  14,
+                                             "Total":  17,
+                                             "Pass":  17,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4419,6 +4515,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\auth.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\button-self-reporter.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
@@ -4478,6 +4580,12 @@
                                                                "Details":  "Zero eval() or new Function() invocations"
                                                            },
                                                            {
+                                                               "Test":  "js\\security-validator.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
                                                                "Test":  "js\\slider.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
@@ -4494,12 +4602,18 @@
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\visual-inspector.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
                                                            }
                                                        ]
                                          },
                        "JS-Resilience":  {
-                                             "Total":  9,
-                                             "Pass":  9,
+                                             "Total":  10,
+                                             "Pass":  10,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4511,6 +4625,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\auth.js - LocalStorage Error Boundary",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "LocalStorage operations are guarded against private mode / quota exceptions"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\button-self-reporter.js - LocalStorage Error Boundary",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "LocalStorage operations are guarded against private mode / quota exceptions"
@@ -4710,8 +4830,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  62,
-                                                 "Pass":  62,
+                                                 "Total":  63,
+                                                 "Pass":  63,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -5083,6 +5203,12 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.get_broker_public_profile",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v2",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

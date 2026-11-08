@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="لوحة فحص الأزرار والإنذار الذاتي لمنصة وسيط WASEET.">
+    <title>WASEET | لوحة فحص الأزرار والإنذار الذاتي (Button Self-Reporting Sentinel)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        :root {
+            --bg-dark: #0a0c13;
+            --bg-card: #121624;
+            --border-metal: rgba(255, 255, 255, 0.08);
+            --gold-primary: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.35);
+            --red-alert: #ef4444;
+            --green-pass: #10b981;
+            --blue-info: #38bdf8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .sentinel-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .sentinel-header {
+            background: linear-gradient(135deg, rgba(20, 26, 42, 0.95), rgba(12, 15, 25, 0.98));
+            border: 1px solid var(--border-metal);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .header-title p {
+            margin: 0.5rem 0 0;
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .agent-pill {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 850px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-metal);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .panel-card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .input-control {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(10, 12, 19, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.7rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-gold-action {
+            background: linear-gradient(135deg, #d4af37, #b89324);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-gold-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-red-action {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-blue-action {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+        }
+
+        .simulation-box {
+            background: rgba(10, 12, 19, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        /* Overlay simulator */
+        .mock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(239, 68, 68, 0.25);
+            border: 2px dashed #ef4444;
+            border-radius: 12px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fca5a5;
+            font-weight: 800;
+            font-size: 0.85rem;
+            backdrop-filter: blur(2px);
+            cursor: not-allowed;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .log-table th {
+            text-align: right;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.04);
+            color: #94a3b8;
+            border-bottom: 1px solid var(--border-metal);
+        }
+
+        .log-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .badge-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .code-box {
+            background: #07090e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: #38bdf8;
+            max-height: 250px;
+            overflow-y: auto;
+            direction: ltr;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sentinel-container">
+        
+        <!-- Header -->
+        <div class="sentinel-header">
+            <div class="header-title">
+                <h1>
+                    <i class="fas fa-radar text-gold"></i>
+                    نظام فحص الأزرار والإنذار الذاتي (Self-Reporting Sentinel)
+                </h1>
+                <p>كشف فوري للأزرار المعطلة، تداخلات Z-Index، وأخطاء الكونسول مع إرسال إشعار فوري لـ AntiGravity و OpenCode.</p>
+            </div>
+            <div>
+                <span class="agent-pill">
+                    <i class="fas fa-robot"></i>
+                    AntiGravity & OpenCode Active
+                </span>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            
+            <!-- Webhook & Config Panel -->
+            <div class="panel-card">
+                <h3><i class="fas fa-satellite-dish text-gold"></i> إعدادات Webhook و API</h3>
+                
+                <div class="input-group">
+                    <label>عنوان Webhook لتلقي إشعارات الخطأ (Discord / Slack / Local):</label>
+                    <input type="text" id="webhook-input" class="input-control" value="http://localhost:5055/webhook/button-alert" placeholder="https://discord.com/api/webhooks/... أو Local Endpoint">
+                </div>
+
+                <div class="input-group">
+                    <label>عنوان API Endpoint الداخلي لتسجيل الأخطاء (Error Logging):</label>
+                    <input type="text" id="api-input" class="input-control" value="http://localhost:5055/api/log-error" placeholder="/api/log-error">
+                </div>
+
+                <div style="display: flex; gap: 0.8rem; margin-top: 1.2rem;">
+                    <button class="btn-action btn-gold-action" onclick="saveWebhookSettings()">
+                        <i class="fas fa-save"></i> حفظ الإعدادات
+                    </button>
+                    <button class="btn-action btn-blue-action" onclick="sendTestWebhook()">
+                        <i class="fas fa-paper-plane"></i> إرسال تنبيه تجريبي
+                    </button>
+                </div>
+            </div>
+
+            <!-- Full Page Auditor -->
+            <div class="panel-card">
+                <h3><i class="fas fa-vial-circle-check text-gold"></i> الفاحص الشامل للمنصة</h3>
+                <p style="color: #94a3b8; font-size: 0.9rem;">فحص جميع الأزرار والروابط التفاعلية في هذه الصفحة واكتشاف أي زر ميت أو مغطى.</p>
+                
+                <div style="margin: 1.5rem 0;">
+                    <button class="btn-action btn-gold-action" style="width: 100%;" onclick="executeFullAudit()">
+                        <i class="fas fa-play"></i> تشغيل الفحص الآلي الفوري الآن
+                    </button>
+                </div>
+
+                <div id="audit-stats" style="display: flex; gap: 1rem; text-align: center;">
+                    <div style="flex: 1; background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 10px;">
+                        <div style="font-size: 0.75rem; color: #94a3b8;">إجمالي الأزرار</div>
+                        <div id="stat-scanned" style="font-size: 1.4rem; font-weight: 800; color: #fff;">0</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(16,185,129,0.08); padding: 0.8rem; border-radius: 10px;">
+                        <div style="font-size: 0.75rem; color: #10b981;">أزرار سليمة</div>
+                        <div id="stat-passed" style="font-size: 1.4rem; font-weight: 800; color: #10b981;">0</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(239,68,68,0.08); padding: 0.8rem; border-radius: 10px;">
+                        <div style="font-size: 0.75rem; color: #ef4444;">أزرار معطلة</div>
+                        <div id="stat-failed" style="font-size: 1.4rem; font-weight: 800; color: #ef4444;">0</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Failure Simulation Laboratory -->
+        <div class="panel-card" style="margin-bottom: 2rem;">
+            <h3><i class="fas fa-bug text-gold"></i> مختبر محاكاة الأخطاء الأربعة (Failure Simulation Lab)</h3>
+            <p style="color: #94a3b8; font-size: 0.9rem;">اضغط على أي من الحالات أدناه للتحقق من أن النظام يكتشفها فوراً ويرسل إشعار Payload دقيق لبيئة التطوير:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                
+                <!-- Case 1: Dead Button -->
+                <div class="simulation-box">
+                    <div style="font-weight: 700; color: #fff; margin-bottom: 0.4rem;">حالة 1: زر ميت بدون Event Listener</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.8rem;">زر من نوع button بدون معالج أحداث.</div>
+                    <button id="sim-btn-dead" type="button" class="btn-action btn-blue-action" style="width: 100%;">
+                        زر تجريبي غير مربوط
+                    </button>
+                    <button class="btn-action btn-gold-action" style="width: 100%; margin-top: 0.6rem; font-size: 0.8rem; padding: 0.4rem;" onclick="testSingleButton('#sim-btn-dead')">
+                        <i class="fas fa-stethoscope"></i> فحص هذا الزر
+                    </button>
+                </div>
+
+                <!-- Case 2: Z-Index Overlay -->
+                <div class="simulation-box" id="overlay-container">
+                    <div style="font-weight: 700; color: #fff; margin-bottom: 0.4rem;">حالة 2: مغطى بـ Z-Index Overlay</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.8rem;">يوجد عنصر شفاف يعلو الزر ويمنع نقره.</div>
+                    
+                    <button id="sim-btn-covered" class="btn-action btn-gold-action" style="width: 100%;" onclick="alert('سليم')">
+                        زر مهم للشراء
+                    </button>
+
+                    <!-- The intercepting overlay -->
+                    <div id="mock-backdrop" class="mock-overlay">
+                        <span><i class="fas fa-shield-alt"></i> طبقة Z-Index 9999 تغطي الزر</span>
+                    </div>
+
+                    <button class="btn-action btn-gold-action" style="width: 100%; margin-top: 0.6rem; font-size: 0.8rem; padding: 0.4rem;" onclick="testSingleButton('#sim-btn-covered')">
+                        <i class="fas fa-stethoscope"></i> فحص هذا الزر
+                    </button>
+                </div>
+
+                <!-- Case 3: Console Runtime Error -->
+                <div class="simulation-box">
+                    <div style="font-weight: 700; color: #fff; margin-bottom: 0.4rem;">حالة 3: خطأ كونسول مباشر عند النقر</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.8rem;">ينفذ كوداً يطلق خطأ برمجياً غير معالج.</div>
+                    <button id="sim-btn-error" class="btn-action btn-red-action" style="width: 100%;" onclick="throw new TypeError('Cannot read properties of undefined (reading balance)');">
+                        زر يطلق استثناء Runtime
+                    </button>
+                    <button class="btn-action btn-gold-action" style="width: 100%; margin-top: 0.6rem; font-size: 0.8rem; padding: 0.4rem;" onclick="testSingleButton('#sim-btn-error')">
+                        <i class="fas fa-stethoscope"></i> فحص هذا الزر
+                    </button>
+                </div>
+
+                <!-- Case 4: Pointer Events None -->
+                <div class="simulation-box">
+                    <div style="font-weight: 700; color: #fff; margin-bottom: 0.4rem;">حالة 4: معطل عبر Pointer-Events</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.8rem;">الزر يحمل خاصية pointer-events: none.</div>
+                    <button id="sim-btn-pointer" class="btn-action btn-blue-action" style="width: 100%; pointer-events: none; opacity: 0.5;" onclick="alert('تم')">
+                        زر غير قابل للنقر
+                    </button>
+                    <button class="btn-action btn-gold-action" style="width: 100%; margin-top: 0.6rem; font-size: 0.8rem; padding: 0.4rem;" onclick="testSingleButton('#sim-btn-pointer')">
+                        <i class="fas fa-stethoscope"></i> فحص هذا الزر
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Incidents Log & Payload Viewer -->
+        <div class="panel-card">
+            <h3>
+                <i class="fas fa-list-check text-gold"></i>
+                سجل الإنذارات المرسلة لبيئة التطوير (Incident Queue)
+            </h3>
+            
+            <div id="incidents-container">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>الوقت</th>
+                            <th>المحدد (Selector)</th>
+                            <th>نوع الفشل (Code)</th>
+                            <th>السبب الدقيق</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incidents-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">
+                                لم يتم تسجيل أي أخطاء حتى الآن. النظام يعمل بكفاءة 100%.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <label style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">تفاصيل آخر Payload تم إنشاؤه وإرساله لـ AntiGravity & OpenCode:</label>
+                <pre id="payload-viewer" class="code-box">// بانتظار التقاط أي فشل لعرض كائن JSON المرسل للـ Webhook...</pre>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Self Reporter Core Library -->
+    <script src="../js/button-self-reporter.js"></script>
+
+    <script>
+        function saveWebhookSettings() {
+            const webhook = document.getElementById('webhook-input').value.trim();
+            const api = document.getElementById('api-input').value.trim();
+            
+            localStorage.setItem('WASEET_ALERT_WEBHOOK', webhook);
+            localStorage.setItem('WASEET_ALERT_API', api);
+            
+            if (window.buttonSelfReporter) {
+                window.buttonSelfReporter.config.webhookUrl = webhook;
+                window.buttonSelfReporter.config.apiEndpoint = api;
+            }
+            alert('تم حفظ إعدادات الـ Webhook بنجاح!');
+        }
+
+        async function sendTestWebhook() {
+            if (!window.buttonSelfReporter) return;
+            const res = await window.buttonSelfReporter.triggerAlert({
+                element: document.getElementById('webhook-input'),
+                failureCode: 'TEST_SYNTHETIC_ALERT',
+                failureTitle: 'تنبيه اختباري لتأكيد جاهزية Webhook',
+                details: 'This is a test notification confirming that AntiGravity and OpenCode can receive real-time webhook alerts.',
+                selector: '#webhook-input',
+                text: 'زر إرسال تجريبي'
+            });
+            displayPayload(res);
+        }
+
+        function executeFullAudit() {
+            if (!window.buttonSelfReporter) return;
+            const res = window.buttonSelfReporter.runFullAudit();
+            document.getElementById('stat-scanned').innerText = res.totalScanned;
+            document.getElementById('stat-passed').innerText = res.passed;
+            document.getElementById('stat-failed').innerText = res.failed;
+        }
+
+        function testSingleButton(selector) {
+            if (!window.buttonSelfReporter) return;
+            const el = document.querySelector(selector);
+            if (!el) return;
+            const res = window.buttonSelfReporter.inspectElement(el);
+            if (res.status === 'FAIL') {
+                window.buttonSelfReporter.triggerAlert(res).then(payload => {
+                    displayPayload(payload);
+                });
+            } else {
+                alert('هذا الزر سليم 100% ولا توجد به أي مشكلة.');
+            }
+        }
+
+        function displayPayload(payload) {
+            if (!payload) return;
+            document.getElementById('payload-viewer').innerText = JSON.stringify(payload, null, 2);
+            updateIncidentsTable();
+        }
+
+        function updateIncidentsTable() {
+            const raw = localStorage.getItem('WASEET_BROKEN_BUTTONS_QUEUE');
+            if (!raw) return;
+            try {
+                const list = JSON.parse(raw);
+                const tbody = document.getElementById('incidents-body');
+                if (list.length === 0) return;
+                
+                tbody.innerHTML = '';
+                list.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const time = new Date(item.timestamp).toLocaleTimeString('ar-EG');
+                    tr.innerHTML = `
+                        <td style="color: #94a3b8;">${time}</td>
+                        <td style="font-family: monospace; color: #f59e0b;">${item.element.selector}</td>
+                        <td><span class="badge-error">${item.failure.code}</span></td>
+                        <td style="color: #e2e8f0; font-size: 0.8rem;">${item.failure.detailedReason}</td>
+                        <td><span class="badge-success">تم الإرسال</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {}
+        }
+
+        // Listen to custom alert events
+        window.addEventListener('waseet:broken-button-alert', (e) => {
+            displayPayload(e.detail);
+        });
+
+        // Initialize table on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedWebhook = localStorage.getItem('WASEET_ALERT_WEBHOOK');
+            if (savedWebhook) document.getElementById('webhook-input').value = savedWebhook;
+            updateIncidentsTable();
+        });
+    </script>
+</body>
+</html>

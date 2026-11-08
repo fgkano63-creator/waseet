@@ -451,7 +451,8 @@
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function openAdminReceiptZoom(url) {
@@ -568,10 +569,10 @@
 
                 const actionsHtml = req.status === 'pending' ? `
                     <div class="deposit-actions-row">
-                        <button type="button" class="btn-approve-deposit" onclick="handleApproveDeposit('${escHtml(req.id)}', ${Number(req.amount_requested)}, '${escHtml(userName)}')">
+                        <button type="button" class="btn-approve-deposit" data-id="${escHtml(req.id)}" data-amount="${Number(req.amount_requested)}" data-username="${escHtml(userName)}" onclick="handleApproveDeposit(this)">
                             <i class="fas fa-check-circle"></i> موافقة وشحن (${Number(req.amount_requested)} نقطة)
                         </button>
-                        <button type="button" class="btn-reject-deposit" onclick="handleRejectDeposit('${escHtml(req.id)}', '${escHtml(userName)}')">
+                        <button type="button" class="btn-reject-deposit" data-id="${escHtml(req.id)}" data-username="${escHtml(userName)}" onclick="handleRejectDeposit(this)">
                             <i class="fas fa-times-circle"></i> رفض
                         </button>
                     </div>
@@ -620,18 +621,26 @@
             }).join('');
         }
 
-        async function handleApproveDeposit(requestId, amount, userName) {
+        async function handleApproveDeposit(requestIdOrBtn, amount, userName) {
+            let requestId = requestIdOrBtn;
+            let amt = amount;
+            let uName = userName;
+            if (requestIdOrBtn && requestIdOrBtn.dataset) {
+                requestId = requestIdOrBtn.dataset.id;
+                amt = Number(requestIdOrBtn.dataset.amount);
+                uName = requestIdOrBtn.dataset.username;
+            }
             let confirmed = true;
             if (typeof waseetConfirm === 'function') {
                 confirmed = await waseetConfirm(
                     'تأكيد الموافقة وشحن النقاط',
-                    `هل تحققت من صورة الإيصال وتود إضافة (${amount} نقطة) فوراً إلى محفظة المستخدم [${userName}]؟`,
+                    `هل تحققت من صورة الإيصال وتود إضافة (${amt} نقطة) فوراً إلى محفظة المستخدم [${uName}]؟`,
                     'نعم، موافقة وشحن الرصيد',
                     'تراجع',
                     'success'
                 );
             } else {
-                confirmed = confirm(`هل تود الموافقة وشحن ${amount} نقطة للمستخدم ${userName}؟`);
+                confirmed = confirm(`هل تود الموافقة وشحن ${amt} نقطة للمستخدم ${uName}؟`);
             }
 
             if (!confirmed) return;
@@ -650,24 +659,30 @@
             if (typeof waseetAlert === 'function') {
                 await waseetAlert(
                     '✅ تم شحن النقاط بنجاح!',
-                    `تمت الموافقة على الطلب وإيداع ${amount} نقطة في حساب [${userName}] وتسجيل العملية في سجل المحفظة.`,
+                    `تمت الموافقة على الطلب وإيداع ${amt} نقطة في حساب [${uName}] وتسجيل العملية في سجل المحفظة.`,
                     'success'
                 );
             }
         }
 
-        async function handleRejectDeposit(requestId, userName) {
+        async function handleRejectDeposit(requestIdOrBtn, userName) {
+            let requestId = requestIdOrBtn;
+            let uName = userName;
+            if (requestIdOrBtn && requestIdOrBtn.dataset) {
+                requestId = requestIdOrBtn.dataset.id;
+                uName = requestIdOrBtn.dataset.username;
+            }
             let reason = 'لم يتم التحقق من صحة إيصال التحويل المرفق، يرجى مراجعة البيانات والمحاولة مجدداً.';
             if (typeof waseetPrompt === 'function') {
                 const inputReason = await waseetPrompt(
                     'رفض طلب الشحن',
-                    `أدخل سبب رفض طلب الشحن الخاص بالمستخدم [${userName}]:`,
+                    `أدخل سبب رفض طلب الشحن الخاص بالمستخدم [${uName}]:`,
                     reason
                 );
                 if (inputReason === null) return;
                 if (inputReason.trim()) reason = inputReason.trim();
             } else {
-                const inputReason = prompt(`سبب رفض طلب الشحن للمستخدم ${userName}:`, reason);
+                const inputReason = prompt(`سبب رفض طلب الشحن للمستخدم ${uName}:`, reason);
                 if (inputReason === null) return;
                 if (inputReason.trim()) reason = inputReason.trim();
             }

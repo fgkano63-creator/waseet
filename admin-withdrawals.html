@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -521,18 +521,25 @@
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        async function copyDetailsText(text, btnEl) {
+        async function copyDetailsText(textOrBtn, btnEl) {
+            let text = textOrBtn;
+            let targetBtn = btnEl;
+            if (textOrBtn && textOrBtn.nodeType === 1) {
+                targetBtn = textOrBtn;
+                text = targetBtn.closest('.financial-details-box')?.querySelector('.details-text-val')?.innerText || '';
+            }
             if (!text) return;
             try {
                 await navigator.clipboard.writeText(text);
-                if (btnEl) {
-                    const origHtml = btnEl.innerHTML;
-                    btnEl.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
+                if (targetBtn) {
+                    const origHtml = targetBtn.innerHTML;
+                    targetBtn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
                     setTimeout(() => {
-                        btnEl.innerHTML = origHtml;
+                        targetBtn.innerHTML = origHtml;
                     }, 1800);
                 }
             } catch (e) {
@@ -542,11 +549,11 @@
                 ta.select();
                 document.execCommand('copy');
                 document.body.removeChild(ta);
-                if (btnEl) {
-                    const origHtml = btnEl.innerHTML;
-                    btnEl.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
+                if (targetBtn) {
+                    const origHtml = targetBtn.innerHTML;
+                    targetBtn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> تم النسخ!';
                     setTimeout(() => {
-                        btnEl.innerHTML = origHtml;
+                        targetBtn.innerHTML = origHtml;
                     }, 1800);
                 }
             }
@@ -615,10 +622,10 @@
                 const actionsHtml = req.status === 'pending'
                     ? `
                         <div class="card-footer-actions">
-                            <button type="button" class="btn-action-admin btn-approve" onclick="handleApproveWithdrawal('${req.id}', '${userName}', ${Number(req.amount)}, '${escapeSafe(req.method)}')">
+                            <button type="button" class="btn-action-admin btn-approve" data-id="${req.id}" data-user="${userName}" data-amount="${Number(req.amount)}" data-method="${escapeSafe(req.method)}" onclick="handleApproveWithdrawal(this)">
                                 <i class="fas fa-check"></i> موافقة وصرف (${Number(req.amount)} نقطة)
                             </button>
-                            <button type="button" class="btn-action-admin btn-reject" onclick="handleRejectWithdrawal('${req.id}', '${userName}', ${Number(req.amount)})">
+                            <button type="button" class="btn-action-admin btn-reject" data-id="${req.id}" data-user="${userName}" data-amount="${Number(req.amount)}" onclick="handleRejectWithdrawal(this)">
                                 <i class="fas fa-times"></i> رفض وإلغاء الحجز
                             </button>
                         </div>
@@ -677,7 +684,7 @@
                                     <span style="font-size: 0.72rem; color: var(--silver-muted); font-weight: 700;">
                                         <i class="fas fa-money-check-alt text-gold"></i> بيانات الحساب / المحفظة للاستلام:
                                     </span>
-                                    <button type="button" class="btn-copy-details" onclick="copyDetailsText('${escapeSafe(req.details)}', this)">
+                                    <button type="button" class="btn-copy-details" onclick="copyDetailsText(this)">
                                         <i class="far fa-copy"></i> نسخ البيانات
                                     </button>
                                 </div>
@@ -743,18 +750,28 @@
             }
         }
 
-        async function handleApproveWithdrawal(requestId, userName, amount, method) {
+        async function handleApproveWithdrawal(requestIdOrBtn, userName, amount, method) {
+            let requestId = requestIdOrBtn;
+            let uName = userName;
+            let amt = amount;
+            let mthd = method;
+            if (requestIdOrBtn && requestIdOrBtn.dataset) {
+                requestId = requestIdOrBtn.dataset.id;
+                uName = requestIdOrBtn.dataset.user;
+                amt = Number(requestIdOrBtn.dataset.amount);
+                mthd = requestIdOrBtn.dataset.method;
+            }
             let note = 'تم تحويل المبلغ المالي واعتماد السحب بنجاح';
             if (typeof waseetPrompt === 'function') {
                 const inputNote = await waseetPrompt(
-                    `اعتماد سحب (${amount} نقطة) للمستخدم ${userName}`,
+                    `اعتماد سحب (${amt} نقطة) للمستخدم ${uName}`,
                     'أدخل رقم الحوالة أو الملاحظة للمستخدم (اختياري):',
                     note
                 );
                 if (inputNote === null) return;
                 if (inputNote.trim()) note = inputNote.trim();
             } else {
-                const confirmed = confirm(`هل تم تحويل المستحقات المالية للمستخدم ${userName} وتريد اعتماد سحب (${amount} نقطة) وخصمها نهائياً؟`);
+                const confirmed = confirm(`هل تم تحويل المستحقات المالية للمستخدم ${uName} وتريد اعتماد سحب (${amt} نقطة) وخصمها نهائياً؟`);
                 if (!confirmed) return;
             }
 
@@ -770,15 +787,23 @@
 
             await loadAdminWithdrawals();
             if (typeof waseetAlert === 'function') {
-                waseetAlert('تم اعتماد السحب بنجاح!', `تم خصم ${amount} نقطة من رصيد ${userName} نهائياً وإشعار المستخدم.`, 'success');
+                waseetAlert('تم اعتماد السحب بنجاح!', `تم خصم ${amt} نقطة من رصيد ${uName} نهائياً وإشعار المستخدم.`, 'success');
             }
         }
 
-        async function handleRejectWithdrawal(requestId, userName, amount) {
+        async function handleRejectWithdrawal(requestIdOrBtn, userName, amount) {
+            let requestId = requestIdOrBtn;
+            let uName = userName;
+            let amt = amount;
+            if (requestIdOrBtn && requestIdOrBtn.dataset) {
+                requestId = requestIdOrBtn.dataset.id;
+                uName = requestIdOrBtn.dataset.user;
+                amt = Number(requestIdOrBtn.dataset.amount);
+            }
             let reason = 'بيانات الحساب غير صحيحة أو التحويل غير متاح، يرجى مراجعة الدعم';
             if (typeof waseetPrompt === 'function') {
                 const inputReason = await waseetPrompt(
-                    `رفض طلب سحب (${amount} نقطة) لـ ${userName}`,
+                    `رفض طلب سحب (${amt} نقطة) لـ ${uName}`,
                     'أدخل سبب رفض طلب السحب (سيظهر للمستخدم وسيتم فك حجز النقاط):',
                     reason
                 );

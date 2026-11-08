@@ -5038,7 +5038,8 @@ html, body {
 
 /* Backdrop */
 .mobile-drawer-overlay,
-.drawer-overlay {
+.drawer-overlay,
+.drawer-backdrop {
     position: fixed !important;
     inset: 0 !important;
     background: rgba(0, 0, 0, 0.78) !important;
@@ -5046,11 +5047,14 @@ html, body {
     z-index: 9998 !important;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none !important;
     transition: all 0.3s ease;
 }
 
 .mobile-drawer-overlay.active,
-.drawer-overlay.active {
+.drawer-overlay.active,
+.drawer-backdrop.active {
+    display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -7396,20 +7400,18 @@ div[class*="netlify"],
 }
 
 /* ===================================================
-   ضمان عدم حجب الشريط السفلي بواسطة أي خلفية شفافة غير نشطة
+   ضمان عدم حجب الشريط السفلي أو أي عناصر تفاعلية بواسطة أي خلفية غير نشطة
 =================================================== */
 .modal-overlay:not(.active),
-.waseet-dialog-overlay:not(.active) {
+.waseet-dialog-overlay:not(.active),
+.mobile-drawer-overlay:not(.active),
+.drawer-overlay:not(.active),
+.drawer-backdrop:not(.active),
+#modal-backdrop:not(.active),
+.modal-backdrop:not(.active) {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-.mobile-drawer-overlay:not(.active),
-.drawer-overlay:not(.active) {
-    opacity: 0 !important;
-    visibility: hidden !important;
     pointer-events: none !important;
 }
 
@@ -7812,12 +7814,41 @@ body.admin-brokers-page::before {
     }
 }
 
-/* أزرار الردود السريعة داخل رسالة الوسيط التلقائية */
+/* أزرار الردود السريعة داخل رسالة الوسيط التلقائية في شات الوساطة */
+.quick-replies-box {
+    white-space: normal !important;
+}
+
+.btn-quick-reply-opt {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.22rem 0.75rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--gold-primary) !important;
+    background: rgba(197, 160, 89, 0.16) !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin: 0 !important;
+    line-height: 1.25 !important;
+    min-height: auto !important;
+    height: auto !important;
+    width: auto !important;
+    text-align: center !important;
+    letter-spacing: normal !important;
+}
+
 .btn-quick-reply-opt:hover {
     background: linear-gradient(135deg, var(--gold-primary), #b08d45) !important;
     color: #090d16 !important;
     border-color: var(--gold-light) !important;
-    transform: translateY(-1px) scale(1.02) !important;
+    transform: translateY(-1px) scale(1.03) !important;
+    box-shadow: 0 4px 10px rgba(197, 160, 89, 0.35) !important;
 }
 
 /* شعار الموقع في شريط التنقل العلوي (Navbar) والقائمة الجانبية بدون خلفية سوداء وبحجم واضح ومتناسق */

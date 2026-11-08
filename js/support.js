@@ -86,10 +86,14 @@
     }
 
     /**
-     * توجيه المستخدم مباشرة لصفحة المحادثة المستقلة مع الوسيط
+     * توجيه المستخدم لصفحة المحادثة المستقلة مع إمكانية تحديد الوسيط المطلوب
      */
-    window.waseetOpenSupportChat = function() {
-        window.location.href = 'contact-support.html';
+    window.waseetOpenSupportChat = function(brokerId) {
+        if (brokerId) {
+            window.location.href = `contact-support.html?brokerId=${encodeURIComponent(brokerId)}`;
+        } else {
+            window.location.href = 'contact-support.html';
+        }
     };
 
     /**

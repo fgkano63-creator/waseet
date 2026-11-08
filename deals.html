@@ -347,6 +347,7 @@
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             renderDealsView();
@@ -621,6 +622,19 @@
             updateDrawerProfile();
         }
 
+        function escDealHtml(str) {
+            if (str === null || str === undefined) return '';
+            if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+                return DOMPurify.sanitize(String(str));
+            }
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         const debouncedRenderDealsView = (typeof waseetDebounce === 'function')
             ? waseetDebounce((q) => renderDealsView(q), 300)
             : (() => {
@@ -768,7 +782,7 @@
                                                 <strong>تم رفض وحذف هذا الحساب من السوق</strong>
                                             </div>
                                             <div style="color: #fff; font-weight: 700;">سبب الرفض المسجل من الوسيط:</div>
-                                            <div style="color: var(--silver-light); margin-top: 2px;">${acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.'}</div>
+                                            <div style="color: var(--silver-light); margin-top: 2px;">${escDealHtml(acc.rejectionReason || 'الحساب به بيانات غير صحيحة أو تم الاشتباه في محاولة تحايل أو مخالفة لقوانين المنصة.')}</div>
                                         </div>
                                     `;
                                 } else if (acc.status === 'available' || acc.status === 'approved') {
@@ -795,9 +809,9 @@
                                     <div class="deal-row-card" style="padding: 1.2rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
                                             <div style="display: flex; align-items: center; gap: 0.8rem;">
-                                                <img src="${acc.image || 'assets/logo.png'}" alt="${acc.title || 'صورة الحساب'}" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold-primary);" onerror="this.onerror=null; this.src='assets/logo.png';">
+                                                <img src="${acc.image || 'assets/logo.png'}" alt="${escDealHtml(acc.title || 'صورة الحساب')}" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold-primary);" onerror="this.onerror=null; this.src='assets/logo.png';">
                                                 <div>
-                                                    <div style="font-weight: 800; color: #fff; font-size: 1.05rem;">#${acc.accountNumber || acc.id} - ${acc.title}</div>
+                                                    <div style="font-weight: 800; color: #fff; font-size: 1.05rem;">#${escDealHtml(acc.accountNumber || acc.id)} - ${escDealHtml(acc.title)}</div>
                                                     <div style="color: var(--silver-muted); font-size: 0.82rem; margin-top: 2px;">
                                                         ${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'} • ليفل ${acc.level || 50} • طريقة الدخول: ${acc.loginType === 'google' ? 'Google' : 'Facebook'}
                                                     </div>
@@ -931,30 +945,31 @@
                         <div style="display: flex; flex-direction: column; gap: 1rem;">
                             ${pendingAccounts.map(acc => {
                                 const pricing = (typeof calculateWaseetFee === 'function') ? calculateWaseetFee(acc.sellerPrice) : { fee: 3, buyerPrice: acc.sellerPrice + 3 };
+                                const safeAccId = escDealHtml(String(acc.id || '')).replace(/'/g, "\\'");
                                 return `
                                     <div class="deal-row-card" style="border-color: rgba(245, 158, 11, 0.35); background: rgba(14, 18, 28, 0.95); margin-bottom: 0;">
                                         <div class="deal-row-top">
                                             <div class="deal-account-heading">
                                                 <span class="deal-num-tag" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #f59e0b;">
-                                                    حساب #${acc.accountNumber || acc.id}
+                                                    حساب #${escDealHtml(acc.accountNumber || acc.id)}
                                                 </span>
-                                                <span style="color: #fff;">${acc.title}</span>
+                                                <span style="color: #fff;">${escDealHtml(acc.title)}</span>
                                             </div>
                                             <div class="deal-amount-tag">
                                                 ${acc.sellerPrice} نقطة <span style="font-size: 0.82rem; color: #fff;">(سعر العرض: ${pricing.buyerPrice} نقطة)</span>
                                             </div>
                                         </div>
                                         <div class="deal-parties-grid">
-                                            <div><i class="fas fa-store text-gold"></i> البائع: <strong style="color: #fff;">${acc.sellerName}</strong></div>
+                                            <div><i class="fas fa-store text-gold"></i> البائع: <strong style="color: #fff;">${escDealHtml(acc.sellerName)}</strong></div>
                                             <div><i class="fas fa-gamepad text-silver"></i> اللعبة: <strong style="color: #fff;">${acc.game === 'free_fire' ? 'فري فاير' : 'ببجي'}</strong></div>
                                             <div><i class="fas fa-sign-in-alt text-orange"></i> طريقة الدخول: <strong style="color: #fff;">${acc.loginType === 'google' ? 'Google' : 'Facebook'}</strong></div>
                                             <div><i class="fas fa-layer-group text-gold"></i> الليفل: <strong style="color: #fff;">Lv.${acc.level || 50} • برايم ${acc.primeLevel || 1}</strong></div>
                                         </div>
                                         <div style="display: flex; gap: 0.8rem; justify-content: flex-end; flex-wrap: wrap;">
-                                            <button class="btn-3d btn-outline" onclick="rejectPendingAccount('${acc.id}')" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+                                            <button class="btn-3d btn-outline" onclick="rejectPendingAccount('${safeAccId}')" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 1.2rem; font-size: 0.9rem;">
                                                 <i class="fas fa-trash-alt"></i> حذف هذا الحساب (تحايل / غير صحيح)
                                             </button>
-                                            <button class="btn-3d" onclick="approvePendingAccount('${acc.id}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+                                            <button class="btn-3d" onclick="approvePendingAccount('${safeAccId}')" style="background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #10b981; color: #fff; padding: 0.6rem 1.4rem; font-size: 0.9rem;">
                                                 <i class="fas fa-check-circle"></i> فحص الحساب واعتماده ونشره في السوق
                                             </button>
                                         </div>
@@ -1036,9 +1051,9 @@
             // Account number (Requirement 2 & 6)
             let accNumberDisplay = '';
             if (deal.accountNumber) {
-                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${deal.accountNumber}</span>`;
+                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${escDealHtml(deal.accountNumber)}</span>`;
             } else if (deal.accountId) {
-                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${deal.accountId.replace('acc_', '')}</span>`;
+                accNumberDisplay = `<span style="background: rgba(0,0,0,0.6); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 3px 8px; border-radius: 6px; font-family: var(--font-en); font-weight: 800; font-size: 0.82rem;">حساب #${escDealHtml(String(deal.accountId).replace('acc_', ''))}</span>`;
             }
 
             return `
@@ -1049,7 +1064,7 @@
                                 #DEAL-${deal.dealNumber || (idx + 1)}
                             </span>
                             ${accNumberDisplay}
-                            <span>${deal.accountTitle}</span>
+                            <span>${escDealHtml(deal.accountTitle)}</span>
                         </div>
                         <div class="deal-amount-tag">
                             ${deal.totalPoints} نقطة
@@ -1057,8 +1072,8 @@
                     </div>
 
                     <div class="deal-parties-grid">
-                        <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color: #fff;">${deal.buyer ? deal.buyer.name : 'أحمد'}</strong></div>
-                        <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color: #fff;">${deal.seller ? deal.seller.name : 'سامي'}</strong></div>
+                        <div><i class="fas fa-shopping-cart text-orange"></i> المشتري: <strong style="color: #fff;">${escDealHtml(deal.buyer ? deal.buyer.name : 'أحمد')}</strong></div>
+                        <div><i class="fas fa-store text-silver"></i> البائع: <strong style="color: #fff;">${escDealHtml(deal.seller ? deal.seller.name : 'سامي')}</strong></div>
                         <div><i class="fas fa-coins text-gold"></i> عمولة الموقع: <strong class="text-orange">+${deal.fee || 3} نقطة</strong></div>
                     </div>
 

@@ -13,3 +13,13 @@
 
 3. **قاعدة ملفات SQL على سطح المكتب (Desktop SQL Rule):**
    - عند إنشاء أو تجهيز أي كود SQL مخصص للتشغيل في **Supabase SQL Editor**، يجب دائماً إنشاء ملف مباشر ومستقل على سطح المكتب (`D:\H P\سطح المكتب 2`) بعنوان وصفي واضح يحتوي على كامل الكود مع تعليمات التشغيل، حتى يتمكن المستخدم من فتحه ونسخه بضغطة واحدة دون أي نواقص أو نسيان.
+
+4. **قاعدة التدقيق الأمني الإلزامي الدائم (Cloudflare Security Audit Skill Rule):**
+   - **المصدر والموقع البرمجي:** المهارة محملة ومربوطة في المشروع محلياً بمجلد: `D:\waseet-app\.agents\skills\security-audit` وعالمياً في `C:\Users\H P\.gemini\config\skills\security-audit`.
+   - **التوجيه الإلزامي الدائم:** في كل سطر كود أو ميزة جديدة أو تعديل برمجي أو واجهة مستخدم أو استعلام أو سياسة أمان في قواعد البيانات (Supabase RLS / Migrations / RPCs)، يجب **دائماً وأبداً** اعتماد وتطبيق ضوابط وفحوصات مهارة التدقيق الأمني (Cloudflare Security Audit Skill):
+     - **الحماية من الحقن (Injection & Sinks):** منع أي حقن SQL أو DOM XSS، والتعقيم الإلزامي بـ DOMPurify لأي مدخلات ديناميكية.
+     - **أمان العميل والمتصفح (Client-Side & Browser Security):** منع DOM Clobbering، وPrototype Pollution، وتأمين رسائل `postMessage` وسجلات LocalStorage وعزل الجلسات.
+     - **بروتوكولات الويب والمصادقة (Web Protocols & Auth):** تطبيق معايير PKCE RFC 7636 في OAuth، والتحقق الصارم من حالة CSRF State والروابط المرتجعة، ومنع سرقة الجلسات.
+     - **نزاهة المنطق المالي وحفظ التوازن (Business Logic & Financial Integrity):** منع الإنفاق المزدوج، والتنفيذ الذري للعمليات المالية وصفقات الضمان (Escrow Locks & Refunds)، وتأكيد حماية ضمان الـ 48 ساعة.
+     - **حماية أسرار وقواعد البيانات (Secrets & Database RLS Hardening):** انعدام وجود أي مفاتيح خاصة في الواجهات، وفرض Row Level Security على جميع الجداول، وتأمين الدوال بـ `SECURITY DEFINER SET search_path = public, auth` ومُشغلات منع التلاعب (Tamper Proof Triggers).
+

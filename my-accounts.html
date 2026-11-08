@@ -372,6 +372,7 @@
     <script src="js/app.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
 
     <!-- My Accounts Page Script -->
     <script>
@@ -1237,9 +1238,45 @@
         // ==========================================
         // نوافذ بيانات الاستلام للمشتري (Purchased Creds Modal)
         // ==========================================
+        let activePurchasedAccount = null;
+
+        function copyPurchasedField(fieldName) {
+            if (!activePurchasedAccount) return;
+            const creds = activePurchasedAccount.credentials || {};
+            let val = '';
+            let msg = 'تم النسخ بنجاح';
+            if (fieldName === 'email') { val = creds.email || ''; msg = 'تم نسخ البريد الإلكتروني'; }
+            else if (fieldName === 'password') { val = creds.rawPassword || creds.password || ''; msg = 'تم نسخ كلمة المرور'; }
+            else if (fieldName === 'recoveryEmail') { val = creds.recoveryEmail || creds.recovery_email || ''; msg = 'تم نسخ بريد الاسترداد'; }
+            else if (fieldName === 'recoveryPassword') { val = creds.recoveryPassword || creds.recovery_password || ''; msg = 'تم نسخ كلمة مرور الاسترداد'; }
+            copyPurchasedText(val, msg);
+        }
+
+        function togglePurchasedFieldPw(fieldId, eyeId, fieldName = 'password') {
+            if (!activePurchasedAccount) return;
+            const creds = activePurchasedAccount.credentials || {};
+            const val = fieldName === 'recoveryPassword'
+                ? (creds.recoveryPassword || creds.recovery_password || '')
+                : (creds.rawPassword || creds.password || '');
+            togglePurchasedPw(fieldId, eyeId, val);
+        }
+
+        function copyAllPurchasedCredentialsFromModal() {
+            if (!activePurchasedAccount) return;
+            const creds = activePurchasedAccount.credentials || {};
+            const loginType = creds.loginType || 'جوجل Gmail';
+            const email = creds.email || '';
+            const pwd = creds.rawPassword || creds.password || '';
+            const recEmail = creds.recoveryEmail || creds.recovery_email || '';
+            const recPwd = creds.recoveryPassword || creds.recovery_password || '';
+            const notes = creds.notes || '';
+            copyAllPurchasedCredentials(loginType, email, pwd, recEmail, recPwd, notes);
+        }
+
         async function openPurchasedCredsModal(accId) {
             const acc = myPurchasesList.find(a => String(a.id) === String(accId));
             if (!acc) return;
+            activePurchasedAccount = acc;
 
             let secRes = null;
             if (typeof window.waseetGetAccountCredentialsSecure === 'function' && acc && acc.id) {
@@ -1299,7 +1336,7 @@
                                     <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope text-gold"></i> البريد الإلكتروني / رقم الحساب:</span>
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                         <span class="cred-value font-mono text-gold" id="p-modal-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeEmail}</span>
-                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeEmail}', 'تم نسخ البريد الإلكتروني')" title="نسخ البريد">
+                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedField('email')" title="نسخ البريد">
                                             <i class="far fa-copy"></i>
                                         </button>
                                     </div>
@@ -1311,10 +1348,10 @@
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                         <span class="cred-value font-mono" id="p-modal-pwd" style="color: #10b981; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
                                         <div style="display: flex; align-items: center; gap: 0.35rem;">
-                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('p-modal-pwd', 'p-modal-eye', '${rawPwd}')" title="إظهار / إخفاء">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedFieldPw('p-modal-pwd', 'p-modal-eye', 'password')" title="إظهار / إخفاء">
                                                 <i class="fas fa-eye" id="p-modal-eye"></i>
                                             </button>
-                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawPwd}', 'تم نسخ كلمة المرور')" title="نسخ كلمة المرور">
+                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedField('password')" title="نسخ كلمة المرور">
                                                 <i class="far fa-copy"></i>
                                             </button>
                                         </div>
@@ -1336,7 +1373,7 @@
                                     <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;"><i class="fas fa-envelope-open-text" style="color: #60a5fa;"></i> البريد / رقم حساب الاسترداد:</span>
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                         <span class="cred-value font-mono text-silver" id="p-modal-rec-email" style="font-weight: 700; word-break: break-all; font-size: 0.92rem;">${safeRecEmail}</span>
-                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${safeRecEmail}', 'تم نسخ بريد الاسترداد')" title="نسخ بريد الاسترداد">
+                                        <button type="button" class="btn-copy-cred" onclick="copyPurchasedField('recoveryEmail')" title="نسخ بريد الاسترداد">
                                             <i class="far fa-copy"></i>
                                         </button>
                                     </div>
@@ -1348,10 +1385,10 @@
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                         <span class="cred-value font-mono" id="p-modal-rec-pwd" style="color: #60a5fa; font-weight: 800; letter-spacing: 1.5px; font-size: 0.95rem;">••••••••••••</span>
                                         <div style="display: flex; align-items: center; gap: 0.35rem;">
-                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedPw('p-modal-rec-pwd', 'p-modal-rec-eye', '${rawRecPwd}')" title="إظهار / إخفاء">
+                                            <button type="button" class="btn-toggle-cred-pwd" onclick="togglePurchasedFieldPw('p-modal-rec-pwd', 'p-modal-rec-eye', 'recoveryPassword')" title="إظهار / إخفاء">
                                                 <i class="fas fa-eye" id="p-modal-rec-eye"></i>
                                             </button>
-                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedText('${rawRecPwd}', 'تم نسخ كلمة مرور الاسترداد')" title="نسخ كلمة مرور الاسترداد">
+                                            <button type="button" class="btn-copy-cred" onclick="copyPurchasedField('recoveryPassword')" title="نسخ كلمة مرور الاسترداد">
                                                 <i class="far fa-copy"></i>
                                             </button>
                                         </div>
@@ -1368,7 +1405,7 @@
                     </div>
 
                     <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="copyAllPurchasedCredentials('${safeLoginType}', '${safeEmail}', '${rawPwd}', '${safeRecEmail}', '${rawRecPwd}', '${safeNotes}')">
+                        <button type="button" class="btn-3d btn-receive-credentials glow-green" style="flex: 1; min-width: 200px; padding: 0.75rem; justify-content: center; font-weight: 800;" onclick="copyAllPurchasedCredentialsFromModal()">
                             <i class="fas fa-clipboard-check"></i> نسخ كافة بيانات الدخول
                         </button>
                         ${acc.dealId ? `

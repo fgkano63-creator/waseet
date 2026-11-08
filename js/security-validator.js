@@ -108,6 +108,13 @@
         },
 
         /**
+         * التحقق المباشر البولياني من معرف UUID
+         */
+        isValidUUID(val) {
+            return this.uuid(val).isValid;
+        },
+
+        /**
          * التحقق من سلامة روابط الصور (Avatar & Account Images)
          */
         imageUrl(val) {

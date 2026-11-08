@@ -1059,13 +1059,13 @@
 
                         ${isSuperAdmin ? `
                         <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <button type="button" class="btn-3d btn-emerald" onclick="openBrokerKycModal('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="flex: 1; padding: 0.5rem 0.7rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399;" title="إدارة ملف التوثيق والوثائق الرسمية">
+                            <button type="button" class="btn-3d btn-emerald" data-id="${b.id}" data-name="${safeName.replace(/"/g, '&quot;')}" data-email="${(b.email || '').replace(/"/g, '&quot;')}" onclick="openBrokerKycModal(this)" style="flex: 1; padding: 0.5rem 0.7rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #34d399;" title="إدارة ملف التوثيق والوثائق الرسمية">
                                 <i class="fas fa-id-card"></i> إدارة التوثيق
                             </button>
                             <button type="button" class="btn-3d btn-gold" onclick="handleChangeCountryPrompt('${b.id}', '${countryCode}')" style="padding: 0.5rem 0.8rem; font-size: 0.8rem;">
                                 <i class="fas fa-edit"></i> الدولة
                             </button>
-                            <button type="button" class="btn-3d btn-danger" onclick="handleDemoteBroker('${b.id}', '${safeName}', '${(b.email || '').replace(/'/g, "\\'")}')" style="padding: 0.5rem 0.8rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
+                            <button type="button" class="btn-3d btn-danger" data-id="${b.id}" data-name="${safeName.replace(/"/g, '&quot;')}" data-email="${(b.email || '').replace(/"/g, '&quot;')}" onclick="handleDemoteBroker(this)" style="padding: 0.5rem 0.8rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;" title="إلغاء صفة الوسيط">
                                 <i class="fas fa-user-minus"></i> إلغاء
                             </button>
                         </div>
@@ -1264,7 +1264,15 @@
             }
         }
 
-        async function handleDemoteBroker(brokerId, brokerName, brokerEmail) {
+        async function handleDemoteBroker(brokerIdOrBtn, brokerName, brokerEmail) {
+            let brokerId = brokerIdOrBtn;
+            let bName = brokerName;
+            let bEmail = brokerEmail;
+            if (brokerIdOrBtn && brokerIdOrBtn.dataset) {
+                brokerId = brokerIdOrBtn.dataset.id;
+                bName = brokerIdOrBtn.dataset.name;
+                bEmail = brokerIdOrBtn.dataset.email;
+            }
             if (!document.body.classList.contains('is-admin-mode')) {
                 if (typeof waseetAlert === 'function') {
                     await waseetAlert('صلاحية محظورة', 'إلغاء رتبة الوسيط من صلاحيات المدير العام للمنصة فقط.', 'warning');
@@ -1276,18 +1284,18 @@
             if (typeof waseetConfirm === 'function') {
                 const confirmed = await waseetConfirm(
                     'إلغاء صفة الوسيط الإقليمي',
-                    `هل أنت متأكد من إلغاء صفة الوسيط الإقليمي عن "${brokerName}" وحذفه نهائياً وإعادته إلى مستخدم عادي؟`,
+                    `هل أنت متأكد من إلغاء صفة الوسيط الإقليمي عن "${bName}" وحذفه نهائياً وإعادته إلى مستخدم عادي؟`,
                     'نعم، حذف وإلغاء الترقية',
                     'تراجع',
                     'danger'
                 );
                 if (!confirmed) return;
             } else {
-                if (!confirm(`هل أنت متأكد من إلغاء ترقية "${brokerName}"؟`)) return;
+                if (!confirm(`هل أنت متأكد من إلغاء ترقية "${bName}"؟`)) return;
             }
 
             if (typeof window.waseetDemoteBroker === 'function') {
-                const res = await window.waseetDemoteBroker(brokerId, brokerEmail);
+                const res = await window.waseetDemoteBroker(brokerId, bEmail);
                 if (res && res.ok) {
                     currentBrokersList = currentBrokersList.filter(b => {
                         const bId = String(b.id || '').trim();
@@ -1315,7 +1323,15 @@
         // ==========================================================================
         let selectedKycFile = null;
 
-        async function openBrokerKycModal(brokerId, brokerName = '', brokerEmail = '') {
+        async function openBrokerKycModal(brokerIdOrBtn, brokerName = '', brokerEmail = '') {
+            let brokerId = brokerIdOrBtn;
+            let bName = brokerName;
+            let bEmail = brokerEmail;
+            if (brokerIdOrBtn && brokerIdOrBtn.dataset) {
+                brokerId = brokerIdOrBtn.dataset.id;
+                bName = brokerIdOrBtn.dataset.name;
+                bEmail = brokerIdOrBtn.dataset.email;
+            }
             const modal = document.getElementById('modal-broker-kyc');
             if (!modal) return;
 
@@ -1334,9 +1350,9 @@
             if (previewWrap) previewWrap.style.display = 'none';
 
             if (idInput) idInput.value = brokerId || '';
-            if (emailInput) emailInput.value = brokerEmail || '';
-            if (nameEl) nameEl.textContent = brokerName || 'الوسيط الإقليمي';
-            if (emailEl) emailEl.textContent = brokerEmail || brokerId || '';
+            if (emailInput) emailInput.value = bEmail || '';
+            if (nameEl) nameEl.textContent = bName || 'الوسيط الإقليمي';
+            if (emailEl) emailEl.textContent = bEmail || brokerId || '';
 
             // جلب بيانات التوثيق المحفوظة سابقاً
             if (typeof window.waseetAdminGetBrokerKyc === 'function') {

@@ -1722,6 +1722,34 @@ async function waseetFetchDealMessagesFromSupabase(dealId) {
 }
 
 /**
+ * التحقق الشامل والدقيق مما إذا كانت الصفقة مكتملة أو منتهية أو مقيمة
+ */
+function waseetIsDealCompleted(d) {
+    if (!d) return false;
+    const st = String(d.status || '').toLowerCase().trim();
+    if (st === 'completed' || st === 'cancelled' || st === 'closed' || st === 'finished' || st === 'rated' || st === 'reviewed' || st === 'done') {
+        return true;
+    }
+    if (d.isCompleted === true || d.completed === true || d.is_completed === true) {
+        return true;
+    }
+    if (typeof d.currentStep === 'number' && d.currentStep >= 4) {
+        return true;
+    }
+    if (Boolean(d.has_review || d.hasReview || d.reviewed || d.buyerReview || d.sellerReview || d.rating || d.rated || d.is_rated)) {
+        return true;
+    }
+    if (typeof d.stageText === 'string' && (d.stageText.includes('مكتملة') || d.stageText.includes('ملغاة') || d.stageText.includes('منتهية'))) {
+        return true;
+    }
+    if (typeof d.currentStage === 'string' && (d.currentStage.includes('مكتملة') || d.currentStage.includes('ملغاة') || d.currentStage.includes('منتهية'))) {
+        return true;
+    }
+    return false;
+}
+window.waseetIsDealCompleted = waseetIsDealCompleted;
+
+/**
  * جلب جميع الصفقات من جدول deals في Supabase (دون تصفية أو استثناء لأي حالة)
  * مع جلب الأسماء الحقيقية لأطراف الصفقة (البائع والمشتري) من جدول profiles
  */
@@ -1862,8 +1890,9 @@ async function waseetFetchDealsFromSupabase() {
             }
         }
 
-        WASEET_STATE.deals = allMerged.filter(d => d.status !== 'completed' && d.status !== 'cancelled');
-        WASEET_STATE.completedDeals = allMerged.filter(d => d.status === 'completed' || d.status === 'cancelled');
+        // فحص صارم وشامل لتصفية الصفقات المنتهية والمكتملة أو المقيمة ونقلها فوراً لسجل المعاملات
+        WASEET_STATE.deals = allMerged.filter(d => !waseetIsDealCompleted(d));
+        WASEET_STATE.completedDeals = allMerged.filter(d => waseetIsDealCompleted(d));
         WASEET_STATE.activeDeal = WASEET_STATE.deals.length > 0 ? WASEET_STATE.deals[0] : null;
 
         // إذا كانت غرفة الوساطة مفتوحة، نحدّث مرجع الصفقة فيها دون فقدان أي رسالة
@@ -1960,7 +1989,7 @@ async function waseetSyncWalletLockedPoints() {
             // Fallback محلي إذا لم تكن دالة RPC مثبتة بعد في Supabase
             if (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user && WASEET_STATE.user.wallet) {
                 const user = WASEET_STATE.user;
-                const activeDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
+                const activeDeals = (WASEET_STATE.deals || []).filter(d => d && !waseetIsDealCompleted(d));
                 let dealsLocked = 0;
                 activeDeals.forEach(d => {
                     const isBuyer = (user.id && (String(d.buyer_id) === String(user.id) || (d.buyer && String(d.buyer.id) === String(user.id)))) ||
@@ -2918,8 +2947,8 @@ function waseetSyncAllNavBadges() {
         const user = WASEET_STATE.user;
         const isMed = typeof isMediatorUser === 'function' ? isMediatorUser(user) : !!(user && (user.isAdmin || user.role === 'admin' || user.role === 'mediator'));
 
-        // 1. حساب عدد الصفقات النشطة (قيد الشراء)
-        const allActiveDeals = (WASEET_STATE.deals || []).filter(d => d && d.status !== 'completed' && d.status !== 'cancelled');
+        // 1. حساب عدد الصفقات النشطة (قيد الشراء) مع استثناء الصفقات المكتملة أو المقيمة
+        const allActiveDeals = (WASEET_STATE.deals || []).filter(d => d && !waseetIsDealCompleted(d));
         let myActiveDealsCount = 0;
         if (isMed) {
             myActiveDealsCount = allActiveDeals.length;
@@ -3194,6 +3223,15 @@ async function waseetCreateEscrowDealOnSupabase(params) {
     const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
     const buyerName = currentUser?.name || 'مشتري معتمد';
     const buyerCountry = currentUser?.country || 'DZ';
+
+    // منع البائع من شراء حسابه الخاص المعروض للبيع (Self-Purchase Prevention Guard)
+    if (currentUser && params.seller_id && String(currentUser.id) === String(params.seller_id)) {
+        console.warn('[Escrow Deal Blocked] Self-purchase attempted by seller:', currentUser.id);
+        if (typeof waseetAlert === 'function') {
+            await waseetAlert('تنبيه أمان', 'لا يمكنك شراء حسابك الخاص المعروض للبيع.', 'info');
+        }
+        return { ok: false, error: 'SELF_PURCHASE_FORBIDDEN' };
+    }
 
     // التوجيه الذكي للوسيط الإقليمي (Smart Routing)
     let assignedBroker = null;
@@ -6103,10 +6141,15 @@ async function waseetUploadProfileAvatar(file) {
         if (typeof window.renderNavbarUser === 'function') {
             window.renderNavbarUser();
         }
-        // تحديث الصور الموجودة مباشرة في DOM
-        document.querySelectorAll('.user-avatar-img, .drawer-avatar, #profile-avatar, #modal-profile-avatar, #dashboard-user-avatar').forEach(img => {
+        // تحديث الصور الموجودة مباشرة في DOM وإظهارها بعد الرفع الناجح
+        document.querySelectorAll('.user-avatar-img, .drawer-avatar, #profile-avatar, #modal-profile-avatar, #dashboard-user-avatar, #settings-avatar-preview-img').forEach(img => {
             img.src = publicUrl;
+            img.style.display = 'block';
         });
+        const fbIcon = document.getElementById('profile-avatar-fallback-icon');
+        if (fbIcon) fbIcon.style.display = 'none';
+        const stIcon = document.getElementById('settings-avatar-placeholder-icon');
+        if (stIcon) stIcon.style.display = 'none';
         window.dispatchEvent(new CustomEvent('waseet-user-updated', { detail: currentUser }));
     }
 

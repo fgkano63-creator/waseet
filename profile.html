@@ -933,9 +933,9 @@
             <button type="button" class="store-modal-close" onclick="ProfileStore.closeModal()">&times;</button>
             <div id="modal-account-content">
                 <div class="gallery-main-img-box">
-                    <button type="button" class="gallery-nav-btn prev-btn" onclick="ProfileStore.prevImage()"><i class="fas fa-chevron-right"></i></button>
+                    <button type="button" class="gallery-nav-btn prev-btn" aria-label="الصورة السابقة" onclick="ProfileStore.prevImage()"><i class="fas fa-chevron-right"></i></button>
                     <img id="modal-main-image" src="" alt="صورة الحساب">
-                    <button type="button" class="gallery-nav-btn next-btn" onclick="ProfileStore.nextImage()"><i class="fas fa-chevron-left"></i></button>
+                    <button type="button" class="gallery-nav-btn next-btn" aria-label="الصورة التالية" onclick="ProfileStore.nextImage()"><i class="fas fa-chevron-left"></i></button>
                 </div>
                 <div class="gallery-thumbs-row" id="modal-thumbs-row"></div>
 
@@ -982,6 +982,7 @@
     <script src="js/navbar.js?v=20261104_v6"></script>
     <script src="js/instant-nav.js" defer></script>
     <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
 
     <!-- Profile & Storefront Logic -->
     <script>
