@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-08 13:25:46",
+    "Timestamp":  "2026-11-08 13:54:09",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  908,
-    "PassCount":  908,
+    "TotalChecks":  925,
+    "PassCount":  925,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -730,17 +730,11 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  388,
-                                               "Pass":  388,
+                                               "Total":  405,
+                                               "Pass":  405,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
-                                                             {
-                                                                 "Test":  "404.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
                                                              {
                                                                  "Test":  "404.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
@@ -760,10 +754,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "404.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "404.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "404.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "404.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "404.html link: assets/favicons/apple-touch-icon.png",
@@ -784,12 +790,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
-                                                                 "Test":  "ad-walkthrough.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "ad-walkthrough.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -808,10 +808,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "ad-walkthrough.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "ad-walkthrough.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "ad-walkthrough.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "ad-walkthrough.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "ad-walkthrough.html link: assets/favicons/apple-touch-icon.png",
@@ -928,12 +940,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\app.js"
                                                              },
                                                              {
-                                                                 "Test":  "admin-brokers.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "admin-brokers.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -952,10 +958,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "admin-brokers.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "admin-brokers.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-brokers.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-brokers.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "admin-brokers.html link: assets/favicons/apple-touch-icon.png",
@@ -1066,12 +1084,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
-                                                                 "Test":  "admin-chats.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "admin-chats.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1090,10 +1102,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "admin-chats.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "admin-chats.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-chats.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-chats.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "admin-chats.html link: assets/favicons/apple-touch-icon.png",
@@ -1204,12 +1228,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
-                                                                 "Test":  "admin-deposits.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "admin-deposits.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1228,10 +1246,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "admin-deposits.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "admin-deposits.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-deposits.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-deposits.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "admin-deposits.html link: assets/favicons/apple-touch-icon.png",
@@ -1342,12 +1372,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
-                                                                 "Test":  "admin-withdrawals.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "admin-withdrawals.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1366,10 +1390,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "admin-withdrawals.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "admin-withdrawals.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-withdrawals.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-withdrawals.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "admin-withdrawals.html link: assets/favicons/apple-touch-icon.png",
@@ -1498,12 +1534,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
-                                                                 "Test":  "chat.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "chat.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1522,10 +1552,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "chat.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "chat.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "chat.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "chat.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "chat.html link: assets/favicons/apple-touch-icon.png",
@@ -1630,12 +1672,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
                                                              },
                                                              {
-                                                                 "Test":  "contact-support.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "contact-support.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1654,10 +1690,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "contact-support.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "contact-support.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "contact-support.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "contact-support.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "contact-support.html link: assets/favicons/apple-touch-icon.png",
@@ -1810,12 +1858,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
-                                                                 "Test":  "deals.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "deals.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1834,10 +1876,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "deals.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "deals.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "deals.html link: assets/favicons/apple-touch-icon.png",
@@ -2020,12 +2074,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\slider\\slide-1.svg"
                                                              },
                                                              {
-                                                                 "Test":  "index.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "index.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2044,10 +2092,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "index.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "index.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "index.html link: assets/favicons/apple-touch-icon.png",
@@ -2188,12 +2248,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\payments\\saudi.svg"
                                                              },
                                                              {
-                                                                 "Test":  "maintenance.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "maintenance.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2212,10 +2266,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "maintenance.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "maintenance.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "maintenance.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "maintenance.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "maintenance.html link: assets/favicons/apple-touch-icon.png",
@@ -2332,12 +2398,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
-                                                                 "Test":  "my-accounts.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "my-accounts.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2356,10 +2416,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "my-accounts.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "my-accounts.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "my-accounts.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "my-accounts.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "my-accounts.html link: assets/favicons/apple-touch-icon.png",
@@ -2482,12 +2554,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
-                                                                 "Test":  "pending-accounts.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "pending-accounts.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2506,10 +2572,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "pending-accounts.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "pending-accounts.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "pending-accounts.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "pending-accounts.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "pending-accounts.html link: assets/favicons/apple-touch-icon.png",
@@ -2674,12 +2752,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
-                                                                 "Test":  "profile.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "profile.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2698,10 +2770,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "profile.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "profile.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "profile.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "profile.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "profile.html link: assets/favicons/apple-touch-icon.png",
@@ -2842,12 +2926,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\visual-inspector.js"
                                                              },
                                                              {
-                                                                 "Test":  "wallet.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "wallet.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2866,10 +2944,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "wallet.html link: assets/favicons/favicon.ico",
+                                                                 "Test":  "wallet.html link: favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html link: assets/favicons/apple-touch-icon.png",
@@ -2938,12 +3028,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\auth.js"
                                                              },
                                                              {
-                                                                 "Test":  "auth\\callback.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "auth\\callback.html link: ../assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2962,10 +3046,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "auth\\callback.html link: ../assets/favicons/favicon.ico",
+                                                                 "Test":  "auth\\callback.html link: ../favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "auth\\callback.html link: ../favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "auth\\callback.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "auth\\callback.html link: ../assets/favicons/apple-touch-icon.png",
@@ -3016,12 +3112,6 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\auth.js"
                                                              },
                                                              {
-                                                                 "Test":  "auth\\callback\\index.html link: /favicon.svg",
-                                                                 "Status":  "PASS",
-                                                                 "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
-                                                             },
-                                                             {
                                                                  "Test":  "auth\\callback\\index.html link: ../../assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -3040,10 +3130,22 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
                                                              },
                                                              {
-                                                                 "Test":  "auth\\callback\\index.html link: ../../assets/favicons/favicon.ico",
+                                                                 "Test":  "auth\\callback\\index.html link: ../../favicon.ico",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "auth\\callback\\index.html link: ../../favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "auth\\callback\\index.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "auth\\callback\\index.html link: ../../assets/favicons/apple-touch-icon.png",
@@ -4611,7 +4713,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1366 open, 1366 close"
+                                                             "Details":  "Balanced: 1367 open, 1367 close"
                                                          }
                                                      ]
                                        },

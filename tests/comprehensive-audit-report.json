@@ -2,19 +2,19 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-08 12:50:48",
+    "Timestamp":  "2026-11-08 13:50:34",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  847,
-                    "Passed":  847,
+                    "TotalChecks":  870,
+                    "Passed":  870,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
                 },
     "Categories":  {
                        "Quality":  {
-                                       "Total":  726,
-                                       "Passed":  726,
+                                       "Total":  746,
+                                       "Passed":  746,
                                        "Warnings":  0,
                                        "Failures":  0,
                                        "Checks":  [
@@ -356,6 +356,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-brokers.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "admin-brokers.html script dependency: js/app.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -612,6 +619,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-chats.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -895,6 +909,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-deposits.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "admin-deposits.html script dependency: js/pwa-register.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1151,6 +1172,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-withdrawals.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -1462,6 +1490,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "chat.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "chat.html script dependency: js/pwa-register.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1749,6 +1784,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "contact-support.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "contact-support.html script dependency: js/auth.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1781,6 +1823,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "contact-support.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -2106,6 +2155,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "deals.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "deals.html script dependency: js/auth.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2138,6 +2194,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "deals.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -2498,6 +2561,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "index.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "index.html script dependency: js/auth.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2530,6 +2600,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "index.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -3163,6 +3240,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "my-accounts.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "my-accounts.html script dependency: js/visual-inspector.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3548,6 +3632,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "pending-accounts.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "pending-accounts.html script dependency: js/visual-inspector.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3905,6 +3996,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "profile.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "profile.html script dependency: js/auth.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3937,6 +4035,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "profile.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -4304,6 +4409,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "wallet.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "wallet.html script dependency: js/auth.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4343,6 +4455,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "wallet.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
@@ -4955,6 +5074,20 @@
                                                       },
                                                       {
                                                           "CheckId":  "JS-Eval",
+                                                          "Name":  "js\\country-selector.js - Zero eval() usage",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Zero dynamic eval() or new Function() calls"
+                                                      },
+                                                      {
+                                                          "CheckId":  "JS-Storage",
+                                                          "Name":  "js\\country-selector.js - LocalStorage Exception Resilience",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "LocalStorage operations protected by safe wrappers / try-catch"
+                                                      },
+                                                      {
+                                                          "CheckId":  "JS-Eval",
                                                           "Name":  "js\\data.js - Zero eval() usage",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -5053,6 +5186,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "JS-Eval",
+                                                          "Name":  "js\\skeleton-ui.js - Zero eval() usage",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Zero dynamic eval() or new Function() calls"
+                                                      },
+                                                      {
+                                                          "CheckId":  "JS-Eval",
                                                           "Name":  "js\\slider.js - Zero eval() usage",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -5113,7 +5253,7 @@
                                                                  "Name":  "CSS Style Brace Balance",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "Exact brace matching: 1331 open / 1331 close"
+                                                                 "Message":  "Exact brace matching: 1366 open / 1366 close"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Overflow",
@@ -5127,7 +5267,7 @@
                                                                  "Name":  "Responsive Media Queries Density",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "High responsiveness granularity with 47 media queries"
+                                                                 "Message":  "High responsiveness granularity with 48 media queries"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Breakpoints",
@@ -5167,8 +5307,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  113,
-                                        "Passed":  113,
+                                        "Total":  116,
+                                        "Passed":  116,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -5931,6 +6071,27 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.handle_new_user",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.save_account_credentials_secure",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

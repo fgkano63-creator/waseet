@@ -873,6 +873,11 @@ body::before {
     opacity: 1;
 }
 
+.calc-card span,
+#fee-calculator span {
+    pointer-events: auto !important;
+}
+
 .calc-grid {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
