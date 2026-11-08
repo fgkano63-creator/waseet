@@ -1,4 +1,4 @@
-/**
+﻿/**
  * WASEET (وسيط) - المرحلة الأولى: تكامل المصادقة مع Supabase Auth & Google OAuth
  * يتعامل حصرياً مع تسجيل الدخول وجلب الملف الشخصي (Profile) المطبق عليه سياسات RLS الصارمة.
  */
@@ -1523,7 +1523,13 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
             .filter(acc => acc && (includeAllStatuses || (acc.status === 'available' || acc.status === 'approved')));
 
         // اعتماد الحسابات الفعلية من قاعدة البيانات فقط كمصدر وحيد للحقيقة
-        WASEET_STATE.accounts = remoteAccounts;
+        // دمج الحسابات الفعلية مع حسابات العرض الـ 20 لضمان ظهورها الدائم في المتجر
+        const remoteIds = new Set(remoteAccounts.map(r => String(r.id)));
+        const showcaseList = (typeof WASEET_SHOWCASE_ACCOUNTS !== 'undefined' && Array.isArray(WASEET_SHOWCASE_ACCOUNTS))
+            ? WASEET_SHOWCASE_ACCOUNTS
+            : ((typeof window !== 'undefined' && Array.isArray(window.WASEET_SHOWCASE_ACCOUNTS)) ? window.WASEET_SHOWCASE_ACCOUNTS : []);
+        const unmergedShowcase = showcaseList.filter(s => !remoteIds.has(String(s.id)));
+        WASEET_STATE.accounts = [...remoteAccounts, ...unmergedShowcase];
         if (window.waseetApp) {
             window.waseetApp.updatePendingAccountsCounter();
             window.waseetApp.updateSellerListingsCounter();

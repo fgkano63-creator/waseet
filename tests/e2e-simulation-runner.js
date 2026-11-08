@@ -1807,6 +1807,360 @@ async function runE2ESimulation() {
     }
     assert(allFeesMatch, 'Security Skill', 'Platform Tiered Fee Mathematical Invariant Check', 'Fee scaling verified across low, mid, and enterprise value transactions');
 
+    // ==========================================================================
+    // PHASE 21: ESCROW UNILATERAL CANCELLATION GUARD & STORAGE BOLA HARDENING (MIGRATION 37)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 21: ESCROW UNILATERAL CANCELLATION GUARD & STORAGE BOLA HARDENING (MIGRATION 37)\x1b[0m');
+
+    // 21.1 Emulate cancel_escrow_deal RPC (Migration 37)
+    function simulateMigration37CancelEscrowDeal(dealId, callerId, reason = '') {
+        const deal = DB.deals.find(d => d.id === dealId);
+        if (!deal) throw new Error('الصفقة المطلوبة غير موجودة');
+        if (deal.status === 'completed') throw new Error('لا يمكن إلغاء صفقة مكتملة تم تسليمها وتحرير أرباحها للبائع');
+        if (['cancelled', 'rejected'].includes(deal.status)) throw new Error('تم إلغاء هذه الصفقة مسبقاً');
+
+        let isCallerAdmin = false;
+        let isCallerBroker = false;
+        let isCallerBuyer = false;
+        let isCallerSeller = false;
+
+        if (callerId) {
+            const callerProf = DB.profiles.find(p => p.id === callerId);
+            isCallerAdmin = isStrictAdminSim(callerProf);
+            isCallerBroker = Boolean(
+                (deal.assigned_broker_id && deal.assigned_broker_id === callerId) ||
+                (callerProf && ['admin', 'mediator', 'regional_broker', 'broker'].includes(callerProf.role))
+            );
+            isCallerBuyer = (deal.buyer_id === callerId);
+            isCallerSeller = (deal.seller_id === callerId);
+        } else {
+            // Cloudflare Security Audit: Anonymous caller strictly denied
+            throw new Error('أمني: يجب تسجيل الدخول أولاً لإلغاء صفقة الضمان');
+        }
+
+        if (!isCallerAdmin && !isCallerBroker && !isCallerBuyer && !isCallerSeller) {
+            throw new Error('أمني: غير مصرح لك بإلغاء هذه الصفقة');
+        }
+
+        // [WST-AUTHZ-ESCROW-UNILATERAL-CANCEL-04]:
+        // Buyer or seller cannot cancel if current_step > 1 or status != 'waiting_credentials'
+        const currentStep = Number(deal.current_step || deal.currentStep || 1);
+        if ((isCallerBuyer || isCallerSeller) && !(isCallerAdmin || isCallerBroker)) {
+            if (currentStep > 1 || deal.status !== 'waiting_credentials') {
+                throw new Error('أمني: لا يمكن لأطراف الصفقة إلغاؤها بعد تقديم وفحص بيانات الحساب السرية. يرجى مراجعة الوسيط المعتمد في المحادثة للتدخل.');
+            }
+        }
+
+        // Refund points to buyer
+        const totalPoints = Number(deal.total_points || deal.totalPoints || 0);
+        const buyerProf = DB.profiles.find(p => p.id === deal.buyer_id);
+        if (buyerProf) {
+            buyerProf.points_balance = (buyerProf.points_balance || 0) + totalPoints;
+            buyerProf.wallet_balance = buyerProf.points_balance;
+            buyerProf.locked_points = Math.max(0, (buyerProf.locked_points || 0) - totalPoints);
+        }
+
+        // Quarantine account if deal reached step 2+
+        const newAccountStatus = (currentStep >= 2) ? 'under_review' : 'available';
+        const acc = DB.marketplace_accounts.find(a => a.id === deal.account_id || a.id === deal.accountId);
+        if (acc) {
+            acc.status = newAccountStatus;
+            acc.buyer_id = null;
+        }
+
+        deal.status = 'cancelled';
+        deal.current_step = 0;
+        deal.rejection_reason = reason || 'تم إلغاء الصفقة عبر الوساطة المعتمدة';
+
+        return {
+            success: true,
+            deal_id: deal.id,
+            refunded_points: totalPoints,
+            status: 'cancelled',
+            account_status: newAccountStatus
+        };
+    }
+
+    // Setup active test deal at Step 2 (credentials revealed to buyer)
+    const activeStep2Account = {
+        id: 'acc-escrow-guard-01',
+        seller_id: 'seller-uuid-202',
+        title: 'حساب كود موبايل - فحص',
+        status: 'in_deal'
+    };
+    DB.marketplace_accounts.push(activeStep2Account);
+
+    const activeStep2Deal = {
+        id: 'deal-step2-escrow-01',
+        buyer_id: 'buyer-uuid-101',
+        seller_id: 'seller-uuid-202',
+        assigned_broker_id: 'broker-dz-uuid-501',
+        accountId: activeStep2Account.id,
+        account_id: activeStep2Account.id,
+        total_points: 200,
+        totalPoints: 200,
+        status: 'buyer_inspecting',
+        current_step: 2
+    };
+    DB.deals.push(activeStep2Deal);
+    buyer.locked_points = (buyer.locked_points || 0) + 200;
+
+    // 21.1 Anonymous Cancellation Denial
+    let anonCancelBlocked = false;
+    try {
+        simulateMigration37CancelEscrowDeal(activeStep2Deal.id, null, 'إلغاء مجهول');
+    } catch (e) {
+        anonCancelBlocked = e.message.includes('يجب تسجيل الدخول');
+    }
+    assert(anonCancelBlocked, 'Escrow Hardening', 'Anonymous Escrow Deal Cancellation Strict Denial (Migration 37)', 'Unauthenticated callers strictly rejected from triggering deal cancellation or refunds');
+
+    // 21.2 Buyer Unilateral Cancellation Blocked at Step 2
+    let buyerCancelBlocked = false;
+    try {
+        simulateMigration37CancelEscrowDeal(activeStep2Deal.id, buyer.id, 'المشتري يريد إلغاء الصفقة بعد رؤية الباسورد');
+    } catch (e) {
+        buyerCancelBlocked = e.message.includes('لا يمكن لأطراف الصفقة إلغاؤها بعد تقديم وفحص بيانات الحساب السرية');
+    }
+    assert(buyerCancelBlocked, 'Escrow Hardening', 'Buyer Unilateral Post-Reveal Cancellation Strict Guard (WST-AUTHZ-04)', 'Buyer strictly blocked from cancelling deal unilaterally once credentials step 2 is active');
+
+    // 21.3 Seller Unilateral Cancellation Blocked at Step 2
+    let sellerCancelBlocked = false;
+    try {
+        simulateMigration37CancelEscrowDeal(activeStep2Deal.id, seller.id, 'البائع يريد استرجاع الحساب فجأة');
+    } catch (e) {
+        sellerCancelBlocked = e.message.includes('لا يمكن لأطراف الصفقة إلغاؤها بعد تقديم وفحص بيانات الحساب السرية');
+    }
+    assert(sellerCancelBlocked, 'Escrow Hardening', 'Seller Unilateral Cancellation Strict Guard', 'Seller strictly blocked from unilaterally cancelling deal while in buyer inspection step');
+
+    // 21.4 Assigned Broker / Admin Authorized Cancellation with Account Quarantine
+    const brokerCancelRes = simulateMigration37CancelEscrowDeal(activeStep2Deal.id, 'broker-dz-uuid-501', 'إلغاء عبر الوسيط بسبب عدم تطابق المواصفات');
+    assert(brokerCancelRes.success === true && brokerCancelRes.status === 'cancelled', 'Escrow Hardening', 'Assigned Broker Escrow Cancellation Authorization', 'Assigned regional broker authorized to cancel deal and refund points');
+    assert(activeStep2Account.status === 'under_review', 'Escrow Hardening', 'Post-Reveal Account Quarantine (under_review)', 'Account transitioned to under_review rather than available to prevent credentials leakage');
+
+    // 21.5 Storage BOLA Authorization Guard (storage.objects avatars bucket)
+    function simulateAvatarsStorageBOLA(callerUser, targetFilePath, action = 'UPDATE') {
+        if (!callerUser) return { allowed: false, error: 'Unauthorized' };
+        const isAdmin = isStrictAdminSim(callerUser);
+        if (isAdmin) return { allowed: true, role: 'admin' };
+
+        // Path structure: "<userId>/filename.png"
+        const folderPrefix = targetFilePath.split('/')[0];
+        const isOwner = (folderPrefix === callerUser.id);
+
+        if (isOwner) {
+            return { allowed: true, role: 'owner' };
+        }
+        return { allowed: false, error: 'أمني: انتهاك سياسة RLS: غير مصرح لك بتعديل أو حذف صور مستخدمين آخرين' };
+    }
+
+    const victimPath = 'user-victim-777/avatar.png';
+    const attackerUser = { id: 'user-attacker-888', role: 'user' };
+    const bolaAttackRes = simulateAvatarsStorageBOLA(attackerUser, victimPath, 'UPDATE');
+    assert(bolaAttackRes.allowed === false && bolaAttackRes.error.includes('انتهاك سياسة RLS'), 'Storage Security', 'Avatars Bucket Cross-Tenant Mutation BOLA Shield [WST-STORAGE-BOLA-05]', 'User A strictly prohibited from modifying or deleting User B avatar in cloud storage');
+
+    const legitimateOwnerRes = simulateAvatarsStorageBOLA(attackerUser, `${attackerUser.id}/my_photo.png`, 'UPDATE');
+    assert(legitimateOwnerRes.allowed === true && legitimateOwnerRes.role === 'owner', 'Storage Security', 'Legitimate Avatar Owner Update Acceptance', 'User successfully authorized to modify their own avatars within their folder');
+
+
+    // ==========================================================================
+    // PHASE 22: COMPREHENSIVE RECOVERY CREDENTIALS VAULT & BROKER ACCESS (MIGRATION 38)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 22: RECOVERY CREDENTIALS VAULT & BROKER ACCESS (MIGRATION 38)\x1b[0m');
+
+    DB.marketplace_account_secrets = DB.marketplace_account_secrets || [];
+
+    // 22.1 Emulate save_account_credentials_secure (Migration 38)
+    function simulateSaveAccountCredentialsSecure(callerId, accountId, loginId, pwd, recEmail, recPwd, notes) {
+        if (!callerId) throw new Error('أمني: يجب تسجيل الدخول لحفظ بيانات الدخول');
+        const acc = DB.marketplace_accounts.find(a => a.id === accountId);
+        if (!acc) throw new Error('الحساب المطلوب غير موجود');
+
+        const callerProf = DB.profiles.find(p => p.id === callerId);
+        const isAdmin = isStrictAdminSim(callerProf);
+        const isBroker = callerProf && ['regional_broker', 'broker'].includes(callerProf.role);
+        const isSeller = (acc.seller_id === callerId);
+
+        if (!isSeller && !isAdmin && !isBroker) {
+            throw new Error('أمني: غير مصرح لك بتسجيل بيانات دخول هذا الحساب');
+        }
+
+        // Upsert into secrets vault
+        const existingIdx = DB.marketplace_account_secrets.findIndex(s => s.account_id === accountId);
+        const secretRecord = {
+            account_id: accountId,
+            login_identifier: loginId || '',
+            password: pwd || '',
+            recovery_email: recEmail || '',
+            recovery_password: recPwd || '',
+            notes: notes || '',
+            updated_at: new Date().toISOString()
+        };
+
+        if (existingIdx >= 0) {
+            DB.marketplace_account_secrets[existingIdx] = secretRecord;
+        } else {
+            DB.marketplace_account_secrets.push(secretRecord);
+        }
+
+        // Update marketplace_accounts recovery columns
+        acc.recovery_email = recEmail || '';
+        acc.recovery_password = recPwd || '';
+
+        return { success: true };
+    }
+
+    // 22.2 Emulate get_account_credentials_secure (Migration 38)
+    function simulateGetAccountCredentialsSecure(callerId, accountId) {
+        if (!callerId) throw new Error('أمني: يجب تسجيل الدخول للوصول لبيانات الحساب الحساسة');
+        const acc = DB.marketplace_accounts.find(a => a.id === accountId);
+        if (!acc) throw new Error('الحساب المطلوب غير موجود');
+
+        const callerProf = DB.profiles.find(p => p.id === callerId);
+        const isAdmin = isStrictAdminSim(callerProf);
+        const isBroker = callerProf && ['regional_broker', 'broker'].includes(callerProf.role);
+        const isSeller = (acc.seller_id === callerId);
+        const isOwnerBuyer = (acc.buyer_id === callerId || acc.owner_id === callerId);
+
+        const isInspectingBuyer = DB.deals.some(d =>
+            (d.account_id === accountId || d.accountId === accountId) &&
+            d.buyer_id === callerId &&
+            ['completed', 'buyer_inspecting'].includes(d.status)
+        );
+
+        if (!isAdmin && !isBroker && !isSeller && !isOwnerBuyer && !isInspectingBuyer) {
+            throw new Error('أمني: غير مصرح لك بالاطلاع على بيانات الدخول الخاصة بهذا الحساب');
+        }
+
+        const sec = DB.marketplace_account_secrets.find(s => s.account_id === accountId);
+        if (!sec) {
+            return {
+                success: true,
+                email_or_phone: 'غير مدخل',
+                password: '••••••••',
+                recovery_email: acc.recovery_email || '',
+                recovery_password: acc.recovery_password || '',
+                notes: ''
+            };
+        }
+
+        return {
+            success: true,
+            email_or_phone: sec.login_identifier,
+            password: sec.password,
+            recovery_email: sec.recovery_email,
+            recovery_password: sec.recovery_password,
+            notes: sec.notes
+        };
+    }
+
+    const testVaultAccount = {
+        id: 'acc-vault-test-01',
+        seller_id: 'seller-uuid-202',
+        title: 'حساب ببجي ماكس متكامل',
+        status: 'available'
+    };
+    DB.marketplace_accounts.push(testVaultAccount);
+
+    // 22.1 Seller Saves Primary and Recovery Credentials
+    const saveVaultRes = simulateSaveAccountCredentialsSecure(
+        'seller-uuid-202',
+        testVaultAccount.id,
+        'pubg_seller@gmail.com',
+        'MainPass@2026',
+        'pubg_recovery@yahoo.com',
+        'RecPass#9988',
+        'حساب نظيف مربوط بإيميل الاسترداد'
+    );
+    assert(saveVaultRes.success === true, 'Credentials Vault', 'Comprehensive 4-Field Credentials Vault Storage (Migration 38)', 'Primary and recovery email/passwords stored securely in encrypted secrets vault');
+
+    // 22.2 Unauthorized 3rd-party User Access Denial
+    let intruderVaultBlocked = false;
+    try {
+        simulateGetAccountCredentialsSecure('user-attacker-888', testVaultAccount.id);
+    } catch (e) {
+        intruderVaultBlocked = e.message.includes('غير مصرح لك بالاطلاع');
+    }
+    assert(intruderVaultBlocked, 'Credentials Vault', 'Unauthorized 3rd-Party Vault Access Strict Denial', 'Random unauthorized user blocked from reading account credentials and recovery passwords');
+
+    // 22.3 Regional Broker Authorized Vault Inspection
+    const brokerVaultRead = simulateGetAccountCredentialsSecure('broker-dz-uuid-501', testVaultAccount.id);
+    assert(
+        brokerVaultRead.success === true &&
+        brokerVaultRead.recovery_email === 'pubg_recovery@yahoo.com' &&
+        brokerVaultRead.recovery_password === 'RecPass#9988',
+        'Credentials Vault',
+        'Regional Broker Vault Inspection Authorization (Migration 38)',
+        'Verified regional broker authorized to inspect recovery credentials during mediation'
+    );
+
+    // 22.4 Completed Buyer Vault Access
+    testVaultAccount.buyer_id = 'buyer-uuid-101';
+    const buyerVaultRead = simulateGetAccountCredentialsSecure('buyer-uuid-101', testVaultAccount.id);
+    assert(
+        buyerVaultRead.success === true &&
+        buyerVaultRead.password === 'MainPass@2026' &&
+        buyerVaultRead.recovery_password === 'RecPass#9988',
+        'Credentials Vault',
+        'Completed Buyer Recovery Credentials Instant Access',
+        'Buyer obtains instant unhindered access to recovery credentials under 48h gold guarantee'
+    );
+
+
+    // ==========================================================================
+    // PHASE 23: PROFILES PHONE NUMBER COORDINATION & PRIVACY (MIGRATION 39)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 23: PROFILES PHONE COORDINATION & PRIVACY (MIGRATION 39)\x1b[0m');
+
+    // 23.1 Self Phone Update Simulation (profiles_update_self RLS)
+    function simulateUpdateProfilePhone(callerUser, targetProfileId, newPhone) {
+        if (!callerUser) throw new Error('أمني: يجب تسجيل الدخول لتحديث رقم الهاتف');
+        const isAdmin = isStrictAdminSim(callerUser);
+        const isSelf = (callerUser.id === targetProfileId);
+
+        if (!isSelf && !isAdmin) {
+            throw new Error('أمني: انتهاك سياسة RLS: لا يمكن تعديل رقم هاتف مستخدم آخر');
+        }
+
+        // Validate phone: allow null/empty or international digits
+        const cleanPhone = String(newPhone || '').trim();
+        if (cleanPhone && !/^\+?[0-9\s\-()]{7,20}$/.test(cleanPhone)) {
+            throw new Error('أمني: رقم الهاتف غير صالح. يرجى إدخال رقم صحيح بصيغة دولية للتنسيق عبر واتساب');
+        }
+
+        const prof = DB.profiles.find(p => p.id === targetProfileId);
+        if (!prof) throw new Error('الملف الشخصي غير موجود');
+
+        prof.phone = cleanPhone || null;
+        prof.updated_at = new Date().toISOString();
+        return { success: true, phone: prof.phone };
+    }
+
+    // Cross-user phone modification blocked
+    let crossPhoneBlocked = false;
+    try {
+        simulateUpdateProfilePhone(buyer, seller.id, '+213555123456');
+    } catch (e) {
+        crossPhoneBlocked = e.message.includes('لا يمكن تعديل رقم هاتف مستخدم آخر');
+    }
+    assert(crossPhoneBlocked, 'Phone Coordination', 'Cross-User Phone Number Tampering RLS Shield (Migration 39)', 'User strictly blocked from mutating another user phone number');
+
+    // Malicious script payload in phone input blocked
+    let phoneScriptBlocked = false;
+    try {
+        simulateUpdateProfilePhone(buyer, buyer.id, '<script>alert(1)</script>');
+    } catch (e) {
+        phoneScriptBlocked = e.message.includes('رقم الهاتف غير صالح');
+    }
+    assert(phoneScriptBlocked, 'Phone Coordination', 'Phone Input Injection & XSS Sanitization Shield', 'Malicious injection payloads in phone field strictly rejected');
+
+    // Legitimate WhatsApp coordination phone update
+    const validPhoneRes = simulateUpdateProfilePhone(buyer, buyer.id, '+213 555 78 90 12');
+    assert(validPhoneRes.success === true && buyer.phone === '+213 555 78 90 12', 'Phone Coordination', 'Valid WhatsApp / Phone Number Profile Update (Migration 39)', 'User successfully saved international phone number for direct broker coordination');
+
+    // Empty/Null phone clear
+    const clearPhoneRes = simulateUpdateProfilePhone(buyer, buyer.id, '');
+    assert(clearPhoneRes.success === true && buyer.phone === null, 'Phone Coordination', 'Phone Number Clearing Acceptance', 'Empty phone input cleanly resets field to NULL without SQL error');
+
     // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------

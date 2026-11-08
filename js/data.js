@@ -1,4 +1,4 @@
-/**
+﻿/**
  * WASEET (وسيط) - State & Mock Data
  * Stores regional payment gateways config, sample accounts, user profiles,
  * multi-deal escrow records, and role-based permissions.
@@ -231,7 +231,12 @@ const SAMPLE_IMAGES = [
 ];
 
 function generateAccountsList() {
-    // تم تنظيف كافة الحسابات الوهمية والتجريبية بالكامل ليعرض المتجر فقط الحسابات الفعلية من قاعدة البيانات
+    if (typeof WASEET_SHOWCASE_ACCOUNTS !== 'undefined' && Array.isArray(WASEET_SHOWCASE_ACCOUNTS)) {
+        return [...WASEET_SHOWCASE_ACCOUNTS];
+    }
+    if (typeof window !== 'undefined' && window.WASEET_SHOWCASE_ACCOUNTS && Array.isArray(window.WASEET_SHOWCASE_ACCOUNTS)) {
+        return [...window.WASEET_SHOWCASE_ACCOUNTS];
+    }
     return [];
 }
 
@@ -249,7 +254,7 @@ const WASEET_STATE = {
     activeDeal: null,
 
     // Accounts in marketplace (populated strictly from Supabase database)
-    accounts: []
+    accounts: (typeof WASEET_SHOWCASE_ACCOUNTS !== 'undefined' && Array.isArray(WASEET_SHOWCASE_ACCOUNTS)) ? [...WASEET_SHOWCASE_ACCOUNTS] : ((typeof window !== 'undefined' && window.WASEET_SHOWCASE_ACCOUNTS) ? [...window.WASEET_SHOWCASE_ACCOUNTS] : [])
 };
 
 function isMediatorUser(user = (typeof WASEET_STATE !== 'undefined' ? WASEET_STATE.user : null)) {
@@ -382,7 +387,7 @@ function loadWaseetData() {
         WASEET_STATE.deals = [];
         WASEET_STATE.completedDeals = [];
         WASEET_STATE.activeDeal = null;
-        WASEET_STATE.accounts = [];
+        WASEET_STATE.accounts = (typeof WASEET_SHOWCASE_ACCOUNTS !== 'undefined' && Array.isArray(WASEET_SHOWCASE_ACCOUNTS)) ? [...WASEET_SHOWCASE_ACCOUNTS] : ((typeof window !== 'undefined' && window.WASEET_SHOWCASE_ACCOUNTS) ? [...window.WASEET_SHOWCASE_ACCOUNTS] : []);
     } catch (e) {
         console.warn('Failed to parse storage', e);
     }

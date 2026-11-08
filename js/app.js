@@ -1,4 +1,4 @@
-/**
+﻿/**
  * WASEET (وسيط) - Main Application Controller
  * Handles:
  * 1. Social Login & User Profile management (Google, Facebook, Quick Mediator).
@@ -2359,6 +2359,23 @@ class WaseetApp {
     }
 
     async requestEscrow(accountId) {
+        // فحص ما إذا كان الحساب غير متوفر حالياً (حسابات العرض أو المحجوزة مسبقاً)
+        const targetAcc = (WASEET_STATE.accounts || []).find(a => String(a.id) === String(accountId));
+        const isShowcase = (typeof isShowcaseAccountId === 'function' && isShowcaseAccountId(accountId)) ||
+                           (targetAcc && (targetAcc.isUnavailableOnEscrow || targetAcc.isUnavailable || targetAcc.isDemoUnavailable));
+        if (isShowcase) {
+            if (typeof waseetAlert === 'function') {
+                await waseetAlert(
+                    'الحساب غير متوفر حالياً',
+                    'عذراً، هذا الحساب غير متوفر حالياً لإتمام الوساطة (قيد المراجعة أو تم حجزه بواسطة مشترٍ آخر). يرجى تصفح باقي حسابات المتجر المتاحة.',
+                    'warning'
+                );
+            } else {
+                alert('عذراً، هذا الحساب غير متوفر حالياً لإتمام الوساطة!');
+            }
+            return;
+        }
+
         // 1. Login requirement check (Requirement 1)
         if (!WASEET_STATE.user) {
             if (typeof waseetAlert === 'function') {

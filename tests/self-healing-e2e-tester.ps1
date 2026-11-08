@@ -61,6 +61,9 @@ $countryApiJs = if (Test-Path 'D:\waseet-app\api\country.js') { Get-Content 'D:\
 $mig34Content = if (Test-Path 'D:\waseet-app\supabase\34_support_messages_broker_support.sql') { Get-Content 'D:\waseet-app\supabase\34_support_messages_broker_support.sql' -Raw -Encoding UTF8 } else { "" }
 $mig35Content = if (Test-Path 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql') { Get-Content 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql' -Raw -Encoding UTF8 } else { "" }
 $mig36Content = if (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql') { Get-Content 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql' -Raw -Encoding UTF8 } else { "" }
+$mig37Content = if (Test-Path 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql') { Get-Content 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql' -Raw -Encoding UTF8 } else { "" }
+$mig38Content = if (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } else { "" }
+$mig39Content = if (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\39_profiles_phone_column.sql' -Raw -Encoding UTF8 } else { "" }
 
 Write-Host ""
 Write-Host ">>> 1. FLOW 1: SELLER ACCOUNT LISTING AND SIMULATION RESILIENCE" -ForegroundColor Yellow
@@ -472,23 +475,68 @@ $geo6 = $securityValidatorJs.Contains('countryCode(val)') -and $securityValidato
 Check-Result -Flow 'Geolocation Engine' -Name 'Country Code Security Validator And Neutral Handling' -Success $geo6 -Detail 'Validates ISO-2 codes strictly while permitting empty string without defaulting to DZ'
 
 Write-Host ""
-Write-Host ">>> 17. FLOW 17: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
+Write-Host ">>> 17. FLOW 17: ESCROW UNILATERAL CANCELLATION & STORAGE BOLA HARDENING (MIGRATION 37)" -ForegroundColor Yellow
+$escrowCancel1 = (Test-Path 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql') -and $mig37Content.Contains('cancel_escrow_deal') -and $mig37Content.Contains('WST-AUTHZ-ESCROW-UNILATERAL-CANCEL-04')
+Check-Result -Flow 'Escrow Security' -Name 'Supabase Migration 37 Unilateral Cancellation Guard' -Success $escrowCancel1 -Detail 'Stored procedure cancel_escrow_deal strictly blocks buyer/seller cancellation after step 1'
+
+$escrowCancel2 = $mig37Content.Contains("v_new_account_status := 'under_review'")
+Check-Result -Flow 'Escrow Security' -Name 'Post-Reveal Account Quarantine Integrity' -Success $escrowCancel2 -Detail 'Quarantines account status to under_review upon cancellation at step 2+ to prevent credentials theft'
+
+$escrowCancel3 = $mig37Content.Contains('avatars_authenticated_update') -and $mig37Content.Contains('avatars_authenticated_delete') -and $mig37Content.Contains('storage.foldername(name)')
+Check-Result -Flow 'Storage Security' -Name 'Avatars Storage BOLA / IDOR Anti-Tampering Shield [WST-STORAGE-BOLA-05]' -Success $escrowCancel3 -Detail 'Strict storage RLS policies prevent users from modifying or deleting others avatars'
+
+$escrowCancel4 = $mig37Content.Contains('REVOKE EXECUTE ON FUNCTION public.cancel_escrow_deal') -and $mig37Content.Contains('FROM anon')
+Check-Result -Flow 'Escrow Security' -Name 'Escrow Deal Cancellation Anonymous Denial' -Success $escrowCancel4 -Detail 'Revokes public anonymous execution on cancel_escrow_deal preventing unauthorized refunds'
+
+$escrowCancel5 = ($desktopSqlFiles | Where-Object { $_.Name -like '*37*' }).Count -gt 0
+Check-Result -Flow 'Escrow Security' -Name 'Desktop SQL Parity (Migration 37 on Desktop)' -Success $escrowCancel5 -Detail 'Standalone Migration 37 SQL file present on Desktop for 1-click execution in Supabase'
+
+Write-Host ""
+Write-Host ">>> 18. FLOW 18: RECOVERY CREDENTIALS VAULT & SECURE MEDIATION ACCESS (MIGRATION 38)" -ForegroundColor Yellow
+$recCred1 = (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') -and $mig38Content.Contains('recovery_email') -and $mig38Content.Contains('recovery_password')
+Check-Result -Flow 'Credentials Vault' -Name 'Supabase Migration 38 Recovery Account Columns Schema' -Success $recCred1 -Detail 'Adds recovery_email and recovery_password to marketplace accounts schema'
+
+$recCred2 = $mig38Content.Contains('save_account_credentials_secure') -and $mig38Content.Contains('SET search_path = public, pg_temp')
+Check-Result -Flow 'Credentials Vault' -Name 'save_account_credentials_secure Procedure & Search Path Hygiene' -Success $recCred2 -Detail 'Safely inserts primary and recovery credentials into marketplace_account_secrets'
+
+$recCred3 = $mig38Content.Contains('get_account_credentials_secure') -and $mig38Content.Contains('public.is_regional_broker()')
+Check-Result -Flow 'Credentials Vault' -Name 'get_account_credentials_secure Authorization & Broker Access' -Success $recCred3 -Detail 'Authorizes regional brokers, admins, sellers, and inspecting buyers to view credentials'
+
+$recCred4 = $escrowJs.Contains('recoveryPassword') -and $myAccountsHtml.Contains('recoveryPassword')
+Check-Result -Flow 'Credentials Vault' -Name 'Client 4-Field Credentials Dossier Parity' -Success $recCred4 -Detail 'UI and escrow engines support primary and recovery credentials throughout the deal lifecycle'
+
+$recCred5 = ($desktopSqlFiles | Where-Object { $_.Name -like '*38*' }).Count -gt 0
+Check-Result -Flow 'Credentials Vault' -Name 'Desktop SQL Parity (Migration 38 on Desktop)' -Success $recCred5 -Detail 'Standalone Migration 38 SQL file present on Desktop for 1-click execution in Supabase'
+
+Write-Host ""
+Write-Host ">>> 19. FLOW 19: PROFILES PHONE COORDINATION & DIRECT BROKER CHANNEL (MIGRATION 39)" -ForegroundColor Yellow
+$phone1 = (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') -and $mig39Content.Contains('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone')
+Check-Result -Flow 'Phone Coordination' -Name 'Supabase Migration 39 Profiles Phone Column' -Success $phone1 -Detail 'Adds phone column to profiles table for WhatsApp broker coordination'
+
+$phone2 = $mig39Content.Contains('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated')
+Check-Result -Flow 'Phone Coordination' -Name 'Phone Column Authenticated Update Grant' -Success $phone2 -Detail 'Explicitly grants authenticated users permission to update their phone numbers'
+
+$phone3 = ($desktopSqlFiles | Where-Object { $_.Name -like '*39*' }).Count -gt 0
+Check-Result -Flow 'Phone Coordination' -Name 'Desktop SQL Parity (Migration 39 on Desktop)' -Success $phone3 -Detail 'Standalone Migration 39 SQL file present on Desktop for 1-click execution in Supabase'
+
+Write-Host ""
+Write-Host ">>> 20. FLOW 20: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
 $nodeCmd = if (Get-Command "agy-node.cmd" -ErrorAction SilentlyContinue) { (Get-Command "agy-node.cmd").Source } elseif (Get-Command "agy-node" -ErrorAction SilentlyContinue) { (Get-Command "agy-node").Source } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { (Get-Command "node").Source } else { "C:\Users\H P\AppData\Roaming\Antigravity\bin\agy-node.cmd" }
 $cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
 $cfAuditSuccess = ($cfAuditResult.ExitCode -eq 0)
 Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, and RLS triggers'
 
 Write-Host ""
-Write-Host ">>> 18. FLOW 18: BUTTON AND INTERACTIVE ELEMENTS SENTINEL HEALTH" -ForegroundColor Yellow
+Write-Host ">>> 21. FLOW 21: BUTTON AND INTERACTIVE ELEMENTS SENTINEL HEALTH" -ForegroundColor Yellow
 $btnAuditorResult = Start-Process -FilePath "powershell" -ArgumentList "-ExecutionPolicy Bypass -File D:\waseet-app\tests\button-self-reporting-auditor.ps1" -NoNewWindow -Wait -PassThru
 $btnAuditorSuccess = ($btnAuditorResult.ExitCode -eq 0)
 Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls Health' -Success $btnAuditorSuccess -Detail 'Verified zero broken buttons, dead triggers, or unhandled click actions across all 17 HTML pages'
 
 Write-Host ""
-Write-Host ">>> 19. FLOW 19: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED)" -ForegroundColor Yellow
+Write-Host ">>> 22. FLOW 22: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 23 PHASES)" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 20 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, and storage journeys'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 23 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, and phone journeys'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

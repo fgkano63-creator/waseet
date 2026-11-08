@@ -183,6 +183,27 @@ const mig32Content = hasMig32 ? fs.readFileSync(mig32Path, 'utf8') : '';
 check('Database RLS', 'Migration 32 (Anti-Tampering, RLS Isolation & XSS Protection)', hasMig32 && mig32Content.includes('tr_prevent_profile_field_tampering_v2'), 'Hardens wallet, points, kyc, and role fields against browser tampering');
 check('Database RLS', 'Transactions & Deals User Isolation RLS Policy', mig32Content.includes('deals_select_participants_or_admin') && mig32Content.includes('transactions_select_policy'), 'Guarantees users can only inspect their own transactions and assigned deals');
 
+// Migration 37 Checks (Escrow Unilateral Cancellation & Storage BOLA Hardening)
+const mig37Path = path.join(ROOT_DIR, 'supabase', '37_security_audit_escrow_cancel_and_storage_bola_hardening.sql');
+const hasMig37 = fs.existsSync(mig37Path);
+const mig37Content = hasMig37 ? fs.readFileSync(mig37Path, 'utf8') : '';
+check('Database RLS', 'Escrow Unilateral Cancellation Prevention Guard [WST-AUTHZ-04]', hasMig37 && mig37Content.includes('WST-AUTHZ-ESCROW-UNILATERAL-CANCEL-04') && mig37Content.includes('current_step, 1) > 1'), 'Prevents buyer or seller from unilaterally cancelling deals after credentials revealed');
+check('Database RLS', 'Avatars Storage Bucket BOLA / IDOR Shielding [WST-STORAGE-BOLA-05]', hasMig37 && mig37Content.includes('avatars_authenticated_update') && mig37Content.includes('storage.foldername(name)'), 'Restricts avatar modifications exclusively to the file owner or admin');
+check('Database RLS', 'Escrow Deal Cancellation Anonymous Execution Denial', hasMig37 && mig37Content.includes('REVOKE EXECUTE ON FUNCTION public.cancel_escrow_deal') && mig37Content.includes('FROM anon'), 'Revokes public anonymous execution on cancel_escrow_deal to prevent unauthorized refunds');
+
+// Migration 38 Checks (Recovery Credentials Vault & Secure Access)
+const mig38Path = path.join(ROOT_DIR, 'supabase', '38_recovery_account_columns_and_access.sql');
+const hasMig38 = fs.existsSync(mig38Path);
+const mig38Content = hasMig38 ? fs.readFileSync(mig38Path, 'utf8') : '';
+check('Database RLS', 'Recovery Credentials Vault Storage & Function Hygiene (Migration 38)', hasMig38 && mig38Content.includes('save_account_credentials_secure') && mig38Content.includes('recovery_password') && mig38Content.includes('SET search_path = public, pg_temp'), 'Secure definer procedure safely preserves primary & recovery secrets with search_path hygiene');
+check('Database RLS', 'Recovery Credentials Access Control & Broker Authorization (Migration 38)', hasMig38 && mig38Content.includes('get_account_credentials_secure') && mig38Content.includes('public.is_regional_broker()'), 'Authorizes regional brokers, admins, sellers, and inspecting buyers while denying 3rd parties');
+
+// Migration 39 Checks (Profiles Phone Column & Direct Broker Coordination)
+const mig39Path = path.join(ROOT_DIR, 'supabase', '39_profiles_phone_column.sql');
+const hasMig39 = fs.existsSync(mig39Path);
+const mig39Content = hasMig39 ? fs.readFileSync(mig39Path, 'utf8') : '';
+check('Database RLS', 'Profiles Phone Number Coordination Schema (Migration 39)', hasMig39 && mig39Content.includes('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone') && mig39Content.includes('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated'), 'Safely grants users permission to coordinate with brokers via phone/WhatsApp');
+
 // ------------------------------------------------------------------------------
 // SUMMARY
 // ------------------------------------------------------------------------------

@@ -81,8 +81,13 @@ BEGIN
         );
         v_caller_is_buyer := (v_deal.buyer_id = v_caller_id);
         v_caller_is_seller := (v_deal.seller_id = v_caller_id);
-    ELSE
+    ELSIF (
+        current_setting('request.jwt.claim.role', true) = 'service_role'
+        OR current_user IN ('postgres', 'service_role')
+    ) THEN
         v_caller_is_admin := true;
+    ELSE
+        RAISE EXCEPTION 'أمني: يجب تسجيل الدخول أولاً لإلغاء صفقة الضمان';
     END IF;
 
     IF NOT (v_caller_is_admin OR v_caller_is_broker OR v_caller_is_buyer OR v_caller_is_seller) THEN
@@ -197,7 +202,8 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.cancel_escrow_deal(text, text) TO authenticated, anon;
+REVOKE EXECUTE ON FUNCTION public.cancel_escrow_deal(text, text) FROM anon;
+GRANT EXECUTE ON FUNCTION public.cancel_escrow_deal(text, text) TO authenticated, service_role;
 
 
 -- ------------------------------------------------------------------------------

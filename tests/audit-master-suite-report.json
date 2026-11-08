@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-08 13:54:09",
+    "Timestamp":  "2026-11-08 14:04:58",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  925,
-    "PassCount":  925,
+    "TotalChecks":  931,
+    "PassCount":  931,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -730,8 +730,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  405,
-                                               "Pass":  405,
+                                               "Total":  409,
+                                               "Pass":  409,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -1786,6 +1786,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\calculator.js"
                                                              },
                                                              {
+                                                                 "Test":  "deals.html script: js/showcase-accounts.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\showcase-accounts.js"
+                                                             },
+                                                             {
                                                                  "Test":  "deals.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1964,6 +1970,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html script: js/showcase-accounts.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\showcase-accounts.js"
                                                              },
                                                              {
                                                                  "Test":  "index.html script: js/data.js",
@@ -2476,6 +2488,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
                                                              },
                                                              {
+                                                                 "Test":  "pending-accounts.html script: js/showcase-accounts.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\showcase-accounts.js"
+                                                             },
+                                                             {
                                                                  "Test":  "pending-accounts.html script: js/data.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2672,6 +2690,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\js\\security-validator.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "profile.html script: js/showcase-accounts.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\showcase-accounts.js"
                                                              },
                                                              {
                                                                  "Test":  "profile.html script: js/data.js",
@@ -4764,8 +4788,8 @@
                                                    ]
                                      },
                        "Security-Secrets":  {
-                                                "Total":  19,
-                                                "Pass":  19,
+                                                "Total":  20,
+                                                "Pass":  20,
                                                 "Warn":  0,
                                                 "Fail":  0,
                                                 "Items":  [
@@ -4854,6 +4878,12 @@
                                                                   "Details":  "No private keys or service_role credentials exposed"
                                                               },
                                                               {
+                                                                  "Test":  "js\\showcase-accounts.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
                                                                   "Test":  "js\\skeleton-ui.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
@@ -4886,8 +4916,8 @@
                                                           ]
                                             },
                        "Security-Code":  {
-                                             "Total":  19,
-                                             "Pass":  19,
+                                             "Total":  20,
+                                             "Pass":  20,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -4971,6 +5001,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\security-validator.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\showcase-accounts.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
@@ -5628,6 +5664,12 @@
                                                                    "Details":  "Explicitly restricts search_path"
                                                                },
                                                                {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
                                                                    "Test":  "SECURITY DEFINER search_path: public.save_account_credentials_secure",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
@@ -5635,12 +5677,6 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
-                                                                   "Status":  "PASS",
-                                                                   "Severity":  "INFO",
-                                                                   "Details":  "Explicitly restricts search_path"
-                                                               },
-                                                               {
-                                                                   "Test":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

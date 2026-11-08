@@ -2,19 +2,19 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-08 13:50:34",
+    "Timestamp":  "2026-11-08 14:05:05",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  870,
-                    "Passed":  870,
+                    "TotalChecks":  892,
+                    "Passed":  892,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
                 },
     "Categories":  {
                        "Quality":  {
-                                       "Total":  746,
-                                       "Passed":  746,
+                                       "Total":  768,
+                                       "Passed":  768,
                                        "Warnings":  0,
                                        "Failures":  0,
                                        "Checks":  [
@@ -55,13 +55,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "404.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "404.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -83,10 +76,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "404.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "404.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "404.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "404.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -160,13 +167,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "ad-walkthrough.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "ad-walkthrough.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -188,10 +188,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "ad-walkthrough.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "ad-walkthrough.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "ad-walkthrough.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "ad-walkthrough.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -370,13 +384,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-brokers.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "admin-brokers.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -398,10 +405,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-brokers.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "admin-brokers.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-brokers.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-brokers.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -636,13 +657,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-chats.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "admin-chats.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -664,10 +678,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-chats.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "admin-chats.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-chats.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-chats.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -923,13 +951,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-deposits.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "admin-deposits.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -951,10 +972,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-deposits.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "admin-deposits.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-deposits.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-deposits.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -1189,13 +1224,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-withdrawals.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "admin-withdrawals.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1217,10 +1245,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "admin-withdrawals.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "admin-withdrawals.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-withdrawals.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-withdrawals.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -1511,13 +1553,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "chat.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "chat.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1539,10 +1574,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "chat.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "chat.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "chat.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "chat.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -1840,13 +1889,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "contact-support.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "contact-support.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -1868,10 +1910,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "contact-support.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "contact-support.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "contact-support.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "contact-support.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -2134,6 +2190,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "deals.html script dependency: js/showcase-accounts.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/showcase-accounts.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "deals.html script dependency: js/data.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2218,13 +2281,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "deals.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "deals.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2246,10 +2302,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "deals.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "deals.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "deals.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "deals.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -2526,6 +2596,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "index.html script dependency: js/showcase-accounts.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/showcase-accounts.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "index.html script dependency: js/data.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2652,13 +2729,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "index.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "index.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2680,10 +2750,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "index.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "index.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "index.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "index.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -3044,13 +3128,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "maintenance.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "maintenance.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3072,10 +3149,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "maintenance.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "maintenance.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "maintenance.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "maintenance.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -3254,13 +3345,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "my-accounts.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "my-accounts.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3282,10 +3366,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "my-accounts.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "my-accounts.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "my-accounts.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "my-accounts.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -3562,6 +3660,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "pending-accounts.html script dependency: js/showcase-accounts.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/showcase-accounts.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "pending-accounts.html script dependency: js/data.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3653,13 +3758,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "pending-accounts.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "pending-accounts.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3681,10 +3779,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "pending-accounts.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "pending-accounts.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "pending-accounts.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "pending-accounts.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -3968,6 +4080,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "profile.html script dependency: js/showcase-accounts.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/showcase-accounts.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "profile.html script dependency: js/data.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4059,13 +4178,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "profile.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "profile.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4087,10 +4199,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "profile.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "profile.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "profile.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "profile.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -4479,13 +4605,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "wallet.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "wallet.html stylesheet dependency: assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4507,10 +4626,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "wallet.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Name":  "wallet.html stylesheet dependency: favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "wallet.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "wallet.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -4787,13 +4920,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "auth\\callback.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "auth\\callback.html stylesheet dependency: ../assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4815,10 +4941,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "auth\\callback.html stylesheet dependency: ../assets/favicons/favicon.ico",
+                                                          "Name":  "auth\\callback.html stylesheet dependency: ../favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: ../assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: ../favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "auth\\callback.html stylesheet dependency: ../favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: ../favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "auth\\callback.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -4934,13 +5074,6 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "auth\\callback\\index.html stylesheet dependency: /favicon.svg",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "File exists: /favicon.svg"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Asset-CSS",
                                                           "Name":  "auth\\callback\\index.html stylesheet dependency: ../../assets/favicons/favicon-32x32.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4962,10 +5095,24 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
-                                                          "Name":  "auth\\callback\\index.html stylesheet dependency: ../../assets/favicons/favicon.ico",
+                                                          "Name":  "auth\\callback\\index.html stylesheet dependency: ../../favicon.ico",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
-                                                          "Message":  "File exists: ../../assets/favicons/favicon.ico"
+                                                          "Message":  "File exists: ../../favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "auth\\callback\\index.html stylesheet dependency: ../../favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: ../../favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "auth\\callback\\index.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-CSS",
@@ -5186,6 +5333,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "JS-Eval",
+                                                          "Name":  "js\\showcase-accounts.js - Zero eval() usage",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Zero dynamic eval() or new Function() calls"
+                                                      },
+                                                      {
+                                                          "CheckId":  "JS-Eval",
                                                           "Name":  "js\\skeleton-ui.js - Zero eval() usage",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -5253,7 +5407,7 @@
                                                                  "Name":  "CSS Style Brace Balance",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "Exact brace matching: 1366 open / 1366 close"
+                                                                 "Message":  "Exact brace matching: 1367 open / 1367 close"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Overflow",
@@ -6077,6 +6231,13 @@
                                                        },
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.save_account_credentials_secure",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
@@ -6085,13 +6246,6 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
-                                                           "Status":  "PASS",
-                                                           "Severity":  "INFO",
-                                                           "Message":  "search_path explicitly restricted"
-                                                       },
-                                                       {
-                                                           "CheckId":  "SEC-SearchPath",
-                                                           "Name":  "SECURITY DEFINER search_path: public.cancel_escrow_deal",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"
