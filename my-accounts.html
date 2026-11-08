@@ -1541,6 +1541,11 @@ ${notes ? `ملاحظات إضافية: ${notes}\n------------------------------
             const user = WASEET_STATE.user;
             const client = typeof initWaseetSupabase === 'function' ? initWaseetSupabase() : null;
 
+            // تحديث الحالة المحلية وقراءة التفاصيل القائمة لمنع فقدان بيانات الاسترداد
+            const targetAcc = myAccountsList.find(a => a.id.toString() === accId.toString());
+            const existingDetails = (targetAcc && targetAcc.details && typeof targetAcc.details === 'object') ? targetAcc.details : {};
+            const updatedDetails = { ...existingDetails, notes: newNotes };
+
             // تحديث قاعدة بيانات Supabase
             if (client && user && user.id) {
                 try {
@@ -1550,7 +1555,7 @@ ${notes ? `ملاحظات إضافية: ${notes}\n------------------------------
                             title: newTitle,
                             seller_price: newPrice,
                             bind_status: newBind,
-                            details: { notes: newNotes },
+                            details: updatedDetails,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', accId)
@@ -1564,13 +1569,12 @@ ${notes ? `ملاحظات إضافية: ${notes}\n------------------------------
                 }
             }
 
-            // تحديث الحالة المحلية
-            const targetAcc = myAccountsList.find(a => a.id.toString() === accId.toString());
             if (targetAcc) {
                 targetAcc.title = newTitle;
                 targetAcc.sellerPrice = newPrice;
                 targetAcc.bindStatus = newBind;
                 targetAcc.accountNotes = newNotes;
+                targetAcc.details = updatedDetails;
             }
 
             const globalAcc = (WASEET_STATE.accounts || []).find(a => a.id.toString() === accId.toString());

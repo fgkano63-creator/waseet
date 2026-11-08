@@ -2930,7 +2930,7 @@ class WaseetApp {
         if (!modal || !body) return;
 
         const pricing = calculateWaseetFee(acc.sellerPrice);
-        const creds = acc.credentials || {};
+        const creds = (acc.credentials && typeof acc.credentials === 'object') ? acc.credentials : ((typeof waseetSafeParseCredentials === 'function') ? waseetSafeParseCredentials(acc, acc.details || {}) : {});
         this.currentInspectCredentials = creds;
 
         let statusText = 'قيد الفحص (أقل من 24 ساعة)';
@@ -3012,11 +3012,11 @@ class WaseetApp {
                     </div>
                     <span style="font-size: 0.75rem; background: rgba(249, 115, 22, 0.2); color: var(--orange-bright); padding: 2px 8px; border-radius: 6px;"><i class="fas fa-user-shield"></i> تدقيق الوسيط</span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 0.8rem;">
                     <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
                         <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم الحساب:</span>
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                            <code style="color: #fff; font-size: 0.95rem; font-weight: 700; word-break: break-all; font-family: monospace;">${creds.email_or_phone || 'غير مسجل'}</code>
+                            <code id="inspect-modal-email" style="color: #fff; font-size: 0.95rem; font-weight: 700; word-break: break-all; font-family: monospace;">${creds.email_or_phone || 'غير مسجل'}</code>
                             <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectEmail()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -3031,6 +3031,33 @@ class WaseetApp {
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectPassword()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Account Details -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; border-top: 1px dashed rgba(249, 115, 22, 0.35); padding-top: 0.8rem;">
+                    <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
+                        <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                            <code id="inspect-modal-rec-email" style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(creds.recovery_email || creds.recoveryEmail || acc.recovery_email || acc.recoveryEmail || (acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) || 'غير مضاف')}</code>
+                            <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectRecoveryEmail()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
+                        <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">كلمة المرور لحساب الاسترداد:</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                            <span id="inspect-modal-rec-pw" style="color: var(--orange-bright); font-size: 0.92rem; font-weight: 700; font-family: monospace; letter-spacing: 2px;">••••••••••</span>
+                            <div style="display: flex; gap: 0.3rem;">
+                                <button class="btn-3d btn-outline" id="btn-toggle-inspect-rec-pw" onclick="window.waseetApp.toggleInspectRecoveryPassword()" title="إظهار/إخفاء" style="padding: 3px 8px; font-size: 0.75rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-3d btn-outline" onclick="window.waseetApp.copyInspectRecoveryPassword()" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -3072,7 +3099,7 @@ class WaseetApp {
             </div>
         `;
 
-        if (canViewCredentials && acc && acc.id) {
+        if (acc && acc.id) {
             (async () => {
                 try {
                     let sec = null;
@@ -3085,33 +3112,40 @@ class WaseetApp {
                         const mainEmail = (sec.email_or_phone || '').trim();
                         const mainPwd = (sec.password || '').trim();
 
+                        if (!this.currentInspectCredentials) this.currentInspectCredentials = {};
+                        if (!acc.credentials) acc.credentials = {};
+
                         if (recEmail && recEmail !== 'غير مضاف') {
                             acc.recovery_email = recEmail;
                             acc.recoveryEmail = recEmail;
-                            if (!acc.credentials) acc.credentials = {};
                             acc.credentials.recovery_email = recEmail;
                             acc.credentials.recoveryEmail = recEmail;
-                            const el = document.getElementById(`deck-rec-email-${acc.id}`);
+                            this.currentInspectCredentials.recovery_email = recEmail;
+                            this.currentInspectCredentials.recoveryEmail = recEmail;
+                            const el = document.getElementById('inspect-modal-rec-email');
                             if (el) el.innerText = recEmail;
                         }
                         if (recPwd && recPwd !== '••••••••' && recPwd !== 'غير مضاف') {
                             acc.recovery_password = recPwd;
                             acc.recoveryPassword = recPwd;
-                            if (!acc.credentials) acc.credentials = {};
                             acc.credentials.recovery_password = recPwd;
                             acc.credentials.recoveryPassword = recPwd;
+                            this.currentInspectCredentials.recovery_password = recPwd;
+                            this.currentInspectCredentials.recoveryPassword = recPwd;
                         }
                         if (mainEmail) {
-                            if (!acc.credentials) acc.credentials = {};
                             acc.credentials.email_or_phone = mainEmail;
+                            this.currentInspectCredentials.email_or_phone = mainEmail;
+                            const el = document.getElementById('inspect-modal-email');
+                            if (el) el.innerText = mainEmail;
                         }
                         if (mainPwd && mainPwd !== '••••••••') {
-                            if (!acc.credentials) acc.credentials = {};
                             acc.credentials.password = mainPwd;
+                            this.currentInspectCredentials.password = mainPwd;
                         }
                     }
                 } catch (e) {
-                    console.warn('[Deck Hydration] Credentials sync warning:', e);
+                    console.warn('[Inspection Hydration] Credentials sync warning:', e);
                 }
             })();
         }
@@ -3212,6 +3246,34 @@ class WaseetApp {
     copyInspectPassword() {
         const pwd = (this.currentInspectCredentials && this.currentInspectCredentials.password) || '';
         this.copyToClipboard(pwd, 'تم نسخ كلمة المرور');
+    }
+
+    copyInspectRecoveryEmail() {
+        const email = (this.currentInspectCredentials && (this.currentInspectCredentials.recovery_email || this.currentInspectCredentials.recoveryEmail)) || '';
+        this.copyToClipboard(email, 'تم نسخ البريد الإلكتروني لحساب الاسترداد');
+    }
+
+    toggleInspectRecoveryPassword(explicitPassword) {
+        const pwEl = document.getElementById('inspect-modal-rec-pw');
+        const btn = document.getElementById('btn-toggle-inspect-rec-pw');
+        if (!pwEl) return;
+        if (pwEl.getAttribute('data-shown') === 'true') {
+            pwEl.innerText = '••••••••••';
+            pwEl.style.letterSpacing = '2px';
+            pwEl.setAttribute('data-shown', 'false');
+            if (btn) btn.innerHTML = '<i class="fas fa-eye"></i>';
+        } else {
+            const pwd = explicitPassword || (this.currentInspectCredentials && (this.currentInspectCredentials.recovery_password || this.currentInspectCredentials.recoveryPassword)) || 'غير مسجل';
+            pwEl.innerText = pwd;
+            pwEl.style.letterSpacing = 'normal';
+            pwEl.setAttribute('data-shown', 'true');
+            if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        }
+    }
+
+    copyInspectRecoveryPassword() {
+        const pwd = (this.currentInspectCredentials && (this.currentInspectCredentials.recovery_password || this.currentInspectCredentials.recoveryPassword)) || '';
+        this.copyToClipboard(pwd, 'تم نسخ كلمة المرور لحساب الاسترداد');
     }
 
     copyDeckEmail(accId) {
