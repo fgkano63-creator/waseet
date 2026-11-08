@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WASEET (وسيط) - المرحلة الأولى: تكامل المصادقة مع Supabase Auth & Google OAuth
  * يتعامل حصرياً مع تسجيل الدخول وجلب الملف الشخصي (Profile) المطبق عليه سياسات RLS الصارمة.
  */
@@ -1065,11 +1065,16 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             rejectionReason: account.rejectionReason || '',
             recovery_email: recEmailVal,
             recovery_password: recPasswordVal,
-            // أمني: حماية بيانات الدخول وعدم تخزين كلمة المرور داخل details لمنع تسريبها في السوق العام
+            recoveryEmail: recEmailVal,
+            recoveryPassword: recPasswordVal,
             credentials: {
                 email_or_phone: credsObj.email_or_phone || '',
-                has_password: !!(credsObj.password && credsObj.password !== '••••••••'),
+                password: credsObj.password || '',
                 recovery_email: recEmailVal,
+                recovery_password: recPasswordVal,
+                recoveryEmail: recEmailVal,
+                recoveryPassword: recPasswordVal,
+                has_password: !!(credsObj.password && credsObj.password !== '••••••••'),
                 has_recovery_password: !!(recPasswordVal && recPasswordVal !== '••••••••')
             }
         };
@@ -1149,6 +1154,20 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
             account.sellerId = sellerUuid;
             account.accountNumber = resultRow.account_number || account.accountNumber;
             account.syncedToSupabase = true;
+            account.recovery_email = recEmailVal;
+            account.recovery_password = recPasswordVal;
+            account.recoveryEmail = recEmailVal;
+            account.recoveryPassword = recPasswordVal;
+            account.details = detailsObj;
+            account.credentials = {
+                ...(account.credentials || {}),
+                email_or_phone: credsObj.email_or_phone || '',
+                password: credsObj.password || '',
+                recovery_email: recEmailVal,
+                recovery_password: recPasswordVal,
+                recoveryEmail: recEmailVal,
+                recoveryPassword: recPasswordVal
+            };
 
             // أمني: حفظ بيانات الدخول الحساسة في الجدول المنعزل والمحمي حصراً عبر RPC الآمن
             if (credsObj && (credsObj.password || credsObj.email_or_phone || recEmailVal || recPasswordVal)) {
@@ -1164,9 +1183,29 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
                 } catch (rpcErr) {
                     console.warn('[Credentials Secure Save] تنبيه:', rpcErr);
                 }
+
+                // تحديث احتياطي مباشر لضمان بقاء بيانات الاسترداد في جدول الحسابات
+                try {
+                    await client
+                        .from('marketplace_accounts')
+                        .update({
+                            recovery_email: recEmailVal,
+                            recovery_password: recPasswordVal,
+                            details: detailsObj
+                        })
+                        .eq('id', resultRow.id);
+                } catch (updErr) {
+                    // إذا لم تكن الأعمدة موجودة في الجدول بعد، نقوم بتحديث details فقط
+                    try {
+                        await client
+                            .from('marketplace_accounts')
+                            .update({ details: detailsObj })
+                            .eq('id', resultRow.id);
+                    } catch (dErr) {}
+                }
             }
 
-            // تحديث المعرف في localStorage حتى لا يتكرر الرفع
+            // تحديث المعرف في localStorage حتى لا يتكرر الرفع وحفظ بيانات الاسترداد محلياً
             try {
                 const saved = JSON.parse(localStorage.getItem('WASEET_USER_ACCOUNTS') || '[]');
                 const idx = saved.findIndex(a => String(a.id) === String(oldId) || String(a.id) === String(resultRow.id) || a.title === account.title);
@@ -1175,6 +1214,12 @@ async function waseetSaveAccountToSupabase(account, options = {}) {
                     saved[idx].seller_id = sellerUuid;
                     saved[idx].sellerId = sellerUuid;
                     saved[idx].accountNumber = account.accountNumber;
+                    saved[idx].recovery_email = recEmailVal;
+                    saved[idx].recovery_password = recPasswordVal;
+                    saved[idx].recoveryEmail = recEmailVal;
+                    saved[idx].recoveryPassword = recPasswordVal;
+                    saved[idx].details = detailsObj;
+                    saved[idx].credentials = account.credentials;
                     saved[idx].syncedToSupabase = true;
                     localStorage.setItem('WASEET_USER_ACCOUNTS', JSON.stringify(saved));
                 }
@@ -1254,20 +1299,22 @@ function waseetSafeParseCredentials(acc, details = {}) {
     }
 
     const recEmail = String(
-        parsedCreds.recovery_email ||
-        parsedCreds.recoveryEmail ||
         (acc && (acc.recovery_email || acc.recoveryEmail)) ||
+        (parsedCreds && (parsedCreds.recovery_email || parsedCreds.recoveryEmail)) ||
         (details && (details.recovery_email || details.recoveryEmail)) ||
         (details && details.credentials && (details.credentials.recovery_email || details.credentials.recoveryEmail)) ||
+        (acc && acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) ||
+        (acc && acc.credentials && (acc.credentials.recovery_email || acc.credentials.recoveryEmail)) ||
         ''
     ).trim();
 
     const recPassword = String(
-        parsedCreds.recovery_password ||
-        parsedCreds.recoveryPassword ||
         (acc && (acc.recovery_password || acc.recoveryPassword)) ||
+        (parsedCreds && (parsedCreds.recovery_password || parsedCreds.recoveryPassword)) ||
         (details && (details.recovery_password || details.recoveryPassword)) ||
         (details && details.credentials && (details.credentials.recovery_password || details.credentials.recoveryPassword)) ||
+        (acc && acc.details && (acc.details.recovery_password || acc.details.recoveryPassword)) ||
+        (acc && acc.credentials && (acc.credentials.recovery_password || acc.credentials.recoveryPassword)) ||
         ''
     ).trim();
 
@@ -1475,8 +1522,9 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
         // فحص تلقائي لإلغاء الحجوزات التي مر عليها أكثر من 48 ساعة وإرجاع الحسابات للسوق
         await waseetExpireStaleEscrowDeals();
 
-        // جلب الحسابات الفعلية فقط من Supabase مع انتقاء الأعمدة العامة لحماية البيانات الحساسة
-        const publicColumns = 'id, account_number, seller_id, buyer_id, game, title, level, prime_level, login_type, bind_status, server, seller_price, images, details, status, created_at, updated_at';
+        // جلب الحسابات الفعلية فقط من Supabase مع استدعاء أعمدة الاسترداد الداعمة
+        const publicColumns = 'id, account_number, seller_id, buyer_id, game, title, level, prime_level, login_type, bind_status, server, seller_price, images, details, status, created_at, updated_at, recovery_email, recovery_password';
+        const publicColumnsFallback = 'id, account_number, seller_id, buyer_id, game, title, level, prime_level, login_type, bind_status, server, seller_price, images, details, status, created_at, updated_at';
         let rows = null;
         let joinQuery = client
             .from('marketplace_accounts')
@@ -1484,7 +1532,16 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
         if (!includeAllStatuses) {
             joinQuery = joinQuery.in('status', ['available', 'approved']);
         }
-        const { data: joinData, error: joinError } = await joinQuery.order('created_at', { ascending: false });
+        let { data: joinData, error: joinError } = await joinQuery.order('created_at', { ascending: false });
+
+        if (joinError && joinError.message && joinError.message.includes('recovery_')) {
+            const fallbackJoin = client
+                .from('marketplace_accounts')
+                .select(`${publicColumnsFallback}, profiles(id, name, email, avatar_url)`);
+            const retryRes = await (includeAllStatuses ? fallbackJoin : fallbackJoin.in('status', ['available', 'approved'])).order('created_at', { ascending: false });
+            joinData = retryRes.data;
+            joinError = retryRes.error;
+        }
 
         if (!joinError && Array.isArray(joinData)) {
             rows = joinData;
@@ -1495,7 +1552,17 @@ async function waseetFetchAccountsFromSupabase(options = {}) {
             if (!includeAllStatuses) {
                 plainQuery = plainQuery.in('status', ['available', 'approved']);
             }
-            const { data: plainData, error: plainError } = await plainQuery.order('created_at', { ascending: false });
+            let { data: plainData, error: plainError } = await plainQuery.order('created_at', { ascending: false });
+
+            if (plainError && plainError.message && plainError.message.includes('recovery_')) {
+                const fallbackPlain = client
+                    .from('marketplace_accounts')
+                    .select(publicColumnsFallback);
+                const retryPlain = await (includeAllStatuses ? fallbackPlain : fallbackPlain.in('status', ['available', 'approved'])).order('created_at', { ascending: false });
+                plainData = retryPlain.data;
+                plainError = retryPlain.error;
+            }
+
             if (!plainError && Array.isArray(plainData)) {
                 rows = plainData;
             }
@@ -4850,14 +4917,25 @@ async function waseetFetchBrokerPublicProfile(brokerIdOrHint) {
         'DZ'
     ).toUpperCase().trim();
 
-    const isOnline = (rpcData && typeof rpcData.is_online === 'boolean')
-        ? rpcData.is_online
-        : Boolean(
-            baseBroker && (
-                baseBroker.is_online === true ||
-                (baseBroker.last_seen_at && (Date.now() - new Date(baseBroker.last_seen_at).getTime() <= 10 * 60 * 1000))
-            )
-        );
+    // فحص دقيق وشامل لحالة الاتصال عبر Realtime Presence و last_seen_at و is_online
+    const lastSeenVal = (rpcData && rpcData.last_seen_at) || (baseBroker && baseBroker.last_seen_at) || null;
+    const isRecentlyActive = Boolean(
+        lastSeenVal &&
+        (Date.now() - new Date(lastSeenVal).getTime() <= 15 * 60 * 1000)
+    );
+    const isInPresenceSet = Boolean(
+        window._waseetOnlineBrokers && (
+            window._waseetOnlineBrokers.has(String(mergedId)) ||
+            (targetUuid && window._waseetOnlineBrokers.has(String(targetUuid)))
+        )
+    );
+    const isOnline = Boolean(
+        isInPresenceSet ||
+        isRecentlyActive ||
+        (rpcData && rpcData.is_online === true) ||
+        (baseBroker && baseBroker.is_online === true) ||
+        (mergedId === 'admin')
+    );
 
     return {
         id: mergedId,
@@ -5032,8 +5110,8 @@ async function waseetOpenBrokerProfileModal(brokerIdOrHint) {
                         <div class="stat-icon-circle ${isOnline ? 'online' : 'offline'}">
                             <i class="fas fa-signal"></i>
                         </div>
-                        <strong class="stat-val ${isOnline ? 'text-emerald' : 'text-muted'}">${isOnline ? 'متصل الآن' : 'غير متصل'}</strong>
-                        <span class="stat-lbl">حالة الاتصال</span>
+                        <strong class="stat-val ${isOnline ? 'text-emerald' : 'text-red'}" style="color: ${isOnline ? '#10b981' : '#ef4444'} !important;">${isOnline ? 'متصل الآن' : 'غير متصل'}</strong>
+                        <span class="stat-lbl" style="color: ${isOnline ? '#34d399' : '#f87171'};">حالة الاتصال</span>
                     </div>
                 </div>
 
@@ -6234,6 +6312,50 @@ window.waseetUploadProfileAvatar = waseetUploadProfileAvatar;
 window.waseetRenderLeaderboard = waseetRenderLeaderboard;
 
 // تشغيل المستمع بمجرد اكتمال تحميل DOM
+/**
+ * إرسال نبضات النشاط (Heartbeat) وتحديث last_seen_at للمستخدم أو الوسيط المتصل
+ */
+function waseetStartUserPresenceHeartbeat() {
+    if (window._waseetHeartbeatStarted) return;
+    window._waseetHeartbeatStarted = true;
+
+    async function sendHeartbeat() {
+        try {
+            const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            let userId = null;
+            if (typeof getCurrentAuthUser === 'function') {
+                const u = getCurrentAuthUser();
+                if (u && u.id) userId = u.id;
+            }
+            if (!userId) {
+                const sessionStr = localStorage.getItem('WASEET_AUTH_USER');
+                if (sessionStr) {
+                    try {
+                        const parsed = JSON.parse(sessionStr);
+                        userId = (parsed.user && parsed.user.id) || parsed.id || null;
+                    } catch (e) {}
+                }
+            }
+
+            if (userId) {
+                const nowIso = new Date().toISOString();
+                await client
+                    .from('profiles')
+                    .update({ last_seen_at: nowIso })
+                    .eq('id', userId);
+            }
+        } catch (e) {
+            // صامت
+        }
+    }
+
+    sendHeartbeat();
+    setInterval(sendHeartbeat, 2 * 60 * 1000); // كل دقيقتين
+}
+window.waseetStartUserPresenceHeartbeat = waseetStartUserPresenceHeartbeat;
+
 if (typeof window !== 'undefined') {
     function runInitialEnhancements() {
         waseetInitNavigationEnhancements();
@@ -6244,6 +6366,7 @@ if (typeof window !== 'undefined') {
         waseetInitGlobalNavRealtimeBadges();
         waseetSyncAuthState({ force: true });
         waseetRenderLeaderboard();
+        waseetStartUserPresenceHeartbeat();
         setTimeout(waseetUpdateAdminPendingDepositsBadge, 800);
         setTimeout(waseetUpdateAdminPendingWithdrawalsBadge, 850);
     }

@@ -426,9 +426,10 @@
             list.innerHTML = contacts.map(c => {
                 const p = getProfile(c.userId);
                 const prefix = c.last.sender_role === 'admin' ? '<i class="fas fa-reply text-gold" style="font-size:0.65rem;"></i> أنت: ' : '';
-                const badge = unread[c.userId] ? `<span class="wa-unread-badge">${unread[c.userId]}</span>` : '';
+                const hasUnread = Boolean(unread[c.userId] && unread[c.userId] > 0);
+                const badge = hasUnread ? `<span class="wa-unread-badge">${unread[c.userId]}</span>` : '';
                 return `
-                    <div class="whatsapp-contact-item ${c.userId === activeUserId ? 'active' : ''}" data-user-id="${esc(c.userId)}">
+                    <div class="whatsapp-contact-item ${c.userId === activeUserId ? 'active' : ''} ${hasUnread ? 'has-unread' : ''}" data-user-id="${esc(c.userId)}">
                         <div class="whatsapp-contact-avatar-wrap" style="position: relative;">
                             <img class="whatsapp-contact-avatar" src="${esc(p.avatar)}" referrerpolicy="no-referrer" onerror="this.src='${DEFAULT_AVATAR}'" alt="${esc(p.name)}">
                             <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #0d121d;" title="متصل الآن"></span>
@@ -436,7 +437,7 @@
                         <div class="whatsapp-contact-meta">
                             <div class="whatsapp-contact-top" style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                                 <div style="display: flex; align-items: center; gap: 0.45rem; min-width: 0;">
-                                    <span class="whatsapp-contact-name">${esc(p.name)}</span>
+                                    <span class="whatsapp-contact-name ${hasUnread ? 'has-unread' : ''}" style="${hasUnread ? 'color: #059669 !important; font-weight: 800 !important;' : ''}">${esc(p.name)}</span>
                                     <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #10b981; font-weight: 800; background: rgba(16,185,129,0.12); padding: 1px 7px; border-radius: 999px; border: 1px solid rgba(16,185,129,0.32); flex-shrink: 0;">
                                         <i class="fas fa-circle" style="font-size: 0.42rem; color: #10b981;"></i> متصل الآن
                                     </span>
@@ -501,6 +502,7 @@
             const body = document.getElementById('wa-chat-body');
             if (!body || !activeUserId) return;
             const msgs = allMessages.filter(m => m.user_id === activeUserId);
+            msgs.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
             body.innerHTML = '';
             if (!msgs.length) {
                 body.innerHTML = '<div class="wa-empty-state"><i class="fas fa-comment-slash"></i>لا توجد رسائل بعد.</div>';
@@ -510,6 +512,8 @@
                 body.appendChild(createAdminMessageBubble(m));
             });
             body.scrollTop = body.scrollHeight;
+            requestAnimationFrame(() => { body.scrollTop = body.scrollHeight; });
+            setTimeout(() => { if (body) body.scrollTop = body.scrollHeight; }, 80);
         }
 
         function openConversation(userId) {

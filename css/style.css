@@ -6521,12 +6521,13 @@ input[type=number] {
    WHATSAPP STYLE ADMIN SUPPORT CHAT (صفحة محادثات الإدارة والوسيط)
    ========================================================================== */
 .whatsapp-admin-wrapper {
-    max-width: 1300px;
-    margin: var(--page-gap-top) auto 2rem;
-    padding: 0 var(--page-gutter);
-    height: calc(100vh - 130px);
-    height: calc(100dvh - 130px);
+    max-width: 100% !important;
+    margin: 0.35rem auto 1rem !important;
+    padding: 0 1rem !important;
+    height: calc(100vh - 90px) !important;
+    height: calc(100dvh - 90px) !important;
     min-height: 560px;
+    box-sizing: border-box !important;
 }
 
 .whatsapp-container {
@@ -6629,6 +6630,20 @@ input[type=number] {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.25s ease, font-weight 0.25s ease;
+}
+
+/* تمييز المحادثات التي تحتوي على رسائل جديدة باللون الأخضر الغامق والخط العريض */
+.whatsapp-contact-item.has-unread .whatsapp-contact-name,
+.whatsapp-contact-name.has-unread {
+    color: #059669 !important; /* أخضر غامق مميز للرسائل غير المقروءة */
+    font-weight: 800 !important;
+    text-shadow: 0 0 10px rgba(5, 150, 105, 0.4);
+}
+
+.whatsapp-contact-item.has-unread {
+    background: rgba(5, 150, 105, 0.08) !important;
+    border-right: 3px solid #059669 !important;
 }
 .whatsapp-contact-time {
     font-size: 0.7rem;
@@ -9709,9 +9724,9 @@ html.lenis body {
 }
 
 .global-broker-online-dot.offline {
-    background: #64748b !important;
-    box-shadow: none !important;
-    opacity: 0.75 !important;
+    background: #ef4444 !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+    opacity: 1 !important;
 }
 
 .global-broker-country-badge {
@@ -9959,7 +9974,8 @@ html.lenis body {
 }
 
 .broker-online-dot.offline {
-    background: #64748b;
+    background: #ef4444 !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6) !important;
 }
 
 .broker-profile-name {
@@ -10093,8 +10109,18 @@ html.lenis body {
 }
 
 .stat-icon-circle.offline {
-    background: rgba(148, 163, 184, 0.15);
-    color: #94a3b8;
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+}
+
+.stat-val.text-red {
+    color: #ef4444 !important;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3) !important;
+}
+
+.stat-val.text-emerald {
+    color: #10b981 !important;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3) !important;
 }
 
 .stat-val {

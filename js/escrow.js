@@ -757,6 +757,15 @@ class WaseetEscrowRoom {
                 sellerChatEl.scrollTop = sellerChatEl.scrollHeight;
             }
         }
+
+        requestAnimationFrame(() => {
+            if (buyerChatEl) buyerChatEl.scrollTop = buyerChatEl.scrollHeight;
+            if (sellerChatEl) sellerChatEl.scrollTop = sellerChatEl.scrollHeight;
+        });
+        setTimeout(() => {
+            if (buyerChatEl) buyerChatEl.scrollTop = buyerChatEl.scrollHeight;
+            if (sellerChatEl) sellerChatEl.scrollTop = sellerChatEl.scrollHeight;
+        }, 80);
     }
 
     setViewerRole(role) {
@@ -1655,6 +1664,13 @@ class WaseetEscrowRoom {
         if (!filteredMessages.length) {
             return '<div style="color: var(--silver-muted); text-align: center; font-size: 0.8rem; padding: 2rem;">لا توجد رسائل سابقة.</div>';
         }
+
+        // ترتيب الرسائل تصاعدياً بحيث تظهر الرسائل الجديدة في الأسفل دائماً
+        filteredMessages.sort((a, b) => {
+            const tA = new Date(a.created_at || a.time || 0).getTime() || 0;
+            const tB = new Date(b.created_at || b.time || 0).getTime() || 0;
+            return tA - tB;
+        });
 
         return filteredMessages.map(msg => {
             const safeMsgId = String(msg.id || '').replace(/"/g, '&quot;');

@@ -383,39 +383,22 @@
         /* الحاوية الرئيسية للمحادثة وضبط الارتفاع مع استبعاد شريط التنقل لمنع التمرير الإضافي */
 
         .support-page-container {
-
-            height: calc(100vh - var(--support-navbar-height, 85px)) !important;
-
-            height: calc(100dvh - var(--support-navbar-height, 85px)) !important;
-
-            max-height: calc(100vh - var(--support-navbar-height, 85px)) !important;
-
-            max-height: calc(100dvh - var(--support-navbar-height, 85px)) !important;
-
+            height: calc(100vh - var(--support-navbar-height, 80px)) !important;
+            height: calc(100dvh - var(--support-navbar-height, 80px)) !important;
+            max-height: calc(100vh - var(--support-navbar-height, 80px)) !important;
+            max-height: calc(100dvh - var(--support-navbar-height, 80px)) !important;
             flex: 1 1 auto !important;
-
             min-height: 0 !important;
-
-            max-width: 1350px !important;
-
+            max-width: 100% !important;
             width: 100% !important;
-
-            margin: 0 auto !important;
-
-            padding: 0.6rem 1rem 0.8rem !important;
-
+            margin: 0 !important;
+            padding: 0.35rem 0.75rem 0.4rem !important;
             box-sizing: border-box !important;
-
             display: flex !important;
-
             flex-direction: column !important;
-
-            overflow: hidden !important; /* لا يوجد تمرير في الحاوية */
-
+            overflow: hidden !important;
             position: relative !important;
-
             z-index: 10 !important;
-
         }
 
 
@@ -1572,7 +1555,7 @@
 
                                     <img id="active-contact-avatar" class="whatsapp-contact-avatar" src="assets/logo.png" alt="الوسيط" referrerpolicy="no-referrer">
 
-                                    <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #0d121d;" title="متصل الآن"></span>
+                                    <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: ${c.isOnline !== false ? '#10b981' : '#ef4444'}; border: 2px solid #0d121d; box-shadow: 0 0 8px ${c.isOnline !== false ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.6)'};" title="${c.isOnline !== false ? 'متصل الآن' : 'غير متصل'}"></span>
 
                                 </div>
 
@@ -2013,6 +1996,7 @@
                     isPinned: true,
 
                     isLocal: false,
+                    isOnline: true,
 
                     welcomeTitle: 'مرحباً بك في المحادثة المباشرة مع إدارة WASEET (المدير العام)',
 
@@ -2107,6 +2091,12 @@
 
                                 
 
+                                const isBrokerOnline = Boolean(
+                                    r.is_online === true ||
+                                    (r.last_seen_at && (Date.now() - new Date(r.last_seen_at).getTime() <= 15 * 60 * 1000)) ||
+                                    (window._waseetOnlineBrokers && window._waseetOnlineBrokers.has(String(r.id || r.user_id)))
+                                );
+
                                 const item = {
 
                                     id: `broker_${r.id || r.user_id}`,
@@ -2137,7 +2127,9 @@
 
                                     avatar: r.avatar_url || 'assets/logo.png',
 
-                                    statusText: `وسيط معتمد في ${cName} • متصل الآن`,
+                                    isOnline: isBrokerOnline,
+
+                                    statusText: isBrokerOnline ? `وسيط معتمد في ${cName} • متصل الآن` : `وسيط معتمد في ${cName} • غير متصل`,
 
                                     desc: `وسيط إقليمي معتمد • فحص الحسابات والشحن في ${cName}`,
 
@@ -2199,6 +2191,12 @@
 
 
 
+                                const isBOnline = Boolean(
+                                    b.is_online === true ||
+                                    (b.last_seen_at && (Date.now() - new Date(b.last_seen_at).getTime() <= 15 * 60 * 1000)) ||
+                                    (window._waseetOnlineBrokers && window._waseetOnlineBrokers.has(String(b.id || b.user_id)))
+                                );
+
                                 const item = {
 
                                     id: `broker_${b.id || b.user_id}`,
@@ -2229,7 +2227,9 @@
 
                                     avatar: b.avatar_url || 'assets/logo.png',
 
-                                    statusText: `وسيط معتمد في ${cName} • متصل الآن`,
+                                    isOnline: isBOnline,
+
+                                    statusText: isBOnline ? `وسيط معتمد في ${cName} • متصل الآن` : `وسيط معتمد في ${cName} • غير متصل`,
 
                                     desc: `وسيط إقليمي معتمد • فحص الحسابات والشحن في ${cName}`,
 
@@ -2513,11 +2513,10 @@
 
 
 
+                    const unreadCount = Number(unreadCounts[c.id] || 0);
+                    const hasUnread = unreadCount > 0;
                     return `
-
-
-
-                        <div class="whatsapp-contact-item ${isActive ? 'active' : ''}" data-contact-id="${escapeHtml(c.id)}" onclick="ContactSupportChat.selectContact('${escapeHtml(c.id)}', true)">
+                        <div class="whatsapp-contact-item ${isActive ? 'active' : ''} ${hasUnread ? 'has-unread' : ''}" data-contact-id="${escapeHtml(c.id)}" onclick="ContactSupportChat.selectContact('${escapeHtml(c.id)}', true)">
 
 
 
@@ -2529,7 +2528,7 @@
 
 
 
-                                <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: #10b981; border: 2px solid #0d121d;" title="متصل الآن"></span>
+                                <span style="position: absolute; bottom: 1px; left: 1px; width: 11px; height: 11px; border-radius: 50%; background: ${c.isOnline !== false ? '#10b981' : '#ef4444'}; border: 2px solid #0d121d; box-shadow: 0 0 8px ${c.isOnline !== false ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.6)'};" title="${c.isOnline !== false ? 'متصل الآن' : 'غير متصل'}"></span>
 
 
 
@@ -2549,7 +2548,7 @@
 
 
 
-                                        <span class="whatsapp-contact-name">${escapeHtml(c.name)}</span>
+                                        <span class="whatsapp-contact-name ${hasUnread ? 'has-unread' : ''}" style="${hasUnread ? 'color: #059669 !important; font-weight: 800 !important;' : ''}">${escapeHtml(c.name)}</span>
 
 
 
@@ -2786,6 +2785,7 @@
 
 
                 unreadCounts[target.id] = 0;
+                renderContactsList();
 
 
 
@@ -2903,7 +2903,10 @@
 
                 if (statusEl) {
 
-                    statusEl.innerHTML = `<i class="fas fa-circle" style="font-size: 0.45rem; color: #10b981;"></i> ${escapeHtml(target.statusText)}`;
+                    const isTOnline = Boolean(target.isOnline !== false);
+                    const tColor = isTOnline ? '#10b981' : '#ef4444';
+                    const tText = isTOnline ? (target.statusText || 'متصل الآن') : 'غير متصل';
+                    statusEl.innerHTML = `<i class="fas fa-circle" style="font-size: 0.45rem; color: ${tColor};"></i> <span style="color: ${tColor}; font-weight: 700;">${escapeHtml(tText)}</span>`;
 
                 }
 
@@ -3552,14 +3555,17 @@
 
 
             function scrollToBottom() {
-
                 const container = document.getElementById('support-chat-messages');
-
                 if (container) {
-
                     container.scrollTop = container.scrollHeight;
-
+                    requestAnimationFrame(() => {
+                        container.scrollTop = container.scrollHeight;
+                    });
+                    setTimeout(() => {
+                        if (container) container.scrollTop = container.scrollHeight;
+                    }, 80);
                 }
+            }
 
             }
 
@@ -3803,7 +3809,12 @@
 
                             const contactKey = newMsg.broker_id || 'admin';
 
-                            ContactSupportChat.appendMessageToActiveChat(newMsg, contactKey);
+                            if (contactKey === activeContactId) {
+                                ContactSupportChat.appendMessageToActiveChat(newMsg, contactKey);
+                            } else {
+                                unreadCounts[contactKey] = (unreadCounts[contactKey] || 0) + 1;
+                                renderContactsList();
+                            }
 
                         })
 

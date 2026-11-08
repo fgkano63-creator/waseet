@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WASEET (وسيط) - Main Application Controller
  * Handles:
  * 1. Social Login & User Profile management (Google, Facebook, Quick Mediator).
@@ -1459,6 +1459,8 @@ class WaseetApp {
         const pricing = calculateWaseetFee(acc.sellerPrice);
         const currentUser = (typeof WASEET_STATE !== 'undefined') ? WASEET_STATE.user : null;
         const isMediator = !!(currentUser && typeof isMediatorUser === 'function' && isMediatorUser(currentUser));
+        const isOwner = !!(currentUser && currentUser.id && (String(currentUser.id) === String(acc.seller_id) || String(currentUser.id) === String(acc.sellerId)));
+        const canViewCredentials = isMediator || isOwner;
         const isPendingPage = window.location.pathname.includes('pending-accounts.html') ||
                               Boolean(document.getElementById('pending-accounts-list-container'));
 
@@ -1533,8 +1535,8 @@ class WaseetApp {
                 </div>
             </div>
 
-            <!-- Private Escrow Credentials Box (Visible to Mediator/Admin Only) -->
-            ${isMediator ? `
+            <!-- Private Escrow Credentials Box (Visible to Mediator/Admin & Account Owner) -->
+            ${canViewCredentials ? `
                 <div class="secret-escrow-box" style="margin-bottom: 1.2rem; background: rgba(249, 115, 22, 0.08); border: 1.5px dashed var(--orange-bright); border-radius: 12px; padding: 1rem;">
                     <div class="secret-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; color: var(--orange-bright); font-weight: 800; font-size: 0.95rem;">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1578,7 +1580,7 @@ class WaseetApp {
                             <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-metal); border-radius: 8px; padding: 0.75rem;">
                                 <span style="font-size: 0.78rem; color: var(--silver-muted); display: block; margin-bottom: 0.3rem;">البريد الإلكتروني / رقم حساب الاسترداد:</span>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                                    <code id="deck-rec-email-${acc.id}" style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && (acc.credentials.recovery_email || acc.credentials.recoveryEmail)) || acc.recovery_email || acc.recoveryEmail || (acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) || 'غير مضاف'}</code>
+                                    <code id="deck-rec-email-${acc.id}" style="color: #fff; font-size: 0.92rem; font-weight: 700; word-break: break-all; font-family: monospace;">${(acc.credentials && (acc.credentials.recovery_email || acc.credentials.recoveryEmail)) || acc.recovery_email || acc.recoveryEmail || (acc.details && (acc.details.recovery_email || acc.details.recoveryEmail)) || (acc.details && acc.details.credentials && (acc.details.credentials.recovery_email || acc.details.credentials.recoveryEmail)) || 'غير مضاف'}</code>
                                     <button class="btn-3d btn-outline" onclick="window.waseetApp.copyDeckRecoveryEmail('${acc.id}')" title="نسخ" style="padding: 3px 8px; font-size: 0.75rem;">
                                         <i class="fas fa-copy"></i>
                                     </button>
@@ -1663,6 +1665,50 @@ class WaseetApp {
                 </div>
             </div>
         `;
+
+        if (canViewCredentials && acc && acc.id) {
+            (async () => {
+                try {
+                    let sec = null;
+                    if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(acc.id))) {
+                        sec = await window.waseetGetAccountCredentialsSecure(acc.id);
+                    }
+                    if (sec) {
+                        const recEmail = (sec.recovery_email || sec.recoveryEmail || '').trim();
+                        const recPwd = (sec.recovery_password || sec.recoveryPassword || '').trim();
+                        const mainEmail = (sec.email_or_phone || '').trim();
+                        const mainPwd = (sec.password || '').trim();
+
+                        if (recEmail && recEmail !== 'غير مضاف') {
+                            acc.recovery_email = recEmail;
+                            acc.recoveryEmail = recEmail;
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.recovery_email = recEmail;
+                            acc.credentials.recoveryEmail = recEmail;
+                            const el = document.getElementById(`deck-rec-email-${acc.id}`);
+                            if (el) el.innerText = recEmail;
+                        }
+                        if (recPwd && recPwd !== '••••••••' && recPwd !== 'غير مضاف') {
+                            acc.recovery_password = recPwd;
+                            acc.recoveryPassword = recPwd;
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.recovery_password = recPwd;
+                            acc.credentials.recoveryPassword = recPwd;
+                        }
+                        if (mainEmail) {
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.email_or_phone = mainEmail;
+                        }
+                        if (mainPwd && mainPwd !== '••••••••') {
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.password = mainPwd;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Deck Hydration] Credentials sync warning:', e);
+                }
+            })();
+        }
 
         modal.classList.add('active');
     }
@@ -2113,6 +2159,17 @@ class WaseetApp {
                         ];
                     }
 
+                    const recEmailVal = (document.getElementById('form-recovery-email')?.value || '').trim();
+                    const recPasswordVal = (document.getElementById('form-recovery-password')?.value || '').trim();
+                    const credsObj = {
+                        email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
+                        password: document.getElementById('form-seller-password')?.value?.trim() || '',
+                        recovery_email: recEmailVal,
+                        recovery_password: recPasswordVal,
+                        recoveryEmail: recEmailVal,
+                        recoveryPassword: recPasswordVal
+                    };
+
                     const newAccount = {
                         id: 'acc_' + Date.now(),
                         accountNumber: 1001 + (WASEET_STATE.accounts ? WASEET_STATE.accounts.length : 0),
@@ -2141,11 +2198,28 @@ class WaseetApp {
                         badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
                         featured: false,
                         status: 'pending',
-                        credentials: {
-                            email_or_phone: document.getElementById('form-seller-email')?.value?.trim() || '',
-                            password: document.getElementById('form-seller-password')?.value?.trim() || '',
-                            recovery_email: document.getElementById('form-recovery-email')?.value?.trim() || '',
-                            recovery_password: document.getElementById('form-recovery-password')?.value?.trim() || ''
+                        credentials: credsObj,
+                        recovery_email: recEmailVal,
+                        recovery_password: recPasswordVal,
+                        recoveryEmail: recEmailVal,
+                        recoveryPassword: recPasswordVal,
+                        details: {
+                            originalGame: game,
+                            sellerName: sellerName,
+                            sellerEmail: sellerEmail,
+                            evoGunsCount: evoCount,
+                            evoGuns: [],
+                            rareSkins: rareSkins,
+                            iconicPants: iconicPants,
+                            accountNotes: notesStr || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.',
+                            notes: notesStr || 'حساب مضمون ومفحوص من المالك الأصلي مباشرة.',
+                            badge: game === 'free_fire' ? `برايم ${primeLevel}` : 'مميز',
+                            reviewStatus: 'pending',
+                            recovery_email: recEmailVal,
+                            recovery_password: recPasswordVal,
+                            recoveryEmail: recEmailVal,
+                            recoveryPassword: recPasswordVal,
+                            credentials: credsObj
                         },
                         submittedAt: new Date().toISOString(),
                         reviewStatus: 'pending',
@@ -2174,6 +2248,8 @@ class WaseetApp {
                             server: 'mena',
                             seller_price: sellerPrice,
                             images: finalImages,
+                            recovery_email: recEmailVal,
+                            recovery_password: recPasswordVal,
                             details: {
                                 originalGame: game,
                                 sellerName: sellerName,
@@ -2186,7 +2262,11 @@ class WaseetApp {
                                 notes: newAccount.accountNotes,
                                 badge: newAccount.badge,
                                 reviewStatus: 'pending',
-                                credentials: newAccount.credentials
+                                recovery_email: recEmailVal,
+                                recovery_password: recPasswordVal,
+                                recoveryEmail: recEmailVal,
+                                recoveryPassword: recPasswordVal,
+                                credentials: credsObj
                             },
                             status: 'pending'
                         };
@@ -2991,6 +3071,50 @@ class WaseetApp {
                 </button>
             </div>
         `;
+
+        if (canViewCredentials && acc && acc.id) {
+            (async () => {
+                try {
+                    let sec = null;
+                    if (typeof window.waseetGetAccountCredentialsSecure === 'function' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(acc.id))) {
+                        sec = await window.waseetGetAccountCredentialsSecure(acc.id);
+                    }
+                    if (sec) {
+                        const recEmail = (sec.recovery_email || sec.recoveryEmail || '').trim();
+                        const recPwd = (sec.recovery_password || sec.recoveryPassword || '').trim();
+                        const mainEmail = (sec.email_or_phone || '').trim();
+                        const mainPwd = (sec.password || '').trim();
+
+                        if (recEmail && recEmail !== 'غير مضاف') {
+                            acc.recovery_email = recEmail;
+                            acc.recoveryEmail = recEmail;
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.recovery_email = recEmail;
+                            acc.credentials.recoveryEmail = recEmail;
+                            const el = document.getElementById(`deck-rec-email-${acc.id}`);
+                            if (el) el.innerText = recEmail;
+                        }
+                        if (recPwd && recPwd !== '••••••••' && recPwd !== 'غير مضاف') {
+                            acc.recovery_password = recPwd;
+                            acc.recoveryPassword = recPwd;
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.recovery_password = recPwd;
+                            acc.credentials.recoveryPassword = recPwd;
+                        }
+                        if (mainEmail) {
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.email_or_phone = mainEmail;
+                        }
+                        if (mainPwd && mainPwd !== '••••••••') {
+                            if (!acc.credentials) acc.credentials = {};
+                            acc.credentials.password = mainPwd;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Deck Hydration] Credentials sync warning:', e);
+                }
+            })();
+        }
 
         modal.classList.add('active');
         this.updateInspectDisplay();
