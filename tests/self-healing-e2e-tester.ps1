@@ -58,6 +58,7 @@ $sitemapXml = Get-Content 'D:\waseet-app\sitemap.xml' -Raw -Encoding UTF8
 $robotsTxt = Get-Content 'D:\waseet-app\robots.txt' -Raw -Encoding UTF8
 $securityValidatorJs = if (Test-Path 'D:\waseet-app\js\security-validator.js') { Get-Content 'D:\waseet-app\js\security-validator.js' -Raw -Encoding UTF8 } else { "" }
 $countryApiJs = if (Test-Path 'D:\waseet-app\api\country.js') { Get-Content 'D:\waseet-app\api\country.js' -Raw -Encoding UTF8 } else { "" }
+$countrySelectorJs = if (Test-Path 'D:\waseet-app\js\country-selector.js') { Get-Content 'D:\waseet-app\js\country-selector.js' -Raw -Encoding UTF8 } else { "" }
 $mig34Content = if (Test-Path 'D:\waseet-app\supabase\34_support_messages_broker_support.sql') { Get-Content 'D:\waseet-app\supabase\34_support_messages_broker_support.sql' -Raw -Encoding UTF8 } else { "" }
 $mig35Content = if (Test-Path 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql') { Get-Content 'D:\waseet-app\supabase\35_fix_support_messages_role_spoof_and_incidents_rls.sql' -Raw -Encoding UTF8 } else { "" }
 $mig36Content = if (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql') { Get-Content 'D:\waseet-app\supabase\36_fix_country_default_and_user_geolocation.sql' -Raw -Encoding UTF8 } else { "" }
@@ -473,6 +474,12 @@ Check-Result -Flow 'Geolocation Engine' -Name 'Safe Neutrality Invariant' -Succe
 
 $geo6 = $securityValidatorJs.Contains('countryCode(val)') -and $securityValidatorJs.Contains('isValid: false')
 Check-Result -Flow 'Geolocation Engine' -Name 'Country Code Security Validator And Neutral Handling' -Success $geo6 -Detail 'Validates ISO-2 codes strictly while permitting empty string without defaulting to DZ'
+
+$geo7 = $countrySelectorJs.Contains('waseetDetectCountryViaGeolocation') -and $countrySelectorJs.Contains('navigator.geolocation.getCurrentPosition') -and $countrySelectorJs.Contains('reverse-geocode-client') -and $countrySelectorJs.Contains('nominatim.openstreetmap.org')
+Check-Result -Flow 'Geolocation Engine' -Name 'HTML5 Geolocation API & BigDataCloud Reverse Geocoding' -Success $geo7 -Detail 'Provides browser-level GPS positioning with BigDataCloud and Nominatim reverse geocode layers'
+
+$geo8 = $countrySelectorJs.Contains('btn-modal-use-location') -and $profileHtml.Contains('btn-profile-use-location') -and $profileHtml.Contains('waseetDetectAndSetLocation')
+Check-Result -Flow 'Geolocation Engine' -Name 'Geolocation UI Trigger Parity (Modal & Profile)' -Success $geo8 -Detail 'Features instant GPS location detection buttons across country selection modal and profile dashboard'
 
 Write-Host ""
 Write-Host ">>> 17. FLOW 17: ESCROW UNILATERAL CANCELLATION & STORAGE BOLA HARDENING (MIGRATION 37)" -ForegroundColor Yellow

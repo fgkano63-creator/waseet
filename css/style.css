@@ -10803,6 +10803,31 @@ html.lenis body {
     margin-bottom: 8px;
 }
 
+/* ==========================================================================
+   Geolocation Buttons (Country Modal & Profile)
+   ========================================================================== */
+.btn-location-gps {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-location-gps:hover:not(:disabled) {
+    background: rgba(197, 160, 89, 0.22) !important;
+    border-color: #dfb76c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.25);
+}
+.btn-location-gps:active:not(:disabled) {
+    transform: translateY(0);
+}
+.btn-location-pill {
+    transition: all 0.2s ease;
+}
+.btn-location-pill:hover:not(:disabled) {
+    background: rgba(197, 160, 89, 0.22) !important;
+    border-color: #dfb76c !important;
+    color: #fff !important;
+}
+
+
 
 
 

@@ -1,7 +1,8 @@
 /**
  * WASEET (وسيط) - Universal Country Selector & Geolocation Fallback
- * يوفر نافذة ذكية لاختيار الدولة يدوياً عند فشل الاكتشاف التلقائي (VPN/AdBlock)
- * ويتيح للمستخدمين تغيير دولتهم في أي وقت بضغطة زر وتحديث قاعدة البيانات فوراً.
+ * يوفر نافذة ذكية لاختيار الدولة يدوياً أو تلقائياً عبر المتصفح (HTML5 Geolocation)
+ * عند فشل الاكتشاف التلقائي عبر الـ IP (بسبب VPN أو حظر الإعلانات)، ويتيح للمستخدمين
+ * تحديد وتغيير دولتهم في أي وقت بضغطة زر وتحديث قاعدة البيانات فوراً.
  */
 
 (function () {
@@ -28,6 +29,170 @@
         { code: 'SD', name: 'السودان', flag: '🇸🇩' },
         { code: 'OTHER', name: 'دولة أخرى', flag: '🌍' }
     ];
+
+    /**
+     * تحديد الدولة بدقة فائقة عبر إحداثيات المتصفح (HTML5 Geolocation API + Reverse Geocoding)
+     * يعتمد على إذن المستخدم ويستخدم BigDataCloud Client API كخيار أول،
+     * مع خيار احتياطي عبر OpenStreetMap Nominatim لضمان عدم الانقطاع.
+     * @param {Object} options { silent: boolean }
+     * @returns {Promise<{countryCode: string, countryName: string, flag: string, latitude: number, longitude: number}>}
+     */
+    async function waseetDetectCountryViaGeolocation(options = {}) {
+        if (typeof window === 'undefined' || !navigator || !navigator.geolocation) {
+            const msg = 'متصفحك لا يدعم ميزة تحديد الموقع الجغرافي (Geolocation API). يرجى اختيار دولتك من القائمة المنسدلة.';
+            if (!options.silent && typeof waseetAlert === 'function') {
+                waseetAlert('الموقع غير مدعوم', msg, 'info');
+            }
+            throw new Error('GEOLOCATION_NOT_SUPPORTED');
+        }
+
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos && pos.coords ? pos.coords.latitude : null;
+                    const lon = pos && pos.coords ? pos.coords.longitude : null;
+
+                    if (typeof lat !== 'number' || typeof lon !== 'number') {
+                        const err = new Error('INVALID_COORDINATES');
+                        if (!options.silent && typeof waseetAlert === 'function') {
+                            waseetAlert('تعذر الوصول للموقع', 'تعذر استخراج إحداثيات الموقع بدقة. يرجى اختيار دولتك من القائمة المنسدلة.', 'info');
+                        }
+                        return reject(err);
+                    }
+
+                    let countryCode = null;
+                    let countryName = '';
+
+                    // 1. محاولة جلب رمز الدولة عبر BigDataCloud Client Reverse Geocode API المجانية والدقيقة
+                    try {
+                        const controller = new AbortController();
+                        const timer = setTimeout(() => controller.abort(), 7000);
+                        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&localityLanguage=ar`, {
+                            signal: controller.signal
+                        });
+                        clearTimeout(timer);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.countryCode && typeof data.countryCode === 'string') {
+                                const code = data.countryCode.trim().toUpperCase();
+                                if (/^[A-Z]{2}$/.test(code)) {
+                                    countryCode = code;
+                                    countryName = (typeof data.countryName === 'string') ? data.countryName.trim() : '';
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('[Geolocation] BigDataCloud reverse geocode note:', e);
+                    }
+
+                    // 2. خيار احتياطي موثوق عبر OpenStreetMap Nominatim في حال تعثر الخدمة الأولى
+                    if (!countryCode) {
+                        try {
+                            const controller = new AbortController();
+                            const timer = setTimeout(() => controller.abort(), 7000);
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&accept-language=ar`, {
+                                headers: { 'Accept': 'application/json' },
+                                signal: controller.signal
+                            });
+                            clearTimeout(timer);
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data && data.address && data.address.country_code) {
+                                    const code = String(data.address.country_code).trim().toUpperCase();
+                                    if (/^[A-Z]{2}$/.test(code)) {
+                                        countryCode = code;
+                                        countryName = (typeof data.address.country === 'string') ? data.address.country.trim() : '';
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('[Geolocation] Nominatim reverse geocode note:', e);
+                        }
+                    }
+
+                    if (!countryCode) {
+                        const err = new Error('COULD_NOT_RESOLVE_COUNTRY_FROM_COORDS');
+                        if (!options.silent && typeof waseetAlert === 'function') {
+                            waseetAlert('تعذر الوصول للموقع', 'تم استلام إحداثيات الموقع ولكن تعذر تحديد الدولة تلقائياً. يرجى اختيار دولتك من القائمة المنسدلة يدوياً.', 'info');
+                        }
+                        return reject(err);
+                    }
+
+                    // حفظ وتحديث الحالة وقاعدة البيانات فوراً
+                    try {
+                        localStorage.setItem('WASEET_DETECTED_COUNTRY', countryCode);
+                        localStorage.setItem('WASEET_USER_MANUAL_COUNTRY_SET', 'true');
+
+                        if (window.WASEET_STATE && window.WASEET_STATE.user) {
+                            window.WASEET_STATE.user.country = countryCode;
+                        }
+
+                        // التحديث في Supabase إن كان المستخدم مسجلاً
+                        const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+                        const user = (window.WASEET_STATE && window.WASEET_STATE.user) ? window.WASEET_STATE.user : null;
+                        if (client && user && user.id && !user.isGuest) {
+                            try {
+                                await client
+                                    .from('profiles')
+                                    .update({ country: countryCode, updated_at: new Date().toISOString() })
+                                    .eq('id', user.id);
+                            } catch (dbErr) {
+                                console.warn('[Geolocation DB update note]', dbErr);
+                            }
+                        }
+
+                        // إطلاق حدث مخصص لإعادة تحميل الوسطاء وطرق الدفع
+                        window.dispatchEvent(new CustomEvent('waseet-country-changed', {
+                            detail: { country: countryCode, method: 'geolocation', latitude: lat, longitude: lon }
+                        }));
+
+                        // تحديث بطاقة الوسيط في القائمة الجانبية فوراً
+                        if (typeof window.waseetResolveCurrentUserCountry === 'function') {
+                            try {
+                                const slot = document.getElementById('drawer-regional-broker-card');
+                                if (slot && typeof window.waseetRenderRegionalBrokerCard === 'function') {
+                                    window.waseetRenderRegionalBrokerCard(slot);
+                                }
+                            } catch (e) {}
+                        }
+
+                        const matchObj = COUNTRIES_LIST.find(c => c.code === countryCode);
+                        const finalName = matchObj ? matchObj.name : (countryName || countryCode);
+                        const finalFlag = matchObj ? matchObj.flag : '📍';
+
+                        resolve({
+                            countryCode,
+                            countryName: finalName,
+                            flag: finalFlag,
+                            latitude: lat,
+                            longitude: lon
+                        });
+                    } catch (storeErr) {
+                        console.error('[Geolocation Store Error]', storeErr);
+                        resolve({ countryCode, countryName, flag: '📍', latitude: lat, longitude: lon });
+                    }
+                },
+                (geoErr) => {
+                    console.warn('[Geolocation Error]', geoErr);
+                    let userMsg = 'تعذر الوصول للموقع. يرجى اختيار دولتك من القائمة المنسدلة.';
+                    if (geoErr && geoErr.code === 1) { // PERMISSION_DENIED
+                        userMsg = 'تم رفض إذن الوصول للموقع الجغرافي. يمكنك دائماً اختيار دولتك يدوياً من القائمة المنسدلة أدناه.';
+                    } else if (geoErr && geoErr.code === 3) { // TIMEOUT
+                        userMsg = 'استغرقت محاولة تحديد الموقع وقتاً أطول من المتوقع. يرجى اختيار دولتك يدوياً.';
+                    }
+                    if (!options.silent && typeof waseetAlert === 'function') {
+                        waseetAlert('تعذر الوصول للموقع', userMsg, 'info');
+                    }
+                    reject(geoErr);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 12000,
+                    maximumAge: 60000
+                }
+            );
+        });
+    }
 
     /**
      * إظهار نافذة منبثقة فاخرة ثلاثية الأبعاد لاختيار الدولة
@@ -63,7 +228,19 @@
                 </div>
 
                 <h3 style="font-size: 1.35rem; font-weight: 800; color: #dfb76c; margin-bottom: 0.6rem;">${title}</h3>
-                <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.5rem;">${subtitle}</p>
+                <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.25rem;">${subtitle}</p>
+
+                <!-- زر تحديد الموقع الفعلي عبر المتصفح HTML5 Geolocation API -->
+                <div style="margin-bottom: 1.25rem;">
+                    <button type="button" id="btn-modal-use-location" class="btn-location-gps" style="width: 100%; height: 46px; background: rgba(197, 160, 89, 0.12); border: 1.5px dashed rgba(197, 160, 89, 0.55); border-radius: 12px; color: #dfb76c; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.25s ease;">
+                        <i class="fas fa-location-crosshairs text-orange" style="color: #f59e0b;"></i> استخدام موقعي الحالي 📍
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin: 0.9rem 0 0.4rem; color: #64748b; font-size: 0.8rem;">
+                        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                        <span>أو حدد دولتك يدوياً من القائمة</span>
+                        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                    </div>
+                </div>
 
                 <div style="margin-bottom: 1.5rem; text-align: right;">
                     <label style="display: block; font-size: 0.82rem; color: #c5a059; font-weight: 700; margin-bottom: 0.5rem;">
@@ -90,6 +267,7 @@
         const saveBtn = document.getElementById('btn-save-country-modal');
         const cancelBtn = document.getElementById('btn-cancel-country-modal');
         const closeBtn = document.getElementById('btn-close-country-modal');
+        const locationBtn = document.getElementById('btn-modal-use-location');
 
         function closeModal() {
             modal.style.opacity = '0';
@@ -107,6 +285,38 @@
             closeBtn.onclick = () => {
                 sessionStorage.setItem('WASEET_COUNTRY_PROMPT_DISMISSED', 'true');
                 closeModal();
+            };
+        }
+
+        // معالج زر تحديد الموقع الفعلي في النافذة المنبثقة
+        if (locationBtn) {
+            locationBtn.onclick = async () => {
+                const originalHtml = locationBtn.innerHTML;
+                locationBtn.disabled = true;
+                locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحديد موقعك الفعلي...';
+
+                try {
+                    const result = await waseetDetectCountryViaGeolocation({ silent: false });
+                    if (result && result.countryCode) {
+                        if (!selectEl.querySelector(`option[value="${result.countryCode}"]`)) {
+                            const opt = document.createElement('option');
+                            opt.value = result.countryCode;
+                            opt.textContent = `${result.flag || '📍'} ${result.countryName || result.countryCode} (${result.countryCode})`;
+                            selectEl.appendChild(opt);
+                        }
+                        selectEl.value = result.countryCode;
+
+                        closeModal();
+
+                        if (typeof waseetAlert === 'function') {
+                            waseetAlert('تم تحديد موقعك بنجاح 📍', `تم التعرف على موقعك وضبط الدولة: ${result.flag || '📍'} ${result.countryName}`, 'success');
+                        }
+                    }
+                } catch (err) {
+                    locationBtn.disabled = false;
+                    locationBtn.innerHTML = originalHtml;
+                    selectEl.focus();
+                }
             };
         }
 
@@ -171,8 +381,9 @@
         };
     }
 
-    // إتاحة الدالة عالمياً
+    // إتاحة الدوال عالمياً
     window.waseetPromptCountrySelection = waseetPromptCountrySelection;
+    window.waseetDetectCountryViaGeolocation = waseetDetectCountryViaGeolocation;
 
     // فحص ذكي عند بدء التشغيل: إذا لم تكن هناك دولة محددة إطلاقاً بعد انتهاء المهلة، اطلب التحديد بلطف
     function scheduleCountryCheck() {
@@ -183,7 +394,7 @@
                 (window.WASEET_STATE && window.WASEET_STATE.user && window.WASEET_STATE.user.country) || '';
 
             if (!country) {
-                // محاولة أخيرة للاكتشاف التلقائي
+                // محاولة أخيرة للاكتشاف التلقائي عبر الـ IP
                 if (typeof waseetDetectVisitorCountry === 'function') {
                     try {
                         const detected = await waseetDetectVisitorCountry();

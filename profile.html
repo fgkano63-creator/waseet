@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -944,9 +944,14 @@
 
                                 <!-- الدولة -->
                                 <div class="profile-field-group">
-                                    <label class="profile-field-label" for="input-profile-country">
-                                        <i class="fas fa-flag text-gold"></i> الدولة المفضلة
-                                    </label>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.5rem;">
+                                        <label class="profile-field-label" for="input-profile-country" style="margin-bottom: 0;">
+                                            <i class="fas fa-flag text-gold"></i> الدولة المفضلة
+                                        </label>
+                                        <button type="button" id="btn-profile-use-location" class="btn-location-pill" onclick="waseetDetectAndSetLocation(this)" style="background: rgba(197, 160, 89, 0.12); border: 1px solid rgba(197, 160, 89, 0.4); border-radius: 8px; color: #dfb76c; font-size: 0.8rem; font-weight: 700; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" title="تحديد الدولة تلقائياً عبر موقعي الفعلي">
+                                            <i class="fas fa-location-crosshairs text-orange" style="color: #f59e0b;"></i> استخدام موقعي الحالي 📍
+                                        </button>
+                                    </div>
                                     <select id="input-profile-country" class="profile-field-select">
                                         <option value="" disabled selected>-- حدد دولتك المفضلة --</option>
                                         <option value="DZ">🇩🇿 الجزائر (Algeria)</option>
@@ -2316,6 +2321,49 @@
             window.location.href = `index.html#marketplace`;
         }
 
+        /* ── استخدام الموقع الفعلي عبر المتصفح لتعيين الدولة تلقائياً (HTML5 Geolocation API) ── */
+        async function detectAndSetLocation(btn) {
+            if (!btn) btn = document.getElementById('btn-profile-use-location');
+            const originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحديد الموقع...';
+            }
+
+            try {
+                if (typeof window.waseetDetectCountryViaGeolocation !== 'function') {
+                    throw new Error('GEOLOCATION_HELPER_UNAVAILABLE');
+                }
+                const res = await window.waseetDetectCountryViaGeolocation({ silent: false });
+                if (res && res.countryCode) {
+                    const countryInput = document.getElementById('input-profile-country');
+                    if (countryInput) {
+                        let opt = countryInput.querySelector(`option[value="${res.countryCode}"]`);
+                        if (!opt) {
+                            opt = document.createElement('option');
+                            opt.value = res.countryCode;
+                            opt.textContent = `${res.flag || '📍'} ${res.countryName} (${res.countryCode})`;
+                            countryInput.appendChild(opt);
+                        }
+                        countryInput.value = res.countryCode;
+                    }
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تم تحديد دولتك بدقة 📍', `تم التعرف على موقعك وضبط الدولة: ${res.flag || '📍'} ${res.countryName}`, 'success');
+                    }
+                }
+            } catch (err) {
+                console.warn('[Profile Geolocation Note]', err);
+                const countryInput = document.getElementById('input-profile-country');
+                if (countryInput) countryInput.focus();
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            }
+        }
+        window.waseetDetectAndSetLocation = detectAndSetLocation;
+
         return {
             init: loadProfileAndStore,
             shareStoreLink,
@@ -2333,7 +2381,8 @@
             handleAvatarUrlInput,
             scrollToSettings,
             copyAccountId,
-            confirmLogout
+            confirmLogout,
+            detectAndSetLocation
         };
     })();
 
