@@ -547,6 +547,7 @@
         }
 
         refreshDrawerExtras();
+        initWaseetLiquidGlassNav();
         // مزامنة دورية خفيفة كل 30 ثانية لتحديث شريط الإشراف والرصيد دون استهلاك موارد المعالج أو الشبكة
         setInterval(function () {
             if (document.hidden) return;
@@ -559,6 +560,105 @@
                 var drawer = getDrawer();
                 if (drawer && drawer.classList.contains('active')) toggleWaseetDrawer(false);
             }
+        });
+    }
+
+    /**
+     * شريط التنقل السفلي الزجاجي الفاخر (WASEET Liquid Glass Bottom Navigation)
+     * يدعم الحركة السلسة في البيئة العربية (RTL) مع حساب دقيق لموقع الفقاعة السائلة.
+     */
+    function initWaseetLiquidGlassNav() {
+        var nav = document.getElementById('waseet-mobile-glass-nav') || document.querySelector('.mobile-bottom-nav');
+        if (!nav) return;
+
+        var indicator = nav.querySelector('.liquid-glass-indicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.className = 'liquid-glass-indicator';
+            indicator.id = 'waseet-glass-indicator';
+            nav.insertBefore(indicator, nav.firstChild);
+        }
+
+        var items = Array.prototype.slice.call(nav.querySelectorAll('.mobile-nav-item'));
+        if (!items.length) return;
+
+        // تحديد التبويب النشط بناءً على الصفحة الحالية
+        var path = (window.location.pathname || '').toLowerCase();
+        var activeItem = null;
+
+        if (path.indexOf('profile.html') !== -1) {
+            activeItem = nav.querySelector('[data-tab="profile"]');
+        } else if (path.indexOf('wallet.html') !== -1) {
+            activeItem = nav.querySelector('[data-tab="wallet"]');
+        } else if (path.indexOf('contact-support.html') !== -1 || path.indexOf('admin-chats.html') !== -1 || path.indexOf('chat.html') !== -1) {
+            activeItem = nav.querySelector('[data-tab="support"]');
+        } else if (path.indexOf('deals.html') !== -1) {
+            activeItem = nav.querySelector('[data-tab="deals"]');
+        } else if (path.indexOf('index.html') !== -1 || path === '/' || !path.endsWith('.html')) {
+            activeItem = nav.querySelector('[data-tab="home"]');
+        }
+
+        if (!activeItem) {
+            activeItem = nav.querySelector('.mobile-nav-item.active') || items[0];
+        }
+
+        function alignIndicator(targetEl, animate) {
+            if (!targetEl || !indicator) return;
+            items.forEach(function (it) { it.classList.remove('active'); });
+            targetEl.classList.add('active');
+
+            var navRect = nav.getBoundingClientRect();
+            var elRect = targetEl.getBoundingClientRect();
+            if (navRect.width === 0) return;
+
+            // حساب الإزاحة الأفقية الدقيقة بالنسبة للحد الأيسر لشريط التنقل
+            var x = elRect.left - navRect.left;
+            var w = elRect.width;
+
+            if (w > 0) {
+                indicator.style.width = w + 'px';
+            }
+
+            if (!animate) {
+                indicator.style.transition = 'none';
+                indicator.style.transform = 'translateX(' + x + 'px)';
+                requestAnimationFrame(function () {
+                    indicator.style.transition = 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease';
+                });
+            } else {
+                indicator.style.transition = 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease';
+                indicator.style.transform = 'translateX(' + x + 'px)';
+            }
+        }
+
+        window.waseetActivateBottomNavTab = function (el) {
+            if (!el) return;
+            alignIndicator(el, true);
+        };
+        window.activateTab = function (menuIdOrEl, maybeEl) {
+            var target = (maybeEl instanceof HTMLElement) ? maybeEl : (menuIdOrEl instanceof HTMLElement ? menuIdOrEl : null);
+            if (!target && typeof menuIdOrEl === 'number' && items[menuIdOrEl]) {
+                target = items[menuIdOrEl];
+            }
+            if (target) alignIndicator(target, true);
+        };
+        window.waseetInitLiquidGlassNav = initWaseetLiquidGlassNav;
+
+        // ضبط الموضع الأولي
+        alignIndicator(activeItem, false);
+        setTimeout(function () { alignIndicator(activeItem, false); }, 150);
+        setTimeout(function () { alignIndicator(activeItem, false); }, 500);
+
+        // مستمعات النقر
+        items.forEach(function (item) {
+            item.addEventListener('click', function () {
+                alignIndicator(this, true);
+            });
+        });
+
+        window.addEventListener('resize', function () {
+            var cur = nav.querySelector('.mobile-nav-item.active') || activeItem;
+            alignIndicator(cur, false);
         });
     }
 

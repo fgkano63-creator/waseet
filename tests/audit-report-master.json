@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-08T14:21:31.935Z",
+  "timestamp": "2026-11-09T19:55:23.515Z",
   "metrics": {
-    "totalChecks": 279,
-    "passed": 279,
+    "totalChecks": 280,
+    "passed": 280,
     "warnings": 0,
     "failures": 0
   },
@@ -110,7 +110,7 @@
         "id": "JS-AsyncCatch-js\\country-selector.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\country-selector.js async error-handling coverage verified (2 async, 4 catch)",
+        "message": "js\\country-selector.js async error-handling coverage verified (5 async, 10 catch)",
         "details": null
       },
       {
@@ -1351,7 +1351,7 @@
         "id": "CSS-Breakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive layout defined with 48 media queries",
+        "message": "Comprehensive responsive layout defined with 49 media queries",
         "details": null
       },
       {
@@ -1396,6 +1396,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "DOMPurify script included prior to executing app/escrow in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-withdrawals.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-withdrawals.html",
         "details": null
       },
       {

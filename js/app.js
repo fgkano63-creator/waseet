@@ -3682,6 +3682,13 @@ if (typeof window !== 'undefined') {
         if (drawer) drawer.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
     };
+
+    window.activateTab = window.activateTab || function (menuIdOrEl, maybeEl) {
+        if (typeof window.waseetActivateBottomNavTab === 'function') {
+            const target = (maybeEl instanceof HTMLElement) ? maybeEl : (menuIdOrEl instanceof HTMLElement ? menuIdOrEl : null);
+            window.waseetActivateBottomNavTab(target);
+        }
+    };
 }
 
 

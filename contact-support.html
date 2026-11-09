@@ -1675,52 +1675,28 @@
 
         <!-- ================= Mobile App Bottom Navigation Bar ================= -->
 
-        <nav class="mobile-bottom-nav">
-
-            <a href="index.html" class="mobile-nav-item">
-
+        <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+            <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+            <a href="index.html" class="mobile-nav-item" data-tab="home">
                 <i class="fas fa-home"></i>
-
                 <span>الرئيسية</span>
-
             </a>
-
-            <a href="index.html#marketplace" class="mobile-nav-item">
-
+            <a href="deals.html" class="mobile-nav-item" data-tab="deals">
                 <i class="fas fa-gamepad"></i>
-
                 <span>المتجر</span>
-
             </a>
-
-            <a href="contact-support.html" class="mobile-nav-item mobile-nav-center-action active" title="المحادثة المباشرة">
-
-                <div class="center-action-circle" style="background: linear-gradient(135deg, var(--orange-bright), var(--gold-primary));">
-
-                    <i class="fas fa-headset"></i>
-
-                </div>
-
-                <span>الوسيط</span>
-
+            <a href="contact-support.html" class="mobile-nav-item active" data-tab="support">
+                <i class="fas fa-comments"></i>
+                <span>الدعم</span>
             </a>
-
-            <a href="deals.html" class="mobile-nav-item">
-
-                <i class="fas fa-shield-alt"></i>
-
-                <span>قيد الشراء</span>
-
+            <a href="wallet.html" class="mobile-nav-item" data-tab="wallet">
+                <i class="fas fa-wallet"></i>
+                <span>المحفظة</span>
             </a>
-
-            <button class="mobile-nav-item" onclick="toggleSupportDrawer()">
-
+            <a href="profile.html" class="mobile-nav-item" data-tab="profile">
                 <i class="fas fa-user"></i>
-
                 <span>حسابي</span>
-
-            </button>
-
+            </a>
         </nav>
 
 

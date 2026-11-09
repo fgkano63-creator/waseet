@@ -336,27 +336,28 @@
     <!-- Unified Mobile Drawer Container (Componentized via renderMobileDrawer) -->
     <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"><!-- id="drawer-regional-broker-card" --></div>
 
-    <!-- ================= Mobile App Bottom Navigation Bar ================= -->
-    <nav class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item">
+    <!-- ================= WASEET Luxury Liquid Glass Mobile Bottom Navigation ================= -->
+    <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+        <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+        <a href="index.html" class="mobile-nav-item" data-tab="home">
             <i class="fas fa-home"></i>
             <span>الرئيسية</span>
         </a>
-        <a href="index.html#marketplace" class="mobile-nav-item">
+        <a href="deals.html" class="mobile-nav-item" data-tab="deals">
             <i class="fas fa-gamepad"></i>
             <span>المتجر</span>
         </a>
-        <a href="my-accounts.html" class="mobile-nav-item active">
-            <i class="fas fa-boxes"></i>
-            <span>حساباتي</span>
-        </a>
-        <a href="deals.html" class="mobile-nav-item">
-            <i class="fas fa-handshake"></i>
-            <span>قيد الشراء</span>
-        </a>
-        <a href="chat.html" class="mobile-nav-item">
+        <a href="contact-support.html" class="mobile-nav-item" data-tab="support">
             <i class="fas fa-comments"></i>
-            <span>المحادثات</span>
+            <span>الدعم</span>
+        </a>
+        <a href="wallet.html" class="mobile-nav-item" data-tab="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item active" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
         </a>
     </nav>
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -1359,27 +1359,26 @@
             </div>
         </div>
     </div>
-    <!-- ================= Mobile App Bottom Navigation Bar ================= -->
-    <nav class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item active" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal();">
+    <!-- ================= WASEET Luxury Liquid Glass Mobile Bottom Navigation ================= -->
+    <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+        <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+        <a href="index.html" class="mobile-nav-item active" data-tab="home" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal();">
             <i class="fas fa-home"></i>
             <span>الرئيسية</span>
         </a>
-        <a href="index.html#marketplace" class="mobile-nav-item" onclick="if(window.waseetCloseSellModal) window.waseetCloseSellModal();">
+        <a href="deals.html" class="mobile-nav-item" data-tab="deals">
             <i class="fas fa-gamepad"></i>
             <span>المتجر</span>
         </a>
-        <button type="button" class="mobile-nav-item mobile-nav-center-action" onclick="if(window.waseetApp) window.waseetApp.openSellModal();" title="بيع حساب جديد">
-            <div class="center-action-circle">
-                <i class="fas fa-plus"></i>
-            </div>
-            <span>بيع حساب</span>
-        </button>
-        <a href="deals.html" class="mobile-nav-item" id="mobile-nav-deals-link">
-            <i class="fas fa-shield-alt"></i>
-            <span>قيد الشراء</span>
+        <a href="contact-support.html" class="mobile-nav-item" data-tab="support">
+            <i class="fas fa-comments"></i>
+            <span>الدعم</span>
         </a>
-        <a href="my-accounts.html" class="mobile-nav-item">
+        <a href="wallet.html" class="mobile-nav-item" data-tab="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" data-tab="profile">
             <i class="fas fa-user"></i>
             <span>حسابي</span>
         </a>
