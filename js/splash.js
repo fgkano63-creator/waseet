@@ -14,6 +14,27 @@
     window._waseetSplashLoaded = true;
 
     var SPLASH_ID = 'waseet-splash-screen';
+    var SESSION_KEY = 'waseet_splash_shown';
+
+    // فحص الجلسة: إذا تم عرض الدخولية مسبقاً في هذه الجلسة، يتم تخطيها فوراً دون أي إبطاء
+    try {
+        if (sessionStorage.getItem(SESSION_KEY)) {
+            var existing = document.getElementById(SPLASH_ID);
+            if (existing) {
+                existing.classList.add('splash-hidden');
+                existing.style.display = 'none';
+                if (existing.parentNode) existing.parentNode.removeChild(existing);
+            }
+            document.documentElement.classList.remove('waseet-splash-active');
+            document.documentElement.classList.add('waseet-splash-dismissed');
+            window.waseetShowSplash = function () {
+                try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+                document.documentElement.classList.remove('waseet-splash-dismissed');
+                launchSplash(true);
+            };
+            return;
+        }
+    } catch (e) {}
 
     /**
      * فحص سرعة الاتصال بالإنترنت لتحديد الوتيرة المثلى لشريط التقدم
@@ -213,7 +234,19 @@
     /**
      * تشغيل شاشة الدخولية مع التدرج السلس الحقيقي من 0% إلى 100%
      */
-    function launchSplash() {
+    function launchSplash(force) {
+        if (!force) {
+            try {
+                if (sessionStorage.getItem(SESSION_KEY)) {
+                    var el = document.getElementById(SPLASH_ID);
+                    if (el) el.style.display = 'none';
+                    document.documentElement.classList.remove('waseet-splash-active');
+                    document.documentElement.classList.add('waseet-splash-dismissed');
+                    return;
+                }
+                sessionStorage.setItem(SESSION_KEY, 'true');
+            } catch (e) {}
+        }
         var splashEl = ensureSplashMarkup();
         if (!splashEl) return;
 
@@ -342,13 +375,15 @@
 
     // إتاحة تشغيل الدخولية يدوياً في أي وقت للمعاينة والتجربة
     window.waseetShowSplash = function () {
-        launchSplash();
+        try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+        document.documentElement.classList.remove('waseet-splash-dismissed');
+        launchSplash(true);
     };
 
     // التشغيل التلقائي فور بدء التنفيذ
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', launchSplash);
+        document.addEventListener('DOMContentLoaded', function () { launchSplash(false); });
     } else {
-        launchSplash();
+        launchSplash(false);
     }
 })();

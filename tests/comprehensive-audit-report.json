@@ -2,11 +2,11 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-10 18:52:56",
+    "Timestamp":  "2026-11-10 19:41:24",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  1138,
-                    "Passed":  1138,
+                    "TotalChecks":  1139,
+                    "Passed":  1139,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
@@ -629,7 +629,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-analytics.html -\u003e deals.html",
+                                                          "Name":  "admin-analytics.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -972,7 +972,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-brokers.html -\u003e deals.html",
+                                                          "Name":  "admin-brokers.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1336,7 +1336,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-chats.html -\u003e deals.html",
+                                                          "Name":  "admin-chats.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1679,7 +1679,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-deposits.html -\u003e deals.html",
+                                                          "Name":  "admin-deposits.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -2022,7 +2022,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-withdrawals.html -\u003e deals.html",
+                                                          "Name":  "admin-withdrawals.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -2400,7 +2400,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "chat.html -\u003e deals.html",
+                                                          "Name":  "chat.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -2799,7 +2799,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "contact-support.html -\u003e deals.html",
+                                                          "Name":  "contact-support.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -3198,7 +3198,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "deals.html -\u003e deals.html",
+                                                          "Name":  "deals.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -4024,7 +4024,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "index.html -\u003e deals.html",
+                                                          "Name":  "index.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -4563,7 +4563,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "my-accounts.html -\u003e deals.html",
+                                                          "Name":  "my-accounts.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -5011,7 +5011,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "pending-accounts.html -\u003e deals.html",
+                                                          "Name":  "pending-accounts.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -5669,7 +5669,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "profile.html -\u003e deals.html",
+                                                          "Name":  "profile.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -6341,7 +6341,7 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "wallet.html -\u003e deals.html",
+                                                          "Name":  "wallet.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -7162,8 +7162,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  119,
-                                        "Passed":  119,
+                                        "Total":  120,
+                                        "Passed":  120,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -7947,6 +7947,13 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v3",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

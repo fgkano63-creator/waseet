@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T17:37:35.804Z",
+  "timestamp": "2026-11-10T17:48:28.188Z",
   "metrics": {
     "totalChecks": 349,
     "passed": 349,
@@ -383,7 +383,7 @@
         "id": "JS-AsyncCatch-js\\splash.js",
         "status": "PASS",
         "severity": "INFO",
-        "message": "js\\splash.js async error-handling coverage verified (0 async, 1 catch)",
+        "message": "js\\splash.js async error-handling coverage verified (0 async, 5 catch)",
         "details": null
       },
       {

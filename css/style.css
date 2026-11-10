@@ -10911,8 +10911,13 @@ body.waseet-splash-active {
     pointer-events: none;
 }
 
-.waseet-splash-screen.splash-hidden {
+.waseet-splash-screen.splash-hidden,
+html.waseet-splash-dismissed .waseet-splash-screen,
+html.waseet-splash-dismissed #waseet-splash-screen {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 /* 1. التوهج الذهبي المحيطي والأشكال الهندسية في الخلفية */
