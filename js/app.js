@@ -795,6 +795,9 @@ class WaseetApp {
             modal.classList.add('active');
             this.restoreSellerFormDraft();
         }
+        if (typeof window.waseetAlignNavToTab === 'function') {
+            window.waseetAlignNavToTab('sell');
+        }
     }
 
     restoreSellerFormDraft() {
@@ -862,6 +865,9 @@ class WaseetApp {
             }, 60);
         }
         document.body.style.overflow = '';
+        if (typeof window.waseetAlignNavToTab === 'function') {
+            window.waseetAlignNavToTab('home');
+        }
     }
 
     async loginWithProvider(provider) {

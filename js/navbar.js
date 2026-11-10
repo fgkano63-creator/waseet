@@ -600,7 +600,9 @@
         } else if (cleanPath.indexOf('wallet') !== -1) {
             activeItem = nav.querySelector('[data-tab="wallet"]');
         } else if (cleanPath.indexOf('deals') !== -1) {
-            activeItem = nav.querySelector('[data-tab="deals"]');
+            activeItem = nav.querySelector('[data-tab="sell"]') || nav.querySelector('[data-tab="home"]');
+        } else if (window.location.hash === '#open-sell' || (document.getElementById('modal-sell') && document.getElementById('modal-sell').classList.contains('active'))) {
+            activeItem = nav.querySelector('[data-tab="sell"]');
         } else if (cleanPath.indexOf('index') !== -1 || cleanPath === '' || cleanPath === '/' || cleanPath.endsWith('/waseet') || cleanPath.indexOf('my-accounts') !== -1 || cleanPath.indexOf('pending-accounts') !== -1) {
             activeItem = nav.querySelector('[data-tab="home"]');
         }
@@ -674,7 +676,15 @@
         if (nav.dataset.liquidListenersBound !== 'true') {
             nav.dataset.liquidListenersBound = 'true';
 
-            items.forEach(function (item) {
+            
+        window.waseetAlignNavToTab = function(tabName) {
+            var targetEl = nav.querySelector('[data-tab="' + tabName + '"]');
+            if (targetEl && typeof alignIndicator === 'function') {
+                alignIndicator(targetEl, true);
+            }
+        };
+    
+        items.forEach(function (item) {
                 item.addEventListener('click', function () {
                     alignIndicator(this, true);
                 }, { passive: true });
