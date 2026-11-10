@@ -1,0 +1,1477 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="لوحة تحكم الإدارة العليا والتحليل المالي لمنصة وسيط (WASEET) - مراقبة السيولة، أموال الضمان، العمولات، وأداء الوسطاء المعتمدين.">
+    <title>WASEET | لوحة الإدارة العليا والتحليل المالي (Super Admin Analytics)</title>
+
+    <!-- Preconnect & Preload Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon / أيقونة الموقع وشعار وسيط الناري (W) الموحد -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261108_w2">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261108_w2">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico?v=20261108_w2">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=20261108_w2">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261108_w2">
+    <link rel="alternate icon" type="image/svg+xml" href="/favicon.svg?v=20261108_w2">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=20261108_w2">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png?v=20261108_w2">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Waseet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css?v=20261109_v1">
+
+    <style>
+        body.is-admin-mode::before,
+        body.admin-analytics-page::before {
+            display: none !important;
+            opacity: 0 !important;
+            animation: none !important;
+            background-image: none !important;
+        }
+
+        :root {
+            --analytics-gold: #c5a059;
+            --analytics-gold-bright: #dfb76c;
+            --analytics-orange: #ea580c;
+            --analytics-emerald: #10b981;
+            --analytics-blue: #0284c7;
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(197, 160, 89, 0.3);
+        }
+
+        .analytics-container {
+            max-width: 1380px;
+            margin: var(--page-gap-top, 95px) auto var(--page-gap-bottom, 90px);
+            padding: 0 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: linear-gradient(145deg, rgba(18, 24, 38, 0.88), rgba(9, 13, 22, 0.94));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(197, 160, 89, 0.08);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(197, 160, 89, 0.55);
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.75), 0 0 35px rgba(197, 160, 89, 0.16);
+        }
+
+        /* Header Bar */
+        .analytics-hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            padding: 1.75rem 2rem;
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.12), rgba(197, 160, 89, 0.15) 50%, rgba(10, 14, 24, 0.95));
+            border: 1.5px solid rgba(197, 160, 89, 0.35);
+            border-radius: 22px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.75);
+        }
+
+        .analytics-title-group h1 {
+            font-size: 1.85rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .analytics-title-group p {
+            color: #94a3b8;
+            font-size: 0.92rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .analytics-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .live-stream-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            color: #10b981;
+            padding: 0.45rem 0.95rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 1.8s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(1.3); }
+        }
+
+        /* 4 Key Stat Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            padding: 1.65rem 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--kpi-color, var(--analytics-gold)), transparent);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .kpi-label {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 0.3rem;
+        }
+        .kpi-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: var(--kpi-color, var(--analytics-gold));
+        }
+
+        .kpi-value {
+            font-family: var(--font-number, 'Orbitron', 'Tajawal', sans-serif);
+            font-size: 2.15rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+        }
+        .kpi-unit {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--analytics-gold-bright);
+        }
+
+        .kpi-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+        .kpi-pill {
+            font-size: 0.76rem;
+            padding: 0.28rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .kpi-pill strong {
+            color: #fff;
+        }
+
+        /* Dual Analytics Middle Grid */
+        .analytics-middle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-box {
+            padding: 1.75rem;
+        }
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel-title span {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* Progress Bar Breakdown */
+        .breakdown-row {
+            margin-bottom: 1.15rem;
+        }
+        .breakdown-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.4rem;
+        }
+        .breakdown-header strong {
+            color: #fff;
+        }
+        .breakdown-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .breakdown-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        /* Leaderboard Data Table */
+        .table-panel {
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .table-search-input {
+            height: 42px;
+            background: rgba(10, 14, 24, 0.9);
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 10px;
+            color: #fff;
+            padding: 0 1rem;
+            font-size: 0.9rem;
+            width: 280px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .table-search-input:focus {
+            border-color: var(--analytics-gold-bright);
+        }
+        .table-filter-select {
+            height: 42px;
+            background: rgba(10, 14, 24, 0.9);
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 10px;
+            color: #fff;
+            padding: 0 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .fintech-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.9rem;
+            min-width: 820px;
+        }
+        .fintech-table th {
+            background: rgba(10, 14, 24, 0.95);
+            padding: 1rem 1.15rem;
+            font-weight: 800;
+            color: var(--analytics-gold-bright);
+            border-bottom: 1.5px solid rgba(197, 160, 89, 0.3);
+            white-space: nowrap;
+        }
+        .fintech-table td {
+            padding: 1rem 1.15rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            vertical-align: middle;
+        }
+        .fintech-table tr:hover td {
+            background: rgba(197, 160, 89, 0.05);
+        }
+
+        .broker-user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+        .broker-avatar-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(197, 160, 89, 0.2);
+            border: 1.5px solid rgba(197, 160, 89, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .broker-avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+        }
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+        .rank-other { background: rgba(255, 255, 255, 0.06); color: #94a3b8; }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        .tier-Diamond { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+        .tier-Platinum { background: rgba(226, 232, 240, 0.15); color: #e2e8f0; border: 1px solid rgba(226, 232, 240, 0.35); }
+        .tier-Gold { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.35); }
+        .tier-Standard { background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+
+        /* Access Denied Overlay */
+        #access-denied-screen {
+            display: none;
+            padding: 6rem 1.5rem;
+            text-align: center;
+            max-width: 550px;
+            margin: 5rem auto;
+            background: linear-gradient(145deg, rgba(20, 26, 42, 0.95), rgba(10, 14, 24, 0.98));
+            border: 1.5px solid rgba(239, 68, 68, 0.5);
+            border-radius: 22px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .analytics-hero-header {
+                padding: 1.25rem;
+            }
+            .analytics-middle-grid {
+                grid-template-columns: 1fr;
+            }
+            .kpi-value {
+                font-size: 1.85rem;
+            }
+        }
+    </style>
+    <!-- ================= Marketing & Analytics Tracking ================= -->
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+    <!-- Meta Pixel -->
+    <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','XXXXXXXXXXXXXXX');fbq('track','PageView');</script>
+</head>
+<body class="admin-analytics-page">
+
+    <!-- ================= Header / Navbar ================= -->
+    <header class="header-navbar">
+        <div class="container nav-container">
+            <!-- 1. الشعار والهوية -->
+            <div class="nav-brand-group">
+                <a href="index.html" class="brand-wrap">
+                    <img src="assets/logo.png?v=20261027_orig" alt="WASEET Logo" class="brand-logo-img">
+                    <div class="brand-text-col">
+                        <span class="brand-title">WASEET</span>
+                        <span class="brand-subtitle">الإدارة العليا • التحليل المالي</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 2. روابط لوحات الإدارة العلوية -->
+            <nav class="nav-middle-group nav-admin-middle-group" id="nav-admin-middle-group" style="display: none;">
+                <a href="admin-analytics.html" class="btn-nav-middle btn-nav-admin active" title="لوحة التحليل المالي والإدارة العليا">
+                    <i class="fas fa-chart-line text-gold"></i> التحليل المالي
+                </a>
+                <a href="admin-withdrawals.html" class="btn-nav-middle btn-nav-admin" title="طلبات سحب الأرباح">
+                    <i class="fas fa-hand-holding-usd text-orange"></i> طلبات السحب
+                    <span class="deals-badge-count admin-withdrawals-badge-count" id="admin-nav-withdrawals-badge" style="display: none;">0</span>
+                </a>
+                <a href="admin-deposits.html" class="btn-nav-middle btn-nav-admin" title="طلبات شحن النقاط">
+                    <i class="fas fa-coins text-gold"></i> طلبات الشحن
+                    <span class="deals-badge-count admin-deposits-badge-count" id="admin-nav-deposits-badge" style="display: none;">0</span>
+                </a>
+                <a href="admin-brokers.html" class="btn-nav-middle btn-nav-admin" title="إدارة الوسطاء الإقليميين">
+                    <i class="fas fa-globe-africa text-orange"></i> الوسطاء الإقليميين
+                </a>
+                <a href="pending-accounts.html" class="btn-nav-middle btn-nav-admin" title="الحسابات قيد الفحص">
+                    <i class="fas fa-clipboard-check text-orange"></i> قيد الفحص
+                </a>
+                <a href="admin-chats.html" class="btn-nav-middle btn-nav-admin" title="محادثات الدعم والإدارة">
+                    <i class="fas fa-inbox text-gold"></i> محادثات الإدارة
+                    <span class="deals-badge-count chats-unread-badge" id="admin-nav-support-badge" style="display: none;"></span>
+                </a>
+                <a href="deals.html" class="btn-nav-middle btn-nav-admin" title="قيد الشراء">
+                    <i class="fas fa-crown text-gold"></i> قيد الشراء
+                </a>
+            </nav>
+
+            <!-- 3. محفظة الإدارة والقائمة الجانبية -->
+            <div class="nav-user-group">
+                <a href="wallet.html" class="wallet-pill-btn" id="admin-wallet-pill" title="محفظة الإدارة العامة">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    <span class="wallet-pts-val" id="admin-wallet-total-pts">0 نقطة</span>
+                </a>
+                <button type="button" class="mobile-hamburger-btn" id="mobile-hamburger-btn" onclick="toggleWaseetDrawer()" aria-label="القائمة الجانبية">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Unified Mobile Drawer Container -->
+    <div id="mobile-drawer-container" data-drawer-slot="drawer-regional-broker-card"></div>
+
+    <!-- ================= WASEET Luxury Liquid Glass Mobile Bottom Navigation ================= -->
+            <!-- ================= WASEET Universal Legal Footer ================= -->
+        <footer class="waseet-legal-footer" style="background: rgba(8, 12, 20, 0.95); border-top: 1px solid rgba(197, 160, 89, 0.25); padding: 1.8rem 1rem 5.5rem 1rem; text-align: center; color: var(--silver-muted, #94a3b8); font-size: 0.88rem; position: relative; z-index: 10;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 0.85rem;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+                    <img src="assets/logo.png" alt="WASEET Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span style="font-family: var(--font-en, 'Cabinet Grotesk', sans-serif); font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.5px;">WASEET</span>
+                    <span style="color: var(--gold-light, #fbbf24); font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 999px; padding: 2px 8px;">ط§ظ„ظˆط³ط§ط·ط© ط§ظ„ط¢ظ…ظ†ط©</span>
+                </div>
+                <div class="legal-footer-links" style="display: flex; align-items: center; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+                    <a href="terms.html" style="color: #cbd5e1; text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#cbd5e1'">ط´ط±ظˆط· ط§ظ„ط§ط³طھط®ط¯ط§ظ…</a>
+                    <span style="color: rgba(148, 163, 184, 0.4);">â€¢</span>
+                    <a href="privacy.html" style="color: #cbd5e1; text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#cbd5e1'">ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط©</a>
+                    <span style="color: rgba(148, 163, 184, 0.4);">â€¢</span>
+                    <a href="disputes.html" style="color: #cbd5e1; text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#cbd5e1'">ط³ظٹط§ط³ط© ط§ظ„ظ†ط²ط§ط¹ط§طھ ظˆط§ظ„طھط­ظƒظٹظ…</a>
+                </div>
+                <div class="legal-footer-copy" style="color: #64748b; font-size: 0.82rem;">
+                    آ© 2026 WASEET. ط¬ظ…ظٹط¹ ط§ظ„ط­ظ‚ظˆظ‚ ظ…ط­ظپظˆط¸ط© â€¢ ظ…ظ†طµط© ط§ظ„ظˆط³ط§ط·ط© ظˆط­ظ…ط§ظٹط© ط§ظ„طھط¹ط§ظ…ظ„ط§طھ ط§ظ„ط±ظ‚ظ…ظٹط©
+                </div>
+            </div>
+        </footer>
+
+    <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+        <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+        <a href="index.html" class="mobile-nav-item" data-tab="home">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="deals.html" class="mobile-nav-item" data-tab="deals">
+            <i class="fas fa-gamepad"></i>
+            <span>المتجر</span>
+        </a>
+        <a href="contact-support.html" class="mobile-nav-item" data-tab="support">
+            <i class="fas fa-comments"></i>
+            <span>الدعم</span>
+        </a>
+        <a href="wallet.html" class="mobile-nav-item" data-tab="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </a>
+        <a href="admin-analytics.html" class="mobile-nav-item active" data-tab="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>التحليل</span>
+        </a>
+    </nav>
+
+    <!-- شاشة حظر الوصول لغير مدراء الإدارة العليا (Access Denied) -->
+    <div id="access-denied-screen">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.4rem; color: #ef4444;">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h2 style="color: #fff; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.8rem;">صلاحية محظورة • Super Admin Only</h2>
+        <p style="color: #94a3b8; line-height: 1.6; font-size: 0.95rem; margin-bottom: 2rem;">
+            هذه اللوحة مخصصة حصرياً للمدير الأعلى (Super Admin) لمنصة وسيط لعرض البيانات والتقارير المالية والتشغيلية الحساسة.
+        </p>
+        <a href="index.html" class="btn-3d btn-gold" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.8rem; border-radius: 12px; text-decoration: none;">
+            <i class="fas fa-home"></i> العودة للصفحة الرئيسية
+        </a>
+    </div>
+
+    <!-- ================= المحتوى الرئيسي للوحة التحليل المالي (مخفي لحين التحقق الأمني) ================= -->
+    <main class="analytics-container" id="admin-analytics-main" style="display: none;">
+
+        <!-- 1. شريط العنوان والإجراءات السريعة -->
+        <section class="analytics-hero-header">
+            <div class="analytics-title-group">
+                <h1>
+                    <i class="fas fa-chart-pie text-gold"></i> لوحة تحكم الإدارة العليا والتحليل المالي
+                </h1>
+                <p>مراقبة السيولة النقدية، أموال الضمان، عمولات المنصة، وأداء الوسطاء المعتمدين في الوقت الفعلي.</p>
+            </div>
+            <div class="analytics-actions">
+                <div class="live-stream-badge">
+                    <span class="live-dot"></span> تدفق مباشر مشفر
+                </div>
+                <button type="button" id="btn-refresh-analytics" class="btn-3d btn-outline" onclick="loadSuperAdminAnalytics(true)" style="height: 42px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; padding: 0 1.2rem; cursor: pointer;">
+                    <i class="fas fa-rotate"></i> تحديث الأرقام
+                </button>
+                <button type="button" id="btn-export-analytics" class="btn-3d btn-gold" onclick="exportAnalyticsReport()" style="height: 42px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; padding: 0 1.2rem; cursor: pointer;">
+                    <i class="fas fa-file-invoice-dollar"></i> تصدير كشف مالي
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. كروت الأرقام المالية الكبرى (4 Large Glassmorphism Cards) -->
+        <section class="kpi-grid">
+            <!-- الكرت 1: إجمالي السيولة في التداول -->
+            <div class="glass-card kpi-card" style="--kpi-color: var(--analytics-gold);">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">إجمالي السيولة في المنصة</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">Total Points in Circulation</div>
+                    </div>
+                    <div class="kpi-icon-wrap">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">
+                    <span id="val-total-liquidity">0</span>
+                    <span class="kpi-unit">نقطة</span>
+                </div>
+                <div class="kpi-pills">
+                    <span class="kpi-pill"><i class="fas fa-wallet text-gold"></i> حرة: <strong id="val-available-pts">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-lock text-orange"></i> محجوزة: <strong id="val-locked-pts">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-users text-silver"></i> مستخدمين: <strong id="val-users-count">0</strong></span>
+                </div>
+            </div>
+
+            <!-- الكرت 2: أموال الضمان المحجوزة -->
+            <div class="glass-card kpi-card" style="--kpi-color: var(--analytics-orange);">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">أموال الضمان في صفقات نشطة</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">Total Escrowed Funds</div>
+                    </div>
+                    <div class="kpi-icon-wrap" style="background: rgba(234, 88, 12, 0.1); border-color: rgba(234, 88, 12, 0.25);">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">
+                    <span id="val-total-escrow" style="color: #f97316;">0</span>
+                    <span class="kpi-unit">نقطة</span>
+                </div>
+                <div class="kpi-pills">
+                    <span class="kpi-pill"><i class="fas fa-hourglass-half text-orange"></i> صفقات جارية: <strong id="val-active-deals-count">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-check-double text-emerald"></i> أمان وساطة: <strong>100%</strong></span>
+                </div>
+            </div>
+
+            <!-- الكرت 3: أرباح وعمولات المنصة -->
+            <div class="glass-card kpi-card" style="--kpi-color: var(--analytics-emerald);">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">أرباح وعمولات المنصة</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">Total Platform Commissions</div>
+                    </div>
+                    <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.25);">
+                        <i class="fas fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">
+                    <span id="val-total-commissions" style="color: #10b981;">0</span>
+                    <span class="kpi-unit">نقطة</span>
+                </div>
+                <div class="kpi-pills">
+                    <span class="kpi-pill"><i class="fas fa-circle-check text-emerald"></i> صفقات ناجحة: <strong id="val-completed-deals-count">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-percent text-gold"></i> متوسط العمولة: <strong id="val-avg-fee">0</strong></span>
+                </div>
+            </div>
+
+            <!-- الكرت 4: نشاط المعروض والوسطاء -->
+            <div class="glass-card kpi-card" style="--kpi-color: var(--analytics-blue);">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">نشاط الحسابات والوسطاء</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">Marketplace & Brokers Velocity</div>
+                    </div>
+                    <div class="kpi-icon-wrap" style="background: rgba(2, 132, 199, 0.1); border-color: rgba(2, 132, 199, 0.25);">
+                        <i class="fas fa-store"></i>
+                    </div>
+                </div>
+                <div class="kpi-value">
+                    <span id="val-available-accounts" style="color: #38bdf8;">0</span>
+                    <span class="kpi-unit">حساب متاح</span>
+                </div>
+                <div class="kpi-pills">
+                    <span class="kpi-pill"><i class="fas fa-tags text-blue"></i> مباع: <strong id="val-sold-accounts">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-clock text-gold"></i> قيد الفحص: <strong id="val-pending-accounts">0</strong></span>
+                    <span class="kpi-pill"><i class="fas fa-user-tie text-orange"></i> وسطاء: <strong id="val-total-brokers">0</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. لوحتان تفصيليتان (توزيع السيولة + مؤشرات التشغيل والسلامة) -->
+        <section class="analytics-middle-grid">
+            <!-- لوحة تدفق السيولة والضمان -->
+            <div class="glass-card panel-box">
+                <div class="panel-title">
+                    <span><i class="fas fa-layer-group text-gold"></i> هيكل توزيع السيولة والضمان</span>
+                    <span style="font-size: 0.78rem; color: #94a3b8; font-weight: normal;">Financial Distribution</span>
+                </div>
+
+                <div class="breakdown-row">
+                    <div class="breakdown-header">
+                        <span>السيولة الحرة في المحافظ</span>
+                        <strong id="bar-val-available">0 نقطة (0%)</strong>
+                    </div>
+                    <div class="breakdown-track">
+                        <div id="bar-fill-available" class="breakdown-fill" style="width: 0%; background: linear-gradient(90deg, #c5a059, #dfb76c);"></div>
+                    </div>
+                </div>
+
+                <div class="breakdown-row">
+                    <div class="breakdown-header">
+                        <span>أموال الضمان في صفقات جارية</span>
+                        <strong id="bar-val-escrow">0 نقطة (0%)</strong>
+                    </div>
+                    <div class="breakdown-track">
+                        <div id="bar-fill-escrow" class="breakdown-fill" style="width: 0%; background: linear-gradient(90deg, #ea580c, #f97316);"></div>
+                    </div>
+                </div>
+
+                <div class="breakdown-row">
+                    <div class="breakdown-header">
+                        <span>أرباح المنصة المقتطعة</span>
+                        <strong id="bar-val-commissions">0 نقطة (0%)</strong>
+                    </div>
+                    <div class="breakdown-track">
+                        <div id="bar-fill-commissions" class="breakdown-fill" style="width: 0%; background: linear-gradient(90deg, #059669, #10b981);"></div>
+                    </div>
+                </div>
+
+                <div class="breakdown-row" style="margin-bottom: 0;">
+                    <div class="breakdown-header">
+                        <span>سحوبات الأرباح المنفذة</span>
+                        <strong id="bar-val-withdrawals">0 نقطة</strong>
+                    </div>
+                    <div class="breakdown-track">
+                        <div id="bar-fill-withdrawals" class="breakdown-fill" style="width: 0%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة مؤشرات السلامة والتشغيل -->
+            <div class="glass-card panel-box">
+                <div class="panel-title">
+                    <span><i class="fas fa-shield-virus text-emerald"></i> مؤشرات السلامة التشغيلية والوساطة</span>
+                    <span style="font-size: 0.78rem; color: #10b981;"><i class="fas fa-shield-check"></i> RLS Secured</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.15rem; text-align: center;">
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.35rem;">نسبة إتمام الصفقات</div>
+                        <div id="metric-success-rate" style="font-size: 1.75rem; font-weight: 900; color: #10b981;">100%</div>
+                        <div style="font-size: 0.72rem; color: #64748b;">نجاح الوساطة التام</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.15rem; text-align: center;">
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.35rem;">معدل النزاعات</div>
+                        <div id="metric-dispute-rate" style="font-size: 1.75rem; font-weight: 900; color: #f59e0b;">0.0%</div>
+                        <div style="font-size: 0.72rem; color: #64748b;">محلولة عبر الوسطاء</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.15rem; text-align: center;">
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.35rem;">إجمالي الصفقات المعالجة</div>
+                        <div id="metric-total-deals" style="font-size: 1.75rem; font-weight: 900; color: #dfb76c;">0</div>
+                        <div style="font-size: 0.72rem; color: #64748b;">صفقات منذ الإطلاق</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.15rem; text-align: center;">
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.35rem;">سحوبات معلقة</div>
+                        <div id="metric-pending-withdrawals" style="font-size: 1.75rem; font-weight: 900; color: #38bdf8;">0</div>
+                        <div style="font-size: 0.72rem; color: #64748b;">نقطة تنتظر المراجعة</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. جدول إحصائيات وتقييم أداء الوسطاء المعتمدين (Brokers Leaderboard Data Table) -->
+        <section class="glass-card table-panel">
+            <div class="table-controls">
+                <div class="panel-title" style="margin-bottom: 0;">
+                    <span><i class="fas fa-trophy text-gold"></i> لائحة صدارة وتقييم الوسطاء المعتمدين (Brokers Leaderboard)</span>
+                </div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <input type="text" id="broker-search-input" class="table-search-input" placeholder="ابحث باسم الوسيط أو بريده..." oninput="filterBrokersTable()">
+                    <select id="broker-country-filter" class="table-filter-select" onchange="filterBrokersTable()">
+                        <option value="ALL">🌍 كافة الدول</option>
+                        <option value="DZ">🇩🇿 الجزائر</option>
+                        <option value="EG">🇪🇬 مصر</option>
+                        <option value="SA">🇸🇦 السعودية</option>
+                        <option value="MA">🇲🇦 المغرب</option>
+                        <option value="SY">🇸🇾 سوريا</option>
+                        <option value="IQ">🇮🇶 العراق</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="fintech-table" id="brokers-leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">#</th>
+                            <th>الوسيط المعتمد</th>
+                            <th>الدولة</th>
+                            <th>الصفقات المكتملة</th>
+                            <th>الصفقات النشطة</th>
+                            <th>إجمالي المبالغ المدارة</th>
+                            <th>عمولات المنصة</th>
+                            <th>التقييم</th>
+                            <th>تصنيف الأداء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="brokers-table-body">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 2.5rem; color: #94a3b8;">
+                                <i class="fas fa-spinner fa-spin text-gold" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                                <div>جاري جلب بيانات الوسطاء وتحليل الأداء...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 5. سجل أحدث الصفقات المكتملة (Recent Completed Deals Audit Trail) -->
+        <section class="glass-card table-panel">
+            <div class="panel-title">
+                <span><i class="fas fa-receipt text-gold"></i> سجل أحدث صفقات الوساطة المكتملة (Recent Deals Audit)</span>
+                <span style="font-size: 0.78rem; color: #94a3b8;">شفافية كاملة للإدارة العليا</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="fintech-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الصفقة</th>
+                            <th>المشتري</th>
+                            <th>البائع</th>
+                            <th>الوسيط المعين</th>
+                            <th>قيمة الصفقة</th>
+                            <th>عمولة المنصة</th>
+                            <th>تاريخ الإتمام</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-deals-table-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                                لا توجد صفقات معروضة حالياً.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts Core Platform -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/data.js?v=20261109_v1"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/supabase.js?v=20261109_v1"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/support.js"></script>
+    <script src="js/notifications.js?v=20261109_v1"></script>
+    <script src="js/navbar.js?v=20261109_v1"></script>
+    <script src="js/instant-nav.js" defer></script>
+    <script src="js/pwa-register.js"></script>
+    <script src="js/skeleton-ui.js"></script>
+    <script src="js/country-selector.js?v=20261109_v1"></script>
+    <script src="js/app.js?v=20261109_v1"></script>
+
+    <!-- Super Admin Analytics Logic -->
+    <script>
+    (function () {
+        'use strict';
+
+        let analyticsData = null;
+        let cachedBrokersList = [];
+
+        /**
+         * 1. الفحص الصارم لصلاحية المدير الأعلى (Super Admin Strict RBAC Gate)
+         * إذا لم يكن المستخدم يمتلك صلاحية الإدارة العليا، يتم طرده فوراً إلى index.html
+         */
+        async function checkSuperAdminAccess() {
+            const mainContainer = document.getElementById('admin-analytics-main');
+            const deniedScreen = document.getElementById('access-denied-screen');
+
+            const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+            if (!client) {
+                console.error('[RBAC] Supabase client is not available');
+                ejectUnauthorizedUser();
+                return false;
+            }
+
+            try {
+                // فحص الجلسة النشطة
+                const { data: { session }, error: sErr } = await client.auth.getSession();
+                if (sErr || !session || !session.user) {
+                    console.warn('[RBAC] No active session found. Redirecting...');
+                    ejectUnauthorizedUser();
+                    return false;
+                }
+
+                const user = session.user;
+                const userId = user.id;
+                const userEmail = (user.email ? String(user.email).toLowerCase().trim() : '');
+
+                // جلب بيانات الملف الشخصي والصلاحيات
+                let profile = null;
+                try {
+                    const { data: profData } = await client
+                        .from('profiles')
+                        .select('id, email, name, role, is_admin, is_super_admin')
+                        .eq('id', userId)
+                        .maybeSingle();
+                    profile = profData;
+                } catch (pErr) {
+                    console.warn('[RBAC] profile query note:', pErr);
+                }
+
+                const isSuperAdminFlag = Boolean(
+                    (profile && (profile.is_super_admin === true || profile.role === 'super_admin')) ||
+                    (user.user_metadata && (user.user_metadata.is_super_admin === true || user.user_metadata.role === 'super_admin'))
+                );
+
+                const isAdminRole = Boolean(
+                    (profile && (profile.role === 'admin' || profile.is_admin === true)) ||
+                    (user.user_metadata && (user.user_metadata.role === 'admin' || user.user_metadata.is_admin === true))
+                );
+
+                const isSuperEmail = Boolean(
+                    userEmail === 'fgkano63@gmail.com' ||
+                    userEmail === 'saadani2009@gmail.com' ||
+                    userEmail === 'mediator@waseet.com'
+                );
+
+                const isStrict = (typeof isStrictAdmin === 'function') ? isStrictAdmin(user) : false;
+
+                const hasSuperAdminAccess = isSuperAdminFlag || isAdminRole || isSuperEmail || isStrict;
+
+                if (!hasSuperAdminAccess) {
+                    console.warn('[RBAC] Access Denied: User is not a Super Admin');
+                    ejectUnauthorizedUser();
+                    return false;
+                }
+
+                // مستخدم معتمد كمدير أعلى
+                if (deniedScreen) deniedScreen.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+
+                // إظهار روابط الإدارة في الشريط العلوي
+                const navAdmin = document.getElementById('nav-admin-middle-group');
+                if (navAdmin) navAdmin.style.display = 'flex';
+
+                return true;
+            } catch (err) {
+                console.error('[RBAC] Error validating super admin access:', err);
+                ejectUnauthorizedUser();
+                return false;
+            }
+        }
+
+        function ejectUnauthorizedUser() {
+            const mainContainer = document.getElementById('admin-analytics-main');
+            const deniedScreen = document.getElementById('access-denied-screen');
+            if (mainContainer) mainContainer.style.display = 'none';
+            if (deniedScreen) deniedScreen.style.display = 'block';
+
+            if (typeof waseetAlert === 'function') {
+                waseetAlert('صلاحية مخصصة للإدارة العليا', 'عذراً، هذه الصفحة مخصصة لمدراء الإدارة العليا فقط.', 'danger');
+            }
+            setTimeout(() => {
+                window.location.replace('index.html');
+            }, 1200);
+        }
+
+        /**
+         * 2. تجميع البيانات عبر Supabase RPC (get_super_admin_analytics) مع فولباك مرن
+         */
+        async function loadSuperAdminAnalytics(isManualRefresh = false) {
+            const refreshBtn = document.getElementById('btn-refresh-analytics');
+            if (refreshBtn && isManualRefresh) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
+            }
+
+            const client = (typeof initWaseetSupabase === 'function') ? initWaseetSupabase() : null;
+            if (!client) return;
+
+            try {
+                let data = null;
+
+                // أ. محاولة استدعاء الدالة التجميعية الفائقة RPC
+                try {
+                    const { data: rpcData, error: rpcErr } = await client.rpc('get_super_admin_analytics');
+                    if (!rpcErr && rpcData && rpcData.success) {
+                        data = rpcData;
+                    } else if (rpcErr) {
+                        console.warn('[Analytics RPC Note]', rpcErr);
+                    }
+                } catch (rpcCallErr) {
+                    console.warn('[Analytics RPC Exception]', rpcCallErr);
+                }
+
+                // ب. الفولباك المرن: في حال عدم تثبيت الدالة بعد، تجميع البيانات مباشرة من الجداول
+                if (!data) {
+                    data = await fallbackDirectAggregation(client);
+                }
+
+                analyticsData = data;
+                renderAnalyticsDashboard(data);
+
+                if (isManualRefresh && typeof waseetToast === 'function') {
+                    waseetToast('تم تحديث المؤشرات المالية والتشغيلية بنجاح 📊', 'success');
+                }
+            } catch (err) {
+                console.error('[Analytics Error]', err);
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('تعذر جلب البيانات', 'حدث خطأ أثناء تجميع البيانات المالية: ' + (err.message || err), 'warning');
+                }
+            } finally {
+                if (refreshBtn && isManualRefresh) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i class="fas fa-rotate"></i> تحديث الأرقام';
+                }
+            }
+        }
+
+        /**
+         * فولباك مرن لتجميع البيانات مباشرة
+         */
+        async function fallbackDirectAggregation(client) {
+            const [profilesRes, dealsRes, accountsRes, brokersRes, withdrawalsRes] = await Promise.allSettled([
+                client.from('profiles').select('id, name, email, points_balance, locked_points, country, role'),
+                client.from('deals').select('id, seller_price, fee, total_points, status, assigned_broker_id, created_at, updated_at'),
+                client.from('marketplace_accounts').select('id, status'),
+                client.from('regional_brokers').select('id, user_id, name, email, country, avatar_url, wallet_balance, points_balance'),
+                client.from('withdrawals').select('id, points, status')
+            ]);
+
+            const profiles = (profilesRes.status === 'fulfilled' && profilesRes.value.data) ? profilesRes.value.data : [];
+            const deals = (dealsRes.status === 'fulfilled' && dealsRes.value.data) ? dealsRes.value.data : [];
+            const accounts = (accountsRes.status === 'fulfilled' && accountsRes.value.data) ? accountsRes.value.data : [];
+            const brokers = (brokersRes.status === 'fulfilled' && brokersRes.value.data) ? brokersRes.value.data : [];
+            const withdrawals = (withdrawalsRes.status === 'fulfilled' && withdrawalsRes.value.data) ? withdrawalsRes.value.data : [];
+
+            // 1. السيولة
+            let totalAvailable = 0;
+            let totalLocked = 0;
+            profiles.forEach(p => {
+                totalAvailable += (Number(p.points_balance) || 0);
+                totalLocked += (Number(p.locked_points) || 0);
+            });
+            const totalCirculation = totalAvailable + totalLocked;
+
+            // 2. الضمان والعمولات
+            let totalEscrow = 0;
+            let activeDealsCount = 0;
+            let totalCommissions = 0;
+            let completedDealsCount = 0;
+            let disputedCount = 0;
+            let cancelledCount = 0;
+
+            deals.forEach(d => {
+                const price = Number(d.seller_price) || 0;
+                const fee = Number(d.fee) || 0;
+                if (d.status === 'completed') {
+                    totalCommissions += fee;
+                    completedDealsCount++;
+                } else if (d.status === 'cancelled') {
+                    cancelledCount++;
+                } else {
+                    totalEscrow += price;
+                    activeDealsCount++;
+                    if (d.status === 'disputed') disputedCount++;
+                }
+            });
+
+            // 3. الحسابات
+            let availAcc = 0;
+            let soldAcc = 0;
+            let pendingAcc = 0;
+            accounts.forEach(a => {
+                if (a.status === 'available') availAcc++;
+                else if (a.status === 'sold') soldAcc++;
+                else if (['pending', 'pending_verification', 'pending_review'].includes(a.status)) pendingAcc++;
+            });
+
+            // 4. السحوبات
+            let completedWithdrawals = 0;
+            let pendingWithdrawals = 0;
+            withdrawals.forEach(w => {
+                const pts = Number(w.points) || 0;
+                if (w.status === 'approved') completedWithdrawals += pts;
+                else if (w.status === 'pending') pendingWithdrawals += pts;
+            });
+
+            // 5. لائحة الوسطاء
+            const brokerMap = {};
+            // الوسطاء من profiles
+            profiles.filter(p => p.role === 'broker' || p.role === 'regional_broker').forEach(p => {
+                brokerMap[p.id] = {
+                    id: p.id,
+                    name: p.name || 'وسيط معتمد',
+                    email: p.email || '',
+                    country: p.country || 'DZ',
+                    avatar_url: '',
+                    current_balance: Number(p.points_balance) || 0,
+                    completed_deals: 0,
+                    active_deals: 0,
+                    total_volume: 0,
+                    commissions_generated: 0,
+                    reviews_count: 5,
+                    rating: 5.0,
+                    performance_tier: 'Gold'
+                };
+            });
+            // الوسطاء من regional_brokers
+            brokers.forEach(b => {
+                const key = b.user_id || b.id;
+                if (!brokerMap[key]) {
+                    brokerMap[key] = {
+                        id: key,
+                        name: b.name || 'وسيط إقليمي',
+                        email: b.email || '',
+                        country: b.country || 'DZ',
+                        avatar_url: b.avatar_url || '',
+                        current_balance: Number(b.points_balance) || 0,
+                        completed_deals: 0,
+                        active_deals: 0,
+                        total_volume: 0,
+                        commissions_generated: 0,
+                        reviews_count: 5,
+                        rating: 5.0,
+                        performance_tier: 'Gold'
+                    };
+                }
+            });
+
+            // دمج إحصائيات الصفقات للوسطاء
+            deals.forEach(d => {
+                if (d.assigned_broker_id && brokerMap[d.assigned_broker_id]) {
+                    const b = brokerMap[d.assigned_broker_id];
+                    const price = Number(d.seller_price) || 0;
+                    const fee = Number(d.fee) || 0;
+                    if (d.status === 'completed') {
+                        b.completed_deals++;
+                        b.total_volume += price;
+                        b.commissions_generated += fee;
+                    } else if (d.status !== 'cancelled') {
+                        b.active_deals++;
+                    }
+                }
+            });
+
+            const leaderboard = Object.values(brokerMap).map(b => {
+                let tier = 'Standard';
+                if (b.completed_deals >= 20) tier = 'Diamond';
+                else if (b.completed_deals >= 10) tier = 'Platinum';
+                else if (b.completed_deals >= 5) tier = 'Gold';
+                return { ...b, performance_tier: tier };
+            }).sort((a, b) => b.total_volume - a.total_volume);
+
+            return {
+                success: true,
+                liquidity: {
+                    total_circulation: totalCirculation,
+                    available_points: totalAvailable,
+                    locked_points: totalLocked,
+                    total_users: profiles.length
+                },
+                escrow: {
+                    total_escrowed: totalEscrow,
+                    active_deals_count: activeDealsCount,
+                    total_deals_count: deals.length,
+                    completed_deals_count: completedDealsCount,
+                    disputed_deals_count: disputedCount,
+                    cancelled_deals_count: cancelledCount
+                },
+                commissions: {
+                    total_platform_commissions: totalCommissions,
+                    average_commission_per_deal: completedDealsCount > 0 ? Math.round(totalCommissions / completedDealsCount) : 0
+                },
+                marketplace: {
+                    total_accounts: accounts.length,
+                    available_accounts: availAcc,
+                    sold_accounts: soldAcc,
+                    pending_accounts: pendingAcc
+                },
+                withdrawals: {
+                    completed_volume: completedWithdrawals,
+                    pending_volume: pendingWithdrawals
+                },
+                brokers: {
+                    total_brokers: leaderboard.length,
+                    leaderboard: leaderboard
+                },
+                recent_deals: deals.filter(d => d.status === 'completed').slice(0, 8)
+            };
+        }
+
+        /**
+         * 3. رسم الواجهة وتحديث أرقام الكروت التفاعلية
+         */
+        function renderAnalyticsDashboard(data) {
+            if (!data) return;
+
+            const formatNum = (n) => Number(n || 0).toLocaleString('en-US');
+
+            // الكرت 1: السيولة
+            const liq = data.liquidity || {};
+            setElementText('val-total-liquidity', formatNum(liq.total_circulation));
+            setElementText('val-available-pts', formatNum(liq.available_points));
+            setElementText('val-locked-pts', formatNum(liq.locked_points));
+            setElementText('val-users-count', formatNum(liq.total_users));
+
+            // الكرت 2: أموال الضمان
+            const esc = data.escrow || {};
+            setElementText('val-total-escrow', formatNum(esc.total_escrowed));
+            setElementText('val-active-deals-count', formatNum(esc.active_deals_count));
+
+            // الكرت 3: عمولات المنصة
+            const comm = data.commissions || {};
+            setElementText('val-total-commissions', formatNum(comm.total_platform_commissions));
+            setElementText('val-completed-deals-count', formatNum(esc.completed_deals_count));
+            setElementText('val-avg-fee', formatNum(comm.average_commission_per_deal));
+
+            // الكرت 4: المعروض والوسطاء
+            const mkt = data.marketplace || {};
+            const brk = data.brokers || {};
+            setElementText('val-available-accounts', formatNum(mkt.available_accounts));
+            setElementText('val-sold-accounts', formatNum(mkt.sold_accounts));
+            setElementText('val-pending-accounts', formatNum(mkt.pending_accounts));
+            setElementText('val-total-brokers', formatNum(brk.total_brokers));
+
+            // لوحة التوزيع البياني
+            const totalLiq = Math.max(Number(liq.total_circulation) || 1, 1);
+            const availPct = Math.min(Math.round(((Number(liq.available_points) || 0) / totalLiq) * 100), 100);
+            const escrowPct = Math.min(Math.round(((Number(esc.total_escrowed) || 0) / totalLiq) * 100), 100);
+            const commPct = Math.min(Math.round(((Number(comm.total_platform_commissions) || 0) / totalLiq) * 100), 100);
+
+            setElementText('bar-val-available', `${formatNum(liq.available_points)} نقطة (${availPct}%)`);
+            setElementText('bar-val-escrow', `${formatNum(esc.total_escrowed)} نقطة (${escrowPct}%)`);
+            setElementText('bar-val-commissions', `${formatNum(comm.total_platform_commissions)} نقطة (${commPct}%)`);
+
+            const withVolume = (data.withdrawals && data.withdrawals.completed_volume) || 0;
+            setElementText('bar-val-withdrawals', `${formatNum(withVolume)} نقطة`);
+
+            setElementWidth('bar-fill-available', `${availPct}%`);
+            setElementWidth('bar-fill-escrow', `${escrowPct}%`);
+            setElementWidth('bar-fill-commissions', `${commPct}%`);
+            setElementWidth('bar-fill-withdrawals', '45%');
+
+            // لوحة المؤشرات
+            const totalDeals = Number(esc.total_deals_count) || 0;
+            const completedDeals = Number(esc.completed_deals_count) || 0;
+            const disputedDeals = Number(esc.disputed_deals_count) || 0;
+            const successRate = totalDeals > 0 ? ((completedDeals / totalDeals) * 100).toFixed(1) : '100';
+            const disputeRate = totalDeals > 0 ? ((disputedDeals / totalDeals) * 100).toFixed(1) : '0.0';
+
+            setElementText('metric-success-rate', `${successRate}%`);
+            setElementText('metric-dispute-rate', `${disputeRate}%`);
+            setElementText('metric-total-deals', formatNum(totalDeals));
+
+            const pendingWith = (data.withdrawals && data.withdrawals.pending_volume) || 0;
+            setElementText('metric-pending-withdrawals', formatNum(pendingWith));
+
+            // جدول الوسطاء
+            cachedBrokersList = (brk.leaderboard && Array.isArray(brk.leaderboard)) ? brk.leaderboard : [];
+            renderBrokersTable(cachedBrokersList);
+
+            // سجل أحدث الصفقات
+            renderRecentDeals(data.recent_deals || []);
+        }
+
+        function setElementText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function setElementWidth(id, width) {
+            const el = document.getElementById(id);
+            if (el) el.style.width = width;
+        }
+
+        /**
+         * 4. رسم جدول صدارة الوسطاء (مع الفلترة والبحث وحماية XSS عبر DOMPurify)
+         */
+        function renderBrokersTable(brokers) {
+            const tbody = document.getElementById('brokers-table-body');
+            if (!tbody) return;
+
+            if (!brokers || brokers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                            <i class="fas fa-user-slash" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                            <div>لم يتم العثور على وسطاء معتمدين مسجلين حالياً.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sanitize = (str) => {
+                if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
+                    return DOMPurify.sanitize(String(str || ''));
+                }
+                const div = document.createElement('div');
+                div.textContent = String(str || '');
+                return div.innerHTML;
+            };
+
+            const formatNum = (n) => Number(n || 0).toLocaleString('en-US');
+
+            const countryFlags = {
+                'DZ': { name: 'الجزائر', flag: '🇩🇿' },
+                'EG': { name: 'مصر', flag: '🇪🇬' },
+                'SA': { name: 'السعودية', flag: '🇸🇦' },
+                'MA': { name: 'المغرب', flag: '🇲🇦' },
+                'SY': { name: 'سوريا', flag: '🇸🇾' },
+                'IQ': { name: 'العراق', flag: '🇮🇶' },
+                'AE': { name: 'الإمارات', flag: '🇦🇪' },
+                'TN': { name: 'تونس', flag: '🇹🇳' },
+                'LY': { name: 'ليبيا', flag: '🇱🇾' }
+            };
+
+            tbody.innerHTML = brokers.map((b, idx) => {
+                const rank = idx + 1;
+                let rankClass = 'rank-other';
+                let crown = '';
+                if (rank === 1) { rankClass = 'rank-1'; crown = '👑 '; }
+                else if (rank === 2) { rankClass = 'rank-2'; crown = '🥈 '; }
+                else if (rank === 3) { rankClass = 'rank-3'; crown = '🥉 '; }
+
+                const cInfo = countryFlags[b.country] || { name: b.country || 'أخرى', flag: '🌍' };
+                const safeName = sanitize(b.name || 'وسيط معتمد');
+                const safeEmail = sanitize(b.email || '');
+                const safeAvatar = sanitize(b.avatar_url || '');
+                const tier = sanitize(b.performance_tier || 'Standard');
+
+                const avatarHtml = safeAvatar ? `<img src="${safeAvatar}" alt="avatar" onerror="this.onerror=null; this.src='assets/logo.png';">` : `<i class="fas fa-user-tie text-gold"></i>`;
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="rank-badge ${rankClass}">${rank}</span>
+                        </td>
+                        <td>
+                            <div class="broker-user-cell">
+                                <div class="broker-avatar-wrap">
+                                    ${avatarHtml}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #fff;">${crown}${safeName}</div>
+                                    <div style="font-size: 0.78rem; color: #64748b;">${safeEmail}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.95rem;">${cInfo.flag}</span>
+                            <span style="font-size: 0.82rem; color: #cbd5e1;">${cInfo.name}</span>
+                        </td>
+                        <td>
+                            <strong style="color: #10b981;">${formatNum(b.completed_deals)}</strong> صفقة
+                        </td>
+                        <td>
+                            <span style="color: #f59e0b; font-weight: 700;">${formatNum(b.active_deals)}</span> جارية
+                        </td>
+                        <td>
+                            <strong style="color: #dfb76c;">${formatNum(b.total_volume)}</strong> <span style="font-size: 0.75rem; color: #94a3b8;">نقطة</span>
+                        </td>
+                        <td>
+                            <strong style="color: #10b981;">${formatNum(b.commissions_generated)}</strong> <span style="font-size: 0.75rem; color: #94a3b8;">نقطة</span>
+                        </td>
+                        <td>
+                            <span style="color: #fbbf24; font-weight: 700;"><i class="fas fa-star"></i> ${b.rating || '5.0'}</span>
+                            <span style="font-size: 0.75rem; color: #10b981; margin-right: 4px;"><i class="fas fa-badge-check"></i> موثق</span>
+                        </td>
+                        <td>
+                            <span class="tier-badge tier-${tier}">${tier}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.filterBrokersTable = function () {
+            const searchVal = String(document.getElementById('broker-search-input')?.value || '').toLowerCase().trim();
+            const countryVal = document.getElementById('broker-country-filter')?.value || 'ALL';
+
+            const filtered = cachedBrokersList.filter(b => {
+                const matchName = String(b.name || '').toLowerCase().includes(searchVal);
+                const matchEmail = String(b.email || '').toLowerCase().includes(searchVal);
+                const matchCountry = (countryVal === 'ALL' || b.country === countryVal);
+                return (matchName || matchEmail) && matchCountry;
+            });
+
+            renderBrokersTable(filtered);
+        };
+
+        /**
+         * 5. رسم جدول أحدث الصفقات المكتملة
+         */
+        function renderRecentDeals(deals) {
+            const tbody = document.getElementById('recent-deals-table-body');
+            if (!tbody) return;
+
+            if (!deals || deals.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">لا توجد صفقات مكتملة مؤخراً.</td></tr>`;
+                return;
+            }
+
+            const sanitize = (str) => (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) ? DOMPurify.sanitize(String(str || '')) : String(str || '');
+            const formatNum = (n) => Number(n || 0).toLocaleString('en-US');
+
+            tbody.innerHTML = deals.map(d => {
+                const dateStr = d.completed_at ? new Date(d.completed_at).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'حديثاً';
+                return `
+                    <tr>
+                        <td><strong style="color: #dfb76c;">${sanitize(d.id)}</strong></td>
+                        <td>${sanitize(d.buyer_name || 'مشتري')}</td>
+                        <td>${sanitize(d.seller_name || 'بائع')}</td>
+                        <td><span style="color: #38bdf8;"><i class="fas fa-user-shield"></i> ${sanitize(d.broker_name || 'الإدارة')}</span></td>
+                        <td><strong>${formatNum(d.seller_price)}</strong> نقطة</td>
+                        <td><strong style="color: #10b981;">+${formatNum(d.fee)}</strong> نقطة</td>
+                        <td style="font-size: 0.8rem; color: #94a3b8;">${dateStr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        /**
+         * 6. تصدير تقرير مالي بصيغة CSV للإدارة العليا
+         */
+        window.exportAnalyticsReport = function () {
+            if (!analyticsData) {
+                if (typeof waseetAlert === 'function') waseetAlert('تنبيه', 'يرجى انتظار اكتمال تحميل البيانات أولاً.', 'info');
+                return;
+            }
+
+            const rows = [
+                ['تقرير الإدارة العليا والتحليل المالي - منصة وسيط (WASEET)'],
+                ['تاريخ الاستخراج', new Date().toISOString()],
+                [],
+                ['المؤشرات المالية الكبرى'],
+                ['إجمالي السيولة النقدية', analyticsData.liquidity?.total_circulation || 0],
+                ['السيولة الحرة في المحافظ', analyticsData.liquidity?.available_points || 0],
+                ['النقاط المحجوزة', analyticsData.liquidity?.locked_points || 0],
+                ['أموال الضمان المحجوزة في صفقات نشطة', analyticsData.escrow?.total_escrowed || 0],
+                ['أرباح وعمولات المنصة التراكمية', analyticsData.commissions?.total_platform_commissions || 0],
+                ['إجمالي الصفقات المكتملة', analyticsData.escrow?.completed_deals_count || 0],
+                ['إجمالي الحسابات المعروضة', analyticsData.marketplace?.available_accounts || 0],
+                ['إجمالي الحسابات المباعة', analyticsData.marketplace?.sold_accounts || 0],
+                [],
+                ['أداء الوسطاء المعتمدين'],
+                ['اسم الوسيط', 'البريد الإلكتروني', 'الدولة', 'الصفقات المكتملة', 'الصفقات النشطة', 'إجمالي المبالغ المدارة', 'العمولات الناتجة', 'التقييم', 'فئة الأداء']
+            ];
+
+            (analyticsData.brokers?.leaderboard || []).forEach(b => {
+                rows.push([
+                    b.name || '',
+                    b.email || '',
+                    b.country || '',
+                    b.completed_deals || 0,
+                    b.active_deals || 0,
+                    b.total_volume || 0,
+                    b.commissions_generated || 0,
+                    b.rating || 5,
+                    b.performance_tier || 'Standard'
+                ]);
+            });
+
+            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `WASEET-SuperAdmin-Analytics-${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            if (typeof waseetToast === 'function') {
+                waseetToast('تم تصدير الكشف المالي بنجاح 📑', 'success');
+            }
+        };
+
+        window.loadSuperAdminAnalytics = loadSuperAdminAnalytics;
+
+        // تهيئة الصفحة عند اكتمال تحميل المستند
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAccess = await checkSuperAdminAccess();
+            if (!hasAccess) return;
+
+            await loadSuperAdminAnalytics();
+        });
+    })();
+    </script>
+</body>
+</html>

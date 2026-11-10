@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-09T19:55:23.515Z",
+  "timestamp": "2026-11-10T12:38:52.071Z",
   "metrics": {
-    "totalChecks": 280,
-    "passed": 280,
+    "totalChecks": 310,
+    "passed": 310,
     "warnings": 0,
     "failures": 0
   },
@@ -583,6 +583,41 @@
         "details": null
       },
       {
+        "id": "HTML-DocType-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in admin-analytics.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in admin-analytics.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in admin-analytics.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in admin-analytics.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in admin-analytics.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-admin-brokers.html",
         "status": "PASS",
         "severity": "INFO",
@@ -898,6 +933,41 @@
         "details": null
       },
       {
+        "id": "HTML-DocType-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in disputes.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in disputes.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in disputes.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in disputes.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in disputes.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-index.html",
         "status": "PASS",
         "severity": "INFO",
@@ -1038,6 +1108,41 @@
         "details": null
       },
       {
+        "id": "HTML-DocType-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in privacy.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in privacy.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in privacy.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in privacy.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in privacy.html",
+        "details": null
+      },
+      {
         "id": "HTML-DocType-profile.html",
         "status": "PASS",
         "severity": "INFO",
@@ -1070,6 +1175,41 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "All inline scripts syntax valid in profile.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DocType-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard DOCTYPE present in terms.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DuplicateIDs-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate DOM IDs in terms.html",
+        "details": null
+      },
+      {
+        "id": "HTML-ImgAlt-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All <img> tags have alt attribute in terms.html",
+        "details": null
+      },
+      {
+        "id": "HTML-DeadLinks-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero broken internal hyperlinks in terms.html",
+        "details": null
+      },
+      {
+        "id": "HTML-InlineScriptSyntax-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All inline scripts syntax valid in terms.html",
         "details": null
       },
       {
@@ -1135,6 +1275,20 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Native Arabic RTL declaration in ad-walkthrough.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in admin-analytics.html",
+        "details": null
+      },
+      {
+        "id": "RTL-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in admin-analytics.html",
         "details": null
       },
       {
@@ -1264,6 +1418,20 @@
         "details": null
       },
       {
+        "id": "Viewport-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in disputes.html",
+        "details": null
+      },
+      {
+        "id": "RTL-disputes.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in disputes.html",
+        "details": null
+      },
+      {
         "id": "Viewport-index.html",
         "status": "PASS",
         "severity": "INFO",
@@ -1320,6 +1488,20 @@
         "details": null
       },
       {
+        "id": "Viewport-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in privacy.html",
+        "details": null
+      },
+      {
+        "id": "RTL-privacy.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in privacy.html",
+        "details": null
+      },
+      {
         "id": "Viewport-profile.html",
         "status": "PASS",
         "severity": "INFO",
@@ -1331,6 +1513,20 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "Native Arabic RTL declaration in profile.html",
+        "details": null
+      },
+      {
+        "id": "Viewport-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Mobile-ready viewport configured in terms.html",
+        "details": null
+      },
+      {
+        "id": "RTL-terms.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Native Arabic RTL declaration in terms.html",
         "details": null
       },
       {
@@ -1381,7 +1577,14 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1879 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1886 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-analytics.html",
         "details": null
       },
       {
@@ -1396,6 +1599,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "DOMPurify script included prior to executing app/escrow in admin-chats.html",
+        "details": null
+      },
+      {
+        "id": "XSS-Purify-admin-deposits.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify script included prior to executing app/escrow in admin-deposits.html",
         "details": null
       },
       {

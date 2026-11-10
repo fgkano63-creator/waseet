@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-09T19:55:25.249Z",
+  "timestamp": "2026-11-10T12:38:53.845Z",
   "stats": {
-    "totalChecks": 334,
-    "passed": 334,
+    "totalChecks": 375,
+    "passed": 375,
     "warnings": 0,
     "failures": 0
   },
@@ -149,6 +149,76 @@
         "details": null
       },
       {
+        "checkId": "admin-analytics.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"WASEET | لوحة الإدارة العليا والتحل...\"",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (44 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (14 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "admin-analytics.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
         "checkId": "admin-brokers.html-DOCTYPE",
         "status": "PASS",
         "severity": "INFO",
@@ -187,7 +257,7 @@
         "checkId": "admin-brokers.html-DuplicateIDs",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Zero duplicate element IDs (45 IDs scanned)",
+        "message": "Zero duplicate element IDs (47 IDs scanned)",
         "details": null
       },
       {
@@ -257,7 +327,7 @@
         "checkId": "admin-chats.html-DuplicateIDs",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Zero duplicate element IDs (32 IDs scanned)",
+        "message": "Zero duplicate element IDs (34 IDs scanned)",
         "details": null
       },
       {
@@ -327,7 +397,7 @@
         "checkId": "admin-deposits.html-DuplicateIDs",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Zero duplicate element IDs (26 IDs scanned)",
+        "message": "Zero duplicate element IDs (28 IDs scanned)",
         "details": null
       },
       {
@@ -779,6 +849,76 @@
         "details": null
       },
       {
+        "checkId": "disputes.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"سياسة النزاعات والتحكيم • WASEET...\"",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (1 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (1 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "disputes.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
         "checkId": "index.html-DOCTYPE",
         "status": "PASS",
         "severity": "INFO",
@@ -1059,6 +1199,76 @@
         "details": null
       },
       {
+        "checkId": "privacy.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"سياسة الخصوصية وحماية البيانات • WA...\"",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (1 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (1 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "privacy.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
         "checkId": "profile.html-DOCTYPE",
         "status": "PASS",
         "severity": "INFO",
@@ -1123,6 +1333,76 @@
       },
       {
         "checkId": "profile.html-InternalLinks",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All internal page links resolve correctly",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-DOCTYPE",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Standard HTML5 doctype declared",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-Lang-RTL",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Configured with lang=\"ar\" and dir=\"rtl\" for Arabic layout",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-Charset",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "UTF-8 charset explicitly declared",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-Viewport",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Responsive viewport configured",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-Title",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Title defined: \"شروط الاستخدام والخدمة • WASEET...\"",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-DuplicateIDs",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero duplicate element IDs (1 IDs scanned)",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-ScriptsResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local script tags resolve to valid files (1 scripts)",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-CSSResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local CSS links resolve to valid files",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-ImageResolution",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "All local image tags resolve on disk (2 images)",
+        "details": null
+      },
+      {
+        "checkId": "terms.html-InternalLinks",
         "status": "PASS",
         "severity": "INFO",
         "message": "All internal page links resolve correctly",
@@ -1344,7 +1624,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1380 rules)",
+        "message": "CSS curly braces perfectly balanced (1381 rules)",
         "details": null
       },
       {
@@ -2057,6 +2337,13 @@
         "details": null
       },
       {
+        "checkId": "DOMPurify-admin-analytics.html",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "DOMPurify loaded prior to application execution",
+        "details": null
+      },
+      {
         "checkId": "DOMPurify-admin-brokers.html",
         "status": "PASS",
         "severity": "INFO",
@@ -2144,7 +2431,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1974 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1981 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {

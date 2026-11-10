@@ -205,6 +205,9 @@
                             '<i class="fas fa-money-check-alt text-gold"></i><span>شحن النقاط</span>' +
                             '<span class="deals-badge-count admin-deposits-badge" id="drawer-deposits-badge" style="display: none;">0</span>' +
                         '</a>' +
+                        '<a href="admin-analytics.html" class="drawer-shortcut-card" id="drawer-admin-analytics-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
+                            '<i class="fas fa-chart-line text-gold"></i><span>التحليل المالي</span>' +
+                        '</a>' +
                         '<a href="admin-brokers.html" class="drawer-shortcut-card" id="drawer-admin-brokers-link" style="display: none;" data-admin-only onclick="window.waseetCloseDrawerSafe && window.waseetCloseDrawerSafe()">' +
                             '<i class="fas fa-globe-africa text-orange"></i><span>الوسطاء الإقليميين</span>' +
                         '</a>' +
@@ -496,6 +499,8 @@
                 el.style.display = admin ? '' : 'none';
             }
         });
+        var drawerAnalytics = byId('drawer-admin-analytics-link');
+        if (drawerAnalytics) drawerAnalytics.style.setProperty('display', admin ? 'flex' : 'none', 'important');
         var drawerBrokers = byId('drawer-admin-brokers-link');
         if (drawerBrokers) drawerBrokers.style.setProperty('display', admin ? 'flex' : 'none', 'important');
         var drawerDeposits = byId('drawer-admin-deposits-link');
@@ -565,7 +570,8 @@
 
     /**
      * شريط التنقل السفلي الزجاجي الفاخر (WASEET Liquid Glass Bottom Navigation)
-     * يدعم الحركة السلسة في البيئة العربية (RTL) مع حساب دقيق لموقع الفقاعة السائلة.
+     * يدعم الحركة السلسة في البيئة العربية (RTL) مع حساب دقيق لموقع الفقاعة السائلة،
+     * ويتعرف بدقة على المسارات في بيئات Vercel النظيفة بدون .html، ويمنع تراكم المستمعات.
      */
     function initWaseetLiquidGlassNav() {
         var nav = document.getElementById('waseet-mobile-glass-nav') || document.querySelector('.mobile-bottom-nav');
@@ -582,24 +588,38 @@
         var items = Array.prototype.slice.call(nav.querySelectorAll('.mobile-nav-item'));
         if (!items.length) return;
 
-        // تحديد التبويب النشط بناءً على الصفحة الحالية
-        var path = (window.location.pathname || '').toLowerCase();
+        // تحديد التبويب النشط بدقة متناهية (يدعم مسارات Vercel النظيفة ومسارات .html المحلية)
+        var rawPath = (window.location.pathname || '').toLowerCase();
+        var cleanPath = rawPath.replace(/\/+$/, ''); // إزالة الشرطة المائلة الختامية
         var activeItem = null;
 
-        if (path.indexOf('profile.html') !== -1) {
-            activeItem = nav.querySelector('[data-tab="profile"]');
-        } else if (path.indexOf('wallet.html') !== -1) {
-            activeItem = nav.querySelector('[data-tab="wallet"]');
-        } else if (path.indexOf('contact-support.html') !== -1 || path.indexOf('admin-chats.html') !== -1 || path.indexOf('chat.html') !== -1) {
+        if (cleanPath.indexOf('contact-support') !== -1 || cleanPath.indexOf('admin-chats') !== -1 || cleanPath.indexOf('chat') !== -1) {
             activeItem = nav.querySelector('[data-tab="support"]');
-        } else if (path.indexOf('deals.html') !== -1) {
+        } else if (cleanPath.indexOf('profile') !== -1) {
+            activeItem = nav.querySelector('[data-tab="profile"]');
+        } else if (cleanPath.indexOf('wallet') !== -1) {
+            activeItem = nav.querySelector('[data-tab="wallet"]');
+        } else if (cleanPath.indexOf('deals') !== -1) {
             activeItem = nav.querySelector('[data-tab="deals"]');
-        } else if (path.indexOf('index.html') !== -1 || path === '/' || !path.endsWith('.html')) {
+        } else if (cleanPath.indexOf('index') !== -1 || cleanPath === '' || cleanPath === '/' || cleanPath.endsWith('/waseet') || cleanPath.indexOf('my-accounts') !== -1 || cleanPath.indexOf('pending-accounts') !== -1) {
             activeItem = nav.querySelector('[data-tab="home"]');
         }
 
+        // مطابقة بديلة بواسطة الـ href إذا لم يتطابق أي تبويب أعلاه
         if (!activeItem) {
-            activeItem = nav.querySelector('.mobile-nav-item.active') || items[0];
+            for (var i = 0; i < items.length; i++) {
+                var it = items[i];
+                var href = (it.getAttribute('href') || '').toLowerCase().replace(/\.html$/, '').replace(/^\.\//, '').replace(/^\//, '');
+                var lastSegment = cleanPath.split('/').pop().replace(/\.html$/, '');
+                if (href && lastSegment && href === lastSegment) {
+                    activeItem = it;
+                    break;
+                }
+            }
+        }
+
+        if (!activeItem) {
+            activeItem = nav.querySelector('.mobile-nav-item.active') || nav.querySelector('[data-tab="home"]') || items[0];
         }
 
         function alignIndicator(targetEl, animate) {
@@ -611,9 +631,9 @@
             var elRect = targetEl.getBoundingClientRect();
             if (navRect.width === 0) return;
 
-            // حساب الإزاحة الأفقية الدقيقة بالنسبة للحد الأيسر لشريط التنقل
-            var x = elRect.left - navRect.left;
-            var w = elRect.width;
+            // حساب الإزاحة الأفقية الدقيقة بالنسبة للحد الأيسر لشريط التنقل بتسريع GPU عتادي
+            var x = Math.round(elRect.left - navRect.left);
+            var w = Math.round(elRect.width);
 
             if (w > 0) {
                 indicator.style.width = w + 'px';
@@ -621,13 +641,13 @@
 
             if (!animate) {
                 indicator.style.transition = 'none';
-                indicator.style.transform = 'translateX(' + x + 'px)';
+                indicator.style.transform = 'translate3d(' + x + 'px, 0, 0)';
                 requestAnimationFrame(function () {
-                    indicator.style.transition = 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease';
+                    indicator.style.transition = 'transform 0.38s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s ease';
                 });
             } else {
-                indicator.style.transition = 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease';
-                indicator.style.transform = 'translateX(' + x + 'px)';
+                indicator.style.transition = 'transform 0.38s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s ease';
+                indicator.style.transform = 'translate3d(' + x + 'px, 0, 0)';
             }
         }
 
@@ -644,22 +664,31 @@
         };
         window.waseetInitLiquidGlassNav = initWaseetLiquidGlassNav;
 
-        // ضبط الموضع الأولي
+        // ضبط الموضع الأولي فوراً وبسلاسة
         alignIndicator(activeItem, false);
-        setTimeout(function () { alignIndicator(activeItem, false); }, 150);
-        setTimeout(function () { alignIndicator(activeItem, false); }, 500);
+        requestAnimationFrame(function () {
+            alignIndicator(activeItem, false);
+        });
 
-        // مستمعات النقر
-        items.forEach(function (item) {
-            item.addEventListener('click', function () {
-                alignIndicator(this, true);
+        // حماية من تكرار مستمعات الأحداث (منع تسرب الذاكرة والتقطيع أثناء التنقل)
+        if (nav.dataset.liquidListenersBound !== 'true') {
+            nav.dataset.liquidListenersBound = 'true';
+
+            items.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    alignIndicator(this, true);
+                }, { passive: true });
             });
-        });
 
-        window.addEventListener('resize', function () {
-            var cur = nav.querySelector('.mobile-nav-item.active') || activeItem;
-            alignIndicator(cur, false);
-        });
+            var resizeRaf = null;
+            window.addEventListener('resize', function () {
+                if (resizeRaf) cancelAnimationFrame(resizeRaf);
+                resizeRaf = requestAnimationFrame(function () {
+                    var cur = nav.querySelector('.mobile-nav-item.active') || activeItem;
+                    if (cur) alignIndicator(cur, false);
+                });
+            }, { passive: true });
+        }
     }
 
     // أسماء بديلة شائعة عبر الصفحات للتوافق التام 100%

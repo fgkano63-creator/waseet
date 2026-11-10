@@ -4583,7 +4583,11 @@ html, body {
         0 4px 12px rgba(0, 0, 0, 0.3);
     pointer-events: none;
     z-index: 1;
-    transition: transform 0.42s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translate3d(0, 0, 0);
+    will-change: transform, width;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: transform 0.38s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s ease;
 }
 
 @media (min-width: 901px) {
@@ -4596,7 +4600,11 @@ html, body {
     .mobile-bottom-nav {
         display: flex !important;
     }
-    body:not(.chat-page-body) {
+    body.support-in-chat .mobile-bottom-nav,
+    body.support-typing .mobile-bottom-nav {
+        display: none !important;
+    }
+    body:not(.chat-page-body):not(.support-chat-page-body) {
         padding-bottom: env(safe-area-inset-bottom);
         padding-bottom: max(105px, calc(95px + env(safe-area-inset-bottom, 0px)));
     }

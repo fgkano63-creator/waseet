@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-09 21:54:00",
+    "Timestamp":  "2026-11-09 21:57:29",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  934,
-    "PassCount":  934,
+    "TotalChecks":  944,
+    "PassCount":  944,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -3302,8 +3302,8 @@
                                                         ]
                                           },
                        "HTML-Links":  {
-                                          "Total":  226,
-                                          "Pass":  226,
+                                          "Total":  236,
+                                          "Pass":  236,
                                           "Warn":  0,
                                           "Fail":  0,
                                           "Items":  [
@@ -3360,6 +3360,36 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e profile.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: profile.html"
                                                         },
                                                         {
                                                             "Test":  "admin-brokers.html -\u003e index.html",
@@ -3494,6 +3524,36 @@
                                                             "Details":  "Target exists: index.html"
                                                         },
                                                         {
+                                                            "Test":  "admin-deposits.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e profile.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: profile.html"
+                                                        },
+                                                        {
                                                             "Test":  "admin-withdrawals.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -3554,28 +3614,28 @@
                                                             "Details":  "Target exists: index.html"
                                                         },
                                                         {
-                                                            "Test":  "admin-withdrawals.html -\u003e index.html",
-                                                            "Status":  "PASS",
-                                                            "Severity":  "INFO",
-                                                            "Details":  "Target exists: index.html"
-                                                        },
-                                                        {
-                                                            "Test":  "admin-withdrawals.html -\u003e admin-withdrawals.html",
-                                                            "Status":  "PASS",
-                                                            "Severity":  "INFO",
-                                                            "Details":  "Target exists: admin-withdrawals.html"
-                                                        },
-                                                        {
                                                             "Test":  "admin-withdrawals.html -\u003e deals.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: deals.html"
                                                         },
                                                         {
+                                                            "Test":  "admin-withdrawals.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
                                                             "Test":  "admin-withdrawals.html -\u003e wallet.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-withdrawals.html -\u003e profile.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: profile.html"
                                                         },
                                                         {
                                                             "Test":  "chat.html -\u003e index.html",
@@ -3662,28 +3722,28 @@
                                                             "Details":  "Target exists: index.html"
                                                         },
                                                         {
-                                                            "Test":  "chat.html -\u003e index.html",
-                                                            "Status":  "PASS",
-                                                            "Severity":  "INFO",
-                                                            "Details":  "Target exists: index.html"
-                                                        },
-                                                        {
-                                                            "Test":  "chat.html -\u003e chat.html",
-                                                            "Status":  "PASS",
-                                                            "Severity":  "INFO",
-                                                            "Details":  "Target exists: chat.html"
-                                                        },
-                                                        {
                                                             "Test":  "chat.html -\u003e deals.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: deals.html"
                                                         },
                                                         {
-                                                            "Test":  "chat.html -\u003e my-accounts.html",
+                                                            "Test":  "chat.html -\u003e contact-support.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
-                                                            "Details":  "Target exists: my-accounts.html"
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "chat.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "chat.html -\u003e profile.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: profile.html"
                                                         },
                                                         {
                                                             "Test":  "chat.html -\u003e index.html",
