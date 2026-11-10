@@ -529,6 +529,23 @@ $phone3 = ($desktopSqlFiles | Where-Object { $_.Name -like '*39*' -or $_.Name -l
 Check-Result -Flow 'Phone Coordination' -Name 'Desktop SQL Parity (Migration 39/42 on Desktop)' -Success $phone3 -Detail 'Standalone Migration 39/42 SQL file present on Desktop for 1-click execution in Supabase'
 
 Write-Host ""
+Write-Host ">>> 20. FLOW 20: SUPER ADMIN ANALYTICS & FINANCIAL AGGREGATION DASHBOARD (MIGRATION 43)" -ForegroundColor Yellow
+$analytics1 = (Test-Path 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql') -and $mig43Content.Contains('get_super_admin_analytics()') -and $mig43Content.Contains('is_super_admin') -and $mig43Content.Contains('SECURITY DEFINER')
+Check-Result -Flow 'Super Admin Analytics' -Name 'Supabase Migration 43 Financial Aggregation RPC' -Success $analytics1 -Detail 'Stored procedure get_super_admin_analytics securely aggregates circulation, escrow, commissions, and broker metrics'
+
+$analytics2 = (Test-Path 'D:\waseet-app\admin-analytics.html') -and $adminAnalyticsHtml.Contains('checkSuperAdminAccess') -and $adminAnalyticsHtml.Contains('ejectUnauthorizedUser') -and $adminAnalyticsHtml.Contains('access-denied-screen')
+Check-Result -Flow 'Super Admin Analytics' -Name 'Super Admin Strict RBAC & Ejection Gate' -Success $analytics2 -Detail 'Restricts access strictly to super admins, automatically ejecting unauthorized visitors to index.html'
+
+$analytics3 = $adminAnalyticsHtml.Contains('val-total-liquidity') -and $adminAnalyticsHtml.Contains('val-total-escrow') -and $adminAnalyticsHtml.Contains('val-total-commissions') -and $adminAnalyticsHtml.Contains('val-available-accounts')
+Check-Result -Flow 'Super Admin Analytics' -Name 'FinTech 4-Card Realtime KPI Grid' -Success $analytics3 -Detail 'Displays total liquidity, active escrowed funds, platform commissions, and marketplace velocity'
+
+$analytics4 = $adminAnalyticsHtml.Contains('brokers-leaderboard-table') -and $adminAnalyticsHtml.Contains('broker-search-input') -and $adminAnalyticsHtml.Contains('broker-country-filter')
+Check-Result -Flow 'Super Admin Analytics' -Name 'Brokers Performance Leaderboard Data Table' -Success $analytics4 -Detail 'Features interactive broker search, country filtering, rank tiers, volume, and commissions tracking'
+
+$analytics5 = $adminAnalyticsHtml.Contains('waseet-mobile-glass-nav') -and $adminAnalyticsHtml.Contains('liquid-glass-indicator')
+Check-Result -Flow 'Super Admin Analytics' -Name 'Luxury Liquid Glass Mobile Navigation Integration' -Success $analytics5 -Detail 'Unifies mobile user experience with responsive liquid glass dock navigation bar'
+
+Write-Host ""
 Write-Host ">>> 20. FLOW 20: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
 $nodeCmd = if (Get-Command "agy-node.cmd" -ErrorAction SilentlyContinue) { (Get-Command "agy-node.cmd").Source } elseif (Get-Command "agy-node" -ErrorAction SilentlyContinue) { (Get-Command "agy-node").Source } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { (Get-Command "node").Source } else { "C:\Users\H P\AppData\Roaming\Antigravity\bin\agy-node.cmd" }
 $cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
