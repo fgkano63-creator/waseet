@@ -20,7 +20,7 @@ LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 STABLE
-AS \$\$
+AS $$
     SELECT EXISTS (
         SELECT 1 FROM public.profiles
         WHERE id = auth.uid()
@@ -31,7 +31,7 @@ AS \$\$
           )
     )
     OR lower(coalesce(auth.jwt() ->> 'email', '')) IN ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com');
-\$\$;
+$$;
 
 GRANT EXECUTE ON FUNCTION public.is_super_admin() TO authenticated, service_role;
 
@@ -41,7 +41,7 @@ RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
-AS \$\$
+AS $$
 DECLARE
     v_total_points_circulation numeric := 0;
     v_total_points_available numeric := 0;
@@ -285,6 +285,6 @@ BEGIN
 
     RETURN v_result;
 END;
-\$\$;
+$$;
 
 GRANT EXECUTE ON FUNCTION public.get_super_admin_analytics() TO authenticated, service_role;
