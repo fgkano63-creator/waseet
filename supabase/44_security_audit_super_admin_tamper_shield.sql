@@ -7,6 +7,11 @@
 -- متوافق مع معايير Cloudflare Security Audit Skill
 -- ==============================================================================
 
+-- 0. التأكد من وجود كافة الأعمدة المطلوبة في جدول profiles لمنع أخطاء المشغلات
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS escrow_balance numeric DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_broker boolean DEFAULT false;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_super_admin boolean DEFAULT false;
+
 BEGIN;
 
 -- 1. تحديث دالة منع التلاعب ببيانات البروفايل للإصدار الثالث (v3)

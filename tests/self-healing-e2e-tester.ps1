@@ -562,9 +562,8 @@ Check-Result -Flow 'Privilege Shield' -Name 'Desktop SQL Parity (Migration 44 on
 
 Write-Host ""
 Write-Host ">>> 22. FLOW 22: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
-$nodeCmd = if (Get-Command "agy-node.cmd" -ErrorAction SilentlyContinue) { (Get-Command "agy-node.cmd").Source } elseif (Get-Command "agy-node" -ErrorAction SilentlyContinue) { (Get-Command "agy-node").Source } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { (Get-Command "node").Source } else { "C:\Users\H P\AppData\Roaming\Antigravity\bin\agy-node.cmd" }
-$cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
-$cfAuditSuccess = ($cfAuditResult.ExitCode -eq 0)
+$cfOutput = & "agy-node.cmd" "D:\waseet-app\tests\audit-cloudflare-security.js"
+$cfAuditSuccess = ($LASTEXITCODE -eq 0)
 Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, RLS triggers, and search_path hygiene'
 
 Write-Host ""
@@ -575,8 +574,8 @@ Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls He
 
 Write-Host ""
 Write-Host ">>> 24. FLOW 24: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 24 PHASES)" -ForegroundColor Yellow
-$simResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
-$simSuccess = ($simResult.ExitCode -eq 0)
+$simOutput = & "agy-node.cmd" "D:\waseet-app\tests\e2e-simulation-runner.js"
+$simSuccess = ($LASTEXITCODE -eq 0)
 Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 24 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, phone, and super admin analytics journeys'
 
 Write-Host ""

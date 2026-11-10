@@ -1,20 +1,20 @@
-{
+﻿{
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-10 15:41:59",
+    "Timestamp":  "2026-11-10 18:52:56",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  1103,
-                    "Passed":  1103,
+                    "TotalChecks":  1138,
+                    "Passed":  1138,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
                 },
     "Categories":  {
                        "Quality":  {
-                                       "Total":  976,
-                                       "Passed":  976,
+                                       "Total":  1011,
+                                       "Passed":  1011,
                                        "Warnings":  0,
                                        "Failures":  0,
                                        "Checks":  [
@@ -5697,6 +5697,55 @@
                                                       },
                                                       {
                                                           "CheckId":  "HTML-Doctype",
+                                                          "Name":  "schedule_v1.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "schedule_v1.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "schedule_v1.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "schedule_v1.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "schedule_v1.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "schedule_v1.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "schedule_v1.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
                                                           "Name":  "terms.html - Valid HTML5 DOCTYPE",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -5869,6 +5918,55 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "test_v1.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "test_v1.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "test_v1.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "test_v1.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "test_v1.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: جدول الامتحانات - الصف الرابع"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "test_v1.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "test_v1.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
                                                       },
                                                       {
                                                           "CheckId":  "HTML-Doctype",
@@ -6296,6 +6394,153 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: جدول الامتحانات النصفية - الصف الرابع الابتدائي - مدرسة نيل الأوطار"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: جدول الامتحانات النصفية - الصف الرابع (بنات) - مدرسة نيل الأوطار"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "جدول_امتحانات_الصف_الرابع_بنات.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
                                                       },
                                                       {
                                                           "CheckId":  "HTML-Doctype",

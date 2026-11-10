@@ -1,15 +1,15 @@
-{
-    "Timestamp":  "2026-11-10 15:49:34",
-    "Platform":  "منصة وسيط (Waseet Platform)",
+﻿{
+    "Timestamp":  "2026-11-10 18:53:25",
+    "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  1152,
-    "PassCount":  1152,
+    "TotalChecks":  1197,
+    "PassCount":  1197,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
                        "HTML-Quality":  {
-                                            "Total":  147,
-                                            "Pass":  147,
+                                            "Total":  182,
+                                            "Pass":  182,
                                             "Warn":  0,
                                             "Fail":  0,
                                             "Items":  [
@@ -728,6 +728,48 @@
                                                               "Details":  "Favicon declared"
                                                           },
                                                           {
+                                                              "Test":  "schedule_v1.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "schedule_v1.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
                                                               "Test":  "terms.html - DOCTYPE declaration",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
@@ -770,6 +812,48 @@
                                                               "Details":  "Favicon declared"
                                                           },
                                                           {
+                                                              "Test":  "test_v1.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: جدول الامتحانات - الصف الرابع"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "test_v1.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
                                                               "Test":  "wallet.html - DOCTYPE declaration",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
@@ -807,6 +891,132 @@
                                                           },
                                                           {
                                                               "Test":  "wallet.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: جدول الامتحانات النصفية - الصف الرابع الابتدائي - مدرسة نيل الأوطار"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: جدول الامتحانات النصفية - الصف الرابع (بنات) - مدرسة نيل الأوطار"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Favicon Link",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
                                                               "Details":  "Favicon declared"
@@ -898,8 +1108,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  469,
-                                               "Pass":  469,
+                                               "Total":  474,
+                                               "Pass":  474,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -3334,6 +3544,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "schedule_v1.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
                                                                  "Test":  "terms.html link: assets/favicons/favicon-32x32.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -3368,6 +3584,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "test_v1.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html script: js/vendor/supabase.min.js",
@@ -3550,6 +3772,24 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
                                                                  "Test":  "auth\\callback.html script: ../js/purify.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -3720,8 +3960,8 @@
                                                          ]
                                            },
                        "HTML-Semantics":  {
-                                              "Total":  21,
-                                              "Pass":  21,
+                                              "Total":  26,
+                                              "Pass":  26,
                                               "Warn":  0,
                                               "Fail":  0,
                                               "Items":  [
@@ -3828,13 +4068,43 @@
                                                                 "Details":  "All element IDs are unique"
                                                             },
                                                             {
+                                                                "Test":  "schedule_v1.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
                                                                 "Test":  "terms.html - Unique Element IDs",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
                                                                 "Details":  "All element IDs are unique"
                                                             },
                                                             {
+                                                                "Test":  "test_v1.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
                                                                 "Test":  "wallet.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
+                                                                "Test":  "جدول_امتحانات_الصف_الرابع_الرسمي.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
+                                                                "Test":  "جدول_امتحانات_الصف_الرابع_المبهج.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
+                                                                "Test":  "جدول_امتحانات_الصف_الرابع_بنات.html - Unique Element IDs",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
                                                                 "Details":  "All element IDs are unique"
