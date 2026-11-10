@@ -10873,6 +10873,350 @@ html.lenis body {
     color: #fff !important;
 }
 
+/* ==========================================================================
+   WASEET Luxury Splash Screen & Intro Loader (شاشة الدخولية الفاخرة)
+   ========================================================================== */
+html.waseet-splash-active,
+body.waseet-splash-active {
+    overflow: hidden !important;
+}
+
+.waseet-splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    width: 100dvw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 9999999;
+    background: radial-gradient(circle at 50% 32%, #18150c 0%, #0a0c13 55%, #05060a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+.waseet-splash-screen.splash-fading {
+    opacity: 0;
+    transform: scale(1.04);
+    pointer-events: none;
+}
+
+.waseet-splash-screen.splash-hidden {
+    display: none !important;
+}
+
+/* 1. التوهج الذهبي المحيطي والأشكال الهندسية في الخلفية */
+.splash-bg-glow {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, 92vw);
+    height: min(520px, 92vw);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.16) 0%, rgba(212, 175, 55, 0.04) 50%, transparent 70%);
+    filter: blur(35px);
+    pointer-events: none;
+    animation: splashGlowPulse 4s ease-in-out infinite;
+}
+
+.splash-geom-watermark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38%;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.14) 0%, transparent 65%),
+        linear-gradient(135deg, rgba(212, 175, 55, 0.04) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(212, 175, 55, 0.04) 25%, transparent 25%),
+        linear-gradient(315deg, rgba(212, 175, 55, 0.04) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(212, 175, 55, 0.04) 25%, transparent 25%);
+    background-size: 100% 100%, 48px 48px, 48px 48px, 48px 48px, 48px 48px;
+    background-position: 0 0, 0 0, 0 0, 24px 24px, 24px 24px;
+    opacity: 0.55;
+    pointer-events: none;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+}
+
+.splash-particle-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 2. الحاوية الرئيسية للمحتوى */
+.splash-content {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-height: 840px;
+    width: 100%;
+    max-width: 480px;
+    padding: max(3.5rem, calc(2rem + env(safe-area-inset-top, 0px))) 1.5rem max(3rem, calc(1.5rem + env(safe-area-inset-bottom, 0px))) 1.5rem;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* 3. شعار الدرع الذهبي الفاخر */
+.splash-emblem-wrap {
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.splash-emblem-aura {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.28) 0%, rgba(255, 152, 0, 0.12) 45%, transparent 70%);
+    filter: blur(16px);
+    pointer-events: none;
+    animation: splashAuraPulse 3s ease-in-out infinite alternate;
+}
+
+.splash-emblem-img {
+    position: relative;
+    z-index: 2;
+    width: 145px;
+    height: 145px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 24px rgba(212, 175, 55, 0.45)) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85));
+    animation: splashLogoBreath 3.2s ease-in-out infinite;
+}
+
+/* 4. الخطوط الذهبية المعدنية الثلاثية الأبعاد */
+.splash-brand-titles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: auto;
+    width: 100%;
+}
+
+.splash-brand-en {
+    display: block;
+    font-family: 'Cinzel', 'Outfit', 'Montserrat', 'Rajdhani', sans-serif;
+    font-size: 2.35rem;
+    font-weight: 900;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 0.15rem;
+    color: #f7df94;
+    background: linear-gradient(180deg, #ffffff 0%, #fae69e 25%, #d4af37 60%, #9e7a18 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 3px 12px rgba(212, 175, 55, 0.35));
+}
+
+.splash-brand-ar {
+    display: block;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    line-height: 1.15;
+    margin-bottom: 0.65rem;
+    color: #f7df94;
+    background: linear-gradient(180deg, #ffffff 0%, #fae69e 30%, #e0ba4a 65%, #947110 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 3px 14px rgba(212, 175, 55, 0.4));
+}
+
+.splash-brand-tagline {
+    margin: 0;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #d8b467;
+    opacity: 0.9;
+    letter-spacing: 0.6px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+/* 5. منطقة التحميل السفلية والمؤشرات التفاعلية */
+.splash-loader-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 290px;
+    margin-top: auto;
+    padding-bottom: 0.75rem;
+}
+
+/* حلقة التحميل الدائرية الذهبية */
+.splash-ring-spinner {
+    width: 36px;
+    height: 36px;
+    position: relative;
+    animation: splashRingRotate 1.1s linear infinite;
+}
+
+.splash-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.splash-ring-track {
+    stroke: rgba(212, 175, 55, 0.16);
+}
+
+.splash-ring-head {
+    stroke: #d4af37;
+    stroke-linecap: round;
+    stroke-dasharray: 125;
+    stroke-dashoffset: 85;
+    filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.8));
+}
+
+/* شريط التقدم الخطي الفاخر */
+.splash-progress-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.splash-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #8a680e 0%, #d4af37 55%, #fff1a8 100%);
+    border-radius: 999px;
+    position: relative;
+    transition: width 0.12s linear;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.75);
+}
+
+.splash-progress-head {
+    position: absolute;
+    right: 0;
+    top: -1px;
+    bottom: -1px;
+    width: 7px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ffffff, 0 0 14px #fde047;
+    filter: blur(0.5px);
+}
+
+/* نصوص الحالة */
+.splash-status-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    min-height: 38px;
+    justify-content: center;
+}
+
+.splash-status-ar {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #dfb76c;
+    letter-spacing: 0.4px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    transition: color 0.3s ease;
+}
+
+.splash-status-en {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: rgba(223, 183, 108, 0.65);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+/* 6. استجابة شاشات الحواسيب وسطح المكتب (Desktop / PC View) */
+@media (min-width: 769px) {
+    .splash-content {
+        max-width: 580px;
+        padding-top: 4.5rem;
+        padding-bottom: 4.5rem;
+    }
+
+    .splash-emblem-img {
+        width: 165px;
+        height: 165px;
+    }
+
+    .splash-brand-en {
+        font-size: 3rem;
+        letter-spacing: 9px;
+    }
+
+    .splash-brand-ar {
+        font-size: 3.4rem;
+        letter-spacing: 6px;
+    }
+
+    .splash-brand-tagline {
+        font-size: 1.15rem;
+        letter-spacing: 1px;
+    }
+
+    .splash-loader-area {
+        max-width: 350px;
+    }
+
+    .splash-progress-track {
+        height: 5px;
+    }
+}
+
+/* 7. الحركات والمؤثرات البصرية */
+@keyframes splashGlowPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+}
+
+@keyframes splashAuraPulse {
+    0% { transform: scale(0.92); opacity: 0.6; }
+    100% { transform: scale(1.18); opacity: 1; }
+}
+
+@keyframes splashLogoBreath {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.025); }
+}
+
+@keyframes splashRingRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 
 
 

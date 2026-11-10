@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-10T12:42:39.192Z",
+  "timestamp": "2026-11-10T13:34:47.393Z",
   "stats": {
-    "totalChecks": 375,
-    "passed": 375,
+    "totalChecks": 379,
+    "passed": 379,
     "warnings": 0,
     "failures": 0
   },
@@ -957,14 +957,14 @@
         "checkId": "index.html-DuplicateIDs",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Zero duplicate element IDs (118 IDs scanned)",
+        "message": "Zero duplicate element IDs (123 IDs scanned)",
         "details": null
       },
       {
         "checkId": "index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (25 scripts)",
+        "message": "All local script tags resolve to valid files (26 scripts)",
         "details": null
       },
       {
@@ -978,7 +978,7 @@
         "checkId": "index.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (16 images)",
+        "message": "All local image tags resolve on disk (17 images)",
         "details": null
       },
       {
@@ -1624,7 +1624,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1381 rules)",
+        "message": "CSS curly braces perfectly balanced (1427 rules)",
         "details": null
       },
       {
@@ -1638,7 +1638,7 @@
         "checkId": "CSS-ResponsiveBreakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive coverage with 49 media queries (Mobile 375px/480px, Tablet 768px, Desktop)",
+        "message": "Comprehensive responsive coverage with 50 media queries (Mobile 375px/480px, Tablet 768px, Desktop)",
         "details": null
       },
       {
@@ -2141,6 +2141,34 @@
         "details": null
       },
       {
+        "checkId": "JS-Syntax-js/splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Clean ES syntax execution: js/splash.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-Eval-js/splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js/splash.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-DocWrite-js/splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Zero document.write() usages in js/splash.js",
+        "details": null
+      },
+      {
+        "checkId": "JS-InnerHTML-js/splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "Safe dynamic HTML interpolation and sanitization verified",
+        "details": null
+      },
+      {
         "checkId": "JS-Syntax-js/supabase.js",
         "status": "PASS",
         "severity": "INFO",
@@ -2431,7 +2459,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1980 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1982 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {

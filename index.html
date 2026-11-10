@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -144,6 +144,41 @@
     <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','XXXXXXXXXXXXXXX');fbq('track','PageView');</script>
 </head>
 <body>
+
+    <!-- ================= WASEET Luxury Splash Screen (شاشة الدخولية الفاخرة) ================= -->
+    <aside id="waseet-splash-screen" class="waseet-splash-screen" aria-live="polite" aria-label="شاشة الدخول والتحميل لمنصة وسيط">
+        <div class="splash-bg-glow" aria-hidden="true"></div>
+        <div class="splash-geom-watermark" aria-hidden="true"></div>
+        <canvas id="splash-particle-canvas" class="splash-particle-canvas" aria-hidden="true"></canvas>
+        <div class="splash-content">
+            <div class="splash-emblem-wrap">
+                <div class="splash-emblem-aura" aria-hidden="true"></div>
+                <img src="assets/logo.png?v=20261027_orig" alt="شعار منصة وسيط WASEET" class="splash-emblem-img" width="145" height="145" decoding="async">
+            </div>
+            <div class="splash-brand-titles">
+                <span class="splash-brand-en">WASEET</span>
+                <span class="splash-brand-ar">وســـيـــط</span>
+                <p class="splash-brand-tagline">المنصة الآمنة للوساطة والضمان</p>
+            </div>
+            <div class="splash-loader-area">
+                <div class="splash-ring-spinner" aria-hidden="true">
+                    <svg viewBox="0 0 50 50" class="splash-ring-svg">
+                        <circle class="splash-ring-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                        <circle class="splash-ring-head" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                    </svg>
+                </div>
+                <div class="splash-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="splash-progressbar">
+                    <div class="splash-progress-bar" id="splash-progress-fill">
+                        <span class="splash-progress-head"></span>
+                    </div>
+                </div>
+                <div class="splash-status-text" id="splash-status-text">
+                    <span class="splash-status-ar">جاري التحميل...</span>
+                    <span class="splash-status-en">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <!-- Subtle 3D Ambient Background Canvas -->
     <canvas id="ambient-canvas"></canvas>
@@ -1423,6 +1458,7 @@
     <script src="js/skeleton-ui.js" defer></script>
     <script src="js/app.js?v=20261104_v6" defer></script>
     <script src="js/support.js?v=20261017" defer></script>
+    <script src="js/splash.js?v=20261110_v1" defer></script>
     <script src="js/pwa-register.js" defer></script>
     <script src="js/visual-inspector.js" defer></script>
 </body>

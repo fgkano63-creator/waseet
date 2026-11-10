@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-10T12:42:37.285Z",
+  "timestamp": "2026-11-10T13:34:45.396Z",
   "metrics": {
-    "totalChecks": 310,
-    "passed": 310,
+    "totalChecks": 314,
+    "passed": 314,
     "warnings": 0,
     "failures": 0
   },
@@ -363,6 +363,27 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "js\\slider.js async error-handling coverage verified (0 async, 0 catch)",
+        "details": null
+      },
+      {
+        "id": "JS-Syntax-js\\splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "JavaScript syntax is valid: js\\splash.js",
+        "details": null
+      },
+      {
+        "id": "JS-Eval-js\\splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No eval() or dynamic Function constructors in js\\splash.js",
+        "details": null
+      },
+      {
+        "id": "JS-AsyncCatch-js\\splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "js\\splash.js async error-handling coverage verified (0 async, 2 catch)",
         "details": null
       },
       {
@@ -1547,7 +1568,7 @@
         "id": "CSS-Breakpoints",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Comprehensive responsive layout defined with 49 media queries",
+        "message": "Comprehensive responsive layout defined with 50 media queries",
         "details": null
       },
       {
@@ -1577,7 +1598,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1885 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1887 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {
@@ -1788,6 +1809,13 @@
         "status": "PASS",
         "severity": "INFO",
         "message": "No raw unescaped user-input innerHTML interpolations detected in js\\slider.js",
+        "details": null
+      },
+      {
+        "id": "XSS-RawInnerHTML-js\\splash.js",
+        "status": "PASS",
+        "severity": "INFO",
+        "message": "No raw unescaped user-input innerHTML interpolations detected in js\\splash.js",
         "details": null
       },
       {

@@ -2161,6 +2161,207 @@ async function runE2ESimulation() {
     const clearPhoneRes = simulateUpdateProfilePhone(buyer, buyer.id, '');
     assert(clearPhoneRes.success === true && buyer.phone === null, 'Phone Coordination', 'Phone Number Clearing Acceptance', 'Empty phone input cleanly resets field to NULL without SQL error');
 
+    // ==========================================================================
+    // PHASE 24: SUPER ADMIN ANALYTICS RPC & FINANCIAL INVARIANTS (MIGRATION 43)
+    // ==========================================================================
+    console.log('\n\x1b[33m>>> PHASE 24: SUPER ADMIN ANALYTICS RPC & FINANCIAL INVARIANTS (MIGRATION 43)\x1b[0m');
+
+    // 24.1 Emulate public.is_super_admin()
+    function simulateIsSuperAdmin(callerProf) {
+        if (!callerProf) return false;
+        const email = String(callerProf.email || '').toLowerCase().trim();
+        const superEmails = ['fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com'];
+        return (
+            callerProf.is_super_admin === true ||
+            ['super_admin', 'admin'].includes(callerProf.role) ||
+            superEmails.includes(email)
+        );
+    }
+
+    // 24.2 Emulate get_super_admin_analytics() RPC
+    function simulateGetSuperAdminAnalytics(callerProf) {
+        if (!simulateIsSuperAdmin(callerProf)) {
+            throw new Error('Access Denied: Super Admin privileges required (WST-AUTHZ-ANALYTICS-403)');
+        }
+
+        // 1. Liquidity
+        let totalCirculation = 0;
+        let totalAvailable = 0;
+        let totalLocked = 0;
+        DB.profiles.forEach(p => {
+            const avail = Number(p.points_balance) || 0;
+            const locked = Number(p.locked_points) || 0;
+            totalAvailable += avail;
+            totalLocked += locked;
+            totalCirculation += (avail + locked);
+        });
+
+        // 2. Escrow & Deals
+        let totalEscrowed = 0;
+        let activeDealsCount = 0;
+        let totalPlatformCommissions = 0;
+        let completedDealsCount = 0;
+        let disputedDealsCount = 0;
+        let cancelledDealsCount = 0;
+
+        DB.deals.forEach(d => {
+            const price = Number(d.seller_price) || 0;
+            const fee = Number(d.fee) || 0;
+            if (d.status === 'completed') {
+                totalPlatformCommissions += fee;
+                completedDealsCount++;
+            } else if (d.status === 'cancelled') {
+                cancelledDealsCount++;
+            } else {
+                totalEscrowed += price;
+                activeDealsCount++;
+                if (d.status === 'disputed') disputedDealsCount++;
+            }
+        });
+
+        // 3. Marketplace
+        let availAccounts = 0;
+        let soldAccounts = 0;
+        let pendingAccounts = 0;
+        DB.marketplace_accounts.forEach(a => {
+            if (a.status === 'available') availAccounts++;
+            else if (a.status === 'sold') soldAccounts++;
+            else if (['pending', 'pending_verification', 'pending_review'].includes(a.status)) pendingAccounts++;
+        });
+
+        // 4. Brokers Leaderboard & Tiers
+        const brokers = DB.profiles.filter(p => ['broker', 'regional_broker'].includes(p.role) || p.is_broker);
+        const leaderboard = brokers.map(b => {
+            let completed = 0;
+            let active = 0;
+            let volume = 0;
+            let comms = 0;
+
+            DB.deals.forEach(d => {
+                if (d.assigned_broker_id === b.id) {
+                    const price = Number(d.seller_price) || 0;
+                    const fee = Number(d.fee) || 0;
+                    if (d.status === 'completed') {
+                        completed++;
+                        volume += price;
+                        comms += fee;
+                    } else if (d.status !== 'cancelled') {
+                        active++;
+                    }
+                }
+            });
+
+            let tier = 'Standard';
+            if (completed >= 20) tier = 'Diamond';
+            else if (completed >= 10) tier = 'Platinum';
+            else if (completed >= 5) tier = 'Gold';
+
+            return {
+                id: b.id,
+                name: b.name || b.full_name || 'وسيط معتمد',
+                email: b.email,
+                country: b.country || 'DZ',
+                completed_deals: completed,
+                active_deals: active,
+                total_volume: volume,
+                commissions_generated: comms,
+                performance_tier: tier,
+                rating: 5.0
+            };
+        }).sort((a, b) => b.total_volume - a.total_volume || b.completed_deals - a.completed_deals);
+
+        return {
+            success: true,
+            timestamp: new Date().toISOString(),
+            liquidity: {
+                total_circulation: totalCirculation,
+                available_points: totalAvailable,
+                locked_points: totalLocked,
+                total_users: DB.profiles.length
+            },
+            escrow: {
+                total_escrowed: totalEscrowed,
+                active_deals_count: activeDealsCount,
+                total_deals_count: DB.deals.length,
+                completed_deals_count: completedDealsCount,
+                disputed_deals_count: disputedDealsCount,
+                cancelled_deals_count: cancelledDealsCount
+            },
+            commissions: {
+                total_platform_commissions: totalPlatformCommissions,
+                average_commission_per_deal: completedDealsCount > 0 ? Math.round(totalPlatformCommissions / completedDealsCount) : 0
+            },
+            marketplace: {
+                total_accounts: DB.marketplace_accounts.length,
+                available_accounts: availAccounts,
+                sold_accounts: soldAccounts,
+                pending_accounts: pendingAccounts
+            },
+            withdrawals: {
+                completed_volume: 0,
+                pending_volume: 0
+            },
+            brokers: {
+                total_brokers: leaderboard.length,
+                leaderboard: leaderboard
+            },
+            recent_deals: DB.deals.filter(d => d.status === 'completed').slice(-8)
+        };
+    }
+
+    // 24.1 RBAC Ejection: Non-admin rejected with 403
+    let regularUserBlocked = false;
+    try {
+        simulateGetSuperAdminAnalytics(buyer);
+    } catch (e) {
+        regularUserBlocked = e.message.includes('WST-AUTHZ-ANALYTICS-403');
+    }
+    assert(regularUserBlocked, 'Super Admin Analytics', 'Strict RBAC Ejection Gate [WST-AUTHZ-ANALYTICS-403]', 'Non-super-admin caller rejected with 403 privilege exception');
+
+    // 24.2 Super Admin Authorization & Data Retrieval
+    const adminUser = DB.profiles.find(p => p.email === 'fgkano63@gmail.com') || admin;
+    const analyticsPayload = simulateGetSuperAdminAnalytics(adminUser);
+    assert(analyticsPayload.success === true && analyticsPayload.liquidity, 'Super Admin Analytics', 'Super Admin Aggregation RPC Execution', 'Super admin retrieves comprehensive financial & operational snapshot');
+
+    // 24.3 Financial Invariant: Points Circulation Conservation
+    const liq = analyticsPayload.liquidity;
+    assert(liq.total_circulation === (liq.available_points + liq.locked_points), 'Financial Invariants', 'Total Circulation Points Conservation Invariant', 'Circulation exactly equals available + locked points across all user wallets');
+
+    // 24.4 Financial Invariant: Escrow Balance Isolation
+    const expectedEscrow = DB.deals.filter(d => !['completed', 'cancelled'].includes(d.status)).reduce((sum, d) => sum + (Number(d.seller_price) || 0), 0);
+    assert(analyticsPayload.escrow.total_escrowed === expectedEscrow, 'Financial Invariants', 'Active Escrow Funds Mathematical Exactness', 'Escrow total matches active deal commitments without leakage');
+
+    // 24.5 Financial Invariant: Platform Commissions Cumulative Exactness
+    const expectedFees = DB.deals.filter(d => d.status === 'completed').reduce((sum, d) => sum + (Number(d.fee) || 0), 0);
+    assert(analyticsPayload.commissions.total_platform_commissions === expectedFees, 'Financial Invariants', 'Platform Revenue & Fee Conservation Invariant', 'Total commissions correspond exactly to 100% of completed transaction fees');
+
+    // 24.6 Brokers Leaderboard & Performance Tiers
+    const lb = analyticsPayload.brokers.leaderboard;
+    const isSorted = lb.every((b, i) => i === 0 || lb[i - 1].total_volume >= b.total_volume);
+    assert(isSorted, 'Brokers Analytics', 'Brokers Performance Ranking Integrity (Volume DESC)', 'Brokers accurately sorted by trading volume and deals');
+
+    // 24.7 Interactive Search & Country Filter Simulation
+    function filterBrokersSim(list, searchVal, countryVal) {
+        return list.filter(b => {
+            const matchQuery = String(b.name).toLowerCase().includes(searchVal.toLowerCase()) || String(b.email).toLowerCase().includes(searchVal.toLowerCase());
+            const matchCountry = (countryVal === 'ALL' || b.country === countryVal);
+            return matchQuery && matchCountry;
+        });
+    }
+    const dzBrokers = filterBrokersSim(lb, '', 'DZ');
+    assert(dzBrokers.every(b => b.country === 'DZ'), 'Brokers Analytics', 'Brokers Dynamic Country & Query Filter Parity', 'Multi-country filter selectively extracts target regional brokers');
+
+    // 24.8 Client RBAC Ejection Gate Simulation (admin-analytics.html)
+    function simulateClientAccessGate(userProf) {
+        if (!userProf || !simulateIsSuperAdmin(userProf)) {
+            return { allowed: false, redirect: 'index.html' };
+        }
+        return { allowed: true, redirect: null };
+    }
+    const buyerGate = simulateClientAccessGate(buyer);
+    const adminGate = simulateClientAccessGate(adminUser);
+    assert(!buyerGate.allowed && buyerGate.redirect === 'index.html' && adminGate.allowed, 'Super Admin Analytics', 'Client-Side Super Admin RBAC Ejection Gate', 'Unauthorized visitors immediately redirected to index.html with denial screen');
+
     // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------

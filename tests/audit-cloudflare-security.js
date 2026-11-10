@@ -212,6 +212,24 @@ const hasMig39 = fs.existsSync(mig39Path);
 const mig39Content = hasMig39 ? fs.readFileSync(mig39Path, 'utf8') : '';
 check('Database RLS', 'Profiles Phone Number Coordination Schema (Migration 39/42)', hasMig39 && mig39Content.includes('ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone') && mig39Content.includes('GRANT UPDATE (phone) ON TABLE public.profiles TO authenticated'), 'Safely grants users permission to coordinate with brokers via phone/WhatsApp');
 
+// Migration 43 Checks (Super Admin Analytics RPC & Production Reset)
+const mig43AnalyticsPath = path.join(ROOT_DIR, 'supabase', '43_super_admin_analytics_rpc.sql');
+const hasMig43 = fs.existsSync(mig43AnalyticsPath);
+const mig43Content = hasMig43 ? fs.readFileSync(mig43AnalyticsPath, 'utf8') : '';
+check('Database RLS', 'Super Admin Analytics RPC Authorization Shield (Migration 43)', hasMig43 && mig43Content.includes('is_super_admin()') && mig43Content.includes('WST-AUTHZ-ANALYTICS-403'), 'RPC strictly enforces is_super_admin() guard and denies unauthorized callers');
+check('Database RLS', 'Super Admin Analytics Search Path & Anonymous Denial (Migration 43)', hasMig43 && mig43Content.includes('SET search_path = public, pg_temp') && !mig43Content.includes('TO anon'), 'Enforces pg_temp search_path hygiene and denies public anonymous execution');
+
+// Migration 44 Checks (Super Admin & Broker Privilege Tampering Shield)
+const mig44Path = path.join(ROOT_DIR, 'supabase', '44_security_audit_super_admin_tamper_shield.sql');
+const hasMig44 = fs.existsSync(mig44Path);
+const mig44Content = hasMig44 ? fs.readFileSync(mig44Path, 'utf8') : '';
+check('Database RLS', 'Super Admin & Broker Privilege Escalation Anti-Tampering Trigger (Migration 44)', hasMig44 && mig44Content.includes('tr_prevent_profile_field_tampering_v3') && mig44Content.includes('NEW.is_super_admin IS DISTINCT FROM OLD.is_super_admin') && mig44Content.includes('NEW.is_broker IS DISTINCT FROM OLD.is_broker'), 'Blocks client modification of is_super_admin and is_broker flags');
+check('Database RLS', 'Profiles Column-Level Permissions Isolation (Migration 44)', hasMig44 && mig44Content.includes('REVOKE UPDATE ON TABLE public.profiles FROM authenticated') && mig44Content.includes('GRANT UPDATE (name, avatar_url, country, phone, last_seen_at)'), 'Enforces least-privilege column updates on profiles table');
+
+// Client-Side CSV Export Formula Injection Defense
+const adminAnalyticsContent = fs.readFileSync(path.join(ROOT_DIR, 'admin-analytics.html'), 'utf8');
+check('Client-Side', 'CSV Spreadsheet Formula Injection Neutralization in Analytics Export', adminAnalyticsContent.includes('sanitizeCsvCell') && adminAnalyticsContent.includes('/^[=+\\-@\\t\\r]/'), 'Neutralizes CSV formula injection attacks in exported financial reports');
+
 // ------------------------------------------------------------------------------
 // SUMMARY
 // ------------------------------------------------------------------------------

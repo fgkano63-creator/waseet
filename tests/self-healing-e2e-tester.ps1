@@ -67,6 +67,7 @@ $mig38Content = if (Test-Path 'D:\waseet-app\supabase\41_recovery_account_column
 $mig39Content = if (Test-Path 'D:\waseet-app\supabase\42_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\42_profiles_phone_column.sql' -Raw -Encoding UTF8 } elseif (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\39_profiles_phone_column.sql' -Raw -Encoding UTF8 } else { "" }
 $adminAnalyticsHtml = if (Test-Path 'D:\waseet-app\admin-analytics.html') { Get-Content 'D:\waseet-app\admin-analytics.html' -Raw -Encoding UTF8 } else { "" }
 $mig43Content = if (Test-Path 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql') { Get-Content 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql' -Raw -Encoding UTF8 } else { "" }
+$mig44Content = if (Test-Path 'D:\waseet-app\supabase\44_security_audit_super_admin_tamper_shield.sql') { Get-Content 'D:\waseet-app\supabase\44_security_audit_super_admin_tamper_shield.sql' -Raw -Encoding UTF8 } else { "" }
 
 Write-Host ""
 Write-Host ">>> 1. FLOW 1: SELLER ACCOUNT LISTING AND SIMULATION RESILIENCE" -ForegroundColor Yellow
@@ -533,6 +534,9 @@ Write-Host ">>> 20. FLOW 20: SUPER ADMIN ANALYTICS & FINANCIAL AGGREGATION DASHB
 $analytics1 = (Test-Path 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql') -and $mig43Content.Contains('get_super_admin_analytics()') -and $mig43Content.Contains('is_super_admin') -and $mig43Content.Contains('SECURITY DEFINER')
 Check-Result -Flow 'Super Admin Analytics' -Name 'Supabase Migration 43 Financial Aggregation RPC' -Success $analytics1 -Detail 'Stored procedure get_super_admin_analytics securely aggregates circulation, escrow, commissions, and broker metrics'
 
+$analyticsDesktop = ($desktopSqlFiles | Where-Object { $_.Name -like '*43*super_admin*' -or $_.Name -like '*43*analytics*' }).Count -gt 0
+Check-Result -Flow 'Super Admin Analytics' -Name 'Desktop SQL Parity (Migration 43 on Desktop)' -Success $analyticsDesktop -Detail 'Standalone Migration 43 SQL file present on Desktop for 1-click execution in Supabase'
+
 $analytics2 = (Test-Path 'D:\waseet-app\admin-analytics.html') -and $adminAnalyticsHtml.Contains('checkSuperAdminAccess') -and $adminAnalyticsHtml.Contains('ejectUnauthorizedUser') -and $adminAnalyticsHtml.Contains('access-denied-screen')
 Check-Result -Flow 'Super Admin Analytics' -Name 'Super Admin Strict RBAC & Ejection Gate' -Success $analytics2 -Detail 'Restricts access strictly to super admins, automatically ejecting unauthorized visitors to index.html'
 
@@ -546,23 +550,34 @@ $analytics5 = $adminAnalyticsHtml.Contains('waseet-mobile-glass-nav') -and $admi
 Check-Result -Flow 'Super Admin Analytics' -Name 'Luxury Liquid Glass Mobile Navigation Integration' -Success $analytics5 -Detail 'Unifies mobile user experience with responsive liquid glass dock navigation bar'
 
 Write-Host ""
-Write-Host ">>> 20. FLOW 20: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
+Write-Host ">>> 21. FLOW 21: PRIVILEGE ESCALATION SHIELD & PROFILE ANTI-TAMPERING (MIGRATION 44)" -ForegroundColor Yellow
+$mig44TriggerCheck = (Test-Path 'D:\waseet-app\supabase\44_security_audit_super_admin_tamper_shield.sql') -and $mig44Content.Contains('prevent_profile_field_tampering_v3') -and $mig44Content.Contains('is_super_admin') -and $mig44Content.Contains('is_broker') -and $mig44Content.Contains('escrow_balance')
+Check-Result -Flow 'Privilege Shield' -Name 'Supabase Migration 44 Anti-Tampering Trigger v3' -Success $mig44TriggerCheck -Detail 'Blocks client mutation of is_super_admin, is_broker, and escrow_balance in profiles'
+
+$mig44GrantsCheck = $mig44Content.Contains('REVOKE UPDATE ON TABLE public.profiles FROM authenticated') -and $mig44Content.Contains('GRANT UPDATE (name, avatar_url, country, phone, last_seen_at)')
+Check-Result -Flow 'Privilege Shield' -Name 'Profiles Column-Level Permissions Isolation' -Success $mig44GrantsCheck -Detail 'Restricts authenticated users strictly to non-financial and non-privilege profile columns'
+
+$mig44Desktop = ($desktopSqlFiles | Where-Object { $_.Name -like '*44*' }).Count -gt 0
+Check-Result -Flow 'Privilege Shield' -Name 'Desktop SQL Parity (Migration 44 on Desktop)' -Success $mig44Desktop -Detail 'Standalone Migration 44 SQL file present on Desktop for 1-click execution in Supabase'
+
+Write-Host ""
+Write-Host ">>> 22. FLOW 22: CLOUDFLARE SECURITY AUDIT SKILL VERIFICATION" -ForegroundColor Yellow
 $nodeCmd = if (Get-Command "agy-node.cmd" -ErrorAction SilentlyContinue) { (Get-Command "agy-node.cmd").Source } elseif (Get-Command "agy-node" -ErrorAction SilentlyContinue) { (Get-Command "agy-node").Source } elseif (Get-Command "node" -ErrorAction SilentlyContinue) { (Get-Command "node").Source } else { "C:\Users\H P\AppData\Roaming\Antigravity\bin\agy-node.cmd" }
 $cfAuditResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\audit-cloudflare-security.js" -NoNewWindow -Wait -PassThru
 $cfAuditSuccess = ($cfAuditResult.ExitCode -eq 0)
-Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, and RLS triggers'
+Check-Result -Flow 'Security Audit' -Name 'Cloudflare Security Audit Skill Compliance' -Success $cfAuditSuccess -Detail 'Verified injection sinks, browser security, PKCE OAuth, business logic, RLS triggers, and search_path hygiene'
 
 Write-Host ""
-Write-Host ">>> 21. FLOW 21: BUTTON AND INTERACTIVE ELEMENTS SENTINEL HEALTH" -ForegroundColor Yellow
+Write-Host ">>> 23. FLOW 23: BUTTON AND INTERACTIVE ELEMENTS SENTINEL HEALTH" -ForegroundColor Yellow
 $btnAuditorResult = Start-Process -FilePath "powershell" -ArgumentList "-ExecutionPolicy Bypass -File D:\waseet-app\tests\button-self-reporting-auditor.ps1" -NoNewWindow -Wait -PassThru
 $btnAuditorSuccess = ($btnAuditorResult.ExitCode -eq 0)
-Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls Health' -Success $btnAuditorSuccess -Detail 'Verified zero broken buttons, dead triggers, or unhandled click actions across all 17 HTML pages'
+Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls Health' -Success $btnAuditorSuccess -Detail 'Verified zero broken buttons, dead triggers, or unhandled click actions across all 21 platform HTML pages'
 
 Write-Host ""
-Write-Host ">>> 22. FLOW 22: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 23 PHASES)" -ForegroundColor Yellow
+Write-Host ">>> 24. FLOW 24: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 24 PHASES)" -ForegroundColor Yellow
 $simResult = Start-Process -FilePath $nodeCmd -ArgumentList "D:\waseet-app\tests\e2e-simulation-runner.js" -NoNewWindow -Wait -PassThru
 $simSuccess = ($simResult.ExitCode -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 23 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, and phone journeys'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 24 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, phone, and super admin analytics journeys'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

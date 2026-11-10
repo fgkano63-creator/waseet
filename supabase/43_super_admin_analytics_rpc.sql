@@ -33,6 +33,7 @@ AS $$
     OR lower(coalesce(auth.jwt() ->> 'email', '')) IN ('fgkano63@gmail.com', 'saadani2009@gmail.com', 'mediator@waseet.com');
 $$;
 
+REVOKE EXECUTE ON FUNCTION public.is_super_admin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_super_admin() TO authenticated, service_role;
 
 -- 3. دالة التحليل المالي والتشغيلي الشامل للإدارة العليا get_super_admin_analytics()
@@ -287,4 +288,5 @@ BEGIN
 END;
 $$;
 
+REVOKE EXECUTE ON FUNCTION public.get_super_admin_analytics() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.get_super_admin_analytics() TO authenticated, service_role;
