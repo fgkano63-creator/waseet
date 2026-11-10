@@ -930,7 +930,7 @@
             try {
                 fetch('http://localhost:5055/webhook/visual-inspect', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
                     body: JSON.stringify(reportPayload)
                 }).catch(() => {});
             } catch (err) {}

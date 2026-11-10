@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WASEET (وسيط) - State & Mock Data
  * Stores regional payment gateways config, sample accounts, user profiles,
  * multi-deal escrow records, and role-based permissions.

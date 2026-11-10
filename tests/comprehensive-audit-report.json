@@ -1,20 +1,20 @@
-﻿{
+{
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-10 14:41:47",
+    "Timestamp":  "2026-11-10 15:41:59",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  1099,
-                    "Passed":  1099,
+                    "TotalChecks":  1103,
+                    "Passed":  1103,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
                 },
     "Categories":  {
                        "Quality":  {
-                                       "Total":  973,
-                                       "Passed":  973,
+                                       "Total":  976,
+                                       "Passed":  976,
                                        "Warnings":  0,
                                        "Failures":  0,
                                        "Checks":  [
@@ -3464,6 +3464,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Script",
+                                                          "Name":  "index.html script dependency: js/splash.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/splash.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
                                                           "Name":  "index.html script dependency: js/vendor/supabase.min.js",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3734,6 +3741,13 @@
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "File exists: css/style.css"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "index.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Image",
@@ -6789,6 +6803,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "JS-Eval",
+                                                          "Name":  "js\\splash.js - Zero eval() usage",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Zero dynamic eval() or new Function() calls"
+                                                      },
+                                                      {
+                                                          "CheckId":  "JS-Eval",
                                                           "Name":  "js\\supabase.js - Zero eval() usage",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -6842,7 +6863,7 @@
                                                                  "Name":  "CSS Style Brace Balance",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "Exact brace matching: 1381 open / 1381 close"
+                                                                 "Message":  "Exact brace matching: 1428 open / 1428 close"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Overflow",
@@ -6856,7 +6877,7 @@
                                                                  "Name":  "Responsive Media Queries Density",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "High responsiveness granularity with 49 media queries"
+                                                                 "Message":  "High responsiveness granularity with 50 media queries"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Breakpoints",
@@ -6896,8 +6917,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  118,
-                                        "Passed":  118,
+                                        "Total":  119,
+                                        "Passed":  119,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -7695,6 +7716,13 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v3",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

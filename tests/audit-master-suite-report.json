@@ -1,9 +1,9 @@
-﻿{
-    "Timestamp":  "2026-11-10 14:49:41",
-    "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
+{
+    "Timestamp":  "2026-11-10 15:49:34",
+    "Platform":  "منصة وسيط (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  1147,
-    "PassCount":  1147,
+    "TotalChecks":  1152,
+    "PassCount":  1152,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -898,8 +898,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  467,
-                                               "Pass":  467,
+                                               "Total":  469,
+                                               "Pass":  469,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -2344,6 +2344,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "index.html script: js/splash.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\splash.js"
+                                                             },
+                                                             {
                                                                  "Test":  "index.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2576,6 +2582,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "index.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "index.html img: assets/logo.png",
@@ -6021,7 +6033,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1381 open, 1381 close"
+                                                             "Details":  "Balanced: 1428 open, 1428 close"
                                                          }
                                                      ]
                                        },
@@ -6041,7 +6053,7 @@
                                                                 "Test":  "Responsive Media Queries",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
-                                                                "Details":  "High responsive granularity with 49 media queries"
+                                                                "Details":  "High responsive granularity with 50 media queries"
                                                             },
                                                             {
                                                                 "Test":  "Breakpoints Coverage (Mobile, Tablet, Desktop)",
@@ -6072,8 +6084,8 @@
                                                    ]
                                      },
                        "Security-Secrets":  {
-                                                "Total":  20,
-                                                "Pass":  20,
+                                                "Total":  21,
+                                                "Pass":  21,
                                                 "Warn":  0,
                                                 "Fail":  0,
                                                 "Items":  [
@@ -6180,6 +6192,12 @@
                                                                   "Details":  "No private keys or service_role credentials exposed"
                                                               },
                                                               {
+                                                                  "Test":  "js\\splash.js - No Hardcoded Private Keys/Service Keys",
+                                                                  "Status":  "PASS",
+                                                                  "Severity":  "INFO",
+                                                                  "Details":  "No private keys or service_role credentials exposed"
+                                                              },
+                                                              {
                                                                   "Test":  "js\\supabase.js - No Hardcoded Private Keys/Service Keys",
                                                                   "Status":  "PASS",
                                                                   "Severity":  "INFO",
@@ -6200,8 +6218,8 @@
                                                           ]
                                             },
                        "Security-Code":  {
-                                             "Total":  20,
-                                             "Pass":  20,
+                                             "Total":  21,
+                                             "Pass":  21,
                                              "Warn":  0,
                                              "Fail":  0,
                                              "Items":  [
@@ -6303,6 +6321,12 @@
                                                            },
                                                            {
                                                                "Test":  "js\\slider.js - Dangerous eval() check",
+                                                               "Status":  "PASS",
+                                                               "Severity":  "INFO",
+                                                               "Details":  "Zero eval() or new Function() invocations"
+                                                           },
+                                                           {
+                                                               "Test":  "js\\splash.js - Dangerous eval() check",
                                                                "Status":  "PASS",
                                                                "Severity":  "INFO",
                                                                "Details":  "Zero eval() or new Function() invocations"
@@ -6558,8 +6582,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  69,
-                                                 "Pass":  69,
+                                                 "Total":  70,
+                                                 "Pass":  70,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -6973,6 +6997,12 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.prevent_profile_field_tampering_v3",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

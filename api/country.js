@@ -18,7 +18,7 @@ export default function handler(req, res) {
         ? rawCountry.trim().toUpperCase()
         : null;
 
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Type', 'application/json; charset=UTF-8');
     res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     res.setHeader('Vary', 'x-vercel-ip-country, cf-ipcountry, x-country-code');
     res.setHeader('Access-Control-Allow-Origin', '*');
