@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T12:38:53.845Z",
+  "timestamp": "2026-11-10T12:42:39.192Z",
   "stats": {
     "totalChecks": 375,
     "passed": 375,
@@ -54,7 +54,7 @@
         "checkId": "404.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (0 scripts)",
+        "message": "All local script tags resolve to valid files (1 scripts)",
         "details": null
       },
       {
@@ -68,7 +68,7 @@
         "checkId": "404.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (1 images)",
+        "message": "All local image tags resolve on disk (2 images)",
         "details": null
       },
       {
@@ -124,7 +124,7 @@
         "checkId": "ad-walkthrough.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (0 scripts)",
+        "message": "All local script tags resolve to valid files (1 scripts)",
         "details": null
       },
       {
@@ -138,7 +138,7 @@
         "checkId": "ad-walkthrough.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (4 images)",
+        "message": "All local image tags resolve on disk (5 images)",
         "details": null
       },
       {
@@ -194,7 +194,7 @@
         "checkId": "admin-analytics.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -208,7 +208,7 @@
         "checkId": "admin-analytics.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (2 images)",
+        "message": "All local image tags resolve on disk (3 images)",
         "details": null
       },
       {
@@ -264,7 +264,7 @@
         "checkId": "admin-brokers.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -278,7 +278,7 @@
         "checkId": "admin-brokers.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (2 images)",
+        "message": "All local image tags resolve on disk (3 images)",
         "details": null
       },
       {
@@ -334,7 +334,7 @@
         "checkId": "admin-chats.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -348,7 +348,7 @@
         "checkId": "admin-chats.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (2 images)",
+        "message": "All local image tags resolve on disk (3 images)",
         "details": null
       },
       {
@@ -404,7 +404,7 @@
         "checkId": "admin-deposits.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (14 scripts)",
+        "message": "All local script tags resolve to valid files (15 scripts)",
         "details": null
       },
       {
@@ -418,7 +418,7 @@
         "checkId": "admin-deposits.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (3 images)",
+        "message": "All local image tags resolve on disk (4 images)",
         "details": null
       },
       {
@@ -474,7 +474,7 @@
         "checkId": "admin-withdrawals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -488,7 +488,7 @@
         "checkId": "admin-withdrawals.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (2 images)",
+        "message": "All local image tags resolve on disk (3 images)",
         "details": null
       },
       {
@@ -684,7 +684,7 @@
         "checkId": "chat.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (17 scripts)",
+        "message": "All local script tags resolve to valid files (18 scripts)",
         "details": null
       },
       {
@@ -698,7 +698,7 @@
         "checkId": "chat.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (3 images)",
+        "message": "All local image tags resolve on disk (4 images)",
         "details": null
       },
       {
@@ -754,7 +754,7 @@
         "checkId": "contact-support.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (13 scripts)",
+        "message": "All local script tags resolve to valid files (14 scripts)",
         "details": null
       },
       {
@@ -768,7 +768,7 @@
         "checkId": "contact-support.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (5 images)",
+        "message": "All local image tags resolve on disk (6 images)",
         "details": null
       },
       {
@@ -824,7 +824,7 @@
         "checkId": "deals.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (19 scripts)",
+        "message": "All local script tags resolve to valid files (20 scripts)",
         "details": null
       },
       {
@@ -838,7 +838,7 @@
         "checkId": "deals.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (4 images)",
+        "message": "All local image tags resolve on disk (5 images)",
         "details": null
       },
       {
@@ -964,7 +964,7 @@
         "checkId": "index.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (24 scripts)",
+        "message": "All local script tags resolve to valid files (25 scripts)",
         "details": null
       },
       {
@@ -1034,7 +1034,7 @@
         "checkId": "maintenance.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (0 scripts)",
+        "message": "All local script tags resolve to valid files (1 scripts)",
         "details": null
       },
       {
@@ -1048,7 +1048,7 @@
         "checkId": "maintenance.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (1 images)",
+        "message": "All local image tags resolve on disk (2 images)",
         "details": null
       },
       {
@@ -1104,7 +1104,7 @@
         "checkId": "my-accounts.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (17 scripts)",
+        "message": "All local script tags resolve to valid files (18 scripts)",
         "details": null
       },
       {
@@ -1118,7 +1118,7 @@
         "checkId": "my-accounts.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (5 images)",
+        "message": "All local image tags resolve on disk (6 images)",
         "details": null
       },
       {
@@ -1174,7 +1174,7 @@
         "checkId": "pending-accounts.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (16 scripts)",
+        "message": "All local script tags resolve to valid files (17 scripts)",
         "details": null
       },
       {
@@ -1188,7 +1188,7 @@
         "checkId": "pending-accounts.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (7 images)",
+        "message": "All local image tags resolve on disk (8 images)",
         "details": null
       },
       {
@@ -1314,7 +1314,7 @@
         "checkId": "profile.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (21 scripts)",
+        "message": "All local script tags resolve to valid files (22 scripts)",
         "details": null
       },
       {
@@ -1328,7 +1328,7 @@
         "checkId": "profile.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (3 images)",
+        "message": "All local image tags resolve on disk (4 images)",
         "details": null
       },
       {
@@ -1594,7 +1594,7 @@
         "checkId": "wallet.html-ScriptsResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local script tags resolve to valid files (17 scripts)",
+        "message": "All local script tags resolve to valid files (18 scripts)",
         "details": null
       },
       {
@@ -1608,7 +1608,7 @@
         "checkId": "wallet.html-ImageResolution",
         "status": "PASS",
         "severity": "INFO",
-        "message": "All local image tags resolve on disk (9 images)",
+        "message": "All local image tags resolve on disk (10 images)",
         "details": null
       },
       {
@@ -2431,7 +2431,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1981 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1980 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {

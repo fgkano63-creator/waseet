@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T12:38:52.071Z",
+  "timestamp": "2026-11-10T12:42:37.285Z",
   "metrics": {
     "totalChecks": 310,
     "passed": 310,
@@ -1577,7 +1577,7 @@
         "id": "Secrets-Scan",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1886 repository files. Zero hardcoded secrets, service keys or private keys.",
+        "message": "Scanned 1885 repository files. Zero hardcoded secrets, service keys or private keys.",
         "details": null
       },
       {

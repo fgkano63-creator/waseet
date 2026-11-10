@@ -2,19 +2,19 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-09 21:53:51",
+    "Timestamp":  "2026-11-10 14:41:47",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  895,
-                    "Passed":  895,
+                    "TotalChecks":  1099,
+                    "Passed":  1099,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
                 },
     "Categories":  {
                        "Quality":  {
-                                       "Total":  771,
-                                       "Passed":  771,
+                                       "Total":  973,
+                                       "Passed":  973,
                                        "Warnings":  0,
                                        "Failures":  0,
                                        "Checks":  [
@@ -117,6 +117,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "404.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "404.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -126,6 +133,27 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "404.html -\u003e /",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "404.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "404.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "404.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -250,11 +278,389 @@
                                                           "Message":  "Image found: assets/favicons/icon-192x192.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "ad-walkthrough.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "ad-walkthrough.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "ad-walkthrough.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "ad-walkthrough.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "ad-walkthrough.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "admin-analytics.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "admin-analytics.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "admin-analytics.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "admin-analytics.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "admin-analytics.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: WASEET | لوحة الإدارة العليا والتحليل المالي (Super Admin Analytics)"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/vendor/supabase.min.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/vendor/supabase.min.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/purify.min.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/purify.min.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/data.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/data.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/dialog.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/dialog.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/supabase.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/supabase.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/auth.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/auth.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/support.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/support.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/notifications.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/notifications.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/navbar.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/navbar.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/instant-nav.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/instant-nav.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/pwa-register.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/pwa-register.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/skeleton-ui.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/skeleton-ui.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/country-selector.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/country-selector.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Script",
+                                                          "Name":  "admin-analytics.html script dependency: js/app.js",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: js/app.js"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: assets/favicons/favicon-32x32.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-32x32.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: assets/favicons/favicon-16x16.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-16x16.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: favicon.ico",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: /favicon.svg",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: /favicon.svg"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: assets/favicons/apple-touch-icon.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/apple-touch-icon.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: assets/favicons/apple-touch-icon.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/apple-touch-icon.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "admin-analytics.html stylesheet dependency: css/style.css",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: css/style.css"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-analytics.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-analytics.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-analytics.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "admin-analytics.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-analytics.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-withdrawals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-deposits.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-brokers.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e pending-accounts.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-chats.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e admin-analytics.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-analytics.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
                                                       },
                                                       {
                                                           "CheckId":  "HTML-Doctype",
@@ -460,6 +866,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-brokers.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "admin-brokers.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -469,6 +882,13 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-brokers.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e admin-analytics.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -518,6 +938,62 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-brokers.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-brokers.html -\u003e profile.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -726,6 +1202,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-chats.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "admin-chats.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -763,6 +1246,13 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-chats.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e admin-analytics.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -812,6 +1302,62 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-chats.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-chats.html -\u003e profile.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1027,6 +1573,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-deposits.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "admin-deposits.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -1092,6 +1645,62 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-deposits.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-deposits.html -\u003e profile.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1300,6 +1909,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "admin-withdrawals.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "admin-withdrawals.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -1309,6 +1925,13 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-withdrawals.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-withdrawals.html -\u003e admin-analytics.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1371,7 +1994,21 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "admin-withdrawals.html -\u003e index.html",
+                                                          "Name":  "admin-withdrawals.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-withdrawals.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-withdrawals.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1379,13 +2016,6 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "admin-withdrawals.html -\u003e index.html",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "Link target exists"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Link-Target",
-                                                          "Name":  "admin-withdrawals.html -\u003e admin-withdrawals.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1399,7 +2029,21 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
+                                                          "Name":  "admin-withdrawals.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
                                                           "Name":  "admin-withdrawals.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "admin-withdrawals.html -\u003e profile.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1622,6 +2266,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "chat.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "chat.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -1721,7 +2372,21 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "chat.html -\u003e index.html",
+                                                          "Name":  "chat.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "chat.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "chat.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1729,13 +2394,6 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "chat.html -\u003e index.html",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "Link target exists"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Link-Target",
-                                                          "Name":  "chat.html -\u003e chat.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1749,7 +2407,21 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "chat.html -\u003e my-accounts.html",
+                                                          "Name":  "chat.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "chat.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "chat.html -\u003e profile.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -1986,6 +2658,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "contact-support.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "contact-support.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -2086,6 +2765,27 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "contact-support.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "contact-support.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "contact-support.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "contact-support.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -2364,6 +3064,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "deals.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "deals.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -2463,6 +3170,27 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
+                                                          "Name":  "deals.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "deals.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "deals.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
                                                           "Name":  "deals.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -2520,6 +3248,181 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "deals.html -\u003e chat.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "disputes.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "disputes.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "disputes.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "disputes.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "disputes.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: سياسة النزاعات والتحكيم • WASEET"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "disputes.html stylesheet dependency: assets/favicons/favicon-32x32.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-32x32.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "disputes.html stylesheet dependency: assets/favicons/favicon-16x16.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-16x16.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "disputes.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "disputes.html stylesheet dependency: css/style.css",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: css/style.css"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "disputes.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "disputes.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "disputes.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "disputes.html -\u003e contact-support.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -3072,6 +3975,27 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
+                                                          "Name":  "index.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "index.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "index.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
                                                           "Name":  "index.html -\u003e wallet.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3211,11 +4135,39 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "maintenance.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "maintenance.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "maintenance.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "maintenance.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "maintenance.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
                                                       },
                                                       {
                                                           "CheckId":  "HTML-Doctype",
@@ -3435,6 +4387,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "my-accounts.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "my-accounts.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -3556,6 +4515,27 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "my-accounts.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "my-accounts.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "my-accounts.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "my-accounts.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -3856,6 +4836,13 @@
                                                       },
                                                       {
                                                           "CheckId":  "Asset-Image",
+                                                          "Name":  "pending-accounts.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
                                                           "Name":  "pending-accounts.html static image: assets/favicon-512.png",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -3982,7 +4969,21 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "pending-accounts.html -\u003e index.html",
+                                                          "Name":  "pending-accounts.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "pending-accounts.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "pending-accounts.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -3990,13 +4991,6 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "pending-accounts.html -\u003e index.html",
-                                                          "Status":  "PASS",
-                                                          "Severity":  "INFO",
-                                                          "Message":  "Link target exists"
-                                                      },
-                                                      {
-                                                          "CheckId":  "Link-Target",
-                                                          "Name":  "pending-accounts.html -\u003e pending-accounts.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -4010,7 +5004,196 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
-                                                          "Name":  "pending-accounts.html -\u003e chat.html",
+                                                          "Name":  "pending-accounts.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "pending-accounts.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "pending-accounts.html -\u003e profile.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "privacy.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "privacy.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "privacy.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "privacy.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "privacy.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: سياسة الخصوصية وحماية البيانات • WASEET"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "privacy.html stylesheet dependency: assets/favicons/favicon-32x32.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-32x32.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "privacy.html stylesheet dependency: assets/favicons/favicon-16x16.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-16x16.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "privacy.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "privacy.html stylesheet dependency: css/style.css",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: css/style.css"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "privacy.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "privacy.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "privacy.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "privacy.html -\u003e contact-support.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -4282,6 +5465,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "profile.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "profile.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -4437,6 +5627,27 @@
                                                       },
                                                       {
                                                           "CheckId":  "Link-Target",
+                                                          "Name":  "profile.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "profile.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "profile.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
                                                           "Name":  "profile.html -\u003e index.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
@@ -4466,6 +5677,181 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "profile.html -\u003e profile.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Doctype",
+                                                          "Name":  "terms.html - Valid HTML5 DOCTYPE",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "HTML5 standard compliance"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-i18n",
+                                                          "Name":  "terms.html - Arabic Locale and RTL Config",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on root html element"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Viewport",
+                                                          "Name":  "terms.html - Standard Viewport Meta Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "width=device-width present"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Charset",
+                                                          "Name":  "terms.html - UTF-8 Character Encoding",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "UTF-8 declared for Arabic typography"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-Title",
+                                                          "Name":  "terms.html - Page Title Tag",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Title: شروط الاستخدام والخدمة • WASEET"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "terms.html stylesheet dependency: assets/favicons/favicon-32x32.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-32x32.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "terms.html stylesheet dependency: assets/favicons/favicon-16x16.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon-16x16.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "terms.html stylesheet dependency: assets/favicons/favicon.ico",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: assets/favicons/favicon.ico"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-CSS",
+                                                          "Name":  "terms.html stylesheet dependency: css/style.css",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "File exists: css/style.css"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "terms.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "terms.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
+                                                          "CheckId":  "HTML-UniqueID",
+                                                          "Name":  "terms.html - Unique DOM Element IDs",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "All DOM IDs are distinct"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e contact-support.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e disputes.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e index.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e deals.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "terms.html -\u003e contact-support.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -4709,6 +6095,13 @@
                                                           "Message":  "Image found: assets/logo.png"
                                                       },
                                                       {
+                                                          "CheckId":  "Asset-Image",
+                                                          "Name":  "wallet.html static image: assets/logo.png",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Image found: assets/logo.png"
+                                                      },
+                                                      {
                                                           "CheckId":  "HTML-UniqueID",
                                                           "Name":  "wallet.html - Unique DOM Element IDs",
                                                           "Status":  "PASS",
@@ -4802,6 +6195,27 @@
                                                       {
                                                           "CheckId":  "Link-Target",
                                                           "Name":  "wallet.html -\u003e wallet.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "wallet.html -\u003e terms.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "wallet.html -\u003e privacy.html",
+                                                          "Status":  "PASS",
+                                                          "Severity":  "INFO",
+                                                          "Message":  "Link target exists"
+                                                      },
+                                                      {
+                                                          "CheckId":  "Link-Target",
+                                                          "Name":  "wallet.html -\u003e disputes.html",
                                                           "Status":  "PASS",
                                                           "Severity":  "INFO",
                                                           "Message":  "Link target exists"
@@ -5428,7 +6842,7 @@
                                                                  "Name":  "CSS Style Brace Balance",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "Exact brace matching: 1380 open / 1380 close"
+                                                                 "Message":  "Exact brace matching: 1381 open / 1381 close"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Overflow",
@@ -5482,8 +6896,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  116,
-                                        "Passed":  116,
+                                        "Total":  118,
+                                        "Passed":  118,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -6267,6 +7681,20 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.is_super_admin",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

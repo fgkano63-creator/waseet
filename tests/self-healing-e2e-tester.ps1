@@ -65,6 +65,8 @@ $mig36Content = if (Test-Path 'D:\waseet-app\supabase\36_fix_country_default_and
 $mig37Content = if (Test-Path 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql') { Get-Content 'D:\waseet-app\supabase\37_security_audit_escrow_cancel_and_storage_bola_hardening.sql' -Raw -Encoding UTF8 } else { "" }
 $mig38Content = if (Test-Path 'D:\waseet-app\supabase\41_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\41_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } elseif (Test-Path 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql') { Get-Content 'D:\waseet-app\supabase\38_recovery_account_columns_and_access.sql' -Raw -Encoding UTF8 } else { "" }
 $mig39Content = if (Test-Path 'D:\waseet-app\supabase\42_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\42_profiles_phone_column.sql' -Raw -Encoding UTF8 } elseif (Test-Path 'D:\waseet-app\supabase\39_profiles_phone_column.sql') { Get-Content 'D:\waseet-app\supabase\39_profiles_phone_column.sql' -Raw -Encoding UTF8 } else { "" }
+$adminAnalyticsHtml = if (Test-Path 'D:\waseet-app\admin-analytics.html') { Get-Content 'D:\waseet-app\admin-analytics.html' -Raw -Encoding UTF8 } else { "" }
+$mig43Content = if (Test-Path 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql') { Get-Content 'D:\waseet-app\supabase\43_super_admin_analytics_rpc.sql' -Raw -Encoding UTF8 } else { "" }
 
 Write-Host ""
 Write-Host ">>> 1. FLOW 1: SELLER ACCOUNT LISTING AND SIMULATION RESILIENCE" -ForegroundColor Yellow

@@ -1,15 +1,15 @@
 ﻿{
-    "Timestamp":  "2026-11-09 21:57:29",
+    "Timestamp":  "2026-11-10 14:42:05",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  944,
-    "PassCount":  944,
+    "TotalChecks":  1147,
+    "PassCount":  1147,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
                        "HTML-Quality":  {
-                                            "Total":  119,
-                                            "Pass":  119,
+                                            "Total":  147,
+                                            "Pass":  147,
                                             "Warn":  0,
                                             "Fail":  0,
                                             "Items":  [
@@ -93,6 +93,48 @@
                                                           },
                                                           {
                                                               "Test":  "ad-walkthrough.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: WASEET | لوحة الإدارة العليا والتحليل المالي (Super Admin Analytics)"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "admin-analytics.html - Favicon Link",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
                                                               "Details":  "Favicon declared"
@@ -392,6 +434,48 @@
                                                               "Details":  "Favicon declared"
                                                           },
                                                           {
+                                                              "Test":  "disputes.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: سياسة النزاعات والتحكيم • WASEET"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "disputes.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
                                                               "Test":  "index.html - DOCTYPE declaration",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
@@ -560,6 +644,48 @@
                                                               "Details":  "Favicon declared"
                                                           },
                                                           {
+                                                              "Test":  "privacy.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: سياسة الخصوصية وحماية البيانات • WASEET"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "privacy.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
                                                               "Test":  "profile.html - DOCTYPE declaration",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
@@ -597,6 +723,48 @@
                                                           },
                                                           {
                                                               "Test":  "profile.html - Favicon Link",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Favicon declared"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - DOCTYPE declaration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Valid HTML5 doctype"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - Arabic RTL configuration",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "lang=\u0027ar\u0027 and dir=\u0027rtl\u0027 present on \u003chtml\u003e"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - Responsive Viewport",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Mobile-first width=device-width found"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - UTF-8 Charset",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "UTF-8 encoding declared"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - Page Title",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Title: شروط الاستخدام والخدمة • WASEET"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - Meta Description",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "Description declared"
+                                                          },
+                                                          {
+                                                              "Test":  "terms.html - Favicon Link",
                                                               "Status":  "PASS",
                                                               "Severity":  "INFO",
                                                               "Details":  "Favicon declared"
@@ -730,8 +898,8 @@
                                                       ]
                                         },
                        "Asset-Integrity":  {
-                                               "Total":  409,
-                                               "Pass":  409,
+                                               "Total":  467,
+                                               "Pass":  467,
                                                "Warn":  0,
                                                "Fail":  0,
                                                "Items":  [
@@ -782,6 +950,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\apple-touch-icon.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "404.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "404.html img: assets/logo.png",
@@ -860,6 +1034,168 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\favicons\\icon-192x192.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "ad-walkthrough.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/vendor/supabase.min.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\vendor\\supabase.min.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/purify.min.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\purify.min.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/data.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\data.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/dialog.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\dialog.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/supabase.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\supabase.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/auth.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\auth.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/support.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\support.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/notifications.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\notifications.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/navbar.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\navbar.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/instant-nav.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\instant-nav.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/pwa-register.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\pwa-register.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/skeleton-ui.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\skeleton-ui.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/country-selector.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\country-selector.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html script: js/app.js",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\js\\app.js"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: assets/favicons/favicon-32x32.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-32x32.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: assets/favicons/favicon-16x16.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-16x16.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: assets/favicons/favicon.ico",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: favicon.ico",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: /favicon.svg",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\favicon.svg"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: assets/favicons/apple-touch-icon.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\apple-touch-icon.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: assets/favicons/apple-touch-icon.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\apple-touch-icon.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html link: css/style.css",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-analytics.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "admin-brokers.html script: js/vendor/supabase.min.js",
@@ -1006,6 +1342,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "admin-brokers.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "admin-chats.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1136,6 +1478,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-chats.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "admin-chats.html img: assets/logo.png",
@@ -1294,6 +1642,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "admin-deposits.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "admin-withdrawals.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1424,6 +1778,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "admin-withdrawals.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "admin-withdrawals.html img: assets/logo.png",
@@ -1594,6 +1954,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "chat.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "contact-support.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -1724,6 +2090,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "contact-support.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "contact-support.html img: assets/logo.png",
@@ -1925,6 +2297,48 @@
                                                              },
                                                              {
                                                                  "Test":  "deals.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "deals.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html link: assets/favicons/favicon-32x32.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-32x32.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html link: assets/favicons/favicon-16x16.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-16x16.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html link: assets/favicons/favicon.ico",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html link: css/style.css",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "disputes.html img: assets/logo.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
@@ -2314,6 +2728,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "maintenance.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "my-accounts.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2462,6 +2882,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "my-accounts.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "my-accounts.html img: assets/logo.png",
@@ -2638,6 +3064,12 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "pending-accounts.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "pending-accounts.html img: assets/favicon-512.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -2645,6 +3077,42 @@
                                                              },
                                                              {
                                                                  "Test":  "pending-accounts.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html link: assets/favicons/favicon-32x32.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-32x32.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html link: assets/favicons/favicon-16x16.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-16x16.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html link: assets/favicons/favicon.ico",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html link: css/style.css",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "privacy.html img: assets/logo.png",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
@@ -2848,6 +3316,48 @@
                                                                  "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
+                                                                 "Test":  "profile.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html link: assets/favicons/favicon-32x32.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-32x32.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html link: assets/favicons/favicon-16x16.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon-16x16.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html link: assets/favicons/favicon.ico",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\favicons\\favicon.ico"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html link: css/style.css",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
+                                                                 "Test":  "terms.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
+                                                             },
+                                                             {
                                                                  "Test":  "wallet.html script: js/vendor/supabase.min.js",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
@@ -3002,6 +3512,12 @@
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
                                                                  "Details":  "Found at D:\\waseet-app\\css\\style.css"
+                                                             },
+                                                             {
+                                                                 "Test":  "wallet.html img: assets/logo.png",
+                                                                 "Status":  "PASS",
+                                                                 "Severity":  "INFO",
+                                                                 "Details":  "Found at D:\\waseet-app\\assets\\logo.png"
                                                              },
                                                              {
                                                                  "Test":  "wallet.html img: assets/logo.png",
@@ -3192,8 +3708,8 @@
                                                          ]
                                            },
                        "HTML-Semantics":  {
-                                              "Total":  17,
-                                              "Pass":  17,
+                                              "Total":  21,
+                                              "Pass":  21,
                                               "Warn":  0,
                                               "Fail":  0,
                                               "Items":  [
@@ -3205,6 +3721,12 @@
                                                             },
                                                             {
                                                                 "Test":  "ad-walkthrough.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
+                                                                "Test":  "admin-analytics.html - Unique Element IDs",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
                                                                 "Details":  "All element IDs are unique"
@@ -3252,6 +3774,12 @@
                                                                 "Details":  "All element IDs are unique"
                                                             },
                                                             {
+                                                                "Test":  "disputes.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
                                                                 "Test":  "index.html - Unique Element IDs",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
@@ -3276,7 +3804,19 @@
                                                                 "Details":  "All element IDs are unique"
                                                             },
                                                             {
+                                                                "Test":  "privacy.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
                                                                 "Test":  "profile.html - Unique Element IDs",
+                                                                "Status":  "PASS",
+                                                                "Severity":  "INFO",
+                                                                "Details":  "All element IDs are unique"
+                                                            },
+                                                            {
+                                                                "Test":  "terms.html - Unique Element IDs",
                                                                 "Status":  "PASS",
                                                                 "Severity":  "INFO",
                                                                 "Details":  "All element IDs are unique"
@@ -3302,8 +3842,8 @@
                                                         ]
                                           },
                        "HTML-Links":  {
-                                          "Total":  236,
-                                          "Pass":  236,
+                                          "Total":  346,
+                                          "Pass":  346,
                                           "Warn":  0,
                                           "Fail":  0,
                                           "Items":  [
@@ -3314,10 +3854,160 @@
                                                             "Details":  "Target exists: /"
                                                         },
                                                         {
+                                                            "Test":  "404.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "404.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "404.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "ad-walkthrough.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "ad-walkthrough.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "ad-walkthrough.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-analytics.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-analytics.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-withdrawals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-withdrawals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-deposits.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-deposits.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-brokers.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-brokers.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e pending-accounts.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: pending-accounts.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-chats.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-chats.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e admin-analytics.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-analytics.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-analytics.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
                                                             "Test":  "admin-brokers.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e admin-analytics.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-analytics.html"
                                                         },
                                                         {
                                                             "Test":  "admin-brokers.html -\u003e admin-withdrawals.html",
@@ -3360,6 +4050,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-brokers.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "admin-brokers.html -\u003e index.html",
@@ -3428,6 +4136,12 @@
                                                             "Details":  "Target exists: contact-support.html"
                                                         },
                                                         {
+                                                            "Test":  "admin-chats.html -\u003e admin-analytics.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-analytics.html"
+                                                        },
+                                                        {
                                                             "Test":  "admin-chats.html -\u003e admin-deposits.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -3468,6 +4182,54 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-chats.html -\u003e profile.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: profile.html"
                                                         },
                                                         {
                                                             "Test":  "admin-deposits.html -\u003e index.html",
@@ -3524,6 +4286,24 @@
                                                             "Details":  "Target exists: index.html"
                                                         },
                                                         {
+                                                            "Test":  "admin-deposits.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-deposits.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "admin-deposits.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -3558,6 +4338,12 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-withdrawals.html -\u003e admin-analytics.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: admin-analytics.html"
                                                         },
                                                         {
                                                             "Test":  "admin-withdrawals.html -\u003e admin-withdrawals.html",
@@ -3606,6 +4392,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-withdrawals.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-withdrawals.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "admin-withdrawals.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "admin-withdrawals.html -\u003e index.html",
@@ -3714,6 +4518,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: chat.html"
+                                                        },
+                                                        {
+                                                            "Test":  "chat.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "chat.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "chat.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "chat.html -\u003e index.html",
@@ -3836,6 +4658,24 @@
                                                             "Details":  "Target exists: index.html"
                                                         },
                                                         {
+                                                            "Test":  "contact-support.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "contact-support.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "contact-support.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "contact-support.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -3944,6 +4784,24 @@
                                                             "Details":  "Target exists: chat.html"
                                                         },
                                                         {
+                                                            "Test":  "deals.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "deals.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "deals.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "deals.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -3996,6 +4854,84 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: chat.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "disputes.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
                                                         },
                                                         {
                                                             "Test":  "index.html -\u003e index.html",
@@ -4100,6 +5036,24 @@
                                                             "Details":  "Target exists: chat.html"
                                                         },
                                                         {
+                                                            "Test":  "index.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "index.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "index.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "index.html -\u003e wallet.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -4134,6 +5088,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: profile.html"
+                                                        },
+                                                        {
+                                                            "Test":  "maintenance.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "maintenance.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "maintenance.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "my-accounts.html -\u003e index.html",
@@ -4236,6 +5208,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "my-accounts.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "my-accounts.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "my-accounts.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "my-accounts.html -\u003e index.html",
@@ -4382,6 +5372,24 @@
                                                             "Details":  "Target exists: admin-chats.html"
                                                         },
                                                         {
+                                                            "Test":  "pending-accounts.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "pending-accounts.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "pending-accounts.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "pending-accounts.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -4410,6 +5418,84 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: profile.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "privacy.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
                                                         },
                                                         {
                                                             "Test":  "profile.html -\u003e index.html",
@@ -4538,6 +5624,24 @@
                                                             "Details":  "Target exists: contact-support.html"
                                                         },
                                                         {
+                                                            "Test":  "profile.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "profile.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "profile.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
                                                             "Test":  "profile.html -\u003e index.html",
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
@@ -4566,6 +5670,84 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: profile.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e index.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: index.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e wallet.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e deals.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: deals.html"
+                                                        },
+                                                        {
+                                                            "Test":  "terms.html -\u003e contact-support.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: contact-support.html"
                                                         },
                                                         {
                                                             "Test":  "wallet.html -\u003e index.html",
@@ -4644,6 +5826,24 @@
                                                             "Status":  "PASS",
                                                             "Severity":  "INFO",
                                                             "Details":  "Target exists: wallet.html"
+                                                        },
+                                                        {
+                                                            "Test":  "wallet.html -\u003e terms.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: terms.html"
+                                                        },
+                                                        {
+                                                            "Test":  "wallet.html -\u003e privacy.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: privacy.html"
+                                                        },
+                                                        {
+                                                            "Test":  "wallet.html -\u003e disputes.html",
+                                                            "Status":  "PASS",
+                                                            "Severity":  "INFO",
+                                                            "Details":  "Target exists: disputes.html"
                                                         },
                                                         {
                                                             "Test":  "wallet.html -\u003e index.html",
@@ -4726,11 +5926,17 @@
                                                     ]
                                       },
                        "Security-XSS":  {
-                                            "Total":  12,
-                                            "Pass":  12,
+                                            "Total":  13,
+                                            "Pass":  13,
                                             "Warn":  0,
                                             "Fail":  0,
                                             "Items":  [
+                                                          {
+                                                              "Test":  "admin-analytics.html - DOMPurify Inclusion",
+                                                              "Status":  "PASS",
+                                                              "Severity":  "INFO",
+                                                              "Details":  "DOMPurify is included in page scripts"
+                                                          },
                                                           {
                                                               "Test":  "admin-brokers.html - DOMPurify Inclusion",
                                                               "Status":  "PASS",
@@ -4815,7 +6021,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1380 open, 1380 close"
+                                                             "Details":  "Balanced: 1381 open, 1381 close"
                                                          }
                                                      ]
                                        },
@@ -5352,8 +6558,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  67,
-                                                 "Pass":  67,
+                                                 "Total":  69,
+                                                 "Pass":  69,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -5755,6 +6961,18 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.is_super_admin",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

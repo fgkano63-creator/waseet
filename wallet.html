@@ -4245,6 +4245,32 @@
                 });
             }
 
+
+        // ── مسارات الشحن والسحب المعتمدة (Approved Fiat & Crypto Ramps Helpers) ──
+        function scrollToDepositForm() {
+            var el = document.getElementById('user-deposit-panel');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                var input = document.getElementById('deposit-amount-input');
+                if (input) {
+                    setTimeout(function() { 
+                        input.focus(); 
+                        input.classList.add('glow-highlight');
+                        setTimeout(function() { input.classList.remove('glow-highlight'); }, 1200);
+                    }, 400);
+                }
+            }
+        }
+        window.scrollToDepositForm = scrollToDepositForm;
+
+        function selectRampCategory(cat) {
+            if (typeof switchGatewayCategory === 'function') {
+                switchGatewayCategory(cat);
+            }
+            scrollToDepositForm();
+        }
+        window.selectRampCategory = selectRampCategory;
+
             renderWalletSummaryUI();
             setTimeout(async () => {
                 await refreshAllWalletData();
