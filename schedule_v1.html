@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>جدول الامتحانات النصفية - الصف الرابع - مدرسة نيل الأوطار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@700;800;900&family=Readex+Pro:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #e5ebf0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    padding: 20px;
+  }
+  .schedule-wrapper {
+    position: relative;
+    width: 682px;
+    height: 1024px;
+    background: url('original_schedule.jpg') no-repeat center top;
+    background-size: 682px 1024px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+  
+  /* Grade Badge Overlay: Covers the pill seamlessly */
+  .grade-badge-overlay {
+    position: absolute;
+    top: 224px;
+    left: 172px;
+    width: 338px;
+    height: 52px;
+    background: linear-gradient(180deg, #dd6772 0%, #cb4b56 50%, #b23541 100%);
+    border: 2px solid #c9a358;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.3), 0 3px 8px rgba(0,0,0,0.15);
+    z-index: 20;
+  }
+  .grade-badge-overlay::before, .grade-badge-overlay::after {
+    content: '';
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: #f7de9c;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.4);
+  }
+  .grade-badge-overlay::before { left: 14px; }
+  .grade-badge-overlay::after { right: 14px; }
+
+  .grade-badge-overlay span {
+    color: #ffffff;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    margin-top: -3px;
+  }
+
+  /* Table Subject Cells Overlay */
+  .subject-cell {
+    position: absolute;
+    left: 236px;
+    width: 217px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    font-weight: 800;
+    color: #041935;
+    background: #fdf8f2;
+    z-index: 10;
+  }
+  
+  .subject-cell.english {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+  <div class="schedule-wrapper">
+    <!-- Grade Badge -->
+    <div class="grade-badge-overlay">
+      <span>الصف الرابع</span>
+    </div>
+
+    <!-- Table 1 (الأسبوع الأول) -->
+    <div class="subject-cell" style="top: 403px; height: 31px;">إجتماعيات</div>
+    <div class="subject-cell" style="top: 435px; height: 31px;">رياضيات</div>
+    <div class="subject-cell" style="top: 467px; height: 30px;">علوم</div>
+    <div class="subject-cell english" style="top: 498px; height: 31px;">English</div>
+    <div class="subject-cell" style="top: 530px; height: 32px;">لغة عربية</div>
+
+    <!-- Table 2 (الأسبوع الثاني) -->
+    <div class="subject-cell" style="top: 681px; height: 32px;">متون</div>
+    <div class="subject-cell" style="top: 714px; height: 32px;">كتابة</div>
+    <div class="subject-cell" style="top: 747px; height: 33px;">حاسوب</div>
+    <div class="subject-cell" style="top: 781px; height: 33px;">قرآن</div>
+    <div class="subject-cell" style="top: 815px; height: 32px;">تربية إسلامية</div>
+  </div>
+</body>
+</html>

@@ -2082,7 +2082,7 @@
 
                             .from('regional_brokers')
 
-                            .select('id, user_id, name, email, avatar_url, role, country, is_active, rating, completed_deals')
+                            .select('id, user_id, name, email, avatar_url, country, is_active')
 
                             .eq('is_active', true);
 

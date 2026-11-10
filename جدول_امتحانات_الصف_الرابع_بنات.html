@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="جدول الامتحانات النصفية - الصف الرابع (بنات) - مدرسة نيل الأوطار">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>جدول الامتحانات النصفية - الصف الرابع (بنات) - مدرسة نيل الأوطار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Readex+Pro:wght@500;600;700;800&family=Baloo+Bhaijaan+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: #fdf2f8;
+    font-family: 'Readex Pro', 'Cairo', sans-serif;
+    color: #374151;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  /* Toolbar */
+  .no-print-toolbar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+  }
+  .btn-print {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    color: #ffffff;
+    border: none;
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-print:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(236, 72, 153, 0.45);
+  }
+
+  /* Schedule Card */
+  .schedule-page {
+    width: 820px;
+    background: linear-gradient(180deg, #ffffff 0%, #fffbfd 60%, #fdf4f8 100%);
+    border-radius: 32px;
+    box-shadow: 0 15px 45px rgba(236, 72, 153, 0.1), 0 2px 6px rgba(0,0,0,0.03);
+    border: 3px solid #fce7f3;
+    position: relative;
+    overflow: hidden;
+    padding: 32px 36px;
+  }
+
+  /* Decorative Corner Ribbons & Florals */
+  .schedule-page::before {
+    content: '';
+    position: absolute;
+    top: -70px;
+    right: -70px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(244, 114, 182, 0.22) 0%, rgba(251, 207, 232, 0.1) 60%, transparent 100%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .schedule-page::after {
+    content: '';
+    position: absolute;
+    bottom: -70px;
+    left: -70px;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.18) 0%, rgba(253, 230, 138, 0.1) 60%, transparent 100%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .content-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header Section */
+  .school-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .school-emblem {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 66px;
+    height: 66px;
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%);
+    color: white;
+    border-radius: 22px;
+    font-size: 32px;
+    box-shadow: 0 6px 18px rgba(236, 72, 153, 0.3);
+    margin-bottom: 8px;
+    border: 2px solid #fef08a;
+  }
+  .school-name {
+    font-size: 27px;
+    font-weight: 800;
+    color: #831843;
+    margin-bottom: 3px;
+  }
+  .school-subtitle {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #9d174d;
+    opacity: 0.85;
+    letter-spacing: 0.5px;
+  }
+
+  /* Main Title Banner */
+  .title-banner {
+    background: linear-gradient(135deg, #be185d 0%, #db2777 50%, #e11d48 100%);
+    color: #ffffff;
+    border-radius: 50px;
+    padding: 12px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(219, 39, 119, 0.28);
+    border: 2px solid #fbcfe8;
+    margin-bottom: 16px;
+  }
+  .title-banner .exam-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .title-banner .academic-year {
+    font-size: 14px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.22);
+    padding: 6px 18px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  /* Grade Badge */
+  .grade-strip {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+  }
+  .grade-capsule {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 50%, #e11d48 100%);
+    color: #ffffff;
+    padding: 8px 40px;
+    border-radius: 50px;
+    font-size: 23px;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.3);
+    border: 2px solid #fed7aa;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Baloo Bhaijaan 2', 'Cairo', sans-serif;
+  }
+
+  /* Weeks Container */
+  .weeks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+
+  /* Week Card */
+  .week-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 2px solid #fce7f3;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(244, 114, 182, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+  }
+  .week-card.week1 {
+    border-top: 6px solid #f472b6;
+  }
+  .week-card.week2 {
+    border-top: 6px solid #a855f7;
+  }
+
+  .week-header {
+    padding: 14px 16px;
+    text-align: center;
+    background: #fff5f8;
+    border-bottom: 2px solid #fce7f3;
+  }
+  .week-card.week1 .week-header {
+    background: linear-gradient(180deg, #fdf2f8 0%, #fce7f3 100%);
+  }
+  .week-card.week2 .week-header {
+    background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+  }
+  .week-title {
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .week-card.week1 .week-title { color: #9d174d; }
+  .week-card.week2 .week-title { color: #6b21a8; }
+  .week-dates {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+
+  /* Table styling */
+  .exam-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .exam-table th {
+    background: #fff7fa;
+    color: #831843;
+    font-size: 13.5px;
+    font-weight: 800;
+    padding: 10px 8px;
+    border-bottom: 2px solid #fce7f3;
+    text-align: center;
+  }
+  .exam-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #fdf2f8;
+    vertical-align: middle;
+    font-size: 15px;
+  }
+  .exam-table tr:last-child td {
+    border-bottom: none;
+  }
+  .exam-table tr:hover {
+    background: #fff8fc;
+  }
+
+  /* Day Tag - Cute Girly Pastel colors */
+  .day-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .day-sun { background: #ffe4e6; color: #be123c; }   /* Soft Rose */
+  .day-mon { background: #fae8ff; color: #86198f; }   /* Cute Lilac */
+  .day-tue { background: #ccfbf1; color: #0f766e; }   /* Gentle Mint */
+  .day-wed { background: #fef3c7; color: #b45309; }   /* Soft Peach/Gold */
+  .day-thu { background: #fce7f3; color: #9d174d; }   /* Strawberry Pink */
+
+  /* Subject Badge */
+  .subject-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .subject-icon {
+    font-size: 18px;
+  }
+  .date-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  /* Motivational & Tips Box for Young Girls */
+  .motivation-box {
+    background: linear-gradient(135deg, #fff1f2 0%, #fdf2f8 50%, #faf5ff 100%);
+    border: 2px dashed #f472b6;
+    border-radius: 20px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .motivation-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #9d174d;
+  }
+  .motivation-icon {
+    font-size: 26px;
+  }
+  .tips-list {
+    display: flex;
+    gap: 16px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #831843;
+  }
+
+  /* Footer Note */
+  .schedule-footer {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    color: #9d174d;
+    background: #fdf2f8;
+    padding: 11px;
+    border-radius: 50px;
+    border: 1.5px solid #fbcfe8;
+  }
+
+  @media print {
+    body {
+      background: #ffffff;
+      padding: 0;
+    }
+    .no-print-toolbar {
+      display: none;
+    }
+    .schedule-page {
+      box-shadow: none;
+      border: 2px solid #fbcfe8;
+      width: 100%;
+      padding: 20px 24px;
+    }
+    .weeks-grid {
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .exam-table td {
+      padding: 9px 8px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Print Button Bar (Hidden in print) -->
+  <div class="no-print-toolbar">
+    <button class="btn-print" onclick="window.print()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      طباعة جدول الصف الرابع (A4)
+    </button>
+  </div>
+
+  <div class="schedule-page">
+    <div class="content-inner">
+      
+      <!-- School Header -->
+      <div class="school-header">
+        <div class="school-emblem">🌸</div>
+        <h1 class="school-name">مدرسة نيل الأوطار</h1>
+        <p class="school-subtitle">رعاية الموهبة • بناء الهمة • صناعة المستقبل</p>
+      </div>
+
+      <!-- Main Title -->
+      <div class="title-banner">
+        <div class="exam-title">
+          <span>💖</span>
+          <span>جدول الامتحانات النصفية</span>
+        </div>
+        <div class="academic-year">
+          2026 / 2027 الموافق لـ 1448 هجري
+        </div>
+      </div>
+
+      <!-- Grade Capsule -->
+      <div class="grade-strip">
+        <div class="grade-capsule">
+          <span>🌸</span>
+          <span>الصف الرابع</span>
+          <span>🌸</span>
+        </div>
+      </div>
+
+      <!-- Two Weeks Grid -->
+      <div class="weeks-grid">
+        
+        <!-- الأسبوع الأول -->
+        <div class="week-card week1">
+          <div class="week-header">
+            <div class="week-title">
+              <span>🌷</span>
+              <span>الأسبوع الأول</span>
+            </div>
+            <div class="week-dates">من 11/15 إلى 11/19</div>
+          </div>
+          <table class="exam-table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">اليوم</th>
+                <th style="width: 50%;">المادة</th>
+                <th style="width: 25%;">التاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-sun">الأحد</span></td>
+                <td><div class="subject-name"><span class="subject-icon">🌍</span> إجتماعيات</div></td>
+                <td class="date-text">11/15</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-mon">الاثنين</span></td>
+                <td><div class="subject-name"><span class="subject-icon">📐</span> رياضيات</div></td>
+                <td class="date-text">11/16</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-tue">الثلاثاء</span></td>
+                <td><div class="subject-name"><span class="subject-icon">🔬</span> علوم</div></td>
+                <td class="date-text">11/17</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-wed">الأربعاء</span></td>
+                <td><div class="subject-name"><span class="subject-icon">🔤</span> English</div></td>
+                <td class="date-text">11/18</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-thu">الخميس</span></td>
+                <td><div class="subject-name"><span class="subject-icon">📖</span> لغة عربية</div></td>
+                <td class="date-text">11/19</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- الأسبوع الثاني -->
+        <div class="week-card week2">
+          <div class="week-header">
+            <div class="week-title">
+              <span>✨</span>
+              <span>الأسبوع الثاني</span>
+            </div>
+            <div class="week-dates">من 11/22 إلى 11/26</div>
+          </div>
+          <table class="exam-table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">اليوم</th>
+                <th style="width: 50%;">المادة</th>
+                <th style="width: 25%;">التاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-sun">الأحد</span></td>
+                <td><div class="subject-name"><span class="subject-icon">📜</span> متون</div></td>
+                <td class="date-text">11/22</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-mon">الاثنين</span></td>
+                <td><div class="subject-name"><span class="subject-icon">✍️</span> كتابة</div></td>
+                <td class="date-text">11/23</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-tue">الثلاثاء</span></td>
+                <td><div class="subject-name"><span class="subject-icon">💻</span> حاسوب</div></td>
+                <td class="date-text">11/24</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-wed">الأربعاء</span></td>
+                <td><div class="subject-name"><span class="subject-icon">🌸</span> قرآن</div></td>
+                <td class="date-text">11/25</td>
+              </tr>
+              <tr>
+                <td style="text-align: center;"><span class="day-tag day-thu">الخميس</span></td>
+                <td><div class="subject-name"><span class="subject-icon">🕋</span> تربية إسلامية</div></td>
+                <td class="date-text">11/26</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Tips for Young Girls -->
+      <div class="motivation-box">
+        <div class="motivation-text">
+          <span class="motivation-icon">👑</span>
+          <span>نصائح ذهبية لبطلات الصف الرابع:</span>
+        </div>
+        <div class="tips-list">
+          <span>⏰ النوم المبكر والاستيقاظ بنشاط</span>
+          <span>✏️ تجهيز الأقلام والأدوات المدرسية كاملة</span>
+          <span>💖 الهدوء والتركيز سر التفوق</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="schedule-footer">
+        🌸 تمنياتنا لأميرات وبطلات الصف الرابع بالتفوق والنجاح الدائم والدرجات العالية 🎓✨
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

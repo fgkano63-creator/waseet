@@ -4183,14 +4183,18 @@ html, body {
        Modals & Details Card on Mobile: Straight, No Tilt, width 100%, overflow-x hidden
        ========================================================================== */
     .modal-overlay {
-        padding: 0.4rem !important;
+        padding: 0.5rem 0.4rem 2rem 0.4rem !important;
         overflow-x: hidden !important;
-        align-items: center !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        align-items: flex-start !important;
         justify-content: center !important;
     }
+    .modal-card,
     .modal-box-3d,
     .cards-deck-modal-box,
     .card-3d,
+    .modal-overlay .modal-card,
     .modal-overlay .modal-box-3d {
         transform: none !important;
         -webkit-transform: none !important;
@@ -4201,9 +4205,15 @@ html, body {
         border-radius: 16px !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;
-        margin: 0 !important;
-        padding: 1rem 0.75rem !important;
-        max-height: 92vh !important;
+        margin: 0.5rem auto !important;
+        max-height: calc(100dvh - 1.5rem) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .modal-body {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        flex: 1 1 auto !important;
     }
     .modal-title {
         font-size: 1.05rem !important;

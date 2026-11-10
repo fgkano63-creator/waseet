@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="جدول الامتحانات - الصف الرابع">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>جدول الامتحانات - الصف الرابع</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #eef2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+  }
+  .schedule-container {
+    position: relative;
+    width: 682px;
+    height: 1024px;
+    background: url('original_schedule.jpg') no-repeat center top;
+    background-size: 682px 1024px;
+    overflow: hidden;
+  }
+  
+  /* Grade Badge Overlay */
+  .grade-badge-overlay {
+    position: absolute;
+    top: 226px;
+    left: 215px;
+    width: 252px;
+    height: 48px;
+    background: linear-gradient(180deg, #d86972 0%, #ce4f5a 50%, #ba3b46 100%);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.25);
+  }
+  .grade-badge-overlay span {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    margin-top: -2px;
+  }
+
+  /* Table Cell Overlays */
+  .cell-subject {
+    position: absolute;
+    left: 236px;
+    width: 218px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #03152d;
+    background: #fbf7f1;
+    z-index: 10;
+  }
+  .cell-subject.alt {
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>
+  <div class="schedule-container">
+    <div class="grade-badge-overlay">
+      <span>الصف الرابع</span>
+    </div>
+
+    <!-- Table 1 (الأسبوع الأول) -->
+    <!-- Row 1: الأحد - إجتماعيات -->
+    <div class="cell-subject" style="top: 403px; height: 31px;">إجتماعيات</div>
+    <!-- Row 2: الاثنين - رياضيات -->
+    <div class="cell-subject alt" style="top: 435px; height: 31px;">رياضيات</div>
+    <!-- Row 3: الثلاثاء - علوم -->
+    <div class="cell-subject" style="top: 467px; height: 30px;">علوم</div>
+    <!-- Row 4: الأربعاء - English -->
+    <div class="cell-subject alt" style="top: 498px; height: 31px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; font-size: 19px;">English</div>
+    <!-- Row 5: الخميس - لغة عربية -->
+    <div class="cell-subject" style="top: 530px; height: 32px;">لغة عربية</div>
+
+    <!-- Table 2 (الأسبوع الثاني) -->
+    <!-- Row 1: الأحد - متون -->
+    <div class="cell-subject" style="top: 681px; height: 32px;">متون</div>
+    <!-- Row 2: الاثنين - كتابة -->
+    <div class="cell-subject alt" style="top: 714px; height: 32px;">كتابة</div>
+    <!-- Row 3: الثلاثاء - حاسوب -->
+    <div class="cell-subject" style="top: 747px; height: 33px;">حاسوب</div>
+    <!-- Row 4: الأربعاء - قرآن -->
+    <div class="cell-subject alt" style="top: 781px; height: 33px;">قرآن</div>
+    <!-- Row 5: الخميس - تربية إسلامية -->
+    <div class="cell-subject" style="top: 815px; height: 32px;">تربية إسلامية</div>
+  </div>
+</body>
+</html>
