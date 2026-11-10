@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -1448,7 +1448,16 @@
                 ]);
             });
 
-            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const sanitizeCsvCell = (cell) => {
+                let str = String(cell ?? '');
+                // Neutralize spreadsheet formula injection (=, +, -, @, tab, cr) per Cloudflare Security Audit rules
+                if (/^[=+\-@\t\r]/.test(str)) {
+                    str = "'" + str;
+                }
+                return `"${str.replace(/"/g, '""')}"`;
+            };
+
+            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.map(sanitizeCsvCell).join(',')).join('\n');
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.setAttribute('href', encodedUri);

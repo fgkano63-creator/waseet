@@ -1,25 +1,82 @@
 /**
  * ==============================================================================
- * WASEET (وسيط) - Luxury Entrance Splash Screen (شاشة الدخولية الفاخرة)
+ * WASEET (وسيط) - Luxury Entrance Splash Screen & Dynamic Network-Synced Preloader
  * File: js/splash.js
- * High-performance, GPU-accelerated splash preloader with ambient golden embers,
- * metallic typography, circular golden spinner, and smooth progress tracking.
+ * High-performance, GPU-accelerated splash screen with connection-aware speed profiling,
+ * real asset load tracking, and fluid 0% to 100% continuous progress synchronization.
  * ==============================================================================
  */
 
 (function () {
     'use strict';
 
-    // منع التكرار إذا كان السكريبت محملاً مسبقاً
     if (window._waseetSplashLoaded) return;
     window._waseetSplashLoaded = true;
 
     var SPLASH_ID = 'waseet-splash-screen';
-    var MAX_WAIT_MS = 1800; // الحد الأقصى للمدة الزمنية لضمان عدم حجب المستخدم أبداً
-    var MIN_SHOW_MS = 950;  // الحد الأدنى للاستمتاع بالمظهر الفاخر
 
     /**
-     * بناء كود الـ HTML الخاص بشاشة الدخولية إذا لم تكن موجودة في الصفحة
+     * فحص سرعة الاتصال بالإنترنت لتحديد الوتيرة المثلى لشريط التقدم
+     */
+    function getNetworkProfile() {
+        var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        var profile = {
+            speed: 'fast',
+            minDuration: 1350, // ميلي ثانية (لضمان رؤية العداد بوضوح من 0% إلى 100%)
+            maxDuration: 2200,
+            stepMultiplier: 1.2
+        };
+
+        if (conn) {
+            var eff = (conn.effectiveType || '').toLowerCase();
+            var downlink = conn.downlink || 10;
+            var rtt = conn.rtt || 50;
+
+            if (eff === '2g' || eff === 'slow-2g' || downlink < 1.2 || rtt > 500) {
+                profile.speed = 'slow';
+                profile.minDuration = 2400;
+                profile.maxDuration = 4500;
+                profile.stepMultiplier = 0.6;
+            } else if (eff === '3g' || downlink < 4.0 || rtt > 220) {
+                profile.speed = 'medium';
+                profile.minDuration = 1800;
+                profile.maxDuration = 3000;
+                profile.stepMultiplier = 0.85;
+            } else {
+                profile.speed = 'fast';
+                profile.minDuration = 1300;
+                profile.maxDuration = 2000;
+                profile.stepMultiplier = 1.25;
+            }
+        }
+
+        return profile;
+    }
+
+    /**
+     * قياس نسبة اكتمال الموارد والملفات الحقيقية المحملة في الصفحة
+     */
+    function getResourceLoadRatio() {
+        try {
+            if (window.performance && typeof performance.getEntriesByType === 'function') {
+                var entries = performance.getEntriesByType('resource');
+                if (entries && entries.length > 0) {
+                    var completed = 0;
+                    for (var i = 0; i < entries.length; i++) {
+                        if (entries[i].responseEnd > 0) completed++;
+                    }
+                    return Math.min(1.0, completed / entries.length);
+                }
+            }
+        } catch (e) {}
+
+        if (document.readyState === 'complete') return 1.0;
+        if (document.readyState === 'interactive') return 0.75;
+        return 0.35;
+    }
+
+    /**
+     * إنشاء هيكل الـ HTML في حال عدم وجوده مسبقاً
      */
     function ensureSplashMarkup() {
         var existing = document.getElementById(SPLASH_ID);
@@ -52,6 +109,7 @@
                             '<circle class="splash-ring-head" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>' +
                         '</svg>' +
                     '</div>' +
+                    '<div class="splash-percentage" id="splash-percent-text">0%</div>' +
                     '<div class="splash-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="splash-progressbar">' +
                         '<div class="splash-progress-bar" id="splash-progress-fill">' +
                             '<span class="splash-progress-head"></span>' +
@@ -75,7 +133,7 @@
     }
 
     /**
-     * تشغيل الجسيمات الذهبية العائمة (Golden Embers) بأداء عالي خفيف جداً
+     * تشغيل الجسيمات الذهبية العائمة (Golden Embers)
      */
     function initParticles(canvas) {
         if (!canvas || !canvas.getContext) return { stop: function () {} };
@@ -86,7 +144,7 @@
         var width = 0;
         var height = 0;
         var particles = [];
-        var numParticles = window.innerWidth < 768 ? 28 : 45;
+        var numParticles = window.innerWidth < 768 ? 26 : 42;
         var animId = null;
         var isRunning = true;
 
@@ -100,10 +158,10 @@
             return {
                 x: Math.random() * width,
                 y: initial ? Math.random() * height : height + 10,
-                radius: Math.random() * 1.8 + 0.6,
-                speedY: Math.random() * 0.9 + 0.35,
-                speedX: (Math.random() - 0.5) * 0.4,
-                opacity: Math.random() * 0.7 + 0.25,
+                radius: Math.random() * 1.6 + 0.6,
+                speedY: Math.random() * 0.85 + 0.35,
+                speedX: (Math.random() - 0.5) * 0.35,
+                opacity: Math.random() * 0.65 + 0.25,
                 pulsingSpeed: Math.random() * 0.02 + 0.01,
                 pulsingAngle: Math.random() * Math.PI * 2,
                 goldTone: Math.random() > 0.4 ? 'rgba(212, 175, 55,' : 'rgba(255, 230, 140,'
@@ -124,13 +182,13 @@
                 pt.x += pt.speedX;
                 pt.pulsingAngle += pt.pulsingSpeed;
 
-                var curOpacity = Math.max(0.05, Math.min(1, pt.opacity + Math.sin(pt.pulsingAngle) * 0.25));
+                var curOpacity = Math.max(0.05, Math.min(1, pt.opacity + Math.sin(pt.pulsingAngle) * 0.2));
 
                 ctx.beginPath();
                 ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
                 ctx.fillStyle = pt.goldTone + curOpacity + ')';
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = 'rgba(212, 175, 55, 0.6)';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'rgba(212, 175, 55, 0.5)';
                 ctx.fill();
 
                 if (pt.y < -15 || pt.x < -10 || pt.x > width + 10) {
@@ -153,28 +211,13 @@
     }
 
     /**
-     * تشغيل شاشة الدخولية مع شريط التقدم التفاعلي
+     * تشغيل شاشة الدخولية مع التدرج السلس الحقيقي من 0% إلى 100%
      */
-    function launchSplash(force) {
+    function launchSplash() {
         var splashEl = ensureSplashMarkup();
         if (!splashEl) return;
 
-        // إتاحة فرصة التخطي إذا كانت الشاشة قد عُرضت في الجلسة الحالية ما لم يُطلب العرض صراحة
-        var sessionKey = 'waseet_splash_seen_v1';
-        if (!force) {
-            try {
-                if (sessionStorage.getItem(sessionKey) === 'true') {
-                    splashEl.classList.add('splash-hidden');
-                    return;
-                }
-            } catch (e) {}
-        }
-
-        try {
-            sessionStorage.setItem(sessionKey, 'true');
-        } catch (e) {}
-
-        splashEl.classList.remove('splash-fading', 'splash-hidden');
+        splashEl.classList.remove('splash-fading', 'splash-hidden', 'splash-complete');
         document.documentElement.classList.add('waseet-splash-active');
 
         var canvas = document.getElementById('splash-particle-canvas');
@@ -182,59 +225,102 @@
 
         var fillBar = document.getElementById('splash-progress-fill');
         var progBar = document.getElementById('splash-progressbar');
+        var percentText = document.getElementById('splash-percent-text');
         var statusText = document.getElementById('splash-status-text');
 
-        var currentProgress = 0;
+        var network = getNetworkProfile();
         var startTime = performance.now();
-        var isDomReady = document.readyState === 'complete';
+        var isPageLoaded = false;
+        var pageLoadedTime = 0;
+        var visualProgress = 0; // يبدأ حتماً من 0.0
         var isFinished = false;
 
-        function onComplete() {
-            isDomReady = true;
+        function markPageLoaded() {
+            if (!isPageLoaded) {
+                isPageLoaded = true;
+                pageLoadedTime = performance.now();
+            }
         }
 
         if (document.readyState === 'complete') {
-            isDomReady = true;
+            markPageLoaded();
         } else {
-            window.addEventListener('load', onComplete, { once: true });
-            document.addEventListener('DOMContentLoaded', onComplete, { once: true });
+            window.addEventListener('load', markPageLoaded, { once: true });
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(markPageLoaded, 450);
+            }, { once: true });
         }
 
-        function setProgress(val) {
-            currentProgress = Math.max(0, Math.min(100, Math.round(val)));
-            if (fillBar) fillBar.style.width = currentProgress + '%';
-            if (progBar) progBar.setAttribute('aria-valuenow', currentProgress);
+        // تحديث عناصر واجهة المستخدم في كل إطار
+        function renderProgress(val) {
+            var displayVal = Math.max(0, Math.min(100, Math.round(val)));
+            if (fillBar) {
+                fillBar.style.width = val.toFixed(1) + '%';
+            }
+            if (progBar) {
+                progBar.setAttribute('aria-valuenow', displayVal);
+            }
+            if (percentText) {
+                percentText.textContent = displayVal + '%';
+            }
         }
+
+        // البدء فوراً بضبط 0% على الشاشة
+        renderProgress(0);
 
         function step(now) {
             if (isFinished) return;
+
             var elapsed = now - startTime;
+            var resourceRatio = getResourceLoadRatio();
 
+            // حساب النسبة المستهدفة بناءً على الوقت المنقضي وموارد الصفحة وسرعة الشبكة
             var targetProgress = 0;
-            if (elapsed < 300) {
-                targetProgress = (elapsed / 300) * 35;
-            } else if (elapsed < 750) {
-                targetProgress = 35 + ((elapsed - 300) / 450) * 45;
-            } else if (isDomReady || elapsed >= MIN_SHOW_MS) {
-                targetProgress = 80 + ((elapsed - 750) / (MIN_SHOW_MS - 750 + 200)) * 20;
+
+            if (!isPageLoaded) {
+                // أثناء انتظار تحميل موارد الصفحة: التقدم متناغم بين الوقت والموارد
+                var timeRatio = Math.min(1, elapsed / network.maxDuration);
+                var blended = (resourceRatio * 0.6) + (timeRatio * 0.4);
+                // لا نتجاوز 88% قبل اكتمال تحميل الصفحة فعلياً
+                targetProgress = Math.min(88, blended * 92);
             } else {
-                targetProgress = Math.min(88, 80 + (elapsed - 750) * 0.02);
+                // اكتمل تحميل الصفحة: الانتقال السلس إلى 100%
+                var sinceLoad = Math.max(0, now - pageLoadedTime);
+                var finishRatio = Math.min(1, sinceLoad / 350);
+                var baseTarget = 88 + (finishRatio * 12);
+
+                // ضمان استمرار العرض للمدة الدنيا لجمالية المشهد
+                if (elapsed >= network.minDuration) {
+                    targetProgress = 100;
+                } else {
+                    targetProgress = Math.min(98, baseTarget);
+                }
             }
 
-            if (elapsed >= MAX_WAIT_MS || (isDomReady && elapsed >= MIN_SHOW_MS)) {
-                targetProgress = 100;
+            // ضمان التقدم التصاعدي المستمر والسلس لكل إطار دون قفز مفاجئ
+            var distance = targetProgress - visualProgress;
+            if (distance > 0) {
+                // خطوة تقدم ديناميكية ناعمة تضمن التدرج المتصل
+                var stepDelta = Math.max(0.35, Math.min(2.2, distance * 0.085 * network.stepMultiplier));
+                visualProgress = Math.min(100, visualProgress + stepDelta);
             }
 
-            setProgress(Math.max(currentProgress, targetProgress));
+            renderProgress(visualProgress);
 
-            if (currentProgress >= 100) {
+            // عند الوصول الحقيقي إلى 100%
+            if (visualProgress >= 100) {
                 isFinished = true;
+                renderProgress(100);
+
+                splashEl.classList.add('splash-complete');
+
                 if (statusText) {
                     statusText.innerHTML = 
-                        '<span class="splash-status-ar" style="color: #fde047;">مرحباً بك في وسيط</span>' +
+                        '<span class="splash-status-ar" style="color: #fde047; text-shadow: 0 0 10px rgba(253, 224, 71, 0.6);">مرحباً بك في وسيط</span>' +
                         '<span class="splash-status-en" style="color: #fef08a;">Welcome to WASEET</span>';
                 }
 
+                // التوقف برهة قصيرة ليرى المستخدم نسبة 100% ورسالة الترحيب بوضوح تام
                 setTimeout(function () {
                     splashEl.classList.add('splash-fading');
                     document.documentElement.classList.remove('waseet-splash-active');
@@ -243,7 +329,8 @@
                         splashEl.classList.add('splash-hidden');
                         particlesCtrl.stop();
                     }, 680);
-                }, 200);
+                }, 300);
+
                 return;
             }
 
@@ -253,17 +340,15 @@
         requestAnimationFrame(step);
     }
 
-    // إتاحة تشغيل الدخولية يدوياً في أي وقت للمعاينة
+    // إتاحة تشغيل الدخولية يدوياً في أي وقت للمعاينة والتجربة
     window.waseetShowSplash = function () {
-        launchSplash(true);
+        launchSplash();
     };
 
-    // تشغيل تلقائي عند جاهزية المستند
+    // التشغيل التلقائي فور بدء التنفيذ
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-            launchSplash(false);
-        });
+        document.addEventListener('DOMContentLoaded', launchSplash);
     } else {
-        launchSplash(false);
+        launchSplash();
     }
 })();

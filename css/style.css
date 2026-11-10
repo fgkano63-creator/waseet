@@ -11096,6 +11096,20 @@ body.waseet-splash-active {
     filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.8));
 }
 
+/* عداد النسبة المئوية الذهبي المباشر (من 0% إلى 100%) */
+.splash-percentage {
+    font-family: 'Rajdhani', 'Outfit', monospace;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fef08a;
+    letter-spacing: 2px;
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.75), 0 2px 5px rgba(0, 0, 0, 0.9);
+    margin-top: -2px;
+    margin-bottom: -4px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
 /* شريط التقدم الخطي الفاخر */
 .splash-progress-track {
     width: 100%;
@@ -11114,8 +11128,9 @@ body.waseet-splash-active {
     background: linear-gradient(90deg, #8a680e 0%, #d4af37 55%, #fff1a8 100%);
     border-radius: 999px;
     position: relative;
-    transition: width 0.12s linear;
+    transition: none !important;
     box-shadow: 0 0 12px rgba(212, 175, 55, 0.75);
+    will-change: width;
 }
 
 .splash-progress-head {
