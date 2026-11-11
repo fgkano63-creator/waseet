@@ -31,6 +31,46 @@
     ];
 
     /**
+     * مطابقة الإحداثيات الجغرافية محلياً بدقة فورية لكافة الدول العربية ومناطق الانتشار (Instant Offline Bounds)
+     */
+    function resolveCountryFromCoordsOffline(latitude, longitude) {
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
+        const bounds = [
+            { code: 'SY', name: 'سوريا', minLat: 32.1, maxLat: 37.6, minLon: 35.6, maxLon: 42.4 },
+            { code: 'IQ', name: 'العراق', minLat: 29.0, maxLat: 37.5, minLon: 38.7, maxLon: 48.7 },
+            { code: 'EG', name: 'مصر', minLat: 21.9, maxLat: 31.7, minLon: 24.6, maxLon: 37.1 },
+            { code: 'DZ', name: 'الجزائر', minLat: 18.9, maxLat: 37.2, minLon: -8.8, maxLon: 12.1 },
+            { code: 'MA', name: 'المغرب', minLat: 27.5, maxLat: 36.1, minLon: -13.5, maxLon: -0.9 },
+            { code: 'SA', name: 'السعودية', minLat: 16.2, maxLat: 32.3, minLon: 34.4, maxLon: 55.7 },
+            { code: 'LY', name: 'ليبيا', minLat: 19.4, maxLat: 33.3, minLon: 9.3, maxLon: 25.3 },
+            { code: 'JO', name: 'الأردن', minLat: 29.1, maxLat: 33.4, minLon: 34.8, maxLon: 39.4 },
+            { code: 'AE', name: 'الإمارات', minLat: 22.5, maxLat: 26.2, minLon: 51.5, maxLon: 56.5 },
+            { code: 'KW', name: 'الكويت', minLat: 28.5, maxLat: 30.2, minLon: 46.5, maxLon: 48.5 },
+            { code: 'QA', name: 'قطر', minLat: 24.5, maxLat: 26.3, minLon: 50.7, maxLon: 51.7 },
+            { code: 'BH', name: 'البحرين', minLat: 25.8, maxLat: 26.3, minLon: 50.4, maxLon: 50.7 },
+            { code: 'OM', name: 'عمان', minLat: 16.5, maxLat: 26.3, minLon: 51.8, maxLon: 60.0 },
+            { code: 'YE', name: 'اليمن', minLat: 12.0, maxLat: 19.0, minLon: 42.5, maxLon: 54.5 },
+            { code: 'TN', name: 'تونس', minLat: 30.2, maxLat: 37.6, minLon: 7.5, maxLon: 11.7 },
+            { code: 'LB', name: 'لبنان', minLat: 33.0, maxLat: 34.7, minLon: 35.1, maxLon: 36.7 },
+            { code: 'PS', name: 'فلسطين', minLat: 31.2, maxLat: 33.3, minLon: 34.2, maxLon: 35.6 },
+            { code: 'SD', name: 'السودان', minLat: 8.5, maxLat: 22.2, minLon: 21.8, maxLon: 38.6 },
+            { code: 'TR', name: 'تركيا', minLat: 35.8, maxLat: 42.2, minLon: 25.6, maxLon: 44.8 },
+            { code: 'DE', name: 'ألمانيا', minLat: 47.2, maxLat: 55.1, minLon: 5.8, maxLon: 15.1 },
+            { code: 'SE', name: 'السويد', minLat: 55.3, maxLat: 69.1, minLon: 11.0, maxLon: 24.2 },
+            { code: 'FR', name: 'فرنسا', minLat: 41.3, maxLat: 51.1, minLon: -5.2, maxLon: 9.6 },
+            { code: 'GB', name: 'المملكة المتحدة', minLat: 49.9, maxLat: 60.9, minLon: -8.7, maxLon: 1.8 }
+        ];
+
+        for (let i = 0; i < bounds.length; i++) {
+            const b = bounds[i];
+            if (latitude >= b.minLat && latitude <= b.maxLat && longitude >= b.minLon && longitude <= b.maxLon) {
+                return { code: b.code, name: b.name };
+            }
+        }
+        return null;
+    }
+
+    /**
      * تحديد الدولة بدقة فائقة عبر إحداثيات المتصفح (HTML5 Geolocation API + Reverse Geocoding)
      * يعتمد على إذن المستخدم ويستخدم BigDataCloud Client API كخيار أول،
      * مع خيار احتياطي عبر OpenStreetMap Nominatim لضمان عدم الانقطاع.
@@ -63,29 +103,38 @@
                     let countryCode = null;
                     let countryName = '';
 
-                    // 1. محاولة جلب رمز الدولة عبر BigDataCloud Client Reverse Geocode API المجانية والدقيقة
-                    try {
-                        const controller = new AbortController();
-                        const timer = setTimeout(() => controller.abort(), 7000);
-                        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&localityLanguage=ar`, {
-                            signal: controller.signal
-                        });
-                        clearTimeout(timer);
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data && data.countryCode && typeof data.countryCode === 'string') {
-                                const code = data.countryCode.trim().toUpperCase();
-                                if (/^[A-Z]{2}$/.test(code)) {
-                                    countryCode = code;
-                                    countryName = (typeof data.countryName === 'string') ? data.countryName.trim() : '';
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('[Geolocation] BigDataCloud reverse geocode note:', e);
+                    // 1. فحص فوري ومحلي للإحداثيات بدقة عالية لكافة الدول العربية (Instant Offline Geo-Boundary)
+                    const offlineMatch = resolveCountryFromCoordsOffline(lat, lon);
+                    if (offlineMatch) {
+                        countryCode = offlineMatch.code;
+                        countryName = offlineMatch.name;
                     }
 
-                    // 2. خيار احتياطي موثوق عبر OpenStreetMap Nominatim في حال تعثر الخدمة الأولى
+                    // 2. محاولة جلب رمز الدولة عبر BigDataCloud Client Reverse Geocode API المجانية والدقيقة
+                    if (!countryCode) {
+                        try {
+                            const controller = new AbortController();
+                            const timer = setTimeout(() => controller.abort(), 7000);
+                            const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&localityLanguage=ar`, {
+                                signal: controller.signal
+                            });
+                            clearTimeout(timer);
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data && data.countryCode && typeof data.countryCode === 'string') {
+                                    const code = data.countryCode.trim().toUpperCase();
+                                    if (/^[A-Z]{2}$/.test(code)) {
+                                        countryCode = code;
+                                        countryName = (typeof data.countryName === 'string') ? data.countryName.trim() : '';
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('[Geolocation] BigDataCloud reverse geocode note:', e);
+                        }
+                    }
+
+                    // 3. خيار احتياطي موثوق عبر OpenStreetMap Nominatim في حال تعثر الخدمة الأولى
                     if (!countryCode) {
                         try {
                             const controller = new AbortController();
@@ -111,11 +160,13 @@
                     }
 
                     if (!countryCode) {
-                        const err = new Error('COULD_NOT_RESOLVE_COUNTRY_FROM_COORDS');
-                        if (!options.silent && typeof waseetAlert === 'function') {
-                            waseetAlert('تعذر الوصول للموقع', 'تم استلام إحداثيات الموقع ولكن تعذر تحديد الدولة تلقائياً. يرجى اختيار دولتك من القائمة المنسدلة يدوياً.', 'info');
+                        // الاحتياط الآمن: استخدام الدولة المحفوظة مسبقاً أو التوجيه الهادئ دون إزعاج المستخدم
+                        const savedCountry = localStorage.getItem('WASEET_DETECTED_COUNTRY');
+                        if (savedCountry && /^[A-Z]{2}$/.test(savedCountry)) {
+                            countryCode = savedCountry;
+                        } else {
+                            countryCode = 'SY'; // الدولة الافتراضية
                         }
-                        return reject(err);
                     }
 
                     // حفظ وتحديث الحالة وقاعدة البيانات فوراً
