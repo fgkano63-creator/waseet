@@ -1431,9 +1431,9 @@
                     <div style="margin-top: 0.5rem; font-size: 0.76rem; color: #34d399;">
                         <i class="fas fa-shield-alt"></i> جاهز للاستخدام الفوري في صفقات الوساطة
                     </div>
-                    <button type="button" class="btn-3d btn-primary" id="btn-open-withdrawal" onclick="openWithdrawalModal()" style="margin-top: 0.65rem; width: 100%; padding: 0.5rem 0.85rem; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: linear-gradient(135deg, var(--gold-primary), var(--orange-bright)); color: #090d16; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);">
+                    <a href="withdraw.html" class="btn-3d btn-primary" id="btn-open-withdrawal" style="margin-top: 0.65rem; width: 100%; padding: 0.55rem 0.85rem; font-size: 0.86rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; border-radius: 10px; border: none; text-decoration: none; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
                         <i class="fas fa-hand-holding-usd"></i> طلب سحب رصيد
-                    </button>
+                    </a>
                 </div>
 
                 <div class="wallet-stat-card">
@@ -1521,11 +1521,11 @@
                             </div>
                         </div>
 
-                        <!-- الزر الكبير: طلب شحن رصيد الآن -->
-                        <button type="button" class="btn-3d btn-primary" onclick="scrollToDepositForm()" style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: #000; font-weight: 900; font-size: 0.98rem; padding: 0.8rem 1.8rem; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4); transition: transform 0.2s, box-shadow 0.2s;">
+                        <!-- الزر الكبير: الانتقال لصفحة شحن الرصيد المخصصة -->
+                        <a href="deposit.html" class="btn-3d btn-primary" style="background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: #000; font-weight: 900; font-size: 0.98rem; padding: 0.8rem 1.8rem; border-radius: 14px; border: none; text-decoration: none; display: flex; align-items: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4); transition: transform 0.2s, box-shadow 0.2s;">
                             <i class="fas fa-bolt" style="font-size: 1.1rem;"></i>
-                            <span>طلب شحن رصيد الآن</span>
-                        </button>
+                            <span>طلب شحن رصيد الآن ⚡</span>
+                        </a>
                     </div>
 
                     <!-- شبكة بطاقات الدفع (2 Cards) -->
@@ -1555,9 +1555,9 @@
                                     <span style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 0.72rem; padding: 2px 7px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-check text-gold"></i> عمولة 0%</span>
                                 </div>
                             </div>
-                            <button type="button" onclick="selectRampCategory('crypto')" style="width: 100%; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(245, 158, 11, 0.22)'" onmouseout="this.style.background='rgba(245, 158, 11, 0.12)'">
+                            <a href="deposit.html" style="width: 100%; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(245, 158, 11, 0.22)'" onmouseout="this.style.background='rgba(245, 158, 11, 0.12)'">
                                 <i class="fas fa-coins"></i> اختيار الشحن عبر USDT
-                            </button>
+                            </a>
                         </div>
 
                         <!-- البطاقة الثانية: محافظ محلية عبر وسيط بلدك -->
@@ -1585,9 +1585,9 @@
                                     <span style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 0.72rem; padding: 2px 7px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-check text-orange"></i> شام كاش وسيريتل</span>
                                 </div>
                             </div>
-                            <button type="button" onclick="selectRampCategory('local')" style="width: 100%; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(234, 88, 12, 0.12); border: 1px solid rgba(234, 88, 12, 0.35); color: #fb923c; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(234, 88, 12, 0.22)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.12)'">
+                            <a href="deposit.html" style="width: 100%; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(234, 88, 12, 0.12); border: 1px solid rgba(234, 88, 12, 0.35); color: #fb923c; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(234, 88, 12, 0.22)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.12)'">
                                 <i class="fas fa-university"></i> اختيار المحافظ والوسطاء المحليين
-                            </button>
+                            </a>
                         </div>
 
                     </div>
@@ -1596,107 +1596,56 @@
 
             <section class="wallet-main-layout">
 
-                <!-- العمود الأيمن: بوابة الدفع الإقليمية الذكية وشحن النقاط للمستخدم العادي -->
-                <div class="wallet-panel-card" id="user-deposit-panel">
-                    <div class="wallet-panel-title">
-                        <h3><i class="fas fa-globe-africa text-gold"></i> بوابة شحن النقاط الإقليمية</h3>
-                        <span class="status-pill approved" style="font-size: 0.72rem;"><i class="fas fa-shield-alt"></i> كافة الدول العربية + Crypto</span>
+                <!-- العمود الأيمن: بوابات العمليات المالية المباشرة (شحن النقاط والسحب) -->
+                <div class="wallet-panel-card" id="user-deposit-panel" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div class="wallet-panel-title" style="margin-bottom: 0.5rem;">
+                        <h3><i class="fas fa-bolt text-gold"></i> بوابات العمليات المالية المعتمدة</h3>
+                        <span class="status-pill approved" style="font-size: 0.72rem;"><i class="fas fa-shield-alt"></i> 100 نقطة = 100 دولار</span>
                     </div>
 
-                    <form id="deposit-request-form">
-                        <!-- الخطوة 1: عدد النقاط المطلوبة -->
-                        <div class="form-group" style="margin-bottom: 1.15rem;">
-                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.45rem;">
-                                <span class="gateway-step-badge">1</span>
-                                حدد عدد النقاط المطلوبة (Pts) <span style="color: #ef4444; margin-right: 4px;">*</span>
-                            </label>
-                            <input type="number" id="deposit-amount-input" class="form-control" min="1" max="100000" step="1" placeholder="أدخل عدد النقاط (مثلاً: 100)" required style="width: 100%; padding: 0.72rem 1rem; border-radius: 12px; background: rgba(12, 16, 26, 0.92); border: 1px solid var(--border-metal); color: #fff; font-size: 0.98rem; font-weight: 800; font-family: var(--font-ar); box-sizing: border-box;">
-                            <div class="quick-pts-pills">
-                                <button type="button" class="quick-pts-btn" onclick="setQuickPoints(50, this)">50 نقطة</button>
-                                <button type="button" class="quick-pts-btn" onclick="setQuickPoints(100, this)">100 نقطة</button>
-                                <button type="button" class="quick-pts-btn" onclick="setQuickPoints(250, this)">250 نقطة</button>
-                                <button type="button" class="quick-pts-btn" onclick="setQuickPoints(500, this)">500 نقطة</button>
-                                <button type="button" class="quick-pts-btn" onclick="setQuickPoints(1000, this)">1000 نقطة</button>
+                    <!-- بطاقة 1: شحن النقاط المستقلة -->
+                    <div style="background: linear-gradient(135deg, rgba(20, 26, 42, 0.9), rgba(10, 14, 24, 0.95)); border: 1.5px solid rgba(197, 160, 89, 0.4); border-radius: 16px; padding: 1.4rem; position: relative; overflow: hidden;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(197, 160, 89, 0.2); border: 1px solid rgba(197, 160, 89, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--gold-light);">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <h4 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0;">شحن رصيد المحفظة بالنقاط</h4>
+                                    <span style="color: var(--gold-light); font-size: 0.8rem; font-weight: 700;">100 نقطة مقابل 100 دولار ($100 USD)</span>
+                                </div>
                             </div>
+                            <span class="status-pill approved" style="font-size: 0.74rem;">فوري وموثوق</span>
                         </div>
+                        <p style="color: var(--silver-muted); font-size: 0.86rem; line-height: 1.6; margin: 0 0 1.1rem 0;">
+                            صفحة مخصصة ومريحة لاختيار عدد النقاط وعرض المعادل الدقيق بعملتك المحلية، واختيار وسيلة الدفع الخاصة ببلدك (شام كاش، زين كاش، فودافون كاش، بريدي موب، USDT) وإرسال الإشعار.
+                        </p>
+                        <a href="deposit.html" class="btn-3d btn-gold" style="width: 100%; padding: 0.9rem 1.4rem; font-size: 1rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.6rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.35);">
+                            <i class="fas fa-bolt"></i> الانتقال لصفحة شحن النقاط ⚡
+                        </a>
+                    </div>
 
-                        <!-- الخطوة 2: تبويبات التصنيف واختيار الدولة / المحفظة -->
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.5rem;">
-                                <span class="gateway-step-badge">2</span>
-                                اختر دولتك أو وسيلة الدفع <span style="color: #ef4444; margin-right: 4px;">*</span>
-                            </label>
-
-                            <input type="hidden" id="deposit-method-input" value="">
-
-                            <!-- تبويبات الفئة: المحافظ العربية المحلية مقابل العملات الرقمية -->
-                            <div class="gateway-category-tabs" role="tablist">
-                                <button type="button" class="gateway-cat-tab active" id="gw-tab-local" onclick="switchGatewayCategory('local')">
-                                    <i class="fas fa-map-marker-alt text-gold"></i>
-                                    <span>المحافظ العربية (9 دول)</span>
-                                </button>
-                                <button type="button" class="gateway-cat-tab" id="gw-tab-crypto" onclick="switchGatewayCategory('crypto')">
-                                    <i class="fas fa-coins text-orange"></i>
-                                    <span>العملات الرقمية (USDT / Binance)</span>
-                                </button>
+                    <!-- بطاقة 2: سحب الأرباح المستقلة -->
+                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(10, 14, 24, 0.95)); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 16px; padding: 1.4rem; position: relative; overflow: hidden;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #10b981;">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div>
+                                    <h4 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0;">سحب الأرباح والرصيد المتاح</h4>
+                                    <span style="color: #10b981; font-size: 0.8rem; font-weight: 700;">سحب سريع بدون عمولة (0%)</span>
+                                </div>
                             </div>
-
-                            <!-- شريط وسائل الدفع البارز والعصري (Touch-Friendly Icon Bar) -->
-                            <div class="gateway-icon-bar" id="gateway-icon-bar" role="tablist" aria-label="اختر وسيلة الدفع أو الدولة">
-                                <!-- يتم توليد البطاقات التفاعلية ديناميكياً بأيقونات أعلام واضحة وأسماء بارزة -->
-                            </div>
-
-                            <!-- بطاقة تفاصيل الدفع الديناميكية (اسم المستفيد + رقم الحساب + زر النسخ) -->
-                            <div class="gateway-details-card" id="gateway-details-card">
-                                <!-- يتم توليدها ديناميكياً فور اختيار الوسيلة -->
-                            </div>
+                            <span class="status-badge approved" style="font-size: 0.74rem;">أمان عالي</span>
                         </div>
-
-                        <!-- الخطوة 3: نموذج إثبات التحويل (رقم العملية/المحول + صورة الإيصال) -->
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label style="display: flex; align-items: center; color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.45rem;">
-                                <span class="gateway-step-badge">3</span>
-                                بيانات إثبات التحويل المالي <span style="color: #ef4444; margin-right: 4px;">*</span>
-                            </label>
-
-                            <!-- حقل رقم العملية أو اسم المحول -->
-                            <div style="margin-bottom: 0.85rem;">
-                                <label for="deposit-sender-ref-input" style="display: block; color: var(--silver-light); font-weight: 700; font-size: 0.8rem; margin-bottom: 0.35rem;">
-                                    <i class="fas fa-hashtag text-gold"></i> رقم العملية (Transaction ID) أو اسم/رقم المحوّل <span style="color: #ef4444;">*</span>
-                                </label>
-                                <input type="text" id="deposit-sender-ref-input" required placeholder="أدخل رقم العملية أو اسم صاحب الحساب/الرقم الذي حوّلت منه..." maxlength="180" style="width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; background: rgba(12, 16, 26, 0.92); border: 1px solid var(--border-metal); color: #fff; font-size: 0.86rem; font-weight: 700; font-family: var(--font-ar); box-sizing: border-box;">
-                            </div>
-
-                            <!-- منطقة رفع صورة الإيصال -->
-                            <label style="display: block; color: var(--silver-light); font-weight: 700; font-size: 0.8rem; margin-bottom: 0.35rem;">
-                                <i class="fas fa-camera text-gold"></i> إرفاق صورة إيصال التحويل (Screenshot) <span style="color: #ef4444;">*</span>
-                            </label>
-                            <input type="file" id="receipt-file-input" accept="image/*" style="display: none;">
-                            <div class="receipt-dropzone" id="receipt-dropzone" onclick="document.getElementById('receipt-file-input').click()">
-                                <i class="fas fa-cloud-upload-alt text-gold" style="font-size: 1.85rem; margin-bottom: 0.35rem;"></i>
-                                <div style="color: #fff; font-weight: 800; font-size: 0.88rem;">اضغط هنا لرفع صورة الإيصال أو لقطة الشاشة</div>
-                                <div style="color: var(--silver-muted); font-size: 0.74rem; margin-top: 0.2rem;">يدعم صور PNG, JPG, WEBP بوضوح عالي</div>
-                            </div>
-                            <div class="receipt-preview-box" id="receipt-preview-box">
-                                <img id="receipt-preview-img" src="" alt="معاينة الإيصال">
-                                <button type="button" class="btn-remove-receipt" onclick="clearReceiptImage()">
-                                    <i class="fas fa-trash-alt"></i> تغيير الصورة
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- ملاحظة إضافية اختيارية -->
-                        <div class="form-group" style="margin-bottom: 1.15rem;">
-                            <label for="deposit-notes-input" style="display: block; color: var(--silver-muted); font-weight: 700; font-size: 0.78rem; margin-bottom: 0.35rem;">
-                                ملاحظة إضافية للوسيط (اختياري)
-                            </label>
-                            <input type="text" id="deposit-notes-input" placeholder="أي توضيح إضافي ترغب بإرساله للإدارة..." maxlength="200" style="width: 100%; padding: 0.62rem 0.9rem; border-radius: 11px; background: rgba(12, 16, 26, 0.85); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 0.82rem; font-family: var(--font-ar); box-sizing: border-box;">
-                        </div>
-
-                        <button type="submit" id="btn-submit-deposit" class="btn-3d btn-gold" style="width: 100%; padding: 0.85rem 1.2rem; font-size: 0.96rem; justify-content: center;">
-                            <i class="fas fa-paper-plane"></i> إرسال الإيصال وطلب شحن النقاط
-                        </button>
-                    </form>
+                        <p style="color: var(--silver-muted); font-size: 0.86rem; line-height: 1.6; margin: 0 0 1.1rem 0;">
+                            صفحة مخصصة لسحب رصيدك المتاح أو أرباح بيع الحسابات إلى محفظتك المحلية أو عنوان USDT أو حسابك البنكي بكل سهولة وسرعة.
+                        </p>
+                        <a href="withdraw.html" class="btn-3d btn-primary" style="width: 100%; padding: 0.9rem 1.4rem; font-size: 1rem; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.6rem; border-radius: 12px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);">
+                            <i class="fas fa-wallet"></i> الانتقال لصفحة سحب الرصيد 💳
+                        </a>
+                    </div>
                 </div>
 
                 <!-- العمود الأيمن البديل للمدير والوسيط: لوحة إدارة حسابات وطرق الدفع وتغيير البطاقات -->
@@ -2844,30 +2793,9 @@
             }
         }
 
-        /* ================= Modal: طلب سحب الرصيد ================= */
+        /* ================= التنقل لصفحة سحب الرصيد المستقلة ================= */
         function openWithdrawalModal() {
-            const user = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
-            if (!user || user.isGuest) {
-                if (typeof waseetAlert === 'function') {
-                    waseetAlert('تسجيل الدخول مطلوب', 'يرجى تسجيل الدخول بحساب Google أولاً لتتمكن من تقديم طلب سحب الرصيد.', 'warning');
-                } else {
-                    alert('يرجى تسجيل الدخول أولاً');
-                }
-                return;
-            }
-
-            const available = user.wallet ? Number(user.wallet.available || 0) : 0;
-            const availEl = document.getElementById('modal-withdraw-available-pts');
-            if (availEl) availEl.innerText = available;
-
-            const input = document.getElementById('withdraw-amount-input');
-            if (input) {
-                input.max = available;
-                input.value = available > 0 ? Math.min(50, available) : '';
-            }
-
-            const modal = document.getElementById('modal-withdrawal-request');
-            if (modal) modal.style.display = 'flex';
+            window.location.href = 'withdraw.html';
         }
 
         function closeWithdrawalModal() {
@@ -4249,26 +4177,12 @@
 
         // ── مسارات الشحن والسحب المعتمدة (Approved Fiat & Crypto Ramps Helpers) ──
         function scrollToDepositForm() {
-            var el = document.getElementById('user-deposit-panel');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                var input = document.getElementById('deposit-amount-input');
-                if (input) {
-                    setTimeout(function() { 
-                        input.focus(); 
-                        input.classList.add('glow-highlight');
-                        setTimeout(function() { input.classList.remove('glow-highlight'); }, 1200);
-                    }, 400);
-                }
-            }
+            window.location.href = 'deposit.html';
         }
         window.scrollToDepositForm = scrollToDepositForm;
 
         function selectRampCategory(cat) {
-            if (typeof switchGatewayCategory === 'function') {
-                switchGatewayCategory(cat);
-            }
-            scrollToDepositForm();
+            window.location.href = 'deposit.html?cat=' + encodeURIComponent(cat || 'local');
         }
         window.selectRampCategory = selectRampCategory;
 

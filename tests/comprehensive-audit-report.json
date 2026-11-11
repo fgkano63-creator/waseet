@@ -2,11 +2,11 @@
     "AuditName":  "Waseet Platform Comprehensive Automated Audit",
     "ConductedBy":  "AntiGravity \u0026 OpenCode (First Assistant)",
     "Target":  "D:\\waseet-app",
-    "Timestamp":  "2026-11-10 19:49:12",
+    "Timestamp":  "2026-11-10 20:52:47",
     "OverallStatus":  "EXCELLENT_100_PERCENT_CLEAN",
     "Summary":  {
-                    "TotalChecks":  1139,
-                    "Passed":  1139,
+                    "TotalChecks":  1141,
+                    "Passed":  1141,
                     "Warnings":  0,
                     "Failures":  0,
                     "ScorePercentage":  100
@@ -7108,7 +7108,7 @@
                                                                  "Name":  "CSS Style Brace Balance",
                                                                  "Status":  "PASS",
                                                                  "Severity":  "INFO",
-                                                                 "Message":  "Exact brace matching: 1428 open / 1428 close"
+                                                                 "Message":  "Exact brace matching: 1429 open / 1429 close"
                                                              },
                                                              {
                                                                  "CheckId":  "CSS-Overflow",
@@ -7162,8 +7162,8 @@
                                                          ]
                                           },
                        "Security":  {
-                                        "Total":  120,
-                                        "Passed":  120,
+                                        "Total":  122,
+                                        "Passed":  122,
                                         "Warnings":  0,
                                         "Failures":  0,
                                         "Checks":  [
@@ -7968,6 +7968,20 @@
                                                        {
                                                            "CheckId":  "SEC-SearchPath",
                                                            "Name":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                           "Status":  "PASS",
+                                                           "Severity":  "INFO",
+                                                           "Message":  "search_path explicitly restricted"
+                                                       },
+                                                       {
+                                                           "CheckId":  "SEC-SearchPath",
+                                                           "Name":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
                                                            "Status":  "PASS",
                                                            "Severity":  "INFO",
                                                            "Message":  "search_path explicitly restricted"

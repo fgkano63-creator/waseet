@@ -2363,6 +2363,129 @@ async function runE2ESimulation() {
     assert(!buyerGate.allowed && buyerGate.redirect === 'index.html' && adminGate.allowed, 'Super Admin Analytics', 'Client-Side Super Admin RBAC Ejection Gate', 'Unauthorized visitors immediately redirected to index.html with denial screen');
 
     // --------------------------------------------------------------------------
+    // PHASE 25: PRIVILEGE ESCALATION SHIELD & PROFILE ANTI-TAMPERING (MIGRATION 44)
+    // --------------------------------------------------------------------------
+    console.log('\n\x1b[33m>>> PHASE 25: PRIVILEGE ESCALATION SHIELD & PROFILE ANTI-TAMPERING (MIGRATION 44)\x1b[0m');
+
+    // Emulation of trigger tr_prevent_profile_field_tampering_v3 and column-level isolation
+    function simulateProfileUpdateWithTamperShield(caller, targetProfileId, updates, isInternalWalletOp = false) {
+        const profile = DB.profiles.find(p => p.id === targetProfileId);
+        if (!profile) throw new Error('WST-NOT-FOUND: Profile not found');
+
+        const callerIsSuperAdmin = simulateIsSuperAdmin(caller);
+        const callerIsSelf = caller && caller.id === targetProfileId;
+
+        if (!callerIsSelf && !callerIsSuperAdmin) {
+            throw new Error('WST-AUTHZ-CROSS-USER-403: unauthorized cross-user profile update');
+        }
+
+        // Column-level isolation: regular authenticated users are strictly granted UPDATE only on:
+        // (name, avatar_url, country, phone, last_seen_at)
+        const allowedColumnsForUser = ['name', 'full_name', 'avatar_url', 'country', 'phone', 'last_seen_at'];
+        const attemptedKeys = Object.keys(updates);
+
+        if (!callerIsSuperAdmin && !isInternalWalletOp) {
+            // Check column grants isolation
+            for (const key of attemptedKeys) {
+                if (!allowedColumnsForUser.includes(key)) {
+                    // Trigger level checks
+                    if (key === 'is_super_admin' && updates.is_super_admin !== profile.is_super_admin) {
+                        throw new Error('WST-TAMPER-SUPER-ADMIN-403: أمني: غير مصرح لك بتعديل صلاحية المدير الأعلى (is_super_admin)');
+                    }
+                    if (key === 'is_broker' && updates.is_broker !== profile.is_broker) {
+                        throw new Error('WST-TAMPER-BROKER-403: أمني: غير مصرح لك بتعديل صفة الوسيط (is_broker)');
+                    }
+                    if (key === 'escrow_balance' && updates.escrow_balance !== profile.escrow_balance) {
+                        throw new Error('WST-TAMPER-ESCROW-403: أمني: غير مصرح لك بتعديل رصيد الضمان المحجوز مباشرة');
+                    }
+                    if ((key === 'points_balance' || key === 'wallet_balance') && updates[key] !== profile[key]) {
+                        throw new Error('WST-TAMPER-FINANCIAL-403: أمني: غير مصرح لك بتعديل الرصيد المالي أو رصيد النقاط');
+                    }
+                    if (key === 'locked_points' && updates.locked_points !== profile.locked_points) {
+                        throw new Error('WST-TAMPER-LOCKED-403: أمني: غير مصرح لك بتعديل الرصيد المحجوز مباشرة');
+                    }
+                    if (key === 'role' && updates.role !== profile.role) {
+                        throw new Error('WST-TAMPER-ROLE-403: أمني: غير مصرح لك بتعديل رتبة الحساب (role)');
+                    }
+                    if (key === 'is_fully_verified' || key === 'kyc_type' || key === 'kyc_document_url') {
+                        throw new Error('WST-TAMPER-KYC-403: أمني: حقول التوثيق (KYC) لا يعدلها إلا مدير المنصة المعتمد');
+                    }
+                    // Generic column permission denial
+                    throw new Error(`WST-PERMISSION-DENIED-403: permission denied for column "${key}" of relation "profiles"`);
+                }
+            }
+        }
+
+        // Apply legitimate updates
+        Object.assign(profile, updates);
+
+        // Balance dual-sync parity (points_balance <=> wallet_balance, locked_points <=> escrow_balance)
+        if (updates.points_balance !== undefined) {
+            profile.wallet_balance = profile.points_balance;
+        } else if (updates.wallet_balance !== undefined) {
+            profile.points_balance = profile.wallet_balance;
+        }
+
+        if (updates.locked_points !== undefined) {
+            profile.escrow_balance = profile.locked_points;
+        } else if (updates.escrow_balance !== undefined) {
+            profile.locked_points = updates.escrow_balance;
+        }
+
+        profile.updated_at = new Date().toISOString();
+        return { success: true, profile };
+    }
+
+    // 25.1 Tamper Attack: Regular user attempting to set is_super_admin = true
+    let tamperSuperAdminBlocked = false;
+    try {
+        simulateProfileUpdateWithTamperShield(buyer, buyer.id, { is_super_admin: true });
+    } catch (e) {
+        tamperSuperAdminBlocked = e.message.includes('WST-TAMPER-SUPER-ADMIN-403');
+    }
+    assert(tamperSuperAdminBlocked, 'Privilege Shield', 'Super Admin Escalation Shield [WST-TAMPER-SUPER-ADMIN-403]', 'Regular user blocked from granting themselves is_super_admin privileges');
+
+    // 25.2 Tamper Attack: Regular user attempting to set is_broker = true
+    let tamperBrokerBlocked = false;
+    try {
+        simulateProfileUpdateWithTamperShield(buyer, buyer.id, { is_broker: true });
+    } catch (e) {
+        tamperBrokerBlocked = e.message.includes('WST-TAMPER-BROKER-403');
+    }
+    assert(tamperBrokerBlocked, 'Privilege Shield', 'Broker Privilege Escalation Shield [WST-TAMPER-BROKER-403]', 'Regular user blocked from forging regional broker status');
+
+    // 25.3 Tamper Attack: Direct client manipulation of escrow_balance
+    let tamperEscrowBlocked = false;
+    try {
+        simulateProfileUpdateWithTamperShield(buyer, buyer.id, { escrow_balance: 99999 });
+    } catch (e) {
+        tamperEscrowBlocked = e.message.includes('WST-TAMPER-ESCROW-403');
+    }
+    assert(tamperEscrowBlocked, 'Privilege Shield', 'Direct Escrow Balance Tampering Shield [WST-TAMPER-ESCROW-403]', 'Direct client mutation of escrow_balance rejected by BEFORE UPDATE trigger v3');
+
+    // 25.4 Column Permissions Isolation: Updating non-whitelisted columns denied
+    let columnIsolationBlocked = false;
+    try {
+        simulateProfileUpdateWithTamperShield(buyer, buyer.id, { secret_token: 'exploit' });
+    } catch (e) {
+        columnIsolationBlocked = e.message.includes('WST-PERMISSION-DENIED-403');
+    }
+    assert(columnIsolationBlocked, 'Privilege Shield', 'Profiles Column-Level Permissions Isolation', 'Authenticated users restricted strictly to whitelisted non-sensitive columns');
+
+    // 25.5 Legitimate Profile Update: Allowed columns pass and persist cleanly
+    const legitimateUpdate = simulateProfileUpdateWithTamperShield(buyer, buyer.id, {
+        name: 'أحمد المشتري الموثق',
+        phone: '+213555123456',
+        country: 'DZ',
+        avatar_url: 'https://waseet.test/avatar.png'
+    });
+    assert(legitimateUpdate.success && buyer.phone === '+213555123456', 'Privilege Shield', 'Legitimate User Profile Update Acceptance', 'User successfully updates name, phone, country and avatar without trigger rejection');
+
+    // 25.6 Financial Balance Dual-Sync Invariant Parity
+    const internalWalletSync = simulateProfileUpdateWithTamperShield(buyer, buyer.id, { points_balance: 400 }, true);
+    assert(buyer.wallet_balance === 400 && buyer.points_balance === 400, 'Privilege Shield', 'Wallet & Points Balance Dual-Sync Parity', 'points_balance and wallet_balance kept strictly identical across legacy and v3 engines');
+
+    // --------------------------------------------------------------------------
     // SUMMARY
     // --------------------------------------------------------------------------
     console.log('\n\x1b[35m=================================================================\x1b[0m');

@@ -41,6 +41,9 @@
             this.createFloatingTrigger();
             this.bindKeyboardShortcuts();
 
+            window.addEventListener('waseet-auth-changed', () => this.createFloatingTrigger());
+            window.addEventListener('storage', () => this.createFloatingTrigger());
+
             console.log('%c[Visual Inspector]%c Box selection & error analyzer active. Press Ctrl+Shift+X or click the 🎯 button.',
                 'background: #d4af37; color: #000; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
                 'color: #d4af37;');
@@ -96,7 +99,7 @@
                     font-size: 13px;
                     font-weight: 700;
                     cursor: pointer;
-                    display: inline-flex;
+                    display: none;
                     align-items: center;
                     gap: 8px;
                     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.25);
@@ -457,20 +460,46 @@
 
         /**
          * Floating on-screen button to trigger screen/box inspection
+         * حظر ظهور الزر العائم قطعياً لجميع المستخدمين والزوار والوسطاء الإقليميين
+         * وحصره فقط وحصراً للمدير العام (Super Admin) أو عند تمرير ?dev=1
          */
         createFloatingTrigger() {
-            if (document.getElementById('waseet-visual-inspector-trigger')) return;
+            const isDevParam = (typeof window !== 'undefined' && window.location) ? (
+                new URLSearchParams(window.location.search).get('dev') === '1' ||
+                sessionStorage.getItem('WASEET_DEV_INSPECTOR') === '1'
+            ) : false;
 
-            const trigger = document.createElement('div');
-            trigger.id = 'waseet-visual-inspector-trigger';
-            trigger.className = 'waseet-vi-trigger';
-            trigger.innerHTML = `
-                <i class="fa-solid fa-crosshairs"></i>
-                <span>فحص منطقة / تحديد خطأ</span>
-            `;
-            trigger.title = 'انقر أو اضغط AltGr+1 لتحديد مربع بالماوس، أو AltGr+2 لفحص الشاشة كاملة وسؤال جيمناي عنها';
-            trigger.addEventListener('click', () => this.startSelection());
-            document.body.appendChild(trigger);
+            const curUser = (typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) ? WASEET_STATE.user : null;
+            const email = String((curUser && curUser.email) || '').toLowerCase().trim();
+            const isSuperAdmin = Boolean(
+                (curUser && (curUser.is_super_admin === true || curUser.isSuperAdmin === true)) ||
+                email === 'fgkano63@gmail.com' || email === 'saadani2009@gmail.com'
+            );
+
+            let trigger = document.getElementById('waseet-visual-inspector-trigger');
+
+            // إذا لم يكن مديراً عاماً أو وضع تطوير، احذف الزر فوراً ولا تظهره إطلاقاً
+            if (!isDevParam && !isSuperAdmin) {
+                if (trigger) {
+                    trigger.remove();
+                }
+                return;
+            }
+
+            if (!trigger) {
+                trigger = document.createElement('div');
+                trigger.id = 'waseet-visual-inspector-trigger';
+                trigger.className = 'waseet-vi-trigger';
+                trigger.innerHTML = `
+                    <i class="fa-solid fa-crosshairs"></i>
+                    <span>فحص منطقة / تحديد خطأ</span>
+                `;
+                trigger.title = 'انقر أو اضغط AltGr+1 لتحديد مربع بالماوس، أو AltGr+2 لفحص الشاشة كاملة وسؤال جيمناي عنها';
+                trigger.addEventListener('click', () => this.startSelection());
+                document.body.appendChild(trigger);
+            }
+
+            trigger.style.display = 'inline-flex';
         }
 
         /**

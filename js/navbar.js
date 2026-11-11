@@ -597,7 +597,7 @@
             activeItem = nav.querySelector('[data-tab="support"]');
         } else if (cleanPath.indexOf('profile') !== -1) {
             activeItem = nav.querySelector('[data-tab="profile"]');
-        } else if (cleanPath.indexOf('wallet') !== -1) {
+        } else if (cleanPath.indexOf('wallet') !== -1 || cleanPath.indexOf('deposit') !== -1 || cleanPath.indexOf('withdraw') !== -1) {
             activeItem = nav.querySelector('[data-tab="wallet"]');
         } else if (cleanPath.indexOf('deals') !== -1) {
             activeItem = nav.querySelector('[data-tab="sell"]') || nav.querySelector('[data-tab="home"]');

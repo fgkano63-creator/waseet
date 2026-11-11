@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T17:51:45.574Z",
+  "timestamp": "2026-11-10T18:51:06.246Z",
   "stats": {
     "totalChecks": 429,
     "passed": 429,
@@ -1974,7 +1974,7 @@
         "checkId": "CSS-BraceBalance",
         "status": "PASS",
         "severity": "INFO",
-        "message": "CSS curly braces perfectly balanced (1428 rules)",
+        "message": "CSS curly braces perfectly balanced (1429 rules)",
         "details": null
       },
       {
@@ -2809,7 +2809,7 @@
         "checkId": "SecretsScanning",
         "status": "PASS",
         "severity": "INFO",
-        "message": "Scanned 1993 files. Zero private credentials or service_role tokens exposed.",
+        "message": "Scanned 1996 files. Zero private credentials or service_role tokens exposed.",
         "details": null
       },
       {

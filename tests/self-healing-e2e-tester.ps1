@@ -573,10 +573,10 @@ $btnAuditorSuccess = ($btnAuditorResult.ExitCode -eq 0)
 Check-Result -Flow 'UI Sentinel' -Name 'Interactive Buttons And Form Controls Health' -Success $btnAuditorSuccess -Detail 'Verified zero broken buttons, dead triggers, or unhandled click actions across all 21 platform HTML pages'
 
 Write-Host ""
-Write-Host ">>> 24. FLOW 24: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 24 PHASES)" -ForegroundColor Yellow
+Write-Host ">>> 24. FLOW 24: MULTI-ROLE HEADLESS RUNTIME SIMULATION (ENTERPRISE EXPANDED - 25 PHASES)" -ForegroundColor Yellow
 $simOutput = & "agy-node.cmd" "D:\waseet-app\tests\e2e-simulation-runner.js"
 $simSuccess = ($LASTEXITCODE -eq 0)
-Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 24 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, phone, and super admin analytics journeys'
+Check-Result -Flow 'Runtime Simulator' -Name 'Full Headless Multi-Role Simulation Suite (Enterprise 25 Phases)' -Success $simSuccess -Detail 'Executed seller, buyer, mediator, escrow, deposit, dispute, KYC, reviews, geoip, support, storage, BOLA, recovery, phone, super admin analytics, and privilege escalation shield journeys'
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Magenta

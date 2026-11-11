@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="شحن رصيد المحفظة بالنقاط - منصة WASEET. اشحن نقاط محفظتك المعتمدة فورياً (100 نقطة = 100 دولار) عبر وسيط بلدك أو العملات الرقمية USDT.">
+    <title>شحن رصيد المحفظة بالنقاط | WASEET</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261108_w2">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261108_w2">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=20261108_w2">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261108_w2">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=20261026_v1">
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg, #07090e);
+            color: var(--silver-light, #e2e8f0);
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .deposit-page-container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 5rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Top Return Header */
+        .deposit-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .btn-back-wallet {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: var(--gold-light, #dfba73);
+            padding: 0.55rem 1.1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-back-wallet:hover {
+            background: rgba(197, 160, 89, 0.15);
+            border-color: var(--gold-main, #c5a059);
+            transform: translateX(3px);
+            color: #fff;
+        }
+
+        /* Hero Header */
+        .deposit-hero {
+            background: linear-gradient(135deg, rgba(14, 18, 28, 0.95), rgba(8, 10, 16, 0.98));
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(197, 160, 89, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deposit-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .deposit-hero-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .deposit-hero-desc {
+            color: var(--silver-muted, #94a3b8);
+            font-size: 0.94rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Official Rate Guarantee Card */
+        .rate-guarantee-banner {
+            background: linear-gradient(90deg, rgba(197, 160, 89, 0.15), rgba(245, 158, 11, 0.08));
+            border: 1px solid rgba(197, 160, 89, 0.45);
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .rate-guarantee-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--gold-light, #dfba73);
+        }
+
+        .rate-guarantee-badge span {
+            color: #fff;
+            background: rgba(197, 160, 89, 0.25);
+            padding: 3px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .rate-guarantee-note {
+            font-size: 0.82rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        /* Step Card */
+        .deposit-step-card {
+            background: rgba(14, 18, 28, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s ease;
+        }
+
+        .deposit-step-card:focus-within {
+            border-color: rgba(197, 160, 89, 0.5);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold-main, #c5a059), #8b6d30);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+        }
+
+        .step-title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .step-subtitle {
+            margin: 2px 0 0;
+            font-size: 0.82rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        /* Quick Points Pills */
+        .quick-pts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quick-pts-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 0.85rem 0.5rem;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .quick-pts-btn:hover {
+            border-color: rgba(197, 160, 89, 0.5);
+            background: rgba(197, 160, 89, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .quick-pts-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.25), rgba(197, 160, 89, 0.1));
+            border: 2px solid var(--gold-main, #c5a059);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.35);
+        }
+
+        .quick-pts-btn .pts-num {
+            font-size: 1.25rem;
+            font-weight: 900;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+            color: var(--gold-light, #dfba73);
+            display: block;
+        }
+
+        .quick-pts-btn .pts-price {
+            font-size: 0.78rem;
+            color: var(--silver-muted, #94a3b8);
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* Custom Input */
+        .deposit-custom-input-box {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .deposit-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid rgba(197, 160, 89, 0.3);
+            border-radius: 12px;
+            padding: 0.95rem 1.2rem;
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 800;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .deposit-input:focus {
+            border-color: var(--gold-main, #c5a059);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        /* Live Calculation Box */
+        .live-calculation-card {
+            background: linear-gradient(135deg, rgba(20, 26, 42, 0.9), rgba(10, 14, 24, 0.95));
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .calc-left {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .calc-rate-label {
+            font-size: 0.8rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        .calc-rate-main {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #fff;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+        }
+
+        .calc-rate-main .text-gold {
+            color: var(--gold-light, #dfba73);
+        }
+
+        .calc-right {
+            background: rgba(197, 160, 89, 0.12);
+            border: 1px dashed rgba(197, 160, 89, 0.4);
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+
+        .calc-local-title {
+            font-size: 0.74rem;
+            color: var(--gold-light, #dfba73);
+            margin-bottom: 2px;
+        }
+
+        .calc-local-amount {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* Country / Gateway Selector Tabs */
+        .category-switcher {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .cat-tab-btn {
+            flex: 1;
+            padding: 0.7rem 0.8rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--silver-muted, #94a3b8);
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .cat-tab-btn.active {
+            background: rgba(197, 160, 89, 0.15);
+            border-color: var(--gold-main, #c5a059);
+            color: #fff;
+        }
+
+        /* Gateway Grid */
+        .gateways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.65rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .gateway-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 0.85rem 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 95px;
+        }
+
+        .gateway-card:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+            background: rgba(197, 160, 89, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .gateway-card.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(10, 14, 24, 0.9));
+            border-color: var(--gold-main, #c5a059);
+            box-shadow: 0 0 16px rgba(197, 160, 89, 0.35);
+        }
+
+        .gateway-card.active::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            color: var(--gold-light, #dfba73);
+            font-size: 0.78rem;
+        }
+
+        .gateway-flag {
+            font-size: 1.8rem;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .gateway-country-name {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .gateway-method-hint {
+            font-size: 0.72rem;
+            color: var(--silver-muted, #94a3b8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* Beneficiary Card */
+        .beneficiary-card {
+            background: linear-gradient(135deg, rgba(20, 26, 42, 0.95), rgba(12, 16, 26, 0.98));
+            border: 1.5px solid rgba(197, 160, 89, 0.4);
+            border-radius: 16px;
+            padding: 1.4rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .beneficiary-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .beneficiary-field {
+            margin-bottom: 1rem;
+        }
+
+        .beneficiary-label {
+            font-size: 0.78rem;
+            color: var(--silver-muted, #94a3b8);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .beneficiary-value-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            gap: 0.5rem;
+        }
+
+        .beneficiary-value {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #fff;
+            word-break: break-all;
+            font-family: 'Rajdhani', 'Cairo', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-copy-val {
+            background: rgba(197, 160, 89, 0.18);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--gold-light, #dfba73);
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-val:hover {
+            background: var(--gold-main, #c5a059);
+            color: #000;
+        }
+
+        .beneficiary-instructions {
+            background: rgba(245, 158, 11, 0.08);
+            border-right: 3px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.84rem;
+            color: var(--silver-light, #e2e8f0);
+            line-height: 1.6;
+            margin-top: 0.8rem;
+        }
+
+        /* Upload Receipt Box */
+        .upload-receipt-box {
+            border: 2px dashed rgba(197, 160, 89, 0.4);
+            border-radius: 14px;
+            padding: 1.6rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.25);
+            transition: all 0.25s ease;
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .upload-receipt-box:hover, .upload-receipt-box.dragover {
+            border-color: var(--gold-main, #c5a059);
+            background: rgba(197, 160, 89, 0.08);
+        }
+
+        .upload-receipt-preview {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 10px;
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            display: none;
+            margin: 0 auto;
+        }
+
+        .upload-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .btn-remove-receipt {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Submit Button */
+        .btn-submit-deposit-main {
+            background: linear-gradient(135deg, var(--gold-main, #c5a059), #9d7b32);
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            padding: 1.05rem 1.5rem;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: 0 10px 25px rgba(197, 160, 89, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .btn-submit-deposit-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(197, 160, 89, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit-deposit-main:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Security Guarantee Badge */
+        .deposit-safety-guarantee {
+            margin-top: 1.2rem;
+            text-align: center;
+            font-size: 0.84rem;
+            color: var(--silver-muted, #94a3b8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* History Card */
+        .deposit-history-card {
+            background: rgba(14, 18, 28, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.4rem;
+            margin-top: 2rem;
+        }
+
+        .history-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .history-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .status-badge.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        @media (max-width: 640px) {
+            .deposit-page-container {
+                padding: 1rem 0.8rem 5.5rem;
+            }
+            .deposit-hero {
+                padding: 1.3rem 1rem;
+            }
+            .deposit-hero-title {
+                font-size: 1.35rem;
+            }
+            .quick-pts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .gateways-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="waseet-top-nav">
+        <div class="nav-container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1.2rem; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <a href="index.html" class="nav-brand" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; font-weight: 900; font-size: 1.25rem;">
+                <img src="favicon.svg" alt="WASEET" style="width: 32px; height: 32px;">
+                <span>WASEET</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="wallet.html" class="btn-back-wallet">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>العودة للمحفظة</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Deposit Flow -->
+    <main class="deposit-page-container">
+        
+        <!-- Hero Title & Value Guarantee -->
+        <div class="deposit-hero">
+            <h1 class="deposit-hero-title">
+                <i class="fas fa-bolt text-gold"></i>
+                شحن رصيد المحفظة بالنقاط
+            </h1>
+            <p class="deposit-hero-desc">
+                اشحن نقاط محفظتك المعتمدة فورياً لشراء الحسابات واستخدام خدمات الوساطة. تودع النقاط في حسابك مباشرة بمجرد مراجعة الوسيط المعتمد للإيصال.
+            </p>
+
+            <div class="rate-guarantee-banner">
+                <div class="rate-guarantee-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    معادلة السعر الرسمية:
+                    <span>100 نقطة = 100 دولار ($100 USD)</span>
+                </div>
+                <div class="rate-guarantee-note">
+                    <i class="fas fa-info-circle text-gold"></i>
+                    1 نقطة = 1 دولار ثابت. يتم احتساب المعادل بالعملة المحلية لبلدك بدون رسوم مخفية.
+                </div>
+            </div>
+        </div>
+
+        <!-- الخطوة 1: تحديد عدد النقاط المطلوبة -->
+        <section class="deposit-step-card">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div>
+                    <h2 class="step-title">حدد عدد النقاط المطلوبة (Pts)</h2>
+                    <p class="step-subtitle">اختر باقة سريعة أو اكتب عدداً مخصصاً من النقاط (1 نقطة = 1 دولار)</p>
+                </div>
+            </div>
+
+            <!-- Quick Pills -->
+            <div class="quick-pts-grid">
+                <div class="quick-pts-btn" onclick="selectPoints(50, this)">
+                    <span class="pts-num">50</span>
+                    <span class="pts-price">مقابل 50 دولار</span>
+                </div>
+                <div class="quick-pts-btn active" onclick="selectPoints(100, this)">
+                    <span class="pts-num">100</span>
+                    <span class="pts-price">مقابل 100 دولار ⭐</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectPoints(250, this)">
+                    <span class="pts-num">250</span>
+                    <span class="pts-price">مقابل 250 دولار</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectPoints(500, this)">
+                    <span class="pts-num">500</span>
+                    <span class="pts-price">مقابل 500 دولار</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectPoints(1000, this)">
+                    <span class="pts-num">1000</span>
+                    <span class="pts-price">مقابل 1000 دولار</span>
+                </div>
+            </div>
+
+            <!-- Custom Points Input -->
+            <div class="deposit-custom-input-box">
+                <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;">أو أدخل عدداً مخصصاً من النقاط:</label>
+                <input type="number" id="deposit-pts-input" class="deposit-input" value="100" min="10" step="5" placeholder="أدخل عدد النقاط (مثلاً: 100)" oninput="handleManualPointsChange(this.value)">
+            </div>
+
+            <!-- Live Calculation & Price Converter Card -->
+            <div class="live-calculation-card">
+                <div class="calc-left">
+                    <span class="calc-rate-label">المبلغ الإجمالي بالدولار الأمريكي:</span>
+                    <div class="calc-rate-main">
+                        <span id="display-usd-amount">100.00</span>
+                        <span class="text-gold">USD ($)</span>
+                        <span style="font-size: 0.95rem; color: var(--silver-muted); margin-right: 8px;">= <span id="display-pts-counter">100</span> نقطة</span>
+                    </div>
+                </div>
+                <div class="calc-right">
+                    <div class="calc-local-title"><i class="fas fa-coins text-gold"></i> المعادل بالعملة المحلية المتوقعة:</div>
+                    <div class="calc-local-amount" id="display-local-currency">1,450,000 ل.س (سوريا)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- الخطوة 2: اختر دولتك أو وسيلة الدفع -->
+        <section class="deposit-step-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div>
+                    <h2 class="step-title">اختر دولتك أو وسيلة الدفع</h2>
+                    <p class="step-subtitle">تظهر لك بيانات الحساب المعتمد والوسيط الإقليمي الخاص بمنطقتك</p>
+                </div>
+            </div>
+
+            <div class="category-switcher">
+                <button type="button" class="cat-tab-btn active" id="tab-cat-local" onclick="switchCategory('local')">
+                    <i class="fas fa-globe-africa"></i> المحافظ العربية (9 دول)
+                </button>
+                <button type="button" class="cat-tab-btn" id="tab-cat-crypto" onclick="switchCategory('crypto')">
+                    <i class="fab fa-bitcoin text-gold"></i> العملات الرقمية (USDT / Binance)
+                </button>
+            </div>
+
+            <!-- Country & Gateways Grid -->
+            <div class="gateways-grid" id="gateways-grid">
+                <!-- Dynamically Populated by JS -->
+            </div>
+        </section>
+
+        <!-- الخطوة 3: تفاصيل حساب المستفيد المعتمد للتحويل -->
+        <section class="deposit-step-card">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div>
+                    <h2 class="step-title">بيانات التحويل وحساب الوسيط المعتمد</h2>
+                    <p class="step-subtitle">قم بالتحويل للمستفيد أدناه ثم احفظ إشعار أو وصل التحويل</p>
+                </div>
+            </div>
+
+            <div class="beneficiary-card" id="beneficiary-card">
+                <div class="beneficiary-badge">
+                    <i class="fas fa-check-circle"></i>
+                    حساب وسيط معتمد رسمي لدى المنصة
+                </div>
+
+                <div class="beneficiary-field">
+                    <div class="beneficiary-label"><i class="fas fa-user-check text-gold"></i> اسم المستفيد المعتمد:</div>
+                    <div class="beneficiary-value-row">
+                        <span class="beneficiary-value" id="card-beneficiary-name">خزينة وسيط المعتمدة</span>
+                        <button type="button" class="btn-copy-val" onclick="copyCardText('card-beneficiary-name', this)">
+                            <i class="fas fa-copy"></i> نسخ الاسم
+                        </button>
+                    </div>
+                </div>
+
+                <div class="beneficiary-field">
+                    <div class="beneficiary-label"><i class="fas fa-wallet text-gold"></i> <span id="card-account-label">رقم الحساب / المحفظة:</span></div>
+                    <div class="beneficiary-value-row">
+                        <span class="beneficiary-value" id="card-account-number" dir="ltr">0933123456</span>
+                        <button type="button" class="btn-copy-val" onclick="copyCardText('card-account-number', this)">
+                            <i class="fas fa-copy"></i> نسخ الرقم
+                        </button>
+                    </div>
+                </div>
+
+                <div class="beneficiary-field" id="card-secondary-box" style="display: none;">
+                    <div class="beneficiary-label"><i class="fas fa-info-circle text-gold"></i> <span id="card-secondary-label">بيانات إضافية:</span></div>
+                    <div class="beneficiary-value-row">
+                        <span class="beneficiary-value" id="card-secondary-value" dir="ltr">--</span>
+                        <button type="button" class="btn-copy-val" onclick="copyCardText('card-secondary-value', this)">
+                            <i class="fas fa-copy"></i> نسخ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="beneficiary-instructions" id="card-instructions">
+                    قم بالتحويل إلى رقم الحساب أعلاه مع كتابة اسمك في خانة الملاحظات إن وجدت، ثم التقط صورة إشعار التحويل وأرفقها في الخطوة التالية.
+                </div>
+            </div>
+        </section>
+
+        <!-- الخطوة 4: إثبات التحويل وإرسال طلب الشحن -->
+        <section class="deposit-step-card">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div>
+                    <h2 class="step-title">إثبات التحويل وتأكيد الشحن</h2>
+                    <p class="step-subtitle">أدخل بيانات التحويل وأرفق صورة الإيصال ليتم شحن المحفظة فوراً</p>
+                </div>
+            </div>
+
+            <form id="deposit-submission-form" onsubmit="handleDepositSubmit(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;">اسم المحوّل أو رقم الهاتف / رقم العملية (Reference ID):</label>
+                    <input type="text" id="deposit-sender-ref" class="deposit-input" placeholder="مثلاً: محمد أحمد - رقم عملية 498213" required>
+                </div>
+
+                <!-- Receipt Upload Box -->
+                <div class="upload-receipt-box" id="receipt-upload-box" onclick="document.getElementById('receipt-file-input').click()">
+                    <input type="file" id="receipt-file-input" accept="image/*" style="display: none;" onchange="handleReceiptSelected(event)">
+                    <div id="receipt-upload-placeholder">
+                        <i class="fas fa-receipt text-gold" style="font-size: 2.2rem; margin-bottom: 0.6rem; display: block;"></i>
+                        <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">اضغط هنا أو اسحب صورة إيصال التحويل</div>
+                        <div style="font-size: 0.78rem; color: var(--silver-muted); margin-top: 4px;">PNG, JPG, WEBP (حجم أقصى 5 ميجابايت)</div>
+                    </div>
+                    <img id="receipt-preview-img" class="upload-receipt-preview" alt="معاينة إيصال التحويل">
+                    <div class="upload-actions-row">
+                        <button type="button" class="btn-remove-receipt" id="btn-remove-receipt" onclick="removeReceipt(event)">
+                            <i class="fas fa-trash-alt"></i> حذف الإيصال
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-deposit-main" id="btn-submit-deposit">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>إرسال طلب الشحن للمراجعة والاعتماد الفوري ⚡</span>
+                </button>
+
+                <div class="deposit-safety-guarantee">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    عملية الشحن مؤمنة 100% بنظام الحماية والوساطة المعتمد من منصة WASEET
+                </div>
+            </form>
+        </section>
+
+        <!-- سجل طلبات الشحن السابقة للمستخدم -->
+        <section class="deposit-history-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.05rem; color: #fff;">
+                    <i class="fas fa-history text-gold"></i> سجل طلبات الشحن الأخيرة
+                </h3>
+                <button type="button" class="btn-3d btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadRecentDeposits()">
+                    <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+            </div>
+            <div id="recent-deposits-list">
+                <div style="text-align: center; color: var(--silver-muted); padding: 1.5rem 0; font-size: 0.88rem;">
+                    جاري تحميل سجل طلبات الشحن...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Legal Links -->
+    <footer style="background: rgba(8, 10, 16, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem 1rem 5rem; text-align: center; margin-top: auto;">
+        <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.8rem;">
+            <a href="terms.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">شروط الاستخدام</a>
+            <a href="privacy.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">سياسة الخصوصية</a>
+            <a href="disputes.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">سياسة النزاعات والتحكيم</a>
+        </div>
+        <div style="color: rgba(255, 255, 255, 0.4); font-size: 0.78rem;">
+            &copy; 2026 WASEET. جميع الحقوق محفوظة. منصة الوساطة الرقمية المعتمدة.
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+        <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+        <a href="index.html" class="mobile-nav-item" data-tab="home">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#open-sell" class="mobile-nav-item" data-tab="sell">
+            <i class="fas fa-plus-circle"></i>
+            <span>بيع حساب</span>
+        </a>
+        <a href="contact-support.html" class="mobile-nav-item" data-tab="support">
+            <i class="fas fa-comments"></i>
+            <span>الدعم</span>
+        </a>
+        <a href="wallet.html" class="mobile-nav-item active" data-tab="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js?v=20261104_v6"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/security-validator.js"></script>
+    <script src="js/data.js?v=20261104_v6"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js?v=20261104_v6"></script>
+    <script src="js/skeleton-ui.js"></script>
+    <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
+
+    <script>
+        // ── أسعار الصرف التقديرية للعملات المحلية (1 نقطة = 1 دولار) ──
+        const EXCHANGE_RATES = {
+            syria: { rate: 14500, symbol: 'ل.س', name: 'سوريا' },
+            iraq: { rate: 1480, symbol: 'د.ع', name: 'العراق' },
+            egypt: { rate: 49.5, symbol: 'ج.م', name: 'مصر' },
+            algeria: { rate: 230, symbol: 'د.ج', name: 'الجزائر' },
+            morocco: { rate: 10.0, symbol: 'د.م', name: 'المغرب' },
+            saudi: { rate: 3.75, symbol: 'ر.س', name: 'السعودية' },
+            libya: { rate: 4.85, symbol: 'د.ل', name: 'ليبيا' },
+            jordan: { rate: 0.71, symbol: 'د.أ', name: 'الأردن' },
+            crypto: { rate: 1.0, symbol: 'USDT', name: 'العملات الرقمية' }
+        };
+
+        // ── البوابات والوسطاء الافتراضية ──
+        const DEPOSIT_GATEWAYS = [
+            {
+                id: 'syria_shamcash',
+                countryKey: 'syria',
+                category: 'local',
+                flag: '🇸🇾',
+                countryName: 'سوريا',
+                methodHint: 'شام كاش / سيريتل كاش',
+                beneficiaryName: 'خزينة وسيط سوريا المعتمدة',
+                accountLabel: 'رقم حساب شام كاش / سيريتل كاش',
+                accountNumber: 'SC-90482910',
+                secondaryLabel: 'رقم سيريتل كاش (تحويل يدوي)',
+                secondaryValue: '0933123456',
+                instructions: 'قم بالتحويل إلى رقم حساب شام كاش أو سيريتل كاش المعتمد أعلاه، ثم أدخل رقم العملية واسمك وأرفق لقطة شاشة للإشعار.'
+            },
+            {
+                id: 'iraq_zaincash',
+                countryKey: 'iraq',
+                category: 'local',
+                flag: '🇮🇶',
+                countryName: 'العراق',
+                methodHint: 'زين كاش / آسيا حوالة',
+                beneficiaryName: 'خزينة وسيط العراق المعتمدة',
+                accountLabel: 'رقم محفظة زين كاش',
+                accountNumber: '07801234567',
+                secondaryLabel: 'رقم آسيا حوالة البديل',
+                secondaryValue: '07701234567',
+                instructions: 'قم بالتحويل عبر تطبيق زين كاش أو آسيا حوالة للرقم المعتمد أعلاه، ثم أرفق لقطة شاشة لرسالة التأكيد.'
+            },
+            {
+                id: 'egypt_vodafone',
+                countryKey: 'egypt',
+                category: 'local',
+                flag: '🇪🇬',
+                countryName: 'مصر',
+                methodHint: 'فودافون كاش / إنستاباي',
+                beneficiaryName: 'خزينة وسيط مصر المعتمدة',
+                accountLabel: 'رقم فودافون كاش / إنستاباي',
+                accountNumber: '01012345678',
+                secondaryLabel: 'معرف إنستاباي (InstaPay IPA)',
+                secondaryValue: 'waseet@instapay',
+                instructions: 'قم بالتحويل عبر فودافون كاش أو تطبيق إنستاباي، ثم أرفق صورة إشعار نجاح المعاملة.'
+            },
+            {
+                id: 'algeria_baridimob',
+                countryKey: 'algeria',
+                category: 'local',
+                flag: '🇩🇿',
+                countryName: 'الجزائر',
+                methodHint: 'بريدي موب BaridiMob / CCP',
+                beneficiaryName: 'MOUSSAOUI DHAYA EDDINE',
+                accountLabel: 'رقم الـ RIP (BaridiMob)',
+                accountNumber: '00799999004188617443',
+                secondaryLabel: 'رقم حساب CCP',
+                secondaryValue: '0041886174 Clé 43',
+                instructions: 'قم بالتحويل عبر تطبيق بريدي موب أو مكاتب بريد الجزائر، ثم أرفق صورة وصل التحويل (Reçu).'
+            },
+            {
+                id: 'morocco_cih',
+                countryKey: 'morocco',
+                category: 'local',
+                flag: '🇲🇦',
+                countryName: 'المغرب',
+                methodHint: 'CIH Bank / كاش بلوس',
+                beneficiaryName: 'خزينة وسيط المغرب المعتمدة',
+                accountLabel: 'رقم حساب سياش بنك (RIB)',
+                accountNumber: '230780123456789012345678',
+                secondaryLabel: 'كاش بلوس / البريد بنك',
+                secondaryValue: 'CashPlus Waseet Hub',
+                instructions: 'قم بإجراء تحويل بنكي عبر CIH Mobile أو كاش بلوس، ثم أرفق صورة الإيصال.'
+            },
+            {
+                id: 'saudi_stc',
+                countryKey: 'saudi',
+                category: 'local',
+                flag: '🇸🇦',
+                countryName: 'السعودية',
+                methodHint: 'STC Pay / الراجحي / تحويل بنكي',
+                beneficiaryName: 'خزينة وسيط السعودية المعتمدة',
+                accountLabel: 'رقم STC Pay / الآيبان',
+                accountNumber: 'SA4480000123456789012345',
+                secondaryLabel: 'رقم STC Pay السريع',
+                secondaryValue: '0551234567',
+                instructions: 'قم بالتحويل عبر STC Pay أو تطبيق الراجحي، ثم أرفق صورة إشعار التحويل البنكي.'
+            },
+            {
+                id: 'libya_sadad',
+                countryKey: 'libya',
+                category: 'local',
+                flag: '🇱🇾',
+                countryName: 'ليبيا',
+                methodHint: 'سداد / تداول كاش',
+                beneficiaryName: 'خزينة وسيط ليبيا المعتمدة',
+                accountLabel: 'رقم حساب سداد / تداول',
+                accountNumber: '0911234567',
+                secondaryLabel: 'معرف خدمة سداد',
+                secondaryValue: 'SD-882194',
+                instructions: 'قم بالتحويل عبر خدمة سداد أو تداول كاش، ثم أرفق صورة الإيصال.'
+            },
+            {
+                id: 'jordan_cliq',
+                countryKey: 'jordan',
+                category: 'local',
+                flag: '🇯🇴',
+                countryName: 'الأردن',
+                methodHint: 'CliQ / زين كاش الأردن',
+                beneficiaryName: 'خزينة وسيط الأردن المعتمدة',
+                accountLabel: 'اسم مستعار كليك (CliQ Alias)',
+                accountNumber: 'WASEETJO',
+                secondaryLabel: 'رقم محفظة زين كاش',
+                secondaryValue: '0791234567',
+                instructions: 'قم بالتحويل الفوري عبر كليك (CliQ) أو زين كاش الأردن، ثم أرفق صورة الإشعار.'
+            },
+            {
+                id: 'crypto_usdt_trc20',
+                countryKey: 'crypto',
+                category: 'crypto',
+                flag: '🪙',
+                countryName: 'USDT (TRC20)',
+                methodHint: 'شبكة ترون (TRC20) الرسمية',
+                beneficiaryName: 'WASEET Official Treasury (TRC20)',
+                accountLabel: 'عنوان محفظة USDT (TRC20 Address)',
+                accountNumber: 'TYDzsxdUKGspzE8n8TzY4wJqfH9uD8P7Qx',
+                secondaryLabel: 'معرف الدفع Binance Pay ID',
+                secondaryValue: '849201845',
+                instructions: 'قم بالتحويل عبر شبكة TRC20 أو Binance Pay ID. يرجى إدخال رقم العملية (TXID) وإرفاق صورة المعاملة.'
+            },
+            {
+                id: 'crypto_binance_pay',
+                countryKey: 'crypto',
+                category: 'crypto',
+                flag: '🟡',
+                countryName: 'Binance Pay',
+                methodHint: 'تحويل فوري بدون رسوم شبكة',
+                beneficiaryName: 'WASEET VIP Pay Desk',
+                accountLabel: 'معرّف الدفع (Binance Pay ID)',
+                accountNumber: '849201845',
+                secondaryLabel: 'البريد المربوط ببايننس',
+                secondaryValue: 'pay@waseet.app',
+                instructions: 'افتح تطبيق Binance > واختر Pay > ثم Send وأدخل Pay ID المعتمد أعلاه. التحويل فوري بدون أي رسوم شبكة.'
+            }
+        ];
+
+        let currentPoints = 100;
+        let currentCategory = 'local';
+        let selectedGateway = DEPOSIT_GATEWAYS[0];
+        let receiptBase64 = null;
+
+        // ── تهيئة الصفحة ──
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderGateways();
+            updateCalculations();
+            updateBeneficiaryCard();
+            await loadRecentDeposits();
+        });
+
+        // ── اختيار باقة نقاط سريعة ──
+        function selectPoints(pts, btnEl) {
+            currentPoints = Number(pts) || 100;
+            document.getElementById('deposit-pts-input').value = currentPoints;
+            document.querySelectorAll('.quick-pts-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            updateCalculations();
+        }
+
+        // ── تغيير عدد النقاط يدوياً ──
+        function handleManualPointsChange(val) {
+            const num = Number(val);
+            if (!num || num <= 0) return;
+            currentPoints = num;
+            document.querySelectorAll('.quick-pts-btn').forEach(b => {
+                const bPts = Number(b.querySelector('.pts-num').innerText);
+                b.classList.toggle('active', bPts === currentPoints);
+            });
+            updateCalculations();
+        }
+
+        // ── تبديل تصنيف بوابات الدفع (محلي / كريبتو) ──
+        function switchCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('tab-cat-local').classList.toggle('active', cat === 'local');
+            document.getElementById('tab-cat-crypto').classList.toggle('active', cat === 'crypto');
+            
+            const filtered = DEPOSIT_GATEWAYS.filter(g => g.category === cat);
+            if (filtered.length > 0) {
+                selectedGateway = filtered[0];
+            }
+            renderGateways();
+            updateBeneficiaryCard();
+            updateCalculations();
+        }
+
+        // ── عرض شبكة البوابات ──
+        function renderGateways() {
+            const grid = document.getElementById('gateways-grid');
+            if (!grid) return;
+
+            const list = DEPOSIT_GATEWAYS.filter(g => g.category === currentCategory);
+            grid.innerHTML = list.map(gw => `
+                <div class="gateway-card ${gw.id === selectedGateway.id ? 'active' : ''}" onclick="selectGateway('${gw.id}')">
+                    <span class="gateway-flag">${gw.flag}</span>
+                    <div class="gateway-country-name">${gw.countryName}</div>
+                    <div class="gateway-method-hint">${gw.methodHint}</div>
+                </div>
+            `).join('');
+        }
+
+        // ── اختيار بوابة محددة ──
+        function selectGateway(id) {
+            const gw = DEPOSIT_GATEWAYS.find(g => g.id === id);
+            if (!gw) return;
+            selectedGateway = gw;
+            renderGateways();
+            updateBeneficiaryCard();
+            updateCalculations();
+        }
+
+        // ── تحديث الحسابات والمعادل المالي ──
+        function updateCalculations() {
+            const usd = currentPoints.toFixed(2);
+            document.getElementById('display-usd-amount').innerText = usd;
+            document.getElementById('display-pts-counter').innerText = currentPoints;
+
+            const cKey = selectedGateway.countryKey || 'syria';
+            const rateObj = EXCHANGE_RATES[cKey] || EXCHANGE_RATES.syria;
+            const localAmount = (currentPoints * rateObj.rate).toLocaleString('en-US');
+
+            const localDisplay = document.getElementById('display-local-currency');
+            if (localDisplay) {
+                localDisplay.innerText = `${localAmount} ${rateObj.symbol} (${rateObj.name})`;
+            }
+        }
+
+        // ── تحديث بطاقة المستفيد ──
+        function updateBeneficiaryCard() {
+            if (!selectedGateway) return;
+
+            document.getElementById('card-beneficiary-name').innerText = selectedGateway.beneficiaryName || 'خزينة وسيط المعتمدة';
+            document.getElementById('card-account-label').innerText = selectedGateway.accountLabel || 'رقم الحساب / المحفظة:';
+            document.getElementById('card-account-number').innerText = selectedGateway.accountNumber || '--';
+
+            const secBox = document.getElementById('card-secondary-box');
+            if (selectedGateway.secondaryValue) {
+                secBox.style.display = 'block';
+                document.getElementById('card-secondary-label').innerText = selectedGateway.secondaryLabel || 'بيانات إضافية:';
+                document.getElementById('card-secondary-value').innerText = selectedGateway.secondaryValue;
+            } else {
+                secBox.style.display = 'none';
+            }
+
+            document.getElementById('card-instructions').innerText = selectedGateway.instructions || '';
+        }
+
+        // ── نسخ القيم بضغطة زر ──
+        async function copyCardText(elementId, btnEl) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText.trim();
+            if (!text) return;
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+
+                const origHtml = btnEl.innerHTML;
+                btnEl.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+                btnEl.style.background = '#10b981';
+                btnEl.style.color = '#fff';
+                setTimeout(() => {
+                    btnEl.innerHTML = origHtml;
+                    btnEl.style.background = '';
+                    btnEl.style.color = '';
+                }, 1600);
+            } catch (err) {
+                console.warn('Copy failed', err);
+            }
+        }
+
+        // ── اختيار صورة الإيصال ومعاينتها ──
+        function handleReceiptSelected(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('حجم الصورة كبير', 'يرجى اختيار صورة بحجم أقل من 5 ميجابايت.', 'warning');
+                } else {
+                    alert('يرجى اختيار صورة بحجم أقل من 5 ميجابايت.');
+                }
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                receiptBase64 = evt.target.result;
+                const previewImg = document.getElementById('receipt-preview-img');
+                const placeholder = document.getElementById('receipt-upload-placeholder');
+                const btnRemove = document.getElementById('btn-remove-receipt');
+
+                previewImg.src = receiptBase64;
+                previewImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                btnRemove.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ── حذف الإيصال ──
+        function removeReceipt(e) {
+            if (e) e.stopPropagation();
+            receiptBase64 = null;
+            document.getElementById('receipt-file-input').value = '';
+            document.getElementById('receipt-preview-img').style.display = 'none';
+            document.getElementById('receipt-preview-img').src = '';
+            document.getElementById('receipt-upload-placeholder').style.display = 'block';
+            document.getElementById('btn-remove-receipt').style.display = 'none';
+        }
+
+        // ── تقديم طلب الشحن ──
+        async function handleDepositSubmit(e) {
+            e.preventDefault();
+
+            if (!receiptBase64) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('إرفاق الإيصال مطلوب', 'يرجى إرفاق صورة إيصال التحويل لإكمال الطلب.', 'warning');
+                } else {
+                    alert('يرجى إرفاق صورة إيصال التحويل');
+                }
+                return;
+            }
+
+            const senderRef = document.getElementById('deposit-sender-ref').value.trim();
+            if (!senderRef) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('بيانات ناقصة', 'يرجى إدخال اسم المحوّل أو رقم العملية.', 'warning');
+                } else {
+                    alert('يرجى إدخال اسم المحوّل أو رقم العملية');
+                }
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit-deposit');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب واعتماده...';
+
+            const payload = {
+                amount: currentPoints,
+                paymentMethod: `${selectedGateway.countryName} - ${selectedGateway.methodHint}`,
+                receiptImageUrl: receiptBase64,
+                notes: `المحوّل / رقم العملية: ${senderRef} | وسيلة الدفع: ${selectedGateway.methodHint}`
+            };
+
+            try {
+                let res = null;
+                if (typeof waseetSubmitDepositRequest === 'function') {
+                    res = await waseetSubmitDepositRequest(payload);
+                } else {
+                    // Fallback محلي آمن
+                    const key = 'WASEET_LOCAL_DEPOSITS';
+                    const list = JSON.parse(localStorage.getItem(key) || '[]');
+                    const newReq = {
+                        id: 'dep-' + Date.now(),
+                        amount_requested: currentPoints,
+                        payment_method: payload.paymentMethod,
+                        status: 'pending',
+                        created_at: new Date().toISOString(),
+                        notes: payload.notes
+                    };
+                    list.unshift(newReq);
+                    localStorage.setItem(key, JSON.stringify(list));
+                    res = { data: newReq, error: null };
+                }
+
+                if (res && res.error) {
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تعذر إرسال الطلب', res.error.message || 'حدث خطأ أثناء الإرسال', 'danger');
+                    } else {
+                        alert(res.error.message || 'حدث خطأ أثناء الإرسال');
+                    }
+                    return;
+                }
+
+                // تفريغ النموذج وإظهار رسالة النجاح
+                removeReceipt();
+                document.getElementById('deposit-sender-ref').value = '';
+                await loadRecentDeposits();
+
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert(
+                        'تم إرسال طلب الشحن بنجاح! ⚡',
+                        `تم استلام طلب شحن (${currentPoints} نقطة) بقيمة (${currentPoints} دولار).\nيقوم الوسيط المعتمد بمطابقة الإيصال وإيداع الرصيد في محفظتك فوراً.`,
+                        'success'
+                    );
+                } else {
+                    alert(`تم إرسال طلب شحن (${currentPoints} نقطة) بنجاح!`);
+                }
+            } catch (err) {
+                console.error('Deposit submission error', err);
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('خطأ', 'حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقاً', 'danger');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+
+        // ── جلب وعرض طلبات الشحن السابقة ──
+        async function loadRecentDeposits() {
+            const container = document.getElementById('recent-deposits-list');
+            if (!container) return;
+
+            let deposits = [];
+            try {
+                if (typeof waseetFetchMyDepositRequests === 'function') {
+                    const { data } = await waseetFetchMyDepositRequests();
+                    if (Array.isArray(data) && data.length > 0) {
+                        deposits = data;
+                    }
+                }
+            } catch (e) {
+                console.warn('Fetch deposits warn', e);
+            }
+
+            if (deposits.length === 0) {
+                try {
+                    const localList = JSON.parse(localStorage.getItem('WASEET_LOCAL_DEPOSITS') || '[]');
+                    if (Array.isArray(localList)) deposits = localList;
+                } catch (e) {}
+            }
+
+            if (deposits.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--silver-muted); padding: 1.5rem 0; font-size: 0.88rem;">
+                        <i class="fas fa-inbox text-gold" style="font-size: 1.8rem; margin-bottom: 0.5rem; display: block;"></i>
+                        لا توجد طلبات شحن سابقة حتى الآن.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = deposits.slice(0, 5).map(dep => {
+                const pts = dep.amount_requested || dep.amount || 0;
+                const status = dep.status || 'pending';
+                let statusLabel = 'قيد المراجعة';
+                let statusClass = 'pending';
+                if (status === 'approved' || status === 'completed') {
+                    statusLabel = 'تم الشحن والاعتماد';
+                    statusClass = 'approved';
+                } else if (status === 'rejected') {
+                    statusLabel = 'مرفوض';
+                    statusClass = 'rejected';
+                }
+
+                const dateStr = dep.created_at ? new Date(dep.created_at).toLocaleDateString('ar-EG', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                }) : 'الآن';
+
+                return `
+                    <div class="history-list-item">
+                        <div>
+                            <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">
+                                شحن <span class="text-gold">${pts} نقطة</span> (${pts} دولار)
+                            </div>
+                            <div style="font-size: 0.76rem; color: var(--silver-muted); margin-top: 2px;">
+                                ${escapeHtml(dep.payment_method || 'تحويل معتمد')} • ${dateStr}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="status-badge ${statusClass}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+    </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-11-10 19:50:10",
+    "Timestamp":  "2026-11-10 20:58:33",
     "Platform":  "ظ…ظ†طµط© ظˆط³ظٹط· (Waseet Platform)",
     "AuditTarget":  "D:\\waseet-app",
-    "TotalChecks":  1198,
-    "PassCount":  1198,
+    "TotalChecks":  1200,
+    "PassCount":  1200,
     "WarnCount":  0,
     "FailCount":  0,
     "Categories":  {
@@ -6303,7 +6303,7 @@
                                                              "Test":  "CSS Brace Balance",
                                                              "Status":  "PASS",
                                                              "Severity":  "INFO",
-                                                             "Details":  "Balanced: 1428 open, 1428 close"
+                                                             "Details":  "Balanced: 1429 open, 1429 close"
                                                          }
                                                      ]
                                        },
@@ -6852,8 +6852,8 @@
                                                       ]
                                         },
                        "Database-Security":  {
-                                                 "Total":  71,
-                                                 "Pass":  71,
+                                                 "Total":  73,
+                                                 "Pass":  73,
                                                  "Warn":  0,
                                                  "Fail":  0,
                                                  "Items":  [
@@ -7273,6 +7273,18 @@
                                                                },
                                                                {
                                                                    "Test":  "SECURITY DEFINER search_path: public.get_super_admin_analytics",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
+                                                                   "Status":  "PASS",
+                                                                   "Severity":  "INFO",
+                                                                   "Details":  "Explicitly restricts search_path"
+                                                               },
+                                                               {
+                                                                   "Test":  "SECURITY DEFINER search_path: public.get_account_credentials_secure",
                                                                    "Status":  "PASS",
                                                                    "Severity":  "INFO",
                                                                    "Details":  "Explicitly restricts search_path"

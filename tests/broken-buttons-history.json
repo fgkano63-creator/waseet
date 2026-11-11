@@ -1,0 +1,60 @@
+[
+    {
+        "alertType": "BROKEN_BUTTON_DETECTED",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "resolvedAt": "2026-11-07T14:00:00+02:00",
+        "timestamp": "2026-11-07T13:15:20.5248559+02:00",
+        "environment": "Development Test",
+        "page": {
+            "url": "http://localhost:5055/deals.html",
+            "pathname": "/deals.html",
+            "title": "Waseet Platform | Deals Market"
+        },
+        "element": {
+            "tagName": "BUTTON",
+            "id": "test-btn-confirm",
+            "className": "btn-3d btn-gold",
+            "selector": "button#test-btn-confirm.btn-3d",
+            "buttonText": "Complete Deal Now"
+        },
+        "failure": {
+            "code": "Z_INDEX_COVERED",
+            "title": "Click Intercepted by Higher Z-Index Overlay",
+            "detailedReason": "Physical click is blocked because element 'div#modal-backdrop.active' (z-index: 9999) covers this button."
+        },
+        "resolution": {
+            "fixedBy": "AntiGravity & OpenCode",
+            "fixSummary": "Adjusted modal backdrop z-index hierarchy and enforced pointer-events: none when backdrop is inactive."
+        }
+    },
+    {
+        "alertType": "BROKEN_BUTTON_DETECTED",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "resolvedAt": "2026-11-07T14:00:00+02:00",
+        "timestamp": "2026-11-07T13:15:49.8715771+02:00",
+        "environment": "Simulation & Verification",
+        "page": {
+            "url": "http://localhost:5055/deals.html",
+            "pathname": "/deals.html",
+            "title": "Waseet Deals Platform"
+        },
+        "element": {
+            "tagName": "BUTTON",
+            "id": "btn-accept-escrow",
+            "className": "btn-3d btn-emerald action-escrow",
+            "selector": "button#btn-accept-escrow.btn-3d",
+            "buttonText": "Accept Escrow Transfer"
+        },
+        "failure": {
+            "code": "Z_INDEX_COVERED",
+            "title": "Click Intercepted by Higher Z-Index Overlay",
+            "detailedReason": "Physical click is blocked because element 'div.drawer-backdrop' (z-index: 9999) covers this button completely."
+        },
+        "resolution": {
+            "fixedBy": "AntiGravity & OpenCode",
+            "fixSummary": "Enforced pointer-events: none on drawer-backdrop in style.css and auto-dismiss on button interaction."
+        }
+    }
+]

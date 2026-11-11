@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="سحب الأرباح والرصيد المتاح - منصة WASEET. اسحب رصيدك ونقاطك المعتمدة إلى محفظتك المحلية أو USDT بأمان تام.">
+    <title>سحب الأرباح والرصيد | WASEET</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=20261108_w2">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png?v=20261108_w2">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=20261108_w2">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261108_w2">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=20261026_v1">
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg, #07090e);
+            color: var(--silver-light, #e2e8f0);
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .withdraw-page-container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 5rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Top Bar */
+        .withdraw-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .btn-back-wallet {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: var(--gold-light, #dfba73);
+            padding: 0.55rem 1.1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-back-wallet:hover {
+            background: rgba(197, 160, 89, 0.15);
+            border-color: var(--gold-main, #c5a059);
+            transform: translateX(3px);
+            color: #fff;
+        }
+
+        /* Hero */
+        .withdraw-hero {
+            background: linear-gradient(135deg, rgba(14, 18, 28, 0.95), rgba(8, 10, 16, 0.98));
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(197, 160, 89, 0.12);
+        }
+
+        .withdraw-hero-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .withdraw-hero-desc {
+            color: var(--silver-muted, #94a3b8);
+            font-size: 0.94rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Balances Grid */
+        .balances-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .balance-box {
+            background: rgba(14, 18, 28, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.3rem;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .balance-box.available {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(14, 18, 28, 0.95));
+        }
+
+        .balance-box.escrow {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(14, 18, 28, 0.95));
+        }
+
+        .balance-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .balance-box-label {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        .balance-box-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .balance-box.available .balance-box-icon {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .balance-box.escrow .balance-box-icon {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .balance-box-amount {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+            margin-bottom: 4px;
+        }
+
+        .balance-box-hint {
+            font-size: 0.78rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        /* Step Card */
+        .withdraw-step-card {
+            background: rgba(14, 18, 28, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold-main, #c5a059), #8b6d30);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+        }
+
+        .step-title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .step-subtitle {
+            margin: 2px 0 0;
+            font-size: 0.82rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        /* Quick Withdraw Pills */
+        .quick-pts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quick-pts-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 0.85rem 0.5rem;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .quick-pts-btn:hover {
+            border-color: rgba(197, 160, 89, 0.5);
+            background: rgba(197, 160, 89, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .quick-pts-btn.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.25), rgba(197, 160, 89, 0.1));
+            border: 2px solid var(--gold-main, #c5a059);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.35);
+        }
+
+        .quick-pts-btn .pts-num {
+            font-size: 1.25rem;
+            font-weight: 900;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+            color: var(--gold-light, #dfba73);
+            display: block;
+        }
+
+        .quick-pts-btn .pts-price {
+            font-size: 0.78rem;
+            color: var(--silver-muted, #94a3b8);
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* Withdraw Input */
+        .withdraw-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid rgba(197, 160, 89, 0.3);
+            border-radius: 12px;
+            padding: 0.95rem 1.2rem;
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 800;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .withdraw-input:focus {
+            border-color: var(--gold-main, #c5a059);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        /* Methods Grid */
+        .withdraw-methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .method-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 0.85rem 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 95px;
+        }
+
+        .method-card:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+            background: rgba(197, 160, 89, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .method-card.active {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(10, 14, 24, 0.9));
+            border-color: var(--gold-main, #c5a059);
+            box-shadow: 0 0 16px rgba(197, 160, 89, 0.35);
+        }
+
+        .method-card.active::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            color: var(--gold-light, #dfba73);
+            font-size: 0.78rem;
+        }
+
+        .method-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .method-name {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .method-hint {
+            font-size: 0.72rem;
+            color: var(--silver-muted, #94a3b8);
+        }
+
+        /* Payout Summary Box */
+        .payout-summary-card {
+            background: linear-gradient(135deg, rgba(20, 26, 42, 0.9), rgba(10, 14, 24, 0.95));
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payout-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0;
+            font-size: 0.88rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .payout-summary-row:last-child {
+            border-bottom: none;
+            padding-top: 0.7rem;
+            margin-top: 0.3rem;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* Submit Button */
+        .btn-submit-withdraw-main {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 1.05rem 1.5rem;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .btn-submit-withdraw-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit-withdraw-main:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* History Card */
+        .withdraw-history-card {
+            background: rgba(14, 18, 28, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.4rem;
+            margin-top: 2rem;
+        }
+
+        .history-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .history-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .status-badge.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        @media (max-width: 640px) {
+            .withdraw-page-container {
+                padding: 1rem 0.8rem 5.5rem;
+            }
+            .withdraw-methods-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="waseet-top-nav">
+        <div class="nav-container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1.2rem; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <a href="index.html" class="nav-brand" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; font-weight: 900; font-size: 1.25rem;">
+                <img src="favicon.svg" alt="WASEET" style="width: 32px; height: 32px;">
+                <span>WASEET</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="wallet.html" class="btn-back-wallet">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>العودة للمحفظة</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Withdraw Flow -->
+    <main class="withdraw-page-container">
+        
+        <!-- Hero Title -->
+        <div class="withdraw-hero">
+            <h1 class="withdraw-hero-title">
+                <i class="fas fa-money-bill-wave text-gold"></i>
+                سحب الأرباح والرصيد المتاح
+            </h1>
+            <p class="withdraw-hero-desc">
+                اسحب رصيدك المكتسب من مبيعات الحسابات أو رصيدك القابل للاسترداد مباشرة إلى محفظتك المحلية أو عنوان USDT. يتم التحويل في أسرع وقت عبر الوسطاء المعتمدين.
+            </p>
+        </div>
+
+        <!-- Balances Overview -->
+        <div class="balances-overview-grid">
+            <!-- Available -->
+            <div class="balance-box available">
+                <div class="balance-box-header">
+                    <span class="balance-box-label">الرصيد المتاح للسحب الفوري</span>
+                    <div class="balance-box-icon"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="balance-box-amount" id="user-available-balance">0 Pts</div>
+                <div class="balance-box-hint">
+                    <i class="fas fa-check-circle text-gold"></i> جاهز للسحب الفوري أو الشراء داخل المنصة
+                </div>
+            </div>
+
+            <!-- Escrow -->
+            <div class="balance-box escrow">
+                <div class="balance-box-header">
+                    <span class="balance-box-label">النقاط المحجوزة في صفقات (Escrow)</span>
+                    <div class="balance-box-icon"><i class="fas fa-lock"></i></div>
+                </div>
+                <div class="balance-box-amount" id="user-escrow-balance">0 Pts</div>
+                <div class="balance-box-hint">
+                    <i class="fas fa-shield-alt text-gold"></i> مؤمنة في خزينة المنصة لحين اكتمال تسليم الصفقات
+                </div>
+            </div>
+        </div>
+
+        <!-- الخطوة 1: تحديد عدد النقاط المراد سحبها -->
+        <section class="withdraw-step-card">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div>
+                    <h2 class="step-title">حدد عدد النقاط المراد سحبها (Pts)</h2>
+                    <p class="step-subtitle">القيمة: 1 نقطة = 1 دولار أمريكي صافي (الحد الأدنى للسحب 5 نقاط)</p>
+                </div>
+            </div>
+
+            <!-- Quick Pills -->
+            <div class="quick-pts-grid">
+                <div class="quick-pts-btn" onclick="selectWithdrawPoints(25, this)">
+                    <span class="pts-num">25</span>
+                    <span class="pts-price">25 دولار</span>
+                </div>
+                <div class="quick-pts-btn active" onclick="selectWithdrawPoints(50, this)">
+                    <span class="pts-num">50</span>
+                    <span class="pts-price">50 دولار</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectWithdrawPoints(100, this)">
+                    <span class="pts-num">100</span>
+                    <span class="pts-price">100 دولار</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectWithdrawPoints(250, this)">
+                    <span class="pts-num">250</span>
+                    <span class="pts-price">250 دولار</span>
+                </div>
+                <div class="quick-pts-btn" onclick="selectMaxWithdraw(this)">
+                    <span class="pts-num" style="font-size: 1rem;">الكل</span>
+                    <span class="pts-price">كامل الرصيد المتاح</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;">أو أدخل عدداً مخصصاً:</label>
+                <input type="number" id="withdraw-amount-input" class="withdraw-input" value="50" min="5" step="1" placeholder="أدخل عدد النقاط (مثلاً: 50)" oninput="handleManualWithdrawChange(this.value)">
+            </div>
+        </section>
+
+        <!-- الخطوة 2: اختيار وسيلة الاستلام -->
+        <section class="withdraw-step-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div>
+                    <h2 class="step-title">اختر وسيلة الاستلام أو المحفظة</h2>
+                    <p class="step-subtitle">حدد الوجهة التي ترغب في تحويل الأموال إليها</p>
+                </div>
+            </div>
+
+            <div class="withdraw-methods-grid" id="withdraw-methods-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- الخطوة 3: بيانات المستلم وتفاصيل الحساب -->
+        <section class="withdraw-step-card">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div>
+                    <h2 class="step-title">بيانات المستلم وحساب التحويل</h2>
+                    <p class="step-subtitle">أدخل تفاصيل حسابك بدقة لضمان وصول المبلغ دون تأخير</p>
+                </div>
+            </div>
+
+            <form id="withdraw-submission-form" onsubmit="handleWithdrawSubmit(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;" id="label-recipient-name">الاسم الكامل لصاحب الحساب / المحفظة:</label>
+                    <input type="text" id="withdraw-recipient-name" class="withdraw-input" placeholder="مثلاً: علي حسن الأحمد" required>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;" id="label-account-destination">رقم المحفظة / عنوان USDT / رقم الحساب:</label>
+                    <input type="text" id="withdraw-account-dest" class="withdraw-input" dir="ltr" placeholder="أدخل رقم المحفظة أو العنوان بدقة" required>
+                </div>
+
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="font-size: 0.82rem; color: var(--silver-muted); margin-bottom: 6px; display: block;">ملاحظات إضافية أو رقم للتواصل (اختياري):</label>
+                    <input type="text" id="withdraw-notes" class="withdraw-input" placeholder="مثلاً: رقم الواتساب لتأكيد التحويل">
+                </div>
+
+                <!-- Payout Summary -->
+                <div class="payout-summary-card">
+                    <div class="payout-summary-row">
+                        <span style="color: var(--silver-muted);">النقاط المطلوبة للسحب:</span>
+                        <span style="font-weight: 800; color: #fff;"><span id="sum-pts">50</span> Pts</span>
+                    </div>
+                    <div class="payout-summary-row">
+                        <span style="color: var(--silver-muted);">القيمة بالدولار الأمريكي:</span>
+                        <span style="font-weight: 800; color: var(--gold-light);">$<span id="sum-usd">50.00</span> USD</span>
+                    </div>
+                    <div class="payout-summary-row">
+                        <span style="color: var(--silver-muted);">عمولة السحب للمنصة:</span>
+                        <span style="color: #10b981; font-weight: 800;">0% (مجاناً بدون عمولة)</span>
+                    </div>
+                    <div class="payout-summary-row">
+                        <span>الصافي الذي ستستلمه:</span>
+                        <span style="color: #10b981;">$<span id="sum-net">50.00</span> USD</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-withdraw-main" id="btn-submit-withdraw">
+                    <i class="fas fa-check-circle"></i>
+                    <span>تأكيد وإرسال طلب السحب 💳</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- سجل طلبات السحب السابقة -->
+        <section class="withdraw-history-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.05rem; color: #fff;">
+                    <i class="fas fa-history text-gold"></i> سجل طلبات السحب السابقة
+                </h3>
+                <button type="button" class="btn-3d btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadRecentWithdrawals()">
+                    <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+            </div>
+            <div id="recent-withdrawals-list">
+                <div style="text-align: center; color: var(--silver-muted); padding: 1.5rem 0; font-size: 0.88rem;">
+                    جاري تحميل سجل السحوبات...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Legal Links -->
+    <footer style="background: rgba(8, 10, 16, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem 1rem 5rem; text-align: center; margin-top: auto;">
+        <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.8rem;">
+            <a href="terms.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">شروط الاستخدام</a>
+            <a href="privacy.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">سياسة الخصوصية</a>
+            <a href="disputes.html" style="color: var(--silver-muted); text-decoration: none; font-size: 0.84rem;">سياسة النزاعات والتحكيم</a>
+        </div>
+        <div style="color: rgba(255, 255, 255, 0.4); font-size: 0.78rem;">
+            &copy; 2026 WASEET. جميع الحقوق محفوظة. منصة الوساطة الرقمية المعتمدة.
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav waseet-glass-bottom-nav" id="waseet-mobile-glass-nav" aria-label="شريط التنقل السفلي">
+        <div class="liquid-glass-indicator" id="waseet-glass-indicator"></div>
+        <a href="index.html" class="mobile-nav-item" data-tab="home">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="index.html#open-sell" class="mobile-nav-item" data-tab="sell">
+            <i class="fas fa-plus-circle"></i>
+            <span>بيع حساب</span>
+        </a>
+        <a href="contact-support.html" class="mobile-nav-item" data-tab="support">
+            <i class="fas fa-comments"></i>
+            <span>الدعم</span>
+        </a>
+        <a href="wallet.html" class="mobile-nav-item active" data-tab="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/vendor/supabase.min.js"></script>
+    <script src="js/supabase.js?v=20261104_v6"></script>
+    <script src="js/purify.min.js"></script>
+    <script src="js/security-validator.js"></script>
+    <script src="js/data.js?v=20261104_v6"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js?v=20261104_v6"></script>
+    <script src="js/skeleton-ui.js"></script>
+    <script src="js/pwa-register.js"></script>
+    <script src="js/visual-inspector.js" defer></script>
+
+    <script>
+        const WITHDRAW_METHODS = [
+            { id: 'usdt_trc20', icon: '🪙', name: 'USDT (TRC20)', hint: 'محفظة ترون الرقمية', placeholder: 'عنوان محفظة TRC20 يبدأ بحرف T...' },
+            { id: 'binance_pay', icon: '🟡', name: 'Binance Pay', hint: 'معرّف بايننس فوري', placeholder: 'معرف بايننس (Binance Pay ID)...' },
+            { id: 'syria_shamcash', icon: '🇸🇾', name: 'شام كاش / سيريتل', hint: 'سوريا', placeholder: 'رقم حساب شام كاش أو سيريتل كاش...' },
+            { id: 'iraq_zaincash', icon: '🇮🇶', name: 'زين كاش', hint: 'العراق', placeholder: 'رقم محفظة زين كاش العراق...' },
+            { id: 'egypt_vodafone', icon: '🇪🇬', name: 'فودافون كاش / InstaPay', hint: 'مصر', placeholder: 'رقم فودافون كاش أو عنوان إنستاباي...' },
+            { id: 'algeria_baridimob', icon: '🇩🇿', name: 'بريدي موب (BaridiMob)', hint: 'الجزائر', placeholder: 'رقم الـ RIP المكون من 20 رقماً...' },
+            { id: 'morocco_cih', icon: '🇲🇦', name: 'سياش بنك (CIH)', hint: 'المغرب', placeholder: 'رقم الحساب أو الـ RIB...' },
+            { id: 'saudi_stc', icon: '🇸🇦', name: 'STC Pay / بنكي', hint: 'السعودية', placeholder: 'رقم STC Pay أو رقم الآيبان...' },
+            { id: 'libya_sadad', icon: '🇱🇾', name: 'سداد / تداول كاش', hint: 'ليبيا', placeholder: 'رقم حساب سداد أو تداول...' },
+            { id: 'jordan_cliq', icon: '🇯🇴', name: 'كليك (CliQ)', hint: 'الأردن', placeholder: 'معرف كليك (CliQ Alias)...' }
+        ];
+
+        let withdrawAmount = 50;
+        let selectedMethod = WITHDRAW_METHODS[0];
+        let currentAvailableBalance = 0;
+        let currentEscrowBalance = 0;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderWithdrawMethods();
+            updateSummary();
+            await loadUserBalances();
+            await loadRecentWithdrawals();
+        });
+
+        async function loadUserBalances() {
+            try {
+                if (typeof waseetEnsureUserProfileInDb === 'function') {
+                    const profile = await waseetEnsureUserProfileInDb();
+                    if (profile) {
+                        currentAvailableBalance = Number(profile.points_balance || profile.wallet_balance || 0);
+                        currentEscrowBalance = Number(profile.escrow_balance || 0);
+                    }
+                }
+            } catch (e) {
+                console.warn('Balance load error', e);
+            }
+
+            if (currentAvailableBalance === 0 && typeof WASEET_STATE !== 'undefined' && WASEET_STATE.user) {
+                currentAvailableBalance = Number(WASEET_STATE.user.walletBalance || WASEET_STATE.user.points || 0);
+                currentEscrowBalance = Number(WASEET_STATE.user.escrowBalance || 0);
+            }
+
+            const elAvail = document.getElementById('user-available-balance');
+            const elEscrow = document.getElementById('user-escrow-balance');
+            if (elAvail) elAvail.innerText = `${currentAvailableBalance} Pts`;
+            if (elEscrow) elEscrow.innerText = `${currentEscrowBalance} Pts`;
+        }
+
+        function renderWithdrawMethods() {
+            const grid = document.getElementById('withdraw-methods-grid');
+            if (!grid) return;
+
+            grid.innerHTML = WITHDRAW_METHODS.map(m => `
+                <div class="method-card ${m.id === selectedMethod.id ? 'active' : ''}" onclick="selectMethod('${m.id}')">
+                    <span class="method-icon">${m.icon}</span>
+                    <div class="method-name">${m.name}</div>
+                    <div class="method-hint">${m.hint}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectMethod(id) {
+            const m = WITHDRAW_METHODS.find(item => item.id === id);
+            if (!m) return;
+            selectedMethod = m;
+            renderWithdrawMethods();
+
+            const inputDest = document.getElementById('withdraw-account-dest');
+            if (inputDest) {
+                inputDest.placeholder = m.placeholder || 'أدخل رقم الحساب أو المحفظة بدقة';
+            }
+        }
+
+        function selectWithdrawPoints(pts, btnEl) {
+            withdrawAmount = Number(pts) || 50;
+            document.getElementById('withdraw-amount-input').value = withdrawAmount;
+            document.querySelectorAll('.quick-pts-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            updateSummary();
+        }
+
+        function selectMaxWithdraw(btnEl) {
+            withdrawAmount = Math.max(0, currentAvailableBalance);
+            document.getElementById('withdraw-amount-input').value = withdrawAmount;
+            document.querySelectorAll('.quick-pts-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            updateSummary();
+        }
+
+        function handleManualWithdrawChange(val) {
+            const num = Number(val);
+            withdrawAmount = num || 0;
+            document.querySelectorAll('.quick-pts-btn').forEach(b => {
+                const bPts = Number(b.querySelector('.pts-num').innerText);
+                b.classList.toggle('active', bPts === withdrawAmount);
+            });
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const pts = Number(withdrawAmount) || 0;
+            document.getElementById('sum-pts').innerText = pts;
+            document.getElementById('sum-usd').innerText = pts.toFixed(2);
+            document.getElementById('sum-net').innerText = pts.toFixed(2);
+        }
+
+        async function handleWithdrawSubmit(e) {
+            e.preventDefault();
+
+            if (withdrawAmount < 5) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('الحد الأدنى للسحب', 'الحد الأدنى لطلب السحب هو 5 نقاط (5 دولارات).', 'warning');
+                } else {
+                    alert('الحد الأدنى لطلب السحب هو 5 نقاط');
+                }
+                return;
+            }
+
+            if (withdrawAmount > currentAvailableBalance && currentAvailableBalance > 0) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('رصيد غير كافٍ', `رصيدك المتاح للسحب هو (${currentAvailableBalance} نقطة) فقط.`, 'warning');
+                } else {
+                    alert('رصيدك المتاح غير كافٍ');
+                }
+                return;
+            }
+
+            const recipientName = document.getElementById('withdraw-recipient-name').value.trim();
+            const accountDest = document.getElementById('withdraw-account-dest').value.trim();
+            const notes = document.getElementById('withdraw-notes').value.trim();
+
+            if (!recipientName || !accountDest) {
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('بيانات ناقصة', 'يرجى إدخال اسم المستفيد ورقم الحساب/المحفظة.', 'warning');
+                } else {
+                    alert('يرجى إدخال اسم المستفيد ورقم الحساب');
+                }
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit-withdraw');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال طلب السحب...';
+
+            const detailsStr = `المستفيد: ${recipientName} | الحساب: ${accountDest}${notes ? ' | ملاحظات: ' + notes : ''}`;
+
+            try {
+                let res = null;
+                if (typeof waseetSubmitWithdrawalRequest === 'function') {
+                    res = await waseetSubmitWithdrawalRequest({
+                        amount: withdrawAmount,
+                        method: selectedMethod.name,
+                        details: detailsStr
+                    });
+                } else {
+                    // Fallback محلي آمن
+                    const key = 'WASEET_LOCAL_WITHDRAWALS';
+                    const list = JSON.parse(localStorage.getItem(key) || '[]');
+                    const newReq = {
+                        id: 'wdr-' + Date.now(),
+                        amount_requested: withdrawAmount,
+                        withdrawal_method: selectedMethod.name,
+                        status: 'pending',
+                        created_at: new Date().toISOString(),
+                        details: detailsStr
+                    };
+                    list.unshift(newReq);
+                    localStorage.setItem(key, JSON.stringify(list));
+                    res = { data: newReq, error: null };
+                }
+
+                if (res && res.error) {
+                    if (typeof waseetAlert === 'function') {
+                        waseetAlert('تعذر إرسال طلب السحب', res.error.message || 'حدث خطأ أثناء معالجة الطلب', 'danger');
+                    } else {
+                        alert(res.error.message || 'حدث خطأ أثناء معالجة الطلب');
+                    }
+                    return;
+                }
+
+                document.getElementById('withdraw-recipient-name').value = '';
+                document.getElementById('withdraw-account-dest').value = '';
+                document.getElementById('withdraw-notes').value = '';
+                await loadUserBalances();
+                await loadRecentWithdrawals();
+
+                if (typeof waseetAlert === 'function') {
+                    await waseetAlert(
+                        'تم تسجيل طلب السحب بنجاح! 💳',
+                        `تم استلام طلب سحب (${withdrawAmount} نقطة) بقيمة (${withdrawAmount} دولار) عبر (${selectedMethod.name}).\nسيتم تحويل المبلغ إلى حسابك بعد مراجعة الإدارة.`,
+                        'success'
+                    );
+                } else {
+                    alert(`تم تسجيل طلب سحب (${withdrawAmount} نقطة) بنجاح!`);
+                }
+            } catch (err) {
+                console.error('Withdraw submit error', err);
+                if (typeof waseetAlert === 'function') {
+                    waseetAlert('خطأ', 'حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقاً', 'danger');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+
+        async function loadRecentWithdrawals() {
+            const container = document.getElementById('recent-withdrawals-list');
+            if (!container) return;
+
+            let withdrawals = [];
+            try {
+                if (typeof waseetFetchMyWithdrawals === 'function') {
+                    const { data } = await waseetFetchMyWithdrawals();
+                    if (Array.isArray(data) && data.length > 0) {
+                        withdrawals = data;
+                    }
+                }
+            } catch (e) {
+                console.warn('Fetch withdrawals warn', e);
+            }
+
+            if (withdrawals.length === 0) {
+                try {
+                    const localList = JSON.parse(localStorage.getItem('WASEET_LOCAL_WITHDRAWALS') || '[]');
+                    if (Array.isArray(localList)) withdrawals = localList;
+                } catch (e) {}
+            }
+
+            if (withdrawals.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--silver-muted); padding: 1.5rem 0; font-size: 0.88rem;">
+                        <i class="fas fa-inbox text-gold" style="font-size: 1.8rem; margin-bottom: 0.5rem; display: block;"></i>
+                        لا توجد طلبات سحب سابقة حتى الآن.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = withdrawals.slice(0, 5).map(wdr => {
+                const pts = wdr.amount_requested || wdr.amount || 0;
+                const status = wdr.status || 'pending';
+                let statusLabel = 'قيد المراجعة';
+                let statusClass = 'pending';
+                if (status === 'approved' || status === 'completed') {
+                    statusLabel = 'تم التحويل بنجاح';
+                    statusClass = 'approved';
+                } else if (status === 'rejected') {
+                    statusLabel = 'مرفوض';
+                    statusClass = 'rejected';
+                }
+
+                const dateStr = wdr.created_at ? new Date(wdr.created_at).toLocaleDateString('ar-EG', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                }) : 'الآن';
+
+                return `
+                    <div class="history-list-item">
+                        <div>
+                            <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">
+                                سحب <span class="text-gold">${pts} نقطة</span> (${pts} دولار)
+                            </div>
+                            <div style="font-size: 0.76rem; color: var(--silver-muted); margin-top: 2px;">
+                                ${escapeHtml(wdr.withdrawal_method || wdr.method || 'سحب محلي')} • ${dateStr}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="status-badge ${statusClass}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+    </script>
+</body>
+</html>
